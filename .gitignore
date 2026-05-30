@@ -1,0 +1,25 @@
+# 환경변수 (절대 커밋 금지)
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# 데이터 파일
+auction_db.sqlite
+raw_dump.json
+auction_debug_screenshot.png
+
+# 로그 (내용은 제외, 디렉토리 구조는 유지)
+logs/*.log
+logs/*.jsonl
+logs/.hermes_cursor
+
+# Aider
+.aider*
+
+# 에이전트 inbox (처리된 태스크 제외, 빈 폴더 구조는 유지)
+agent_inbox/hermes/done/
+agent_inbox/aider/done/
