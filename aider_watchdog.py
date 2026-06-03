@@ -159,6 +159,7 @@ def process_task(task_file: Path) -> None:
     desc       = task.get("description", "")
     test_cmd   = task.get("test_command", "python -m pytest tests/ -v")
     priority   = task.get("priority", "normal")
+    max_iter   = task.get("max_iter", MAX_ITER)
 
     print(f"\n[Watchdog] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     print(f"[Watchdog] 태스크 시작: {title}")
@@ -177,8 +178,8 @@ def process_task(task_file: Path) -> None:
         return
 
     error_context = output
-    for attempt in range(1, MAX_ITER + 1):
-        print(f"[Watchdog] 시도 {attempt}/{MAX_ITER}")
+    for attempt in range(1, max_iter + 1):
+        print(f"[Watchdog] 시도 {attempt}/{max_iter}")
 
         aider_ok = _run_aider(desc, error_context)
         if not aider_ok:
@@ -197,10 +198,10 @@ def process_task(task_file: Path) -> None:
         print(f"[Watchdog] ❌ 테스트 실패 — 재시도")
         error_context = output  # 실패 로그를 다음 Aider 호출에 전달
 
-    # MAX_ITER 소진
-    print(f"[Watchdog] ⛔ {MAX_ITER}회 시도 후 실패 — 태스크 포기")
-    _move_to_done(task_file, task, success=False, iterations=MAX_ITER)
-    _log_result(task_id, False, MAX_ITER, f"{MAX_ITER}회 초과")
+    # max_iter 소진
+    print(f"[Watchdog] ⛔ {max_iter}회 시도 후 실패 — 태스크 포기")
+    _move_to_done(task_file, task, success=False, iterations=max_iter)
+    _log_result(task_id, False, max_iter, f"{max_iter}회 초과")
 
 
 def _move_to_done(task_file: Path, task: dict,
