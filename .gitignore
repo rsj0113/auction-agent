@@ -8,7 +8,6 @@ __pycache__/
 .pytest_cache/
 
 # 데이터 파일
-auction_db.sqlite
 raw_dump.json
 auction_debug_screenshot.png
 
