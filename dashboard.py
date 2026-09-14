@@ -76,14 +76,42 @@ def compare_auction_naver(auction_df: pd.DataFrame, naver_df: pd.DataFrame) -> p
         aemd  = str(a.get("addr_emd") or "")
         asgg  = str(a.get("addr_sgg") or "")
 
-        # 같은 지역 네이버 매물 필터
-        def match(n):
-            if legal and n.get("legal_div_no") == legal:
-                return True
-            return aemd and asgg and n.get("addr_emd") == aemd and n.get("addr_sgg") == asgg
+        # 같은 지역 네이버 매물 필터 (동일동→동일구→동일시, 면적 ±40%)
+        min_area = area_m2 * 0.6
+        max_area = area_m2 * 1.4
+        location = str(a.get("location") or "")
+        sido = location.split()[0] if location else ""
 
-        sale_peers = [n for n in naver if n.get("trade_type_cd") == "A1" and match(n)]
-        rent_peers = [n for n in naver if n.get("trade_type_cd") == "B2" and match(n)]
+        def get_peers(t_cd):
+            matched_emd = []
+            matched_sgg = []
+            matched_sido = []
+            for n in naver:
+                if n.get("trade_type_cd") != t_cd:
+                    continue
+                n_area = float(n.get("area_m2") or 0)
+                if not (min_area <= n_area <= max_area):
+                    continue
+
+                n_div = str(n.get("legal_div_no") or "")
+                n_emd = str(n.get("addr_emd") or "")
+                n_sgg = str(n.get("addr_sgg") or "")
+                n_rn = str(n.get("region_name") or "")
+
+                if (legal and n_div == legal) or (aemd and asgg and n_emd == aemd and n_sgg == asgg):
+                    matched_emd.append(n)
+                elif asgg and n_sgg == asgg:
+                    matched_sgg.append(n)
+                elif sido and (n_rn.startswith(sido) or sido in n_rn):
+                    matched_sido.append(n)
+
+            if len(matched_emd) > 0: return matched_emd, "동일동"
+            if len(matched_sgg) > 0: return matched_sgg, "동일구"
+            if len(matched_sido) > 0: return matched_sido, "동일시"
+            return [], "매칭없음"
+
+        sale_peers, sale_level = get_peers("A1")
+        rent_peers, rent_level = get_peers("B2")
 
         # 매매 시세 (원/m²)
         sale_valid = [n for n in sale_peers if (n.get("price_sale_10k") or 0) > 0 and (n.get("area_m2") or 0) > 0]
@@ -110,9 +138,11 @@ def compare_auction_naver(auction_df: pd.DataFrame, naver_df: pd.DataFrame) -> p
             "네이버시세"  : est_market_10k,
             "시세할인율"  : mkt_disc,
             "비교매물수"  : len(sale_valid),
+            "매매매칭수준": sale_level,
             "예상월세"    : est_rent_10k,
             "예상수익률"  : yield_pct,
             "월세비교수"  : len(rent_valid),
+            "월세매칭수준": rent_level,
             "AI점수"      : a.get("ai_score"),
             "AI등급"      : a.get("ai_grade"),
         })
@@ -160,15 +190,17 @@ with tab1:
     st.divider()
     st.subheader("물건 목록")
 
-    disp = filtered[["case_number","location","appraisal","min_bid",
-                      "ai_score","ai_grade","ai_verdict","last_updated"]].copy()
+    disp = filtered[["case_number","location","appraisal","min_bid","failed_count",
+                      "floor","area_pyeong","ai_score","ai_grade","ai_verdict","last_updated"]].copy()
     disp["감정가"] = disp["appraisal"].apply(fmt)
     disp["최저가"] = disp["min_bid"].apply(fmt)
     disp["할인율"] = disp.apply(lambda r: disc(r["appraisal"], r["min_bid"]), axis=1)
+    disp["층수"]   = disp["floor"].apply(lambda v: f"{int(v)}층" if v and int(v) > 0 else "-")
+    disp["평수"]   = disp["area_pyeong"].apply(lambda v: f"{v:.1f}평" if v and float(v) > 0 else "-")
     disp = disp.rename(columns={
-        "case_number":"사건번호","location":"소재지","ai_score":"AI점수",
-        "ai_grade":"등급","ai_verdict":"한줄판정","last_updated":"갱신일"
-    })[["사건번호","소재지","감정가","최저가","할인율","AI점수","등급","한줄판정","갱신일"]]
+        "case_number":"사건번호","location":"소재지","failed_count":"유찰",
+        "ai_score":"AI점수","ai_grade":"등급","ai_verdict":"한줄판정","last_updated":"갱신일"
+    })[["사건번호","소재지","감정가","최저가","할인율","유찰","층수","평수","AI점수","등급","한줄판정","갱신일"]]
 
     st.dataframe(disp, use_container_width=True, hide_index=True, column_config={
         "AI점수"  : st.column_config.ProgressColumn("AI점수", min_value=0, max_value=100, format="%d점"),
@@ -192,9 +224,16 @@ with tab1:
             st.markdown(f"**📍 소재지**: {row['location']}")
             st.markdown(f"**💰 감정가**: {fmt(row['appraisal'])}")
             st.markdown(f"**📉 최저가**: {fmt(row['min_bid'])}  ({disc(row['appraisal'], row['min_bid'])} 할인)")
-            area = row.get("area_m2")
-            if area and float(area) > 0:
-                st.markdown(f"**📐 면적**: {float(area):.1f}㎡ ({float(area)/PYEONG:.1f}평)")
+            st.markdown(f"**🔄 유찰횟수**: {int(row.get('failed_count') or 0)}회")
+            area_m2 = float(row.get("area_m2") or 0)
+            area_py = float(row.get("area_pyeong") or 0)
+            floor_v = int(row.get("floor") or 0)
+            if floor_v > 0:
+                st.markdown(f"**🏢 층수**: {floor_v}층")
+            if area_py > 0:
+                st.markdown(f"**📐 면적**: {area_m2:.1f}㎡  ({area_py:.1f}평)")
+            elif area_m2 > 0:
+                st.markdown(f"**📐 면적**: {area_m2:.1f}㎡ ({area_m2/PYEONG:.1f}평)")
             st.markdown(f"**🎯 AI 점수**: {row['ai_score']}점 ({row['ai_grade']}등급)")
             st.markdown(f"**💡 한줄판정**: {row['ai_verdict'] or '-'}")
         with col2:
@@ -346,8 +385,8 @@ with tab3:
             disp_c["예상수익률"] = disp_c["예상수익률"].apply(lambda v: f"{v:.2f}%" if v > 0 else "-")
 
             show_cols = ["사건번호","소재지","면적(평)","최저가","감정가할인",
-                         "네이버시세","시세할인율","비교매물수",
-                         "예상월세","예상수익률","월세비교수","AI점수","AI등급"]
+                         "네이버시세","시세할인율","비교매물수","매매매칭수준",
+                         "예상월세","예상수익률","월세비교수","월세매칭수준","AI점수","AI등급"]
             st.dataframe(
                 disp_c[show_cols],
                 use_container_width=True,
@@ -379,15 +418,24 @@ with tab3:
                 with col2:
                     st.markdown("**네이버 시세 비교**")
                     st.markdown(f"추정 시세: {r['네이버시세']}")
-                    if r["시세할인율"] != "-":
-                        color = "🟢" if float(r["시세할인율"].replace("%","")) > 0 else "🔴"
-                        st.markdown(f"시세 대비: {color} {r['시세할인율']}")
-                    st.markdown(f"비교 매물: {r['비교매물수']}건")
+                    disc_raw = r["시세할인율"]
+                    if pd.notna(disc_raw):
+                        try:
+                            # format check as it could be string due to earlier bug but it's a float
+                            if isinstance(disc_raw, str):
+                                disc_val = float(disc_raw.replace("%", ""))
+                            else:
+                                disc_val = float(disc_raw)
+                            color = "🟢" if disc_val > 0 else "🔴"
+                            st.markdown(f"시세 대비: {color} {disc_val:.1f}%")
+                        except:
+                            st.markdown(f"시세 대비: {disc_raw}")
+                    st.markdown(f"비교 매물: {r['비교매물수']}건 ({r.get('매매매칭수준', '알수없음')})")
                 with col3:
                     st.markdown("**수익률 분석**")
                     st.markdown(f"예상 월세: {r['예상월세']}")
                     st.markdown(f"예상 수익률: {r['예상수익률']}")
-                    st.markdown(f"월세 비교 매물: {r['월세비교수']}건")
+                    st.markdown(f"월세 비교 매물: {r['월세비교수']}건 ({r.get('월세매칭수준', '알수없음')})")
 
                 # 같은 지역 네이버 매물
                 legal = str(a_row.get("legal_div_no") or "")

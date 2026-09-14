@@ -71,25 +71,53 @@ def load_naver_listings(db_path: str, region_filter: str = "") -> List[Dict]:
 # 매칭 + 시세 계산
 # ─────────────────────────────────────────────────────────────
 
-def _match_listings(auction_item: Dict, naver_all: List[Dict], trade_type_cd: str) -> List[Dict]:
-    """경매 물건 위치와 같은 지역의 네이버 매물 필터링 (법정동 코드 우선, 동명 fallback)"""
-    matched = []
+def _match_listings(auction_item: Dict, naver_all: List[Dict], trade_type_cd: str) -> Tuple[List[Dict], str]:
+    """경매 물건 위치와 같은 지역의 네이버 매물 필터링 (면적 ±40% 이내, 동일동→동일구→동일시 fallback)"""
+    target_area = auction_item.get("area_m2") or 0
+    min_area = target_area * 0.6
+    max_area = target_area * 1.4
+
     adiv = auction_item.get("legal_div_no") or ""
     aemd = auction_item.get("addr_emd") or ""
     asgg = auction_item.get("addr_sgg") or ""
+    location = auction_item.get("location") or ""
+    sido = location.split()[0] if location else ""
+
+    matched_emd = []
+    matched_sgg = []
+    matched_sido = []
 
     for n in naver_all:
         if n["trade_type_cd"] != trade_type_cd:
             continue
-        # 법정동 코드 일치 (가장 정확)
-        if adiv and n.get("legal_div_no") == adiv:
-            matched.append(n)
-            continue
-        # 동명 + 구명 일치 (fallback)
-        if aemd and asgg and n.get("addr_emd") == aemd and n.get("addr_sgg") == asgg:
-            matched.append(n)
 
-    return matched
+        n_area = n.get("area_m2") or 0
+        if not (min_area <= n_area <= max_area):
+            continue
+
+        n_div = n.get("legal_div_no")
+        n_emd = n.get("addr_emd")
+        n_sgg = n.get("addr_sgg")
+        n_rn = n.get("region_name") or ""
+
+        # 1. 법정동 일치
+        if (adiv and n_div == adiv) or (aemd and asgg and n_emd == aemd and n_sgg == asgg):
+            matched_emd.append(n)
+        # 2. 구 일치
+        elif asgg and n_sgg == asgg:
+            matched_sgg.append(n)
+        # 3. 시 일치
+        elif sido and (n_rn.startswith(sido) or (sido in n_rn)):
+            matched_sido.append(n)
+
+    if len(matched_emd) > 0:
+        return matched_emd, "동일동"
+    elif len(matched_sgg) > 0:
+        return matched_sgg, "동일구"
+    elif len(matched_sido) > 0:
+        return matched_sido, "동일시"
+
+    return [], "매칭없음"
 
 
 def _avg_price_per_m2(listings: List[Dict]) -> float:
@@ -121,7 +149,7 @@ def compare_one(auction_item: Dict, naver_all: List[Dict]) -> Optional[Dict]:
     area_pyeong = area_m2 / PYEONG
 
     # 매매 시세
-    sale_matches = _match_listings(auction_item, naver_all, "A1")
+    sale_matches, sale_match_level = _match_listings(auction_item, naver_all, "A1")
     avg_price_per_m2 = _avg_price_per_m2(sale_matches)
     est_market_value = avg_price_per_m2 * area_m2 if avg_price_per_m2 else 0
 
@@ -134,7 +162,7 @@ def compare_one(auction_item: Dict, naver_all: List[Dict]) -> Optional[Dict]:
     appraisal_discount_pct = round((appraisal - min_bid) / appraisal * 100, 1) if appraisal > 0 else 0
 
     # 월세 시세 → 수익률
-    rent_matches = _match_listings(auction_item, naver_all, "B2")
+    rent_matches, rent_match_level = _match_listings(auction_item, naver_all, "B2")
     avg_rpp, avg_dep = _avg_monthly_rent_per_pyeong(rent_matches)
     est_monthly_rent_10k = round(avg_rpp * area_pyeong, 1) if avg_rpp and area_pyeong else 0.0
     denom = min_bid / 10000 - avg_dep  # 단위: 만원
@@ -149,10 +177,12 @@ def compare_one(auction_item: Dict, naver_all: List[Dict]) -> Optional[Dict]:
         "est_market_value_10k"    : round(est_market_value / 10000, 0),
         "market_discount_pct"     : market_discount_pct,
         "sale_match_count"        : len(sale_matches),
+        "sale_match_level"        : sale_match_level,
         "avg_price_per_m2"        : round(avg_price_per_m2, 0),
         "est_monthly_rent_10k"    : est_monthly_rent_10k,
         "yield_pct"               : yield_pct,
         "rent_match_count"        : len(rent_matches),
+        "rent_match_level"        : rent_match_level,
     }
 
 
@@ -216,13 +246,13 @@ def print_results(results: List[Dict], top_n: int = 10):
             print(f"      네이버시세: {fmt_price(r['est_market_value_10k'])}  "
                   f"(시세 대비 {'할인' if r['market_discount_pct'] > 0 else '프리미엄'} "
                   f"{abs(r['market_discount_pct']):.1f}%,  "
-                  f"비교매물 {r['sale_match_count']}건)")
+                  f"비교매물 {r['sale_match_count']}건 [{r.get('sale_match_level', '알수없음')}])")
         else:
             print(f"      네이버시세: 비교 매물 없음 (해당 지역 크롤링 필요)")
 
         if r["rent_match_count"] > 0 and r["est_monthly_rent_10k"] > 0:
             print(f"      예상월세 : {fmt_price(r['est_monthly_rent_10k'])}/월  "
-                  f"→ 예상수익률 {r['yield_pct']:.2f}%")
+                  f"→ 예상수익률 {r['yield_pct']:.2f}% (비교매물 {r['rent_match_count']}건 [{r.get('rent_match_level', '알수없음')}])")
         else:
             print(f"      예상수익률: 월세 데이터 부족")
 

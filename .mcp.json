@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "wiki": {
+      "command": "python3",
+      "args": ["/Users/seonjin/vscode_project/auction_agent/wiki_mcp.py"]
+    },
+    "auction-db": {
+      "command": "python3",
+      "args": ["/Users/seonjin/vscode_project/auction_agent/auction_db_mcp.py"]
+    }
+  }
+}

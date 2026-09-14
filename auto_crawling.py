@@ -95,6 +95,8 @@ class AuctionDBAgent:
                 "legal_div_no TEXT",
                 "addr_sgg TEXT",
                 "addr_emd TEXT",
+                "floor INTEGER",
+                "area_pyeong REAL",
             ]:
                 try:
                     cursor.execute(f"ALTER TABLE auction_items ADD COLUMN {col_def}")
@@ -153,8 +155,8 @@ class AuctionDBAgent:
                     case_number, location, appraisal, min_bid, prev_min_bid, failed_count,
                     rights_list, tenant_registration_date, tenant_deposit, is_payout_requested,
                     ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, last_updated, status_flag,
-                    area_m2, legal_div_no, addr_sgg, addr_emd
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(case_number) DO UPDATE SET
                     location=excluded.location,
                     appraisal=excluded.appraisal,
@@ -172,7 +174,9 @@ class AuctionDBAgent:
                     ai_report_json=excluded.ai_report_json,
                     last_updated=excluded.last_updated,
                     status_flag=?,
-                    area_m2=coalesce(excluded.area_m2, auction_items.area_m2),
+                    area_m2=coalesce(nullif(excluded.area_m2, 0), auction_items.area_m2),
+                    area_pyeong=coalesce(nullif(excluded.area_pyeong, 0), auction_items.area_pyeong),
+                    floor=coalesce(nullif(excluded.floor, 0), auction_items.floor),
                     legal_div_no=coalesce(excluded.legal_div_no, auction_items.legal_div_no),
                     addr_sgg=coalesce(excluded.addr_sgg, auction_items.addr_sgg),
                     addr_emd=coalesce(excluded.addr_emd, auction_items.addr_emd)
@@ -195,6 +199,8 @@ class AuctionDBAgent:
                 now_str,
                 status_flag,
                 item.get('area_m2') or 0.0,
+                item.get('area_pyeong') or 0.0,
+                item.get('floor') or 0,
                 item.get('legal_div_no') or '',
                 item.get('addr_sgg') or '',
                 item.get('addr_emd') or '',
@@ -497,20 +503,33 @@ class AuctionCrawler:
         except Exception:
             pass
 
-        # ── 면적 + 법정동 코드 (gdsDspslObjctLst) ──────────────────────
+        # ── 면적 + 층수 + 법정동 코드 (gdsDspslObjctLst) ────────────────
         area_m2 = 0.0
+        floor = 0
         legal_div_no = ""
         addr_sgg = ""
         addr_emd = ""
         try:
-            obj_list = (raw.get('data') or {}).get('dma_result', {}).get('gdsDspslObjctLst') or []
+            dma2 = (raw.get('data') or {}).get('dma_result', {})
+            obj_list = dma2.get('gdsDspslObjctLst') or []
             for obj in obj_list:
                 if not isinstance(obj, dict):
                     continue
+                # 면적
                 ar_str = str(obj.get('objctArDts') or '')
                 m = re.search(r'([\d.]+)', ar_str)
                 if m:
                     area_m2 += float(m.group(1))
+                # 층수 — flrNo 또는 objctFlrNo
+                for fk in ('flrNo', 'objctFlrNo', 'gdsFlrNo', 'floorNo'):
+                    fv = obj.get(fk)
+                    if fv:
+                        try:
+                            floor = int(str(fv).strip())
+                        except ValueError:
+                            pass
+                        break
+                # 법정동
                 if not legal_div_no:
                     sd  = str(obj.get('rprsAdongSdCd')  or '').zfill(2)
                     sgg = str(obj.get('rprsAdongSggCd') or '').zfill(3)
@@ -520,8 +539,17 @@ class AuctionCrawler:
                         legal_div_no = sd + sgg + emd + ri
                     addr_sgg = str(obj.get('adongSggNm') or '')
                     addr_emd = str(obj.get('adongEmdNm') or '')
+
+            # sprfcExstcDts 텍스트에서 면적 보완 (objctArDts 실패 시)
+            if area_m2 == 0.0:
+                sprfc = str((dma2.get('dspslGdsDxdyInfo') or {}).get('sprfcExstcDts') or '')
+                m2 = re.search(r'([\d,]+\.?\d*)\s*㎡', sprfc)
+                if m2:
+                    area_m2 = float(m2.group(1).replace(',', ''))
         except Exception:
             pass
+
+        area_pyeong = round(area_m2 / 3.30579, 1) if area_m2 else 0.0
 
         return {
             "rights_list": rights_list,
@@ -529,6 +557,8 @@ class AuctionCrawler:
             "tenant_deposit": tenant_deposit,
             "is_payout_requested": is_payout_requested,
             "area_m2": round(area_m2, 2),
+            "area_pyeong": area_pyeong,
+            "floor": floor,
             "legal_div_no": legal_div_no,
             "addr_sgg": addr_sgg,
             "addr_emd": addr_emd,
@@ -1035,6 +1065,13 @@ class AuctionCrawler:
                     if api_gds.get('fstPbancLwsDspslPrc') and min_bid == 0:
                         min_bid = int(api_gds['fstPbancLwsDspslPrc'])
 
+                    # 층수: API 미제공 시 location 문자열에서 fallback 파싱
+                    floor = detail_info.get("floor") or 0
+                    if not floor:
+                        m_floor = re.search(r'(\d+)층', location)
+                        if m_floor:
+                            floor = int(m_floor.group(1))
+
                     extracted_items.append({
                         "case_number": case_number,
                         "location": location,
@@ -1046,6 +1083,8 @@ class AuctionCrawler:
                         "tenant_deposit": detail_info["tenant_deposit"],
                         "is_payout_requested": detail_info["is_payout_requested"],
                         "area_m2": detail_info["area_m2"],
+                        "area_pyeong": detail_info["area_pyeong"],
+                        "floor": floor,
                         "legal_div_no": detail_info["legal_div_no"],
                         "addr_sgg": detail_info["addr_sgg"],
                         "addr_emd": detail_info["addr_emd"],
