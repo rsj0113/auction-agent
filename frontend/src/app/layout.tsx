@@ -16,12 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${inter.className} bg-black text-gray-100 min-h-screen flex justify-center`}>
-        <div className="w-full max-w-md bg-gray-900 min-h-screen shadow-2xl relative overflow-x-hidden border-x border-gray-800">
-          <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-md p-4 sticky top-0 z-10">
+      <body className={`${inter.className} bg-gray-50 text-gray-900 min-h-screen flex justify-center`}>
+        <div className="w-full max-w-md bg-white min-h-screen shadow-2xl relative overflow-x-hidden border-x border-gray-200">
+          <nav className="border-b border-gray-200 bg-white/90 backdrop-blur-md p-4 sticky top-0 z-10">
             <div className="flex justify-between items-center">
-              <div className="font-bold text-lg tracking-tight text-white flex items-center gap-2">
-                <span className="text-blue-500">⚡️</span> AI 경매 에이전트
+              <div className="font-bold text-lg tracking-tight text-gray-900 flex items-center gap-2">
+                <span className="text-blue-600">⚡️</span> AI 경매 에이전트
               </div>
             </div>
           </nav>
