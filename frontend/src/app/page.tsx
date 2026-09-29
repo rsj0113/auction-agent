@@ -22,6 +22,7 @@ export default function Home() {
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [auctions, setAuctions] = useState<AuctionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAuction, setSelectedAuction] = useState<AuctionItem | null>(null);
 
   useEffect(() => {
     // API 서버 호출 (uvicorn이 켜져있어야 함)
@@ -59,7 +60,7 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in relative">
       {/* 1. 요약 브리핑 섹션 */}
       <section>
         <h2 className="text-lg font-semibold mb-4 text-gray-700">오늘의 요약 브리핑</h2>
@@ -108,6 +109,7 @@ export default function Home() {
           {!loading && auctions.map((item) => (
             <article 
               key={item.case_number} 
+              onClick={() => setSelectedAuction(item)}
               className="bg-white border border-gray-200 hover:border-blue-500/50 rounded-2xl p-5 shadow-sm transition-all cursor-pointer group"
             >
               <div className="flex justify-between items-start mb-3">
@@ -150,6 +152,81 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* 3. 모달 (Modal) UI */}
+      {selectedAuction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100">
+              <h3 className="font-bold text-gray-900 text-lg">물건 상세 정보</h3>
+              <button 
+                onClick={() => setSelectedAuction(null)}
+                className="text-gray-400 hover:text-gray-700 p-1"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="p-5 overflow-y-auto space-y-6">
+              {/* 기본 정보 */}
+              <div>
+                <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                  {selectedAuction.case_number}
+                </span>
+                <h4 className="mt-2 text-gray-900 font-medium leading-snug">{selectedAuction.location}</h4>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-500 text-xs mb-1">감정가</p>
+                    <p className="font-semibold text-gray-700">{formatPrice(selectedAuction.appraisal)}</p>
+                  </div>
+                  <div className="bg-red-50 p-3 rounded-lg">
+                    <p className="text-red-500 text-xs mb-1">최저가 ({selectedAuction.failed_count}회 유찰)</p>
+                    <p className="font-bold text-red-600">{formatPrice(selectedAuction.min_bid)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI 리포트 (Mock Data) */}
+              <div className="border-t border-gray-100 pt-5 space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">🤖</span>
+                  <h4 className="font-bold text-gray-800">AI 권리분석 및 수익률 리포트</h4>
+                </div>
+                
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between p-3 border border-gray-100 rounded-lg">
+                    <span className="text-gray-600">예상 낙찰가</span>
+                    <span className="font-bold text-gray-900">{formatPrice(selectedAuction.min_bid * 1.15)}</span>
+                  </div>
+                  <div className="flex justify-between p-3 border border-gray-100 rounded-lg">
+                    <span className="text-gray-600">예상 임대수익률 (연)</span>
+                    <span className="font-bold text-blue-600">5.4%</span>
+                  </div>
+                  <div className="p-3 border border-gray-100 rounded-lg bg-gray-50">
+                    <span className="block text-gray-600 mb-1 font-medium">권리분석 결과</span>
+                    <p className="text-gray-700">대항력 있는 임차인이 없으며, 매각으로 모든 권리가 소멸되는 안전한 물건으로 분석됩니다.</p>
+                  </div>
+                  <div className="p-3 border border-red-100 rounded-lg bg-red-50/50">
+                    <span className="block text-red-600 mb-1 font-medium">위험 요소 (Risk)</span>
+                    <p className="text-red-800/80">단기 체납 관리비가 존재할 가능성이 있으므로 현장 조사가 필요합니다.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t border-gray-100 bg-gray-50">
+              <button 
+                onClick={() => setSelectedAuction(null)}
+                className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-medium transition-colors"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
