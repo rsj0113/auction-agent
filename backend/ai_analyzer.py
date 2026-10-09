@@ -28,11 +28,13 @@ def analyze_auction_data(item_data: dict) -> dict:
     - 최저매각가격: {min_bid:,}원
     - 할인율: {discount_rate}%
     - 유찰횟수: {item_data.get('failed_count')}회
-    - 전입신고일: {item_data.get('tenant_registration_date', '정보없음')}
+    - 전입신고일: {item_data.get('tenant_registration_date') or '없음 (또는 미상)'}
     - 보증금: {item_data.get('tenant_deposit', 0):,}원
-    - 등기부/권리내역: {item_data.get('rights_list', '정보없음')}
+    - 등기부/권리내역: {item_data.get('rights_list') or '정보없음'}
 
-    반드시 JSON 형식으로만 응답하십시오:
+    만약 전입신고일이 '없음 (또는 미상)'이고 등기부내역에 임차권이 없다면 임차인이 없는 물건으로 간주하여 무리한 리스크 경고(임차인 불확실성 등)를 생성하지 마십시오.
+
+반드시 JSON 형식으로만 응답하십시오:
     {{
         "score": 0-100,
         "grade": "A-D",

@@ -28,6 +28,19 @@ interface AuctionDetail extends AuctionItem {
   is_payout_requested?: number;
 }
 
+
+function getPropertyType(location: string): string {
+  if (!location) return "기타";
+  if (location.includes("아파트")) return "🏢 아파트";
+  if (location.includes("오피스텔")) return "🏬 오피스텔";
+  if (location.includes("다세대") || location.includes("빌라")) return "🏘️ 빌라/다세대";
+  if (location.includes("상가") || location.includes("근린")) return "상가/근린시설";
+  if (location.includes("산") && location.match(/산\s*[0-9]+/)) return "🌲 임야(산)";
+  if (location.includes("임야")) return "🌲 임야(산)";
+  if (location.match(/[0-9]+번지/)) return "🗺️ 토지/대지";
+  return "🏠 주택/기타";
+}
+
 export default function AuctionsPage() {
   const [auctions, setAuctions] = useState<AuctionItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -276,8 +289,29 @@ export default function AuctionsPage() {
                   <div>
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">물건 소재지</h4>
                     <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
+                      <span className="inline-block mb-2 text-xs font-bold px-2 py-0.5 bg-gray-200 text-gray-700 rounded mr-2">
+                        {getPropertyType(selectedDetail.location)}
+                      </span>
                       {selectedDetail.location}
                     </p>
+                    <div className="mt-2 flex gap-2">
+                      <a 
+                        href={`https://map.kakao.com/link/search/${encodeURIComponent(selectedDetail.location)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-yellow-700 bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg hover:bg-yellow-100 transition-colors"
+                      >
+                        📍 카카오맵 / 로드뷰
+                      </a>
+                      <a 
+                        href={`https://map.naver.com/v5/search/${encodeURIComponent(selectedDetail.location)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors"
+                      >
+                        🗺️ 네이버지도
+                      </a>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
