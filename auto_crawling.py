@@ -155,8 +155,8 @@ class AuctionDBAgent:
                     case_number, location, appraisal, min_bid, prev_min_bid, failed_count,
                     rights_list, tenant_registration_date, tenant_deposit, is_payout_requested,
                     ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, last_updated, status_flag,
-                    area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd, auction_date
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(case_number) DO UPDATE SET
                     location=excluded.location,
                     appraisal=excluded.appraisal,
@@ -179,7 +179,8 @@ class AuctionDBAgent:
                     floor=coalesce(nullif(excluded.floor, 0), auction_items.floor),
                     legal_div_no=coalesce(excluded.legal_div_no, auction_items.legal_div_no),
                     addr_sgg=coalesce(excluded.addr_sgg, auction_items.addr_sgg),
-                    addr_emd=coalesce(excluded.addr_emd, auction_items.addr_emd)
+                    addr_emd=coalesce(excluded.addr_emd, auction_items.addr_emd),
+                    auction_date=excluded.auction_date
             """, (
                 item['case_number'],
                 item['location'],
@@ -204,6 +205,7 @@ class AuctionDBAgent:
                 item.get('legal_div_no') or '',
                 item.get('addr_sgg') or '',
                 item.get('addr_emd') or '',
+                item.get('auction_date') or '',
                 status_flag,
             ))
             conn.commit()
@@ -378,10 +380,12 @@ class AuctionCrawler:
         tenant_registration_date = ""
         tenant_deposit = 0
         is_payout_requested = False
+        auction_date = ""
 
         try:
             dma = (raw.get('data') or {}).get('dma_result') or {}
             gds = dma.get('dspslGdsDxdyInfo') or {}
+            auction_date = gds.get('dspslDxdyYmd') or ""
 
             # 디버그 덤프: --debug-dump 플래그 시 dma_result 전체를 파일로 저장
             if debug_dump_path and dma:
@@ -562,6 +566,7 @@ class AuctionCrawler:
             "legal_div_no": legal_div_no,
             "addr_sgg": addr_sgg,
             "addr_emd": addr_emd,
+            "auction_date": auction_date,
         }
 
     async def search(self, region: str = "서울", max_items: int = 5, court_code: str = "", debug_dump_path: str = "") -> list:
@@ -1088,6 +1093,7 @@ class AuctionCrawler:
                         "legal_div_no": detail_info["legal_div_no"],
                         "addr_sgg": detail_info["addr_sgg"],
                         "addr_emd": detail_info["addr_emd"],
+                        "auction_date": detail_info.get("auction_date", ""),
                     })
 
                 await browser.close()

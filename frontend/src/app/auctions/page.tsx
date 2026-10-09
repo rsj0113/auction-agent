@@ -11,6 +11,7 @@ interface AuctionItem {
   failed_count: number;
   ai_grade: string;
   status_flag: string;
+  auction_date?: string;
 }
 
 interface AIReport {
@@ -272,6 +273,9 @@ export default function AuctionsPage() {
                 <div>
                   <p className="text-[11px] text-gray-400 font-medium mb-0.5">최저가 <span className="text-red-500 ml-1">유찰 {item.failed_count}회</span></p>
                   <p className="text-sm font-bold text-blue-600">{formatMoney(item.min_bid)}</p>
+                  {item.auction_date && (
+                    <p className="text-xs text-gray-500 mt-1">기일: {item.auction_date.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3')}</p>
+                  )}
                 </div>
               </div>
             </article>

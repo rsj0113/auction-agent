@@ -17,6 +17,7 @@ interface AuctionItem {
   failed_count: number;
   ai_grade: string;
   status_flag: string;
+  auction_date?: string;
 }
 
 interface AuctionDetail extends AuctionItem {
@@ -204,8 +205,13 @@ export default function Home() {
                 </div>
               </div>
               
-              <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between text-xs text-gray-500">
-                <span>유찰 {item.failed_count}회</span>
+              <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
+                <div className="flex flex-col gap-1">
+                  <span>유찰 {item.failed_count}회</span>
+                  {item.auction_date && (
+                    <span className="text-gray-600 font-medium">매각기일: {item.auction_date.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3')}</span>
+                  )}
+                </div>
                 <span className="text-blue-600 font-medium">
                   {item.status_flag?.toUpperCase() === 'UNCHANGED' ? '기일변경' : item.status_flag}
                 </span>
