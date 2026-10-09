@@ -215,6 +215,8 @@ export default function Home() {
                     <p className="font-bold text-red-600">{formatPrice(selectedAuction.min_bid)}</p>
                   </div>
                 </div>
+              </div>
+              
               {/* 임차인 정보 */}
               <div className="mb-6 bg-orange-50/50 p-4 rounded-xl border border-orange-100">
                 <h4 className="text-sm font-semibold text-orange-900 mb-2 flex items-center gap-1">
