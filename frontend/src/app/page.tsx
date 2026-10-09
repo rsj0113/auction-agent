@@ -121,9 +121,9 @@ export default function Home() {
       <section>
         <div className="flex justify-between items-end mb-4">
           <h2 className="text-lg font-semibold text-gray-700">AI 추천 물건 Top 6</h2>
-          <button className="text-sm text-blue-600 hover:text-blue-500 transition-colors">
+          <Link href="/auctions" className="text-sm text-blue-600 hover:text-blue-500 transition-colors">
             전체보기 &rarr;
-          </button>
+          </Link>
         </div>
         
         <div className="grid grid-cols-1 gap-4">
