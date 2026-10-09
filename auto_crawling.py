@@ -1215,6 +1215,7 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--region", default="서울")
     parser.add_argument("--max-items", type=int, default=2)
+    parser.add_argument("--property-type", default="", help="0203: 상가, 0205: 오피스텔, 0201: 아파트 등")
     parser.add_argument("--no-headless", action="store_true", help="브라우저 화면 및 개발자 도구를 보여줍니다.")
     parser.add_argument("--api-key", default=None)
     parser.add_argument("--debug-dump", default="", metavar="FILE",
@@ -1224,6 +1225,10 @@ async def main():
     parser.add_argument("--reanalyze-db", action="store_true",
                         help="크롤링 없이 DB 전체 물건을 AI 재분석 (권리분석엔진 재실행 포함)")
     args = parser.parse_args()
+
+    global BUILDING_TYPE_CODE
+    if args.property_type:
+        BUILDING_TYPE_CODE = args.property_type
 
     # 데이터베이스 추적 및 상태 보존을 위한 DBAgent 인스턴스 초기화
     db_agent = AuctionDBAgent()
