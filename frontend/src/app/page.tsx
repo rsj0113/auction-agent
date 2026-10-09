@@ -40,6 +40,18 @@ function getPropertyType(location: string): string {
   return "🏠 주택/기타";
 }
 
+
+function getGradeColor(grade: string) {
+  if (!grade) return 'bg-gray-100 text-gray-500 border-gray-200';
+  const g = grade.toUpperCase();
+  if (g === 'S') return 'bg-red-50 text-red-600 border-red-200';
+  if (g === 'A') return 'bg-blue-50 text-blue-600 border-blue-200';
+  if (g === 'B') return 'bg-green-50 text-green-600 border-green-200';
+  if (g === 'C') return 'bg-yellow-50 text-yellow-600 border-yellow-200';
+  if (g === 'D') return 'bg-gray-50 text-gray-600 border-gray-200';
+  return 'bg-gray-100 text-gray-500 border-gray-200';
+}
+
 export default function Home() {
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [auctions, setAuctions] = useState<AuctionItem[]>([]);
@@ -48,9 +60,14 @@ export default function Home() {
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  const handleSelectAuction = async (item: AuctionItem) => {
-    setSelectedAuction(item);
-    setSelectedDetail(null);
+  let aiReport = null;
+  if (selectedDetail?.ai_report_json) {
+    try {
+      aiReport = JSON.parse(selectedDetail.ai_report_json);
+    } catch (e) {}
+  }
+    const handleSelectAuction = async (item: AuctionItem) => {
+    setSelectedDetail({ ...item, ai_report_json: "{}" } as AuctionDetail);
     setDetailLoading(true);
     try {
       const res = await fetch(`/api/auctions/${item.case_number}`, { headers: { "ngrok-skip-browser-warning": "1" } });
@@ -190,7 +207,7 @@ export default function Home() {
               <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between text-xs text-gray-500">
                 <span>유찰 {item.failed_count}회</span>
                 <span className="text-blue-600 font-medium">
-                  {item.status_flag === 'unchanged' ? '기일변경' : item.status_flag}
+                  {item.status_flag?.toUpperCase() === 'UNCHANGED' ? '기일변경' : item.status_flag}
                 </span>
               </div>
             </article>
@@ -204,182 +221,181 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. 모달 (Modal) UI */}
-      {selectedAuction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="flex justify-between items-center p-5 border-b border-gray-100">
-              <h3 className="font-bold text-gray-900 text-lg">물건 상세 정보</h3>
-              <button 
-                onClick={() => setSelectedAuction(null)}
-                className="text-gray-400 hover:text-gray-700 p-1"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            <div className="p-5 overflow-y-auto space-y-6">
-              {/* 기본 정보 */}
+      {/* 모달 (page.tsx와 동일 로직) */}
+      {selectedDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setSelectedDetail(null)}></div>
+          <div className="bg-white rounded-3xl w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
+            {detailLoading ? (
+               <div className="p-8 text-center text-gray-500">
+                 <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                 데이터를 불러오는 중입니다...
+               </div>
+            ) : (
               <div>
-                <div className="flex gap-2 items-center mb-2">
-                  <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                    {selectedAuction.case_number}
-                  </span>
-                  <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">
-                    {getPropertyType(selectedAuction.location)}
-                  </span>
+                <div className="sticky top-0 bg-white/90 backdrop-blur-md px-6 py-4 border-b border-gray-100 flex justify-between items-center z-20">
+                  <h3 className="font-bold text-gray-900">{selectedDetail.case_number} 상세 분석</h3>
+                  <button onClick={() => setSelectedDetail(null)} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600 transition-colors">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-                <h4 className="mt-2 text-gray-900 font-medium leading-snug">{selectedAuction.location}</h4>
                 
-                {/* 지도 / 로드뷰 버튼 */}
-                <div className="flex gap-2 mt-2">
-                  <a href={`https://map.kakao.com/link/search/${selectedAuction.location}`} target="_blank" rel="noreferrer" className="flex-1 flex justify-center items-center gap-1 bg-[#FEE500] hover:bg-[#FDD800] text-[#000000] text-xs font-bold py-2 rounded-lg transition-colors">
-                    <span>📍</span> 카카오맵 / 로드뷰
-                  </a>
-                  <a href={`https://map.naver.com/v5/search/${selectedAuction.location}`} target="_blank" rel="noreferrer" className="flex-1 flex justify-center items-center gap-1 bg-[#03C75A] hover:bg-[#02b350] text-white text-xs font-bold py-2 rounded-lg transition-colors">
-                    <span>🟢</span> 네이버 지도
-                  </a>
-                </div>
-
-                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-gray-500 text-xs mb-1">감정가</p>
-                    <p className="font-semibold text-gray-700">{formatPrice(selectedAuction.appraisal)}</p>
-                  </div>
-                  <div className="bg-red-50 p-3 rounded-lg">
-                    <p className="text-red-500 text-xs mb-1">최저가 ({selectedAuction.failed_count}회 유찰)</p>
-                    <p className="font-bold text-red-600">{formatPrice(selectedAuction.min_bid)}</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* 임차인 정보 */}
-              <div className="mb-6 bg-orange-50/50 p-4 rounded-xl border border-orange-100">
-                <h4 className="text-sm font-semibold text-orange-900 mb-2 flex items-center gap-1">
-                  <span>👤</span> 임차인 정보 (권리분석용)
-                </h4>
-                <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                <div className="p-6 space-y-6">
                   <div>
-                    <span className="text-gray-500 text-xs block">전입신고일</span>
-                    <span className="font-medium">{selectedDetail?.tenant_registration_date || '정보 없음'}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 text-xs block">보증금</span>
-                    <span className="font-medium text-red-600">{selectedDetail?.tenant_deposit ? formatPrice(selectedDetail.tenant_deposit) : '미상/없음'}</span>
-                  </div>
-                  <div className="col-span-2 mt-1">
-                    <span className="text-gray-500 text-xs mr-2">배당요구:</span>
-                    <span className="font-medium">{selectedDetail?.is_payout_requested ? '✅ 요구함' : '❌ 미요구/해당없음'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* AI 리포트 (Real Data) */}
-              <div className="border-t border-gray-100 pt-5 space-y-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">🤖</span>
-                    <h4 className="font-bold text-gray-800">AI 권리분석 및 수익률 리포트</h4>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {detailLoading && <span className="text-xs text-blue-500 animate-pulse">데이터 로딩 중...</span>}
-                    {!detailLoading && selectedDetail && (
-                      <button
-                        onClick={async () => {
-                          setDetailLoading(true);
-                          try {
-                            const res = await fetch(`/api/auctions/${selectedDetail.case_number}/analyze`, { method: "POST", headers: { "ngrok-skip-browser-warning": "1" } });
-                            if (res.ok) {
-                              const data = await res.json();
-                              setSelectedDetail(data.data);
-                              alert("실시간 AI 재분석이 완료되었습니다!");
-                            }
-                          } catch (e) {
-                            alert("분석 중 오류가 발생했습니다.");
-                          } finally {
-                            setDetailLoading(false);
-                          }
-                        }}
-                        className="text-xs px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
+                    <h4 className="text-sm font-semibold text-gray-900 mb-2">물건 소재지</h4>
+                    <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
+                      <span className="inline-block mb-2 text-xs font-bold px-2 py-0.5 bg-gray-200 text-gray-700 rounded mr-2">
+                        {getPropertyType(selectedDetail.location)}
+                      </span>
+                      {selectedDetail.location}
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <a 
+                        href={`https://map.kakao.com/link/search/${encodeURIComponent(selectedDetail.location)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-yellow-700 bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg hover:bg-yellow-100 transition-colors"
                       >
-                        실시간 재분석 🔄
-                      </button>
+                        📍 카카오맵 / 로드뷰
+                      </a>
+                      <a 
+                        href={`https://map.naver.com/v5/search/${encodeURIComponent(selectedDetail.location)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors"
+                      >
+                        🗺️ 네이버지도
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                     <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                        <p className="text-xs text-blue-600 font-medium mb-1">감정가</p>
+                        <p className="text-lg font-bold text-gray-900">{formatPrice(selectedDetail.appraisal)}</p>
+                     </div>
+                     <div className="bg-red-50/50 p-4 rounded-xl border border-red-100">
+                        <p className="text-xs text-red-600 font-medium mb-1">최저 매각가</p>
+                        <p className="text-lg font-bold text-red-600">{formatPrice(selectedDetail.min_bid)}</p>
+                     </div>
+                  </div>
+
+                  {/* 임차인 정보 */}
+                  <div className="bg-orange-50/50 p-4 rounded-xl border border-orange-100">
+                    <h4 className="text-sm font-semibold text-orange-900 mb-2 flex items-center gap-1">
+                      <span>👤</span> 임차인 정보 (권리분석용)
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                      <div>
+                        <span className="text-gray-500 text-xs block">전입신고일</span>
+                        <span className="font-medium">{selectedDetail?.tenant_registration_date || '정보 없음'}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 text-xs block">보증금</span>
+                        <span className="font-medium text-red-600">{selectedDetail?.tenant_deposit ? formatPrice(selectedDetail.tenant_deposit) : '미상/없음'}</span>
+                      </div>
+                      <div className="col-span-2 mt-1">
+                        <span className="text-gray-500 text-xs mr-2">배당요구:</span>
+                        <span className="font-medium">{selectedDetail?.is_payout_requested ? '✅ 요구함' : '❌ 미요구/해당없음'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">🤖</span>
+                        <h4 className="font-bold text-gray-900">AI 권리분석 리포트</h4>
+                      </div>
+                      <span className={`text-sm font-bold px-3 py-1 rounded-full border ${getGradeColor(selectedDetail.ai_grade)}`}>
+                        {selectedDetail.ai_grade} 등급
+                      </span>
+                    </div>
+
+                    {aiReport ? (
+                      <div className="space-y-4">
+                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
+                          <p className="text-sm font-semibold text-gray-800 mb-1">한 줄 판정</p>
+                          <p className="text-sm text-gray-600 leading-relaxed">{aiReport.verdict}</p>
+                        </div>
+
+                        {aiReport.expected_yield && (
+                          <div className="bg-green-50 p-4 rounded-2xl border border-green-200">
+                            <div className="flex justify-between items-center mb-1">
+                              <p className="text-sm font-semibold text-green-800">적정 입찰가 (AI 제안)</p>
+                              <p className="text-sm font-bold text-green-700">{aiReport.suggested_bid}</p>
+                            </div>
+                            <p className="text-xs text-green-700/80 mt-2">{aiReport.expected_yield}</p>
+                          </div>
+                        )}
+
+                        {aiReport.risks && aiReport.risks.length > 0 && (
+                          <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+                            <span className="block text-red-600 mb-2 font-semibold text-sm">위험 요소 (Risk)</span>
+                            <ul className="list-disc list-inside text-sm text-red-800/80 space-y-1">
+                              {aiReport.risks.map((risk: string, idx: number) => (
+                                <li key={idx}>{risk}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {aiReport.retained_rights && aiReport.retained_rights.length > 0 && aiReport.retained_rights[0] !== '없음' && (
+                          <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100">
+                            <span className="block text-orange-700 mb-2 font-semibold text-sm">인수해야 할 권리/보증금</span>
+                            <ul className="list-disc list-inside text-sm text-orange-800 space-y-1">
+                              {aiReport.retained_rights.map((right: string, idx: number) => (
+                                <li key={idx}>{right}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+                          <span className="block text-blue-700 mb-2 font-semibold text-sm">전문가 상세 분석</span>
+                          <p className="text-blue-800/90 text-sm leading-relaxed whitespace-pre-wrap">
+                            {aiReport.analysis_detail || "상세 분석 내용이 없습니다."}
+                          </p>
+                        </div>
+                        
+                        <div className="pt-2">
+                          <button 
+                            className="w-full bg-blue-600 text-white font-semibold py-3.5 rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm flex justify-center items-center gap-2"
+                            onClick={async () => {
+                              setDetailLoading(true);
+                              try {
+                                const res = await fetch(`/api/auctions/${selectedDetail.case_number}/analyze`, { 
+                                  method: "POST", 
+                                  headers: { "ngrok-skip-browser-warning": "1" } 
+                                });
+                                if (res.ok) {
+                                  const data = await res.json();
+                                  setSelectedDetail(data.data);
+                                  alert("실시간 AI 재분석이 완료되었습니다!");
+                                }
+                              } catch (e) {
+                                alert("분석 중 오류가 발생했습니다.");
+                              } finally {
+                                setDetailLoading(false);
+                              }
+                            }}
+                          >
+                            <span>실시간 재분석</span>
+                            <span>🔄</span>
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 text-center">
+                        <p className="text-sm text-gray-500 mb-3">아직 상세 AI 분석이 진행되지 않은 물건입니다.</p>
+                      </div>
                     )}
                   </div>
                 </div>
-                
-                {!detailLoading && selectedDetail && (() => {
-                  let aiReport = null;
-                  try {
-                    aiReport = selectedDetail.ai_report_json ? JSON.parse(selectedDetail.ai_report_json) : null;
-                  } catch (e) {
-                    console.error("AI 리포트 파싱 오류:", e);
-                  }
-
-                  if (!aiReport) {
-                    return (
-                      <div className="p-4 text-center text-gray-500 bg-gray-50 rounded-lg">
-                        아직 AI 분석이 완료되지 않은 물건입니다.
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between p-3 border border-gray-100 rounded-lg">
-                        <span className="text-gray-600">추천 입찰가</span>
-                        <span className="font-bold text-gray-900">{aiReport.suggested_bid || '-'}</span>
-                      </div>
-                      <div className="flex justify-between p-3 border border-gray-100 rounded-lg">
-                        <span className="text-gray-600">예상 실효수익률</span>
-                        <span className="font-bold text-blue-600">{aiReport.expected_yield || '-'}</span>
-                      </div>
-                      <div className="p-3 border border-gray-100 rounded-lg bg-gray-50">
-                        <span className="block text-gray-600 mb-1 font-medium">권리분석 및 가치 종합</span>
-                        <p className="text-gray-700">{aiReport.verdict || selectedDetail.ai_verdict}</p>
-                      </div>
-                      {aiReport.risks && aiReport.risks.length > 0 && (
-                        <div className="p-3 border border-red-100 rounded-lg bg-red-50/50">
-                          <span className="block text-red-600 mb-1 font-medium">위험 요소 (Risk)</span>
-                          <ul className="list-disc list-inside text-red-800/80 space-y-1">
-                            {aiReport.risks.map((risk: string, idx: number) => (
-                              <li key={idx}>{risk}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {aiReport.retained_rights && aiReport.retained_rights.length > 0 && aiReport.retained_rights[0] !== '없음' && (
-                        <div className="p-3 border border-orange-100 rounded-lg bg-orange-50">
-                          <span className="block text-orange-700 mb-1 font-medium">인수해야 할 권리/보증금</span>
-                          <ul className="list-disc list-inside text-orange-800 space-y-1">
-                            {aiReport.retained_rights.map((right: string, idx: number) => (
-                              <li key={idx}>{right}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      <div className="p-3 border border-blue-100 rounded-lg bg-blue-50/50 mt-2">
-                        <span className="block text-blue-700 mb-1 font-medium">전문가 상세 분석</span>
-                        <p className="text-blue-800/80 text-xs leading-relaxed whitespace-pre-wrap">
-                          {aiReport.analysis_detail || "상세 분석 내용이 없습니다."}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })()}
               </div>
-            </div>
-            
-            <div className="p-4 border-t border-gray-100 bg-gray-50">
-              <button 
-                onClick={() => setSelectedAuction(null)}
-                className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-medium transition-colors"
-              >
-                닫기
-              </button>
-            </div>
+            )}
           </div>
         </div>
       )}
