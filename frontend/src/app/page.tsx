@@ -37,7 +37,7 @@ export default function Home() {
     setSelectedDetail(null);
     setDetailLoading(true);
     try {
-      const res = await fetch(`/api/auctions/${item.case_number}`);
+      const res = await fetch(`/api/auctions/${item.case_number}`, { headers: { "ngrok-skip-browser-warning": "1" } });
       if (res.ok) {
         const data = await res.json();
         setSelectedDetail(data.data);
@@ -54,8 +54,8 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const [summaryRes, auctionsRes] = await Promise.all([
-          fetch("/api/dashboard/summary").catch(() => null),
-          fetch("/api/auctions?limit=6").catch(() => null)
+          fetch("/api/dashboard/summary", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
+          fetch("/api/auctions?limit=6", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null)
         ]);
 
         if (summaryRes?.ok) {
@@ -227,7 +227,7 @@ export default function Home() {
                         onClick={async () => {
                           setDetailLoading(true);
                           try {
-                            const res = await fetch(`/api/auctions/${selectedDetail.case_number}/analyze`, { method: "POST" });
+                            const res = await fetch(`/api/auctions/${selectedDetail.case_number}/analyze`, { method: "POST", headers: { "ngrok-skip-browser-warning": "1" } });
                             if (res.ok) {
                               const data = await res.json();
                               setSelectedDetail(data.data);
