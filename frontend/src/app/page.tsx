@@ -220,7 +220,31 @@ export default function Home() {
                     <span className="text-lg">🤖</span>
                     <h4 className="font-bold text-gray-800">AI 권리분석 및 수익률 리포트</h4>
                   </div>
-                  {detailLoading && <span className="text-xs text-blue-500 animate-pulse">분석 데이터 불러오는 중...</span>}
+                  <div className="flex items-center gap-2">
+                    {detailLoading && <span className="text-xs text-blue-500 animate-pulse">데이터 로딩 중...</span>}
+                    {!detailLoading && selectedDetail && (
+                      <button
+                        onClick={async () => {
+                          setDetailLoading(true);
+                          try {
+                            const res = await fetch(`/api/auctions/${selectedDetail.case_number}/analyze`, { method: "POST" });
+                            if (res.ok) {
+                              const data = await res.json();
+                              setSelectedDetail(data.data);
+                              alert("실시간 AI 재분석이 완료되었습니다!");
+                            }
+                          } catch (e) {
+                            alert("분석 중 오류가 발생했습니다.");
+                          } finally {
+                            setDetailLoading(false);
+                          }
+                        }}
+                        className="text-xs px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
+                      >
+                        실시간 재분석 🔄
+                      </button>
+                    )}
+                  </div>
                 </div>
                 
                 {!detailLoading && selectedDetail && (() => {

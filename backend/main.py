@@ -100,3 +100,56 @@ def get_dashboard_summary():
         raise HTTPException(status_code=500, detail=str(e))
 
 # Run locally using: uvicorn backend.main:app --reload
+
+from .ai_analyzer import analyze_auction_data
+import json
+
+@app.post("/api/auctions/{case_number}/analyze")
+def analyze_auction_on_demand(case_number: str):
+    """
+    On-demand AI analysis for a specific auction item.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT * FROM auction_items WHERE case_number = ?', (case_number,))
+        row = cursor.fetchone()
+        
+        if not row:
+            conn.close()
+            raise HTTPException(status_code=404, detail="Auction not found")
+            
+        item_dict = dict(row)
+        
+        # Call GPT
+        ai_report = analyze_auction_data(item_dict)
+        
+        if "error" in ai_report:
+            conn.close()
+            raise HTTPException(status_code=500, detail=ai_report["error"])
+            
+        # Update DB
+        ai_report_json = json.dumps(ai_report, ensure_ascii=False)
+        ai_score = ai_report.get("score", 0)
+        ai_grade = ai_report.get("grade", "C")
+        ai_verdict = ai_report.get("verdict", "")
+        ai_suggested_bid = ai_report.get("suggested_bid", "")
+        
+        cursor.execute('''
+            UPDATE auction_items 
+            SET ai_score = ?, ai_grade = ?, ai_verdict = ?, ai_suggested_bid = ?, ai_report_json = ?
+            WHERE case_number = ?
+        ''', (ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, case_number))
+        
+        conn.commit()
+        
+        # Fetch updated row
+        cursor.execute('SELECT * FROM auction_items WHERE case_number = ?', (case_number,))
+        updated_row = cursor.fetchone()
+        conn.close()
+        
+        return {"data": dict(updated_row)}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
