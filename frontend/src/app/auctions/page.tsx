@@ -31,19 +31,39 @@ export default function AuctionsPage() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
+  // 필터 상태
+  const [gradeFilter, setGradeFilter] = useState<string>("");
+  const [priceFilter, setPriceFilter] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<string>("recent");
+
   // 모달 상태
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  const fetchAuctions = async (pageIndex: number) => {
+  const fetchAuctions = async (pageIndex: number, overrideParams?: { grade?: string, price?: string, sort?: string }) => {
     try {
-      const res = await fetch(`/api/auctions?limit=20&offset=${pageIndex * 20}`, {
-        headers: { "ngrok-skip-browser-warning": "1" }
-      });
+      if (pageIndex === 0) setLoading(true);
+      const grade = overrideParams?.grade ?? gradeFilter;
+      const price = overrideParams?.price ?? priceFilter;
+      const sort = overrideParams?.sort ?? sortOrder;
+      
+      let url = `/api/auctions?limit=20&offset=${pageIndex * 20}`;
+      if (grade) url += `&grade=${grade}`;
+      if (sort) url += `&sort=${sort}`;
+      if (price) {
+        if (price === "under1") url += `&max_price=100000000`;
+        else if (price === "1to3") url += `&min_price=100000000&max_price=300000000`;
+        else if (price === "3to5") url += `&min_price=300000000&max_price=500000000`;
+        else if (price === "over5") url += `&min_price=500000000`;
+      }
+
+      const res = await fetch(url, { headers: { "ngrok-skip-browser-warning": "1" } });
       if (res.ok) {
         const data = await res.json();
         if (data.data.length < 20) {
           setHasMore(false);
+        } else {
+          setHasMore(true);
         }
         if (pageIndex === 0) {
           setAuctions(data.data);
@@ -58,9 +78,11 @@ export default function AuctionsPage() {
     }
   };
 
+  // 필터 변경시 페이지 초기화 후 다시 호출
   useEffect(() => {
+    setPage(0);
     fetchAuctions(0);
-  }, []);
+  }, [gradeFilter, priceFilter, sortOrder]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -134,6 +156,46 @@ export default function AuctionsPage() {
       </header>
 
       <main className="max-w-md mx-auto px-5 pt-6">
+        {/* Filters */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <select 
+            value={gradeFilter} 
+            onChange={(e) => setGradeFilter(e.target.value)}
+            className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+          >
+            <option value="">모든 등급</option>
+            <option value="S">S 등급</option>
+            <option value="A">A 등급</option>
+            <option value="B">B 등급</option>
+            <option value="C">C 등급</option>
+            <option value="D">D 등급</option>
+            <option value="F">F 등급</option>
+          </select>
+
+          <select 
+            value={priceFilter} 
+            onChange={(e) => setPriceFilter(e.target.value)}
+            className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+          >
+            <option value="">모든 가격대</option>
+            <option value="under1">1억 미만</option>
+            <option value="1to3">1억 ~ 3억</option>
+            <option value="3to5">3억 ~ 5억</option>
+            <option value="over5">5억 이상</option>
+          </select>
+
+          <select 
+            value={sortOrder} 
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+          >
+            <option value="recent">최신 등록순</option>
+            <option value="oldest">오래된 등록순</option>
+            <option value="price_asc">낮은 가격순</option>
+            <option value="price_desc">높은 가격순</option>
+          </select>
+        </div>
+
         <div className="grid grid-cols-1 gap-4">
           {auctions.map((item) => (
             <article 

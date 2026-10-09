@@ -27,23 +27,58 @@ def get_db_connection():
 def read_root():
     return {"message": "Welcome to the AI Auction Agent API"}
 
+from typing import Optional
+
 @app.get("/api/auctions")
-def get_auctions(limit: int = 20, offset: int = 0):
+def get_auctions(
+    limit: int = 20, 
+    offset: int = 0,
+    grade: Optional[str] = None,
+    min_price: Optional[int] = None,
+    max_price: Optional[int] = None,
+    sort: Optional[str] = 'recent'
+):
     """
-    Get a list of auction items.
+    Get a list of auction items with filtering and sorting.
     """
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Simple fetching
-        cursor.execute('''
+        query = '''
             SELECT case_number, location, appraisal, min_bid, 
                    failed_count, ai_grade, ai_verdict, status_flag
             FROM auction_items 
-            ORDER BY last_updated DESC 
-            LIMIT ? OFFSET ?
-        ''', (limit, offset))
+            WHERE 1=1
+        '''
+        params = []
+        
+        if grade:
+            query += " AND ai_grade = ?"
+            params.append(grade.upper())
+            
+        if min_price is not None:
+            query += " AND min_bid >= ?"
+            params.append(min_price)
+            
+        if max_price is not None:
+            query += " AND min_bid <= ?"
+            params.append(max_price)
+            
+        # Sorting
+        if sort == 'price_asc':
+            query += " ORDER BY min_bid ASC"
+        elif sort == 'price_desc':
+            query += " ORDER BY min_bid DESC"
+        elif sort == 'oldest':
+            query += " ORDER BY last_updated ASC"
+        else: # default recent
+            query += " ORDER BY last_updated DESC"
+            
+        query += " LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
+        
+        cursor.execute(query, params)
         
         items = [dict(row) for row in cursor.fetchall()]
         conn.close()
