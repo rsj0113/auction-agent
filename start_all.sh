@@ -18,5 +18,5 @@ pm2 start "npm run start" --name "auction-web"
 cd ..
 
 echo "4. Starting ngrok tunnel (Backend API)..."
-pm2 start "ngrok http --domain=trivial-footprint-empirical.ngrok-free.dev 8000" --name "ngrok-tunnel"
+pm2 start "ngrok http --url=trivial-footprint-empirical.ngrok-free.dev 8000" --name "ngrok-tunnel"
 pm2 save
