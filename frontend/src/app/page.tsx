@@ -23,6 +23,9 @@ interface AuctionDetail extends AuctionItem {
   ai_report_json?: string;
   ai_suggested_bid?: string;
   ai_verdict?: string;
+  tenant_registration_date?: string;
+  tenant_deposit?: number;
+  is_payout_requested?: number;
 }
 
 export default function Home() {
@@ -210,6 +213,25 @@ export default function Home() {
                   <div className="bg-red-50 p-3 rounded-lg">
                     <p className="text-red-500 text-xs mb-1">최저가 ({selectedAuction.failed_count}회 유찰)</p>
                     <p className="font-bold text-red-600">{formatPrice(selectedAuction.min_bid)}</p>
+                  </div>
+                </div>
+              {/* 임차인 정보 */}
+              <div className="mb-6 bg-orange-50/50 p-4 rounded-xl border border-orange-100">
+                <h4 className="text-sm font-semibold text-orange-900 mb-2 flex items-center gap-1">
+                  <span>👤</span> 임차인 정보 (권리분석용)
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                  <div>
+                    <span className="text-gray-500 text-xs block">전입신고일</span>
+                    <span className="font-medium">{selectedDetail?.tenant_registration_date || '정보 없음'}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 text-xs block">보증금</span>
+                    <span className="font-medium text-red-600">{selectedDetail?.tenant_deposit ? formatPrice(selectedDetail.tenant_deposit) : '미상/없음'}</span>
+                  </div>
+                  <div className="col-span-2 mt-1">
+                    <span className="text-gray-500 text-xs mr-2">배당요구:</span>
+                    <span className="font-medium">{selectedDetail?.is_payout_requested ? '✅ 요구함' : '❌ 미요구/해당없음'}</span>
                   </div>
                 </div>
               </div>
