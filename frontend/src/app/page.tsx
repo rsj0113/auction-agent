@@ -18,11 +18,36 @@ interface AuctionItem {
   status_flag: string;
 }
 
+interface AuctionDetail extends AuctionItem {
+  ai_report_json?: string;
+  ai_suggested_bid?: string;
+  ai_verdict?: string;
+}
+
 export default function Home() {
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [auctions, setAuctions] = useState<AuctionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAuction, setSelectedAuction] = useState<AuctionItem | null>(null);
+  const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  const handleSelectAuction = async (item: AuctionItem) => {
+    setSelectedAuction(item);
+    setSelectedDetail(null);
+    setDetailLoading(true);
+    try {
+      const res = await fetch(`/api/auctions/${item.case_number}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSelectedDetail(data.data);
+      }
+    } catch (error) {
+      console.error("상세 데이터 로딩 실패:", error);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
 
   useEffect(() => {
     // API 서버 호출 (uvicorn이 켜져있어야 함)
@@ -109,7 +134,7 @@ export default function Home() {
           {!loading && auctions.map((item) => (
             <article 
               key={item.case_number} 
-              onClick={() => setSelectedAuction(item)}
+              onClick={() => handleSelectAuction(item)}
               className="bg-white border border-gray-200 hover:border-blue-500/50 rounded-2xl p-5 shadow-sm transition-all cursor-pointer group"
             >
               <div className="flex justify-between items-start mb-3">
@@ -188,31 +213,75 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* AI 리포트 (Mock Data) */}
+              {/* AI 리포트 (Real Data) */}
               <div className="border-t border-gray-100 pt-5 space-y-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">🤖</span>
-                  <h4 className="font-bold text-gray-800">AI 권리분석 및 수익률 리포트</h4>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🤖</span>
+                    <h4 className="font-bold text-gray-800">AI 권리분석 및 수익률 리포트</h4>
+                  </div>
+                  {detailLoading && <span className="text-xs text-blue-500 animate-pulse">분석 데이터 불러오는 중...</span>}
                 </div>
                 
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between p-3 border border-gray-100 rounded-lg">
-                    <span className="text-gray-600">예상 낙찰가</span>
-                    <span className="font-bold text-gray-900">{formatPrice(selectedAuction.min_bid * 1.15)}</span>
-                  </div>
-                  <div className="flex justify-between p-3 border border-gray-100 rounded-lg">
-                    <span className="text-gray-600">예상 임대수익률 (연)</span>
-                    <span className="font-bold text-blue-600">5.4%</span>
-                  </div>
-                  <div className="p-3 border border-gray-100 rounded-lg bg-gray-50">
-                    <span className="block text-gray-600 mb-1 font-medium">권리분석 결과</span>
-                    <p className="text-gray-700">대항력 있는 임차인이 없으며, 매각으로 모든 권리가 소멸되는 안전한 물건으로 분석됩니다.</p>
-                  </div>
-                  <div className="p-3 border border-red-100 rounded-lg bg-red-50/50">
-                    <span className="block text-red-600 mb-1 font-medium">위험 요소 (Risk)</span>
-                    <p className="text-red-800/80">단기 체납 관리비가 존재할 가능성이 있으므로 현장 조사가 필요합니다.</p>
-                  </div>
-                </div>
+                {!detailLoading && selectedDetail && (() => {
+                  let aiReport = null;
+                  try {
+                    aiReport = selectedDetail.ai_report_json ? JSON.parse(selectedDetail.ai_report_json) : null;
+                  } catch (e) {
+                    console.error("AI 리포트 파싱 오류:", e);
+                  }
+
+                  if (!aiReport) {
+                    return (
+                      <div className="p-4 text-center text-gray-500 bg-gray-50 rounded-lg">
+                        아직 AI 분석이 완료되지 않은 물건입니다.
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between p-3 border border-gray-100 rounded-lg">
+                        <span className="text-gray-600">추천 입찰가</span>
+                        <span className="font-bold text-gray-900">{aiReport.suggested_bid || '-'}</span>
+                      </div>
+                      <div className="flex justify-between p-3 border border-gray-100 rounded-lg">
+                        <span className="text-gray-600">예상 실효수익률</span>
+                        <span className="font-bold text-blue-600">{aiReport.expected_yield || '-'}</span>
+                      </div>
+                      <div className="p-3 border border-gray-100 rounded-lg bg-gray-50">
+                        <span className="block text-gray-600 mb-1 font-medium">권리분석 및 가치 종합</span>
+                        <p className="text-gray-700">{aiReport.verdict || selectedDetail.ai_verdict}</p>
+                      </div>
+                      {aiReport.risks && aiReport.risks.length > 0 && (
+                        <div className="p-3 border border-red-100 rounded-lg bg-red-50/50">
+                          <span className="block text-red-600 mb-1 font-medium">위험 요소 (Risk)</span>
+                          <ul className="list-disc list-inside text-red-800/80 space-y-1">
+                            {aiReport.risks.map((risk: string, idx: number) => (
+                              <li key={idx}>{risk}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {aiReport.retained_rights && aiReport.retained_rights.length > 0 && aiReport.retained_rights[0] !== '없음' && (
+                        <div className="p-3 border border-orange-100 rounded-lg bg-orange-50">
+                          <span className="block text-orange-700 mb-1 font-medium">인수해야 할 권리/보증금</span>
+                          <ul className="list-disc list-inside text-orange-800 space-y-1">
+                            {aiReport.retained_rights.map((right: string, idx: number) => (
+                              <li key={idx}>{right}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      <div className="p-3 border border-blue-100 rounded-lg bg-blue-50/50 mt-2">
+                        <span className="block text-blue-700 mb-1 font-medium">전문가 상세 분석</span>
+                        <p className="text-blue-800/80 text-xs leading-relaxed whitespace-pre-wrap">
+                          {aiReport.analysis_detail || "상세 분석 내용이 없습니다."}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
             
