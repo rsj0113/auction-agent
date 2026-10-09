@@ -19,6 +19,7 @@ interface AIReport {
   retained_rights: string[];
   expected_yield: string;
   suggested_bid: string;
+  analysis_detail?: string;
 }
 
 interface AuctionDetail extends AuctionItem {
