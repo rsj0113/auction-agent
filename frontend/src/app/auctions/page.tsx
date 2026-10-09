@@ -104,8 +104,11 @@ export default function AuctionsPage() {
   // 필터 변경시 페이지 초기화 후 다시 호출
   useEffect(() => {
     setPage(0);
-    fetchAuctions(0);
-  }, [gradeFilter, priceFilter, sortOrder]);
+    const timer = setTimeout(() => {
+      fetchAuctions(0);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [gradeFilter, priceFilter, sortOrder, propertyTypeFilter, regionFilter]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
