@@ -88,7 +88,7 @@ export default function Home() {
       try {
         const [summaryRes, auctionsRes] = await Promise.all([
           fetch("/api/dashboard/summary", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
-          fetch("/api/auctions?limit=6", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null)
+          fetch("/api/auctions?limit=6&sort=recommend", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null)
         ]);
 
         if (summaryRes?.ok) {
