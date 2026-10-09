@@ -28,6 +28,18 @@ interface AuctionDetail extends AuctionItem {
   is_payout_requested?: number;
 }
 
+function getPropertyType(location: string): string {
+  if (!location) return "기타";
+  if (location.includes("아파트")) return "🏢 아파트";
+  if (location.includes("오피스텔")) return "🏬 오피스텔";
+  if (location.includes("다세대") || location.includes("빌라")) return "🏘️ 빌라/다세대";
+  if (location.includes("상가") || location.includes("근린")) return "상가/근린시설";
+  if (location.includes("산") && location.match(/산\s*[0-9]+/)) return "🌲 임야(산)";
+  if (location.includes("임야")) return "🌲 임야(산)";
+  if (location.match(/[0-9]+번지/)) return "🗺️ 토지/대지";
+  return "🏠 주택/기타";
+}
+
 export default function Home() {
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [auctions, setAuctions] = useState<AuctionItem[]>([]);
@@ -142,13 +154,21 @@ export default function Home() {
               className="bg-white border border-gray-200 hover:border-blue-500/50 rounded-2xl p-5 shadow-sm transition-all cursor-pointer group"
             >
               <div className="flex justify-between items-start mb-3">
-                <span className={`px-2 py-1 text-xs font-bold rounded ${
-                  item.ai_grade === 'S' ? 'bg-red-50 text-red-600' :
-                  item.ai_grade === 'A' ? 'bg-blue-50 text-blue-600' :
-                  'bg-gray-100 text-gray-600'
-                }`}>
-                  {item.ai_grade || '분석중'} 등급
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 text-xs font-bold rounded ${
+                    item.ai_grade === 'S' ? 'bg-red-50 text-red-600' :
+                    item.ai_grade === 'A' ? 'bg-blue-50 text-blue-600' :
+                    item.ai_grade === 'B' ? 'bg-green-50 text-green-600' :
+                    item.ai_grade === 'C' ? 'bg-yellow-50 text-yellow-600' :
+                    item.ai_grade === 'D' ? 'bg-gray-50 text-gray-800' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {item.ai_grade || '분석중'} 등급
+                  </span>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
+                    {getPropertyType(item.location)}
+                  </span>
+                </div>
                 <span className="text-xs text-gray-500">{item.case_number}</span>
               </div>
               
@@ -169,7 +189,9 @@ export default function Home() {
               
               <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between text-xs text-gray-500">
                 <span>유찰 {item.failed_count}회</span>
-                <span className="text-blue-600 font-medium">{item.status_flag}</span>
+                <span className="text-blue-600 font-medium">
+                  {item.status_flag === 'unchanged' ? '기일변경' : item.status_flag}
+                </span>
               </div>
             </article>
           ))}
@@ -201,11 +223,27 @@ export default function Home() {
             <div className="p-5 overflow-y-auto space-y-6">
               {/* 기본 정보 */}
               <div>
-                <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                  {selectedAuction.case_number}
-                </span>
+                <div className="flex gap-2 items-center mb-2">
+                  <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                    {selectedAuction.case_number}
+                  </span>
+                  <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">
+                    {getPropertyType(selectedAuction.location)}
+                  </span>
+                </div>
                 <h4 className="mt-2 text-gray-900 font-medium leading-snug">{selectedAuction.location}</h4>
-                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                
+                {/* 지도 / 로드뷰 버튼 */}
+                <div className="flex gap-2 mt-2">
+                  <a href={`https://map.kakao.com/link/search/${selectedAuction.location}`} target="_blank" rel="noreferrer" className="flex-1 flex justify-center items-center gap-1 bg-[#FEE500] hover:bg-[#FDD800] text-[#000000] text-xs font-bold py-2 rounded-lg transition-colors">
+                    <span>📍</span> 카카오맵 / 로드뷰
+                  </a>
+                  <a href={`https://map.naver.com/v5/search/${selectedAuction.location}`} target="_blank" rel="noreferrer" className="flex-1 flex justify-center items-center gap-1 bg-[#03C75A] hover:bg-[#02b350] text-white text-xs font-bold py-2 rounded-lg transition-colors">
+                    <span>🟢</span> 네이버 지도
+                  </a>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                   <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-gray-500 text-xs mb-1">감정가</p>
                     <p className="font-semibold text-gray-700">{formatPrice(selectedAuction.appraisal)}</p>
