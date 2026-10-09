@@ -36,7 +36,9 @@ def get_auctions(
     grade: Optional[str] = None,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
-    sort: Optional[str] = 'recent'
+    sort: Optional[str] = 'recent',
+    property_type: Optional[str] = None,
+    region: Optional[str] = None
 ):
     """
     Get a list of auction items with filtering and sorting.
@@ -65,8 +67,27 @@ def get_auctions(
             query += " AND min_bid <= ?"
             params.append(max_price)
             
+
+        if property_type:
+            if property_type == 'apartment':
+                query += " AND location LIKE '%아파트%'"
+            elif property_type == 'officetel':
+                query += " AND location LIKE '%오피스텔%'"
+            elif property_type == 'villa':
+                query += " AND (location LIKE '%다세대%' OR location LIKE '%빌라%')"
+            elif property_type == 'commercial':
+                query += " AND (location LIKE '%상가%' OR location LIKE '%근린%')"
+            elif property_type == 'land':
+                query += " AND (location LIKE '%임야%' OR location LIKE '%산 %' OR location LIKE '%번지%')"
+                
+        if region:
+            query += " AND location LIKE ?"
+            params.append(f"%{region}%")
+
         # Sorting
-        if sort == 'price_asc':
+        if sort == 'recommend':
+            query += " ORDER BY CASE WHEN ai_grade='S' THEN 1 WHEN ai_grade='A' THEN 2 WHEN ai_grade='B' THEN 3 WHEN ai_grade='C' THEN 4 WHEN ai_grade='D' THEN 5 ELSE 6 END ASC, last_updated DESC"
+        elif sort == 'price_asc':
             query += " ORDER BY min_bid ASC"
         elif sort == 'price_desc':
             query += " ORDER BY min_bid DESC"
