@@ -385,7 +385,7 @@ export default function AuctionsPage() {
                           </div>
                         )}
 
-                        {aiReport.retained_rights && aiReport.retained_rights.length > 0 && (
+                        {aiReport.retained_rights && aiReport.retained_rights.length > 0 && aiReport.retained_rights[0] !== '없음' && (
                           <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100">
                             <span className="block text-orange-700 mb-2 font-semibold text-sm">인수해야 할 권리/보증금</span>
                             <ul className="list-disc list-inside text-sm text-orange-800 space-y-1">
@@ -395,6 +395,13 @@ export default function AuctionsPage() {
                             </ul>
                           </div>
                         )}
+
+                        <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+                          <span className="block text-blue-700 mb-2 font-semibold text-sm">전문가 상세 분석</span>
+                          <p className="text-blue-800/90 text-sm leading-relaxed whitespace-pre-wrap">
+                            {aiReport.analysis_detail || "상세 분석 내용이 없습니다."}
+                          </p>
+                        </div>
                         
                         <div className="pt-2">
                           <button 
