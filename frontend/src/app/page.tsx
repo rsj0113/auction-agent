@@ -34,7 +34,7 @@ function getPropertyType(location: string): string {
   if (location.includes("아파트")) return "🏢 아파트";
   if (location.includes("오피스텔")) return "🏬 오피스텔";
   if (location.includes("다세대") || location.includes("빌라")) return "🏘️ 빌라/다세대";
-  if (location.includes("상가") || location.includes("근린")) return "상가/근린시설";
+  if (location.includes("상가") || location.includes("근린") || location.includes("타워") || location.includes("지식산업") || location.includes("프라자") || location.includes("플라자") || location.includes("센터") || location.includes("에이스")) return "상가/근린시설";
   if (location.includes("산") && location.match(/산\s*[0-9]+/)) return "🌲 임야(산)";
   if (location.includes("임야")) return "🌲 임야(산)";
   if (location.match(/[0-9]+번지/)) return "🗺️ 토지/대지";

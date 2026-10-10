@@ -76,7 +76,7 @@ def get_auctions(
             elif property_type == 'villa':
                 query += " AND (location LIKE '%다세대%' OR location LIKE '%빌라%')"
             elif property_type == 'commercial':
-                query += " AND (location LIKE '%상가%' OR location LIKE '%근린%')"
+                query += " AND (location LIKE '%상가%' OR location LIKE '%근린%' OR location LIKE '%타워%' OR location LIKE '%지식산업%' OR location LIKE '%프라자%' OR location LIKE '%플라자%' OR location LIKE '%센터%' OR location LIKE '%에이스%')"
             elif property_type == 'land':
                 query += " AND (location LIKE '%임야%' OR location LIKE '%산 %' OR location LIKE '%번지%')"
                 
