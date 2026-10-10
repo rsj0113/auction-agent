@@ -32,10 +32,13 @@ interface AuctionDetail extends AuctionItem {
 function getPropertyType(location: string, usage?: string): string {
   if (!location && !usage) return "기타";
   const target = (usage || "") + " " + (location || "");
+  
+  // 상가/근린을 가장 먼저 체크 (예: "아파트 단지내 상가", "신촌럭키아파트 이룸타워" 등은 상가로 분류되어야 함)
+  if (target.includes("상가") || target.includes("근린") || target.includes("타워") || target.includes("지식산업") || target.includes("프라자") || target.includes("플라자") || target.includes("센터") || target.includes("에이스")) return "상가/근린시설";
+  
   if (target.includes("아파트")) return "🏢 아파트";
   if (target.includes("오피스텔")) return "🏬 오피스텔";
   if (target.includes("다세대") || target.includes("빌라")) return "🏘️ 빌라/다세대";
-  if (target.includes("상가") || target.includes("근린") || target.includes("타워") || target.includes("지식산업") || target.includes("프라자") || target.includes("플라자") || target.includes("센터") || target.includes("에이스")) return "상가/근린시설";
   if (target.includes("산") && target.match(/산\s*[0-9]+/)) return "🌲 임야(산)";
   if (target.includes("임야")) return "🌲 임야(산)";
   if (target.match(/[0-9]+번지/)) return "🗺️ 토지/대지";

@@ -34,10 +34,13 @@ interface AuctionDetail extends AuctionItem {
 function getPropertyType(location: string, usage?: string): string {
   if (!location && !usage) return "기타";
   const target = (usage || "") + " " + (location || "");
+  
+  // 상가/근린을 가장 먼저 체크 (예: "아파트 단지내 상가", "신촌럭키아파트 이룸타워" 등은 상가로 분류되어야 함)
+  if (target.includes("상가") || target.includes("근린") || target.includes("타워") || target.includes("지식산업") || target.includes("프라자") || target.includes("플라자") || target.includes("센터") || target.includes("에이스")) return "상가/근린시설";
+  
   if (target.includes("아파트")) return "🏢 아파트";
   if (target.includes("오피스텔")) return "🏬 오피스텔";
   if (target.includes("다세대") || target.includes("빌라")) return "🏘️ 빌라/다세대";
-  if (target.includes("상가") || target.includes("근린") || target.includes("타워") || target.includes("지식산업") || target.includes("프라자") || target.includes("플라자") || target.includes("센터") || target.includes("에이스")) return "상가/근린시설";
   if (target.includes("산") && target.match(/산\s*[0-9]+/)) return "🌲 임야(산)";
   if (target.includes("임야")) return "🌲 임야(산)";
   if (target.match(/[0-9]+번지/)) return "🗺️ 토지/대지";
@@ -56,6 +59,7 @@ export default function AuctionsPage() {
   const [sortOrder, setSortOrder] = useState<string>("recent");
   const [propertyTypeFilter, setPropertyTypeFilter] = useState<string>("");
   const [regionFilter, setRegionFilter] = useState<string>("");
+  const [regionInput, setRegionInput] = useState<string>("");
 
   // 모달 상태
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
@@ -200,13 +204,22 @@ export default function AuctionsPage() {
               <option value="land">임야/토지</option>
             </select>
             
-            <input 
-              type="text"
-              placeholder="지역 검색 (예: 강남구)"
-              value={regionFilter}
-              onChange={(e) => setRegionFilter(e.target.value)}
-              className="flex-1 text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
-            />
+            <div className="flex-1 flex gap-2">
+              <input 
+                type="text"
+                placeholder="지역 검색 (예: 강남구)"
+                value={regionInput}
+                onChange={(e) => setRegionInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && setRegionFilter(regionInput)}
+                className="w-full text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+              />
+              <button 
+                onClick={() => setRegionFilter(regionInput)}
+                className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 whitespace-nowrap"
+              >
+                검색
+              </button>
+            </div>
           </div>
           <div className="flex gap-2">
             <select 
