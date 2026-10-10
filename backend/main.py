@@ -48,7 +48,7 @@ def get_auctions(
         cursor = conn.cursor()
         
         query = '''
-            SELECT case_number, location, appraisal, min_bid, 
+            SELECT case_number, location, usage, appraisal, min_bid, 
                    auction_date, failed_count, ai_grade, ai_verdict, status_flag
             FROM auction_items 
             WHERE 1=1
@@ -70,15 +70,15 @@ def get_auctions(
 
         if property_type:
             if property_type == 'apartment':
-                query += " AND location LIKE '%아파트%'"
+                query += " AND (usage LIKE '%아파트%' OR location LIKE '%아파트%')"
             elif property_type == 'officetel':
-                query += " AND location LIKE '%오피스텔%'"
+                query += " AND (usage LIKE '%오피스텔%' OR location LIKE '%오피스텔%')"
             elif property_type == 'villa':
-                query += " AND (location LIKE '%다세대%' OR location LIKE '%빌라%')"
+                query += " AND (usage LIKE '%다세대%' OR usage LIKE '%빌라%' OR location LIKE '%다세대%' OR location LIKE '%빌라%')"
             elif property_type == 'commercial':
-                query += " AND (location LIKE '%상가%' OR location LIKE '%근린%' OR location LIKE '%타워%' OR location LIKE '%지식산업%' OR location LIKE '%프라자%' OR location LIKE '%플라자%' OR location LIKE '%센터%' OR location LIKE '%에이스%')"
+                query += " AND (usage LIKE '%상가%' OR usage LIKE '%근린%' OR location LIKE '%상가%' OR location LIKE '%근린%' OR location LIKE '%타워%' OR location LIKE '%지식산업%' OR location LIKE '%프라자%' OR location LIKE '%플라자%' OR location LIKE '%센터%' OR location LIKE '%에이스%')"
             elif property_type == 'land':
-                query += " AND (location LIKE '%임야%' OR location LIKE '%산 %' OR location LIKE '%번지%')"
+                query += " AND (usage LIKE '%임야%' OR usage LIKE '%대지%' OR location LIKE '%임야%' OR location LIKE '%산 %' OR location LIKE '%번지%')"
                 
         if region:
             query += " AND location LIKE ?"

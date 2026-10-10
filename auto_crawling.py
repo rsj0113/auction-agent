@@ -152,13 +152,14 @@ class AuctionDBAgent:
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO auction_items (
-                    case_number, location, appraisal, min_bid, prev_min_bid, failed_count,
+                    case_number, location, usage, appraisal, min_bid, prev_min_bid, failed_count,
                     rights_list, tenant_registration_date, tenant_deposit, is_payout_requested,
                     ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, last_updated, status_flag,
                     area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd, auction_date
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(case_number) DO UPDATE SET
                     location=excluded.location,
+                    usage=excluded.usage,
                     appraisal=excluded.appraisal,
                     min_bid=excluded.min_bid,
                     prev_min_bid=coalesce(prev_min_bid, auction_items.min_bid),
@@ -184,6 +185,7 @@ class AuctionDBAgent:
             """, (
                 item['case_number'],
                 item['location'],
+                item.get('usage', ''),
                 appraisal_val,
                 min_bid_val,
                 _cap(prev_min_bid) if prev_min_bid else min_bid_val,
@@ -901,6 +903,9 @@ class AuctionCrawler:
                         case_matches = re.findall(r'(\d+타경\s*\d+)', case_text)
                         if not case_matches:
                             continue
+                        
+                        usage_text = await cols[2].inner_text()
+                        usage = usage_text.strip()
 
                         location_raw = await cols[3].inner_text()
                         location_lines = [l.strip() for l in location_raw.split('\n') if l.strip()]
@@ -923,6 +928,7 @@ class AuctionCrawler:
                             if not any(b['case_number'] == case_number for b in basic_items):
                                 basic_items.append({"case_number": case_number,
                                                     "location": location,
+                                                    "usage": usage,
                                                     "appraisal": appraisal,
                                                     "min_bid": min_bid,
                                                     "row_id": cur_row_id})
