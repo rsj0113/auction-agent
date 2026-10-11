@@ -97,6 +97,8 @@ class AuctionDBAgent:
                 "addr_emd TEXT",
                 "floor INTEGER",
                 "area_pyeong REAL",
+                "usage TEXT",
+                "auction_date TEXT",
             ]:
                 try:
                     cursor.execute(f"ALTER TABLE auction_items ADD COLUMN {col_def}")
@@ -277,9 +279,12 @@ class RightsAnalysisEngine:
                 risk_level = "WARNING"
                 estimated_loss = deposit
                 reason = "선순위 임차인이 존재합니다. 미배당 보증금이 발생할 경우 낙찰자가 인수해야 합니다."
+        elif not tenant_date:
+            risk_level = "SAFE"
+            reason = "현황조사서상 대항력 있는 임차인이 확인되지 않습니다(소유자/채무자 점유 추정)."
         else:
             risk_level = "SAFE"
-            reason = "후순위 임차인입니다. 낙찰 시 권리가 소멸되어 안전합니다."
+            reason = "후순위 임차인입니다. 말소기준권리 이후 전입으로 대항력이 없어 낙찰 시 권리가 소멸되어 안전합니다."
 
         # 할인율·유찰횟수 기반 추가 경고 (임차인 안전 여부와 독립적으로 체크)
         discount_rate = 0
@@ -376,12 +381,13 @@ class AuctionCrawler:
             "is_payout_requested": is_payout_requested
         }
 
-    def _parse_detail_json(self, raw: dict, debug_dump_path: str = "") -> dict:
-        """selectAuctnCsSrchRslt.on 응답에서 권리관계·임차인 정보를 추출한다."""
+    def _parse_detail_json(self, raw: dict, raw_curst: dict = None, debug_dump_path: str = "") -> dict:
+        """selectAuctnCsSrchRslt.on 및 selectCurstExmndc.on(현황조사서) 응답에서 권리관계·임차인 정보를 추출한다."""
         rights_list = []
         tenant_registration_date = ""
         tenant_deposit = 0
         is_payout_requested = False
+        tenants_list = []
         auction_date = ""
 
         try:
@@ -457,54 +463,111 @@ class AuctionCrawler:
                     if not any(r['name'] == '경매개시결정' and r['date'] == date_str for r in rights_list):
                         rights_list.append({"name": "경매개시결정", "date": date_str})
 
-            # ── 임차인 정보 ───────────────────────────────────────────────
-            # 알려진 키 우선 시도, 실패 시 dma 전체에서 날짜 필드를 가진 dict 탐색
-            TENANT_KEYS = ('lseeInfo', 'tnntInfo', 'lseeStusInfo', 'tenantInfo',
-                           'lseeCntnInfo', 'tnntCntnInfo', 'lseeDtlInfo')
-            DATE_FIELDS = ('mvInYmd', 'entnYmd', 'rgstnYmd', 'mvnYmd',
-                           'lseRgstnYmd', 'jmInDt', 'tnntRgstnYmd', 'entnDt')
-            DEP_FIELDS  = ('lseDposAmt', 'posAmt', 'dposAmt', 'chrtgrAmt', 'tnntDposAmt')
-            SKIP_KEYS   = {'dspslGdsDxdyInfo', 'csBaseInfo', 'dstrtDemnInfo'}
+            # ── 임차인 정보: 1순위 현황조사서(raw_curst) 파싱 ─────────────────────────
+            dates_found = []
+            if raw_curst:
+                try:
+                    c_data = (raw_curst.get('data') or {})
+                    leases = c_data.get('dlt_ordTsLserLtn') or []
+                    for l in leases:
+                        if not isinstance(l, dict):
+                            continue
+                        name = (l.get('intrpsNm') or '').strip()
+                        move_in_raw = (l.get('mvinDtlCtt') or '').strip()
+                        dep_raw = (l.get('lesDposDts') or '').strip()
+                        monthly_raw = (l.get('mmrntAmtDts') or '').strip()
+                        fixed_raw = (l.get('rgstryCrtcpCfmtnCtt') or '').strip()
+                        room = (l.get('bldDtlDts') or '').strip()
+                        poss = (l.get('gdsPossCtt') or '').strip()
 
-            tenant_candidates: list = []
-            for tk in TENANT_KEYS:
-                v = dma.get(tk)
-                if not v:
-                    continue
-                if isinstance(v, dict):
-                    tenant_candidates = [v]; break
-                if isinstance(v, list) and v:
-                    tenant_candidates = v; break
+                        # 전입일자 정규화 YYYY.MM.DD
+                        norm_move_in = ""
+                        if move_in_raw:
+                            dm = re.search(r'(\d{4})[./-](\d{1,2})[./-](\d{1,2})', move_in_raw)
+                            if dm:
+                                norm_move_in = f"{dm.group(1)}.{dm.group(2).zfill(2)}.{dm.group(3).zfill(2)}"
+                                dates_found.append(norm_move_in)
 
-            # 알려진 키에서 못 찾으면 dma 전체 순회하여 날짜 필드를 가진 dict 수집
-            if not tenant_candidates:
-                for k, v in dma.items():
-                    if k in SKIP_KEYS:
+                        # 보증금 정수 변환
+                        dep_num = 0
+                        if dep_raw:
+                            num_matches = re.findall(r'[\d,]+', dep_raw)
+                            for nm in num_matches:
+                                try:
+                                    v = int(nm.replace(',', ''))
+                                    if v > dep_num:
+                                        dep_num = v
+                                except Exception:
+                                    pass
+                        if dep_num > tenant_deposit:
+                            tenant_deposit = dep_num
+
+                        # 배당요구 여부
+                        if any(k in poss or k in fixed_raw for k in ('배당요구', '배당신청', '배당요구일')):
+                            is_payout_requested = True
+
+                        tenants_list.append({
+                            "name": name,
+                            "move_in_date": norm_move_in or move_in_raw,
+                            "deposit": dep_num if dep_num > 0 else (dep_raw or "미상"),
+                            "monthly_rent": monthly_raw or "",
+                            "fixed_date": fixed_raw or "",
+                            "room": room,
+                        })
+
+                    if dates_found:
+                        dates_found.sort()
+                        tenant_registration_date = dates_found[0]
+                except Exception as e_curst:
+                    console.print(f"[dim yellow]⚠️ 현황조사서 임차인 파싱 예외: {e_curst}[/dim yellow]")
+
+            # 2순위: dma 내부 키 탐색 (raw_curst에서 임차인이 없었던 경우 fallback)
+            if not tenant_registration_date:
+                TENANT_KEYS = ('lseeInfo', 'tnntInfo', 'lseeStusInfo', 'tenantInfo',
+                               'lseeCntnInfo', 'tnntCntnInfo', 'lseeDtlInfo')
+                DATE_FIELDS = ('mvInYmd', 'entnYmd', 'rgstnYmd', 'mvnYmd',
+                               'lseRgstnYmd', 'jmInDt', 'tnntRgstnYmd', 'entnDt')
+                DEP_FIELDS  = ('lseDposAmt', 'posAmt', 'dposAmt', 'chrtgrAmt', 'tnntDposAmt')
+                SKIP_KEYS   = {'dspslGdsDxdyInfo', 'csBaseInfo', 'dstrtDemnInfo'}
+
+                tenant_candidates: list = []
+                for tk in TENANT_KEYS:
+                    v = dma.get(tk)
+                    if not v:
                         continue
-                    rows = [v] if isinstance(v, dict) else (v if isinstance(v, list) else [])
-                    for row in rows:
-                        if isinstance(row, dict) and any(row.get(f) for f in DATE_FIELDS):
-                            tenant_candidates.append(row)
+                    if isinstance(v, dict):
+                        tenant_candidates = [v]; break
+                    if isinstance(v, list) and v:
+                        tenant_candidates = v; break
 
-            for t in tenant_candidates:
-                if not isinstance(t, dict):
-                    continue
-                ymd_raw = next((t.get(f) for f in DATE_FIELDS if t.get(f)), '') or ''
-                if ymd_raw:
-                    nums = re.sub(r'[^0-9]', '', str(ymd_raw))
-                    if len(nums) >= 8:
-                        tenant_registration_date = f"{nums[:4]}.{nums[4:6]}.{nums[6:8]}"
-                for df in DEP_FIELDS:
-                    raw_dep = t.get(df)
-                    if raw_dep:
-                        try:
-                            dep_val = int(str(raw_dep).replace(',', ''))
-                            if dep_val > tenant_deposit:
-                                tenant_deposit = dep_val
-                        except Exception:
-                            pass
-                if t.get('dvdndDmndYn') in ('Y', 'y') or t.get('dvdndDmndDt'):
-                    is_payout_requested = True
+                if not tenant_candidates:
+                    for k, v in dma.items():
+                        if k in SKIP_KEYS:
+                            continue
+                        rows = [v] if isinstance(v, dict) else (v if isinstance(v, list) else [])
+                        for row in rows:
+                            if isinstance(row, dict) and any(row.get(f) for f in DATE_FIELDS):
+                                tenant_candidates.append(row)
+
+                for t in tenant_candidates:
+                    if not isinstance(t, dict):
+                        continue
+                    ymd_raw = next((t.get(f) for f in DATE_FIELDS if t.get(f)), '') or ''
+                    if ymd_raw:
+                        nums = re.sub(r'[^0-9]', '', str(ymd_raw))
+                        if len(nums) >= 8:
+                            tenant_registration_date = f"{nums[:4]}.{nums[4:6]}.{nums[6:8]}"
+                    for df in DEP_FIELDS:
+                        raw_dep = t.get(df)
+                        if raw_dep:
+                            try:
+                                dep_val = int(str(raw_dep).replace(',', ''))
+                                if dep_val > tenant_deposit:
+                                    tenant_deposit = dep_val
+                            except Exception:
+                                pass
+                    if t.get('dvdndDmndYn') in ('Y', 'y') or t.get('dvdndDmndDt'):
+                        is_payout_requested = True
 
         except Exception:
             pass
@@ -562,6 +625,7 @@ class AuctionCrawler:
             "tenant_registration_date": tenant_registration_date,
             "tenant_deposit": tenant_deposit,
             "is_payout_requested": is_payout_requested,
+            "tenants_list": tenants_list,
             "area_m2": round(area_m2, 2),
             "area_pyeong": area_pyeong,
             "floor": floor,
@@ -1009,6 +1073,29 @@ class AuctionCrawler:
                     return await resp.json();
                 }}
                 """
+                fetch_curst_js = f"""
+                async ([csNo, cortOfcCd]) => {{
+                    const extraHeaders = {json.dumps(extra_headers)};
+                    const resp = await fetch('/pgj/pgj15B/selectCurstExmndc.on', {{
+                        method: 'POST',
+                        headers: {{
+                            'Content-Type': 'application/json; charset=UTF-8',
+                            ...extraHeaders
+                        }},
+                        credentials: 'same-origin',
+                        body: JSON.stringify({{
+                            dma_srchCurstExmn: {{
+                                cortOfcCd: cortOfcCd,
+                                csNo: csNo,
+                                auctnInfOriginDvsCd: '2',
+                                ordTsCnt: ''
+                            }}
+                        }})
+                    }});
+                    if (!resp.ok) return {{error: resp.status}};
+                    return await resp.json();
+                }}
+                """
                 extracted_items = []
                 row_detail_cache: dict = {}
                 for bi in basic_items:
@@ -1019,6 +1106,7 @@ class AuctionCrawler:
                     row_id      = bi.get('row_id', -1)
                     console.print(f"[bold cyan]👉 {case_number} 상세 API 호출 중...[/bold cyan]")
 
+                    matched_cort_code = cort_ofc_cd
                     if bi.get('_seed_detail'):
                         raw_detail = bi['_seed_detail']
                         console.print(f"[dim]📡 상세(seed): 성공[/dim]")
@@ -1056,6 +1144,7 @@ class AuctionCrawler:
                                     alt_gds = (alt_detail.get('data') or {}).get('dma_result') or {}
                                     if alt_gds.get('dspslGdsDxdyInfo'):
                                         raw_detail = alt_detail
+                                        matched_cort_code = alt_code
                                         break
                                 except Exception:
                                     pass
@@ -1064,9 +1153,28 @@ class AuctionCrawler:
                     else:
                         raw_detail = {}
 
+                    # ── 현황조사서(임차인 상세) API 호출 ──
+                    raw_curst = {}
+                    target_cort = matched_cort_code or cort_ofc_cd
+                    if target_cort:
+                        try:
+                            raw_curst = await page.evaluate(fetch_curst_js, [case_number, target_cort])
+                            if raw_curst and raw_curst.get('error'):
+                                raw_curst = {}
+                            elif raw_curst:
+                                msg_c = raw_curst.get('message') or ''
+                                if '차단' in msg_c or '비정상' in msg_c:
+                                    raw_curst = {}
+                                else:
+                                    c_cnt = len((raw_curst.get('data') or {}).get('dlt_ordTsLserLtn') or [])
+                                    if c_cnt > 0:
+                                        console.print(f"[bold green]👥 현황조사서 임차인 {c_cnt}명 확인[/bold green]")
+                        except Exception as e_c:
+                            console.print(f"[dim yellow]⚠️ 현황조사서 호출 실패: {e_c}[/dim yellow]")
+
                     # 첫 번째 물건에만 덤프 적용 (이미 저장됐으면 빈 경로 전달)
                     _dump = debug_dump_path if (debug_dump_path and not extracted_items) else ""
-                    detail_info = self._parse_detail_json(raw_detail, debug_dump_path=_dump)
+                    detail_info = self._parse_detail_json(raw_detail, raw_curst=raw_curst, debug_dump_path=_dump)
                     dma = (raw_detail.get('data') or {}).get('dma_result') or {}
                     api_gds = dma.get('dspslGdsDxdyInfo') or {}
                     if api_gds and row_id not in row_detail_cache:
@@ -1093,6 +1201,7 @@ class AuctionCrawler:
                         "tenant_registration_date": detail_info["tenant_registration_date"],
                         "tenant_deposit": detail_info["tenant_deposit"],
                         "is_payout_requested": detail_info["is_payout_requested"],
+                        "tenants_list": detail_info.get("tenants_list", []),
                         "area_m2": detail_info["area_m2"],
                         "area_pyeong": detail_info["area_pyeong"],
                         "floor": floor,
@@ -1342,15 +1451,28 @@ async def main():
             ai_report = {}
 
             is_price_changed = existing_item and existing_item['min_bid'] != item['min_bid']
-            use_cache = existing_item and not is_price_changed and not args.force_reanalyze
+            is_tenant_changed = existing_item and (
+                existing_item.get('tenant_registration_date') != item.get('tenant_registration_date') or
+                existing_item.get('tenant_deposit') != item.get('tenant_deposit')
+            )
+            use_cache = existing_item and not is_price_changed and not is_tenant_changed and not args.force_reanalyze
 
             if use_cache:
                 ai_report = existing_item['ai_report_json']
+                if isinstance(ai_report, str):
+                    try:
+                        ai_report = json.loads(ai_report)
+                    except Exception:
+                        ai_report = {}
+                if item.get('tenants_list'):
+                    ai_report['tenants'] = item['tenants_list']
                 status_flag = "UNCHANGED"
                 prev_min_bid = existing_item['min_bid']
                 db_agent.upsert_auction_item(item, ai_report, rights_report)
             else:
                 ai_report = analyzer.analyze_item(item, rights_report)
+                if item.get('tenants_list'):
+                    ai_report['tenants'] = item['tenants_list']
                 status_flag, prev_min_bid = db_agent.upsert_auction_item(item, ai_report, rights_report)
             
             final_results.append({**item, "rights": rights_report, "ai": ai_report})
