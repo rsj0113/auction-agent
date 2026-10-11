@@ -6,12 +6,15 @@ import Link from "next/link";
 interface AuctionItem {
   case_number: string;
   location: string;
+  usage?: string;
   appraisal: number;
   min_bid: number;
   failed_count: number;
   ai_grade: string;
   status_flag: string;
   auction_date?: string;
+  tenant_registration_date?: string;
+  tenant_deposit?: number;
 }
 
 interface AIReport {
@@ -59,6 +62,7 @@ export default function AuctionsPage() {
   const [priceFilter, setPriceFilter] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<string>("recent");
   const [propertyTypeFilter, setPropertyTypeFilter] = useState<string>("");
+  const [tenantFilter, setTenantFilter] = useState<string>("");
   const [regionFilter, setRegionFilter] = useState<string>("");
   const [regionInput, setRegionInput] = useState<string>("");
 
@@ -66,19 +70,21 @@ export default function AuctionsPage() {
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  const fetchAuctions = async (pageIndex: number, overrideParams?: { grade?: string, price?: string, sort?: string, propertyType?: string, region?: string }) => {
+  const fetchAuctions = async (pageIndex: number, overrideParams?: { grade?: string, price?: string, sort?: string, propertyType?: string, region?: string, hasTenant?: string }) => {
     try {
       if (pageIndex === 0) setLoading(true);
       const grade = overrideParams?.grade ?? gradeFilter;
       const price = overrideParams?.price ?? priceFilter;
       const sort = overrideParams?.sort ?? sortOrder;
       const propertyType = overrideParams?.propertyType ?? propertyTypeFilter;
+      const tenant = overrideParams?.hasTenant ?? tenantFilter;
       const region = overrideParams?.region ?? regionFilter;
       
       let url = `/api/auctions?limit=20&offset=${pageIndex * 20}`;
       if (grade) url += `&grade=${grade}`;
       if (sort) url += `&sort=${sort}`;
       if (propertyType) url += `&property_type=${propertyType}`;
+      if (tenant) url += `&has_tenant=${tenant}`;
       if (region) url += `&region=${encodeURIComponent(region)}`;
       if (price) {
         if (price === "under1") url += `&max_price=100000000`;
@@ -115,7 +121,7 @@ export default function AuctionsPage() {
       fetchAuctions(0);
     }, 300);
     return () => clearTimeout(timer);
-  }, [gradeFilter, priceFilter, sortOrder, propertyTypeFilter, regionFilter]);
+  }, [gradeFilter, priceFilter, sortOrder, propertyTypeFilter, tenantFilter, regionFilter]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -204,24 +210,35 @@ export default function AuctionsPage() {
               <option value="commercial">상가/근린</option>
               <option value="land">임야/토지</option>
             </select>
-            
-            <div className="flex-1 flex gap-2">
-              <input 
-                type="text"
-                placeholder="지역 검색 (예: 강남구)"
-                value={regionInput}
-                onChange={(e) => setRegionInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && setRegionFilter(regionInput)}
-                className="w-full text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
-              />
-              <button 
-                onClick={() => setRegionFilter(regionInput)}
-                className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 whitespace-nowrap"
-              >
-                검색
-              </button>
-            </div>
+
+            <select 
+              value={tenantFilter} 
+              onChange={(e) => setTenantFilter(e.target.value)}
+              className="flex-1 text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+            >
+              <option value="">임차인 전체</option>
+              <option value="yes">👤 임차인 있음</option>
+              <option value="no">🏠 소유자 점유 (임차인 없음)</option>
+            </select>
           </div>
+
+          <div className="flex gap-2">
+            <input 
+              type="text"
+              placeholder="지역 검색 (예: 강남구, 분당)"
+              value={regionInput}
+              onChange={(e) => setRegionInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && setRegionFilter(regionInput)}
+              className="w-full text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+            />
+            <button 
+              onClick={() => setRegionFilter(regionInput)}
+              className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 whitespace-nowrap"
+            >
+              검색
+            </button>
+          </div>
+
           <div className="flex gap-2">
             <select 
               value={gradeFilter} 
@@ -270,9 +287,20 @@ export default function AuctionsPage() {
               className="bg-white border border-gray-200 hover:border-blue-500/50 rounded-2xl p-5 shadow-sm transition-all cursor-pointer group"
             >
               <div className="flex justify-between items-start mb-3">
-                <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-lg">
-                  {item.case_number}
-                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-lg">
+                    {item.case_number}
+                  </span>
+                  {item.tenant_registration_date || (item.tenant_deposit && item.tenant_deposit > 0) ? (
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                      임차인 있음
+                    </span>
+                  ) : (
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-gray-100 text-gray-500">
+                      소유자 점유
+                    </span>
+                  )}
+                </div>
                 <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${getGradeColor(item.ai_grade)}`}>
                   {item.ai_grade} 등급
                 </span>

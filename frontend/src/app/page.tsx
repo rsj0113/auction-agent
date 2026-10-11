@@ -12,12 +12,15 @@ interface SummaryData {
 interface AuctionItem {
   case_number: string;
   location: string;
+  usage?: string;
   appraisal: number;
   min_bid: number;
   failed_count: number;
   ai_grade: string;
   status_flag: string;
   auction_date?: string;
+  tenant_registration_date?: string;
+  tenant_deposit?: number;
 }
 
 interface AuctionDetail extends AuctionItem {
@@ -188,8 +191,17 @@ export default function Home() {
                     {item.ai_grade || '분석중'} 등급
                   </span>
                   <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
-                    {getPropertyType(item.location, (item as any).usage)}
+                    {getPropertyType(item.location, item.usage)}
                   </span>
+                  {item.tenant_registration_date || (item.tenant_deposit && item.tenant_deposit > 0) ? (
+                    <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded border border-blue-200">
+                      임차인 있음
+                    </span>
+                  ) : (
+                    <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded">
+                      소유자 점유
+                    </span>
+                  )}
                 </div>
                 <span className="text-xs text-gray-500">{item.case_number}</span>
               </div>

@@ -38,7 +38,8 @@ def get_auctions(
     max_price: Optional[int] = None,
     sort: Optional[str] = 'recent',
     property_type: Optional[str] = None,
-    region: Optional[str] = None
+    region: Optional[str] = None,
+    has_tenant: Optional[str] = None
 ):
     """
     Get a list of auction items with filtering and sorting.
@@ -49,7 +50,8 @@ def get_auctions(
         
         query = '''
             SELECT case_number, location, usage, appraisal, min_bid, 
-                   auction_date, failed_count, ai_grade, ai_verdict, status_flag
+                   auction_date, failed_count, ai_grade, ai_verdict, status_flag,
+                   tenant_registration_date, tenant_deposit
             FROM auction_items 
             WHERE 1=1
         '''
@@ -83,6 +85,12 @@ def get_auctions(
         if region:
             query += " AND location LIKE ?"
             params.append(f"%{region}%")
+
+        if has_tenant:
+            if has_tenant.lower() in ('yes', 'true', '1', 'y'):
+                query += " AND ((tenant_registration_date IS NOT NULL AND tenant_registration_date != '') OR (tenant_deposit IS NOT NULL AND tenant_deposit > 0))"
+            elif has_tenant.lower() in ('no', 'false', '0', 'n'):
+                query += " AND ((tenant_registration_date IS NULL OR tenant_registration_date = '') AND (tenant_deposit IS NULL OR tenant_deposit = 0))"
 
         # Sorting
         if sort == 'recommend':
