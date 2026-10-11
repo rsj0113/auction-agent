@@ -2,7 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async rewrites() {
-    let backendUrl = process.env.BACKEND_URL || 'http://127.0.0.1:8000';
+    let backendUrl = process.env.BACKEND_URL;
+    if (!backendUrl || backendUrl.includes('[SENSITIVE]') || backendUrl.trim() === '') {
+      backendUrl = 'https://trivial-footprint-empirical.ngrok-free.dev';
+    }
     // Ensure it starts with http:// or https:// to prevent Vercel build error
     if (!backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
       backendUrl = 'https://' + backendUrl;
