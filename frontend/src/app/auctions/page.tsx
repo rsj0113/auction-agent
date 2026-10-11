@@ -21,6 +21,7 @@ interface AIReport {
   expected_yield: string;
   suggested_bid: string;
   analysis_detail?: string;
+  tenants?: any[];
 }
 
 interface AuctionDetail extends AuctionItem {
@@ -385,17 +386,58 @@ export default function AuctionsPage() {
                     <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
                       <div>
                         <span className="text-gray-500 text-xs block">전입신고일</span>
-                        <span className="font-medium">{selectedDetail?.tenant_registration_date || '정보 없음'}</span>
+                        <span className="font-medium">
+                          {selectedDetail?.tenant_registration_date === '임차인없음'
+                            ? '임차인 없음 (소유자 점유)'
+                            : (selectedDetail?.tenant_registration_date || '임차인 없음 / 현황조사서 미등재')}
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-500 text-xs block">보증금</span>
-                        <span className="font-medium text-red-600">{selectedDetail?.tenant_deposit ? formatMoney(selectedDetail.tenant_deposit) : '미상/없음'}</span>
+                        <span className="font-medium text-red-600">
+                          {selectedDetail?.tenant_deposit 
+                            ? formatMoney(selectedDetail.tenant_deposit) 
+                            : (selectedDetail?.tenant_registration_date && selectedDetail?.tenant_registration_date !== '임차인없음' ? '미상 (현황조사서)' : '해당 없음')}
+                        </span>
                       </div>
                       <div className="col-span-2 mt-1">
                         <span className="text-gray-500 text-xs mr-2">배당요구:</span>
-                        <span className="font-medium">{selectedDetail?.is_payout_requested ? '✅ 요구함' : '❌ 미요구/해당없음'}</span>
+                        <span className="font-medium">
+                          {selectedDetail?.is_payout_requested 
+                            ? '✅ 요구함' 
+                            : (selectedDetail?.tenant_registration_date && selectedDetail?.tenant_registration_date !== '임차인없음' ? '❌ 미요구' : '해당 없음')}
+                        </span>
                       </div>
                     </div>
+
+                    {/* 임차인 목록 상세 (복수 임차인 등) */}
+                    {aiReport?.tenants && aiReport.tenants.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-orange-200/60 text-xs">
+                        <p className="font-semibold text-orange-950 mb-1.5 flex items-center justify-between">
+                          <span>현황조사서 임차인 상세</span>
+                          <span className="text-orange-700 font-bold">{aiReport.tenants.length}명</span>
+                        </p>
+                        <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                          {aiReport.tenants.map((t: any, idx: number) => (
+                            <div key={idx} className="bg-white/80 p-2 rounded-lg border border-orange-100 flex justify-between items-center text-gray-700 shadow-2xs">
+                              <div>
+                                <span className="font-bold text-gray-900">{t.name || '미상'}</span>
+                                {t.room && <span className="text-gray-500 ml-1 text-[11px]">({t.room})</span>}
+                                <div className="text-[11px] text-gray-500 mt-0.5">
+                                  전입: {t.move_in_date || '미상'} {t.fixed_date ? `| 확정: ${t.fixed_date}` : ''}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <span className="font-bold text-red-600 block">
+                                  {typeof t.deposit === 'number' ? (t.deposit > 0 ? formatMoney(t.deposit) : '미상') : (t.deposit || '미상')}
+                                </span>
+                                {t.monthly_rent && <span className="text-[10px] text-gray-500">월 {t.monthly_rent}</span>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="pt-4 border-t border-gray-100">
