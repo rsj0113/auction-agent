@@ -51,7 +51,7 @@ def get_auctions(
         query = '''
             SELECT case_number, location, usage, appraisal, min_bid, 
                    auction_date, failed_count, ai_grade, ai_verdict, status_flag,
-                   tenant_registration_date, tenant_deposit
+                   tenant_registration_date, tenant_deposit, is_payout_requested, rights_list
             FROM auction_items 
             WHERE 1=1
         '''

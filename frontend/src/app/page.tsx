@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { analyzeSeniorDeposit } from "./auctions/page";
 
 interface SummaryData {
   total_active_auctions: number;
@@ -21,6 +22,8 @@ interface AuctionItem {
   auction_date?: string;
   tenant_registration_date?: string;
   tenant_deposit?: number;
+  is_payout_requested?: number;
+  rights_list?: string;
 }
 
 interface AuctionDetail extends AuctionItem {
@@ -30,6 +33,7 @@ interface AuctionDetail extends AuctionItem {
   tenant_registration_date?: string;
   tenant_deposit?: number;
   is_payout_requested?: number;
+  rights_list?: string;
 }
 
 function getPropertyType(location: string, usage?: string): string {
@@ -218,15 +222,19 @@ export default function Home() {
                   <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
                     {getPropertyType(item.location, item.usage)}
                   </span>
-                  {item.tenant_registration_date || (item.tenant_deposit && item.tenant_deposit > 0) ? (
-                    <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded border border-blue-200">
-                      임차인 있음
-                    </span>
-                  ) : (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded">
-                      소유자 점유
-                    </span>
-                  )}
+                  {(() => {
+                    const analysis = analyzeSeniorDeposit(
+                      item.rights_list,
+                      item.tenant_registration_date,
+                      item.tenant_deposit,
+                      item.is_payout_requested
+                    );
+                    return (
+                      <span className={`px-2 py-1 text-xs font-semibold rounded border ${analysis.statusBadge.color}`}>
+                        {analysis.statusBadge.text}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <span className="text-xs text-gray-500">{item.case_number}</span>
               </div>
@@ -329,67 +337,137 @@ export default function Home() {
                      </div>
                   </div>
 
-                  {/* 임차인 정보 */}
-                  <div className="bg-orange-50/50 p-4 rounded-xl border border-orange-100">
-                    <h4 className="text-sm font-semibold text-orange-900 mb-2 flex items-center gap-1">
-                      <span>👤</span> 임차인 정보 (권리분석용)
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
-                      <div>
-                        <span className="text-gray-500 text-xs block">전입신고일</span>
-                        <span className="font-medium">
-                          {selectedDetail?.tenant_registration_date === '임차인없음'
-                            ? '임차인 없음 (소유자 점유)'
-                            : (selectedDetail?.tenant_registration_date || '임차인 없음 / 현황조사서 미등재')}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 text-xs block">보증금</span>
-                        <span className="font-medium text-red-600">
-                          {selectedDetail?.tenant_deposit 
-                            ? formatPrice(selectedDetail.tenant_deposit) 
-                            : (selectedDetail?.tenant_registration_date && selectedDetail?.tenant_registration_date !== '임차인없음' ? '미상 (현황조사서)' : '해당 없음')}
-                        </span>
-                      </div>
-                      <div className="col-span-2 mt-1">
-                        <span className="text-gray-500 text-xs mr-2">배당요구:</span>
-                        <span className="font-medium">
-                          {selectedDetail?.is_payout_requested 
-                            ? '✅ 요구함' 
-                            : (selectedDetail?.tenant_registration_date && selectedDetail?.tenant_registration_date !== '임차인없음' ? '❌ 미요구' : '해당 없음')}
-                        </span>
-                      </div>
-                    </div>
+                  {/* 선순위 권리 & 낙찰자 인수 보증금 핵심 분석 카드 */}
+                  {(() => {
+                    const analysis = analyzeSeniorDeposit(
+                      selectedDetail.rights_list,
+                      selectedDetail.tenant_registration_date,
+                      selectedDetail.tenant_deposit,
+                      selectedDetail.is_payout_requested
+                    );
+                    const malso = analysis.malsoStandard;
 
-                    {/* 임차인 목록 상세 (복수 임차인 등) */}
-                    {aiReport?.tenants && aiReport.tenants.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-orange-200/60 text-xs">
-                        <p className="font-semibold text-orange-950 mb-1.5 flex items-center justify-between">
-                          <span>현황조사서 임차인 상세</span>
-                          <span className="text-orange-700 font-bold">{aiReport.tenants.length}명</span>
-                        </p>
-                        <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
-                          {aiReport.tenants.map((t: any, idx: number) => (
-                            <div key={idx} className="bg-white/80 p-2 rounded-lg border border-orange-100 flex justify-between items-center text-gray-700 shadow-2xs">
-                              <div>
-                                <span className="font-bold text-gray-900">{t.name || '미상'}</span>
-                                {t.room && <span className="text-gray-500 ml-1 text-[11px]">({t.room})</span>}
-                                <div className="text-[11px] text-gray-500 mt-0.5">
-                                  전입: {t.move_in_date || '미상'} {t.fixed_date ? `| 확정: ${t.fixed_date}` : ''}
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <span className="font-bold text-red-600 block">
-                                  {typeof t.deposit === 'number' ? (t.deposit > 0 ? formatPrice(t.deposit) : '미상') : (t.deposit || '미상')}
-                                </span>
-                                {t.monthly_rent && <span className="text-[10px] text-gray-500">월 {t.monthly_rent}</span>}
-                              </div>
-                            </div>
-                          ))}
+                    return (
+                      <div className={`p-4 rounded-2xl border transition-all ${
+                        analysis.riskLevel === 'CRITICAL' 
+                          ? 'bg-red-50/70 border-red-200 shadow-2xs' 
+                          : analysis.riskLevel === 'WARNING'
+                          ? 'bg-amber-50/70 border-amber-200 shadow-2xs'
+                          : 'bg-emerald-50/70 border-emerald-200'
+                      }`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-bold flex items-center gap-1.5 text-gray-900">
+                            <span>{analysis.riskLevel === 'CRITICAL' ? '🚨' : analysis.riskLevel === 'WARNING' ? '⚠️' : '🛡️'}</span>
+                            <span>선순위 권리 &amp; 인수 보증금 분석</span>
+                          </h4>
+                          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${analysis.statusBadge.color}`}>
+                            {analysis.statusBadge.text}
+                          </span>
                         </div>
+
+                        {/* 4분할 지표 그리드 */}
+                        <div className="grid grid-cols-2 gap-2 text-xs bg-white/90 p-3 rounded-xl border border-gray-100 shadow-2xs mb-2.5">
+                          <div className="border-r border-gray-100 pr-2">
+                            <span className="text-gray-400 block text-[11px] mb-0.5">말소기준권리</span>
+                            <span className="font-semibold text-gray-800">
+                              {malso ? `${malso.name} (${malso.date})` : '등기 미기재 / 확인필요'}
+                            </span>
+                          </div>
+                          <div className="pl-1">
+                            <span className="text-gray-400 block text-[11px] mb-0.5">최초 전입신고일</span>
+                            <span className="font-semibold text-gray-800">
+                              {selectedDetail.tenant_registration_date === '임차인없음'
+                                ? '없음 (소유자 점유)'
+                                : (selectedDetail.tenant_registration_date || '현황조사서 미등재')}
+                            </span>
+                          </div>
+                          <div className="border-r border-gray-100 pr-2 pt-2 border-t">
+                            <span className="text-gray-400 block text-[11px] mb-0.5">신고 임차보증금</span>
+                            <span className="font-semibold text-gray-900">
+                              {selectedDetail.tenant_deposit 
+                                ? formatPrice(selectedDetail.tenant_deposit) 
+                                : (analysis.hasTenant ? '미상 (현황조사서 미표기)' : '해당 없음')}
+                            </span>
+                          </div>
+                          <div className="pl-1 pt-2 border-t border-gray-100">
+                            <span className="text-gray-400 block text-[11px] mb-0.5">배당요구 여부</span>
+                            <span className="font-semibold text-gray-800">
+                              {selectedDetail.is_payout_requested 
+                                ? '✅ 요구함' 
+                                : (analysis.hasTenant ? '❌ 미요구' : '해당 없음')}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 인수 보증금 하이라이트 배너 */}
+                        <div className={`p-3 rounded-xl mb-2 flex items-center justify-between ${
+                          analysis.riskLevel === 'CRITICAL'
+                            ? 'bg-red-100/80 text-red-950 border border-red-200'
+                            : analysis.riskLevel === 'WARNING'
+                            ? 'bg-amber-100/80 text-amber-950 border border-amber-200'
+                            : 'bg-emerald-100/80 text-emerald-950 border border-emerald-200'
+                        }`}>
+                          <div className="text-xs font-semibold">낙찰자 인수 예상 보증금</div>
+                          <div className={`text-base font-extrabold ${
+                            analysis.riskLevel === 'CRITICAL' ? 'text-red-700' : analysis.riskLevel === 'WARNING' ? 'text-amber-700' : 'text-emerald-700'
+                          }`}>
+                            {analysis.depositText}
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-gray-700 leading-relaxed">
+                          {analysis.summaryText}
+                        </p>
+
+                        {/* 현황조사서 임차인 개별 목록 */}
+                        {aiReport?.tenants && aiReport.tenants.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-gray-200/60 text-xs">
+                            <p className="font-semibold text-gray-900 mb-2 flex items-center justify-between">
+                              <span>현황조사서 등재 임차인 상세</span>
+                              <span className="text-blue-600 font-bold">총 {aiReport.tenants.length}명</span>
+                            </p>
+                            <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+                              {aiReport.tenants.map((t: any, idx: number) => {
+                                const tClean = (t.move_in_date || '').replace(/[^0-9]/g, '');
+                                const mClean = malso ? malso.date.replace(/[^0-9]/g, '') : '';
+                                const isIndivSenior = mClean && tClean ? tClean < mClean : null;
+
+                                return (
+                                  <div key={idx} className="bg-white p-2.5 rounded-xl border border-gray-100 flex justify-between items-center text-gray-700 shadow-2xs">
+                                    <div>
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="font-bold text-gray-900">{t.name || '미상'}</span>
+                                        {t.room && <span className="text-gray-500 text-[11px]">({t.room})</span>}
+                                        {isIndivSenior === true && (
+                                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-700 border border-red-200">
+                                            선순위 인수주의
+                                          </span>
+                                        )}
+                                        {isIndivSenior === false && (
+                                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            후순위 소멸
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="text-[11px] text-gray-500 mt-1">
+                                        전입: {t.move_in_date || '미상'} {t.fixed_date ? `| 확정: ${t.fixed_date}` : ''}
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className={`font-bold block ${isIndivSenior ? 'text-red-600' : 'text-gray-800'}`}>
+                                        {typeof t.deposit === 'number' ? (t.deposit > 0 ? formatPrice(t.deposit) : '미상') : (t.deposit || '미상')}
+                                      </span>
+                                      {t.monthly_rent && <span className="text-[10px] text-gray-500">월 {t.monthly_rent}</span>}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    );
+                  })()}
 
                   <div className="pt-4 border-t border-gray-100">
                     <div className="flex items-center justify-between mb-4">
