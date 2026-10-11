@@ -158,12 +158,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 전체 매물 검색 & 필터 바로가기 배너 */}
+      <section>
+        <Link 
+          href="/auctions" 
+          className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 rounded-2xl hover:border-blue-400 hover:shadow-md transition-all group cursor-pointer"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+              🔍
+            </div>
+            <div>
+              <div className="text-sm font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
+                전체 매물 조건별 검색 & 필터링
+              </div>
+              <div className="text-xs text-gray-500 mt-0.5">
+                매물종류 · 지역 · 👤 임차인 유무 · 가격 · 등급 필터
+              </div>
+            </div>
+          </div>
+          <span className="text-blue-600 font-bold text-sm bg-white px-3 py-1.5 rounded-lg border border-blue-100 group-hover:translate-x-1 transition-all shadow-2xs">
+            필터 열기 &rarr;
+          </span>
+        </Link>
+      </section>
+
       {/* 2. 추천 물건 리스트 */}
       <section>
         <div className="flex justify-between items-end mb-4">
           <h2 className="text-lg font-semibold text-gray-700">AI 추천 물건 Top 6</h2>
-          <Link href="/auctions" className="text-sm text-blue-600 hover:text-blue-500 transition-colors">
-            전체보기 &rarr;
+          <Link href="/auctions" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+            전체 매물/필터 보기 &rarr;
           </Link>
         </div>
         

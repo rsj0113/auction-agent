@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   description: "AI가 분석해주는 똑똑한 부동산 경매",
 };
 
+import Link from "next/link";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,11 +20,17 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${inter.className} bg-gray-50 text-gray-900 min-h-screen flex justify-center`}>
         <div className="w-full max-w-md bg-white min-h-screen shadow-2xl relative overflow-x-hidden border-x border-gray-200">
-          <nav className="border-b border-gray-200 bg-white/90 backdrop-blur-md p-4 sticky top-0 z-10">
-            <div className="flex justify-between items-center">
-              <div className="font-bold text-lg tracking-tight text-gray-900 flex items-center gap-2">
-                <span className="text-blue-600">⚡️</span> AI 경매 에이전트
-              </div>
+          <nav className="border-b border-gray-200 bg-white/95 backdrop-blur-md px-4 py-3 sticky top-0 z-30 flex justify-between items-center shadow-sm">
+            <Link href="/" className="font-bold text-base tracking-tight text-gray-900 flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+              <span className="text-blue-600">⚡️</span> AI 경매 에이전트
+            </Link>
+            <div className="flex items-center gap-1.5">
+              <Link href="/" className="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-100 text-gray-700 transition-colors">
+                홈
+              </Link>
+              <Link href="/auctions" className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-sm flex items-center gap-1 transition-colors">
+                🔍 필터 검색
+              </Link>
             </div>
           </nav>
           <main className="p-4 py-6">
