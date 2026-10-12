@@ -499,11 +499,9 @@ class AuctionCrawler:
                                         dep_num = v
                                 except Exception:
                                     pass
-                        if dep_num > tenant_deposit:
-                            tenant_deposit = dep_num
-
                         # 배당요구 여부
-                        if any(k in poss or k in fixed_raw for k in ('배당요구', '배당신청', '배당요구일')):
+                        tenant_payout = any(k in poss or k in fixed_raw for k in ('배당요구', '배당신청', '배당요구일'))
+                        if tenant_payout:
                             is_payout_requested = True
 
                         tenants_list.append({
@@ -513,11 +511,30 @@ class AuctionCrawler:
                             "monthly_rent": monthly_raw or "",
                             "fixed_date": fixed_raw or "",
                             "room": room,
+                            "is_payout_requested": tenant_payout,
                         })
 
                     if dates_found:
                         dates_found.sort()
                         tenant_registration_date = dates_found[0]
+
+                    # 선순위 임차인 보증금 합산 (말소기준권리보다 빠른 임차인들의 보증금 총합)
+                    malso_kw = ['담보가등기', '근저당', '가압류', '경매개시결정', '경매개시', '압류', '저당']
+                    malso_dates = [r['date'].replace('.', '').replace('-', '') for r in rights_list if any(k in r.get('name', '') for k in malso_kw) and r.get('date')]
+                    earliest_malso = min(malso_dates) if malso_dates else ""
+
+                    senior_deposit_sum = 0
+                    total_deposit_sum = 0
+                    for t in tenants_list:
+                        d = t.get('deposit')
+                        d_val = d if isinstance(d, int) else 0
+                        total_deposit_sum += d_val
+                        t_clean = (t.get('move_in_date') or '').replace('.', '').replace('-', '')
+                        if not earliest_malso or (t_clean and t_clean < earliest_malso):
+                            senior_deposit_sum += d_val
+
+                    # 선순위 임차보증금 합산액 우선 반영 (없을 시 전체 보증금 합산액)
+                    tenant_deposit = senior_deposit_sum if senior_deposit_sum > 0 else total_deposit_sum
                 except Exception as e_curst:
                     console.print(f"[dim yellow]⚠️ 현황조사서 임차인 파싱 예외: {e_curst}[/dim yellow]")
 

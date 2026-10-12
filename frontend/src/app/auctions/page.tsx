@@ -82,6 +82,12 @@ export interface SeniorDepositAnalysis {
   hasTenant: boolean;
   isSenior: boolean;
   seniorDeposit: number;
+  seniorCount: number;
+  unknownSeniorCount: number;
+  seniorNoPayoutDeposit: number;
+  seniorPayoutDeposit: number;
+  juniorCount: number;
+  totalTenantsCount: number;
   statusBadge: { text: string; color: string };
   depositText: string;
   summaryText: string;
@@ -92,19 +98,141 @@ export function analyzeSeniorDeposit(
   rightsListJson?: string,
   tenantDate?: string,
   deposit?: number,
-  isPayoutRequested?: number
+  isPayoutRequested?: number,
+  tenants?: any[]
 ): SeniorDepositAnalysis {
   const malso = getMalsoStandard(rightsListJson);
   const cleanTenant = (tenantDate || '').replace(/[^0-9]/g, '');
   const cleanMalso = malso ? malso.date.replace(/[^0-9]/g, '') : '';
   const dep = deposit || 0;
 
+  // 복수 임차인 목록(tenants)이 제공된 경우: 개별 임차인 전입일 및 보증금 정밀 합산
+  if (tenants && Array.isArray(tenants) && tenants.length > 0) {
+    let seniorCount = 0;
+    let unknownSeniorCount = 0;
+    let seniorDepositSum = 0;
+    let seniorNoPayoutDeposit = 0;
+    let seniorPayoutDeposit = 0;
+    let juniorCount = 0;
+
+    for (const t of tenants) {
+      const tDateClean = (t.move_in_date || '').replace(/[^0-9]/g, '');
+      let tDep = 0;
+      if (typeof t.deposit === 'number') {
+        tDep = t.deposit;
+      } else if (typeof t.deposit === 'string') {
+        const matches = t.deposit.match(/[\d,]+/g);
+        if (matches) {
+          tDep = parseInt(matches.join('').replace(/,/g, ''), 10) || 0;
+        }
+      }
+
+      // 선순위 판정: 말소기준일이 있으면 비교, 없으면 보수적으로 선순위 간주
+      const isIndivSenior = cleanMalso ? (tDateClean ? tDateClean < cleanMalso : true) : true;
+
+      if (isIndivSenior) {
+        seniorCount++;
+        if (tDep > 0) {
+          seniorDepositSum += tDep;
+          if (t.is_payout_requested) {
+            seniorPayoutDeposit += tDep;
+          } else {
+            seniorNoPayoutDeposit += tDep;
+          }
+        } else {
+          unknownSeniorCount++;
+        }
+      } else {
+        juniorCount++;
+      }
+    }
+
+    if (seniorCount > 0) {
+      const isCritical = seniorNoPayoutDeposit > 0 || (seniorDepositSum === 0 && unknownSeniorCount > 0);
+      let badgeText = "";
+      if (seniorCount > 1) {
+        badgeText = seniorDepositSum > 0 
+          ? `🚨 선순위 ${seniorCount}명 합산: ${formatMoney(seniorDepositSum)}`
+          : `⚠️ 선순위 ${seniorCount}명 (보증금 미상)`;
+      } else {
+        badgeText = seniorDepositSum > 0
+          ? `🚨 선순위 인수: ${formatMoney(seniorDepositSum)}`
+          : `⚠️ 선순위 (보증금 미상)`;
+      }
+
+      let depText = "";
+      if (seniorDepositSum > 0) {
+        depText = `${formatMoney(seniorDepositSum)} 전액 합산 인수${unknownSeniorCount > 0 ? ` (+미상 ${unknownSeniorCount}명)` : ''}`;
+      } else {
+        depText = `보증금 미상 ${unknownSeniorCount}명 (전액 인수 위험)`;
+      }
+
+      let summary = `말소기준권리(${malso ? `${malso.name} ${malso.date}` : '등기 미확인'})보다 앞선 선순위 임차인이 총 ${seniorCount}명 존재합니다. `;
+      if (seniorDepositSum > 0) {
+        summary += `선순위 보증금 총 합계는 ${formatMoney(seniorDepositSum)}원입니다. `;
+      }
+      if (seniorNoPayoutDeposit > 0) {
+        summary += `이 중 배당 미요구 보증금 ${formatMoney(seniorNoPayoutDeposit)}원은 낙찰자가 전액 인수해야 합니다. `;
+      }
+      if (seniorPayoutDeposit > 0) {
+        summary += `배당 요구 보증금 ${formatMoney(seniorPayoutDeposit)}원은 우선 배당되나 낙찰가 부족 시 잔액을 인수해야 합니다. `;
+      }
+      if (unknownSeniorCount > 0) {
+        summary += `보증금이 확인되지 않은 선순위 임차인이 ${unknownSeniorCount}명 있어 추가 인수 위험이 있으므로 현황조사서 열람이 필수입니다.`;
+      }
+
+      return {
+        malsoStandard: malso,
+        hasTenant: true,
+        isSenior: true,
+        seniorDeposit: seniorDepositSum,
+        seniorCount,
+        unknownSeniorCount,
+        seniorNoPayoutDeposit,
+        seniorPayoutDeposit,
+        juniorCount,
+        totalTenantsCount: tenants.length,
+        statusBadge: { 
+          text: badgeText, 
+          color: isCritical ? 'bg-red-100 text-red-800 border-red-300 font-bold' : 'bg-amber-100 text-amber-800 border-amber-300 font-bold' 
+        },
+        depositText: depText,
+        summaryText: summary,
+        riskLevel: isCritical ? 'CRITICAL' : 'WARNING'
+      };
+    } else if (juniorCount > 0) {
+      return {
+        malsoStandard: malso,
+        hasTenant: true,
+        isSenior: false,
+        seniorDeposit: 0,
+        seniorCount: 0,
+        unknownSeniorCount: 0,
+        seniorNoPayoutDeposit: 0,
+        seniorPayoutDeposit: 0,
+        juniorCount,
+        totalTenantsCount: tenants.length,
+        statusBadge: { text: `✅ 후순위 ${juniorCount}명 (소멸/안전)`, color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+        depositText: '0원 (낙찰 시 권리 소멸)',
+        summaryText: `등재된 ${juniorCount}명의 임차인 모두 말소기준권리(${malso ? `${malso.name} ${malso.date}` : ''}) 이후 전입하여 대항력이 없습니다. 경매 낙찰 시 권리가 모두 소멸되어 낙찰자가 인수할 보증금이 없습니다.`,
+        riskLevel: 'SAFE'
+      };
+    }
+  }
+
+  // 단일 임차인 또는 tenants 미전달 시 fallback
   if (!cleanTenant || tenantDate === '임차인없음' || tenantDate === '해당없음') {
     return {
       malsoStandard: malso,
       hasTenant: false,
       isSenior: false,
       seniorDeposit: 0,
+      seniorCount: 0,
+      unknownSeniorCount: 0,
+      seniorNoPayoutDeposit: 0,
+      seniorPayoutDeposit: 0,
+      juniorCount: 0,
+      totalTenantsCount: 0,
       statusBadge: { text: '소유자 점유', color: 'bg-gray-100 text-gray-600 border-gray-200' },
       depositText: '0원 (인수 없음)',
       summaryText: '현황조사서상 대항력 있는 임차인이 확인되지 않아 낙찰자 인수 보증금이 없습니다.',
@@ -119,6 +247,12 @@ export function analyzeSeniorDeposit(
       hasTenant: true,
       isSenior: true,
       seniorDeposit: dep,
+      seniorCount: 1,
+      unknownSeniorCount: dep === 0 ? 1 : 0,
+      seniorNoPayoutDeposit: isPayoutRequested ? 0 : dep,
+      seniorPayoutDeposit: isPayoutRequested ? dep : 0,
+      juniorCount: 0,
+      totalTenantsCount: 1,
       statusBadge: { text: '선순위 추정 (주의)', color: 'bg-amber-100 text-amber-800 border-amber-300' },
       depositText: dep > 0 ? `${formatMoney(dep)} (인수 주의)` : '보증금 미상 (주의)',
       summaryText: '등기상 말소기준권리를 특정할 수 없어 보수적으로 선순위 인수 가능성을 점검해야 합니다.',
@@ -136,6 +270,12 @@ export function analyzeSeniorDeposit(
         hasTenant: true,
         isSenior: true,
         seniorDeposit: 0,
+        seniorCount: 1,
+        unknownSeniorCount: 1,
+        seniorNoPayoutDeposit: 0,
+        seniorPayoutDeposit: 0,
+        juniorCount: 0,
+        totalTenantsCount: 1,
         statusBadge: { text: '⚠️ 선순위 (보증금 미상)', color: 'bg-red-100 text-red-800 border-red-300' },
         depositText: '보증금 미상 (전액 인수 위험)',
         summaryText: `말소기준권리(${malso.name} ${malso.date})보다 앞선 전입(${tenantDate})으로 대항력이 있습니다. 보증금이 미상이므로 낙찰자 전액 인수 위험이 커 현황조사서 및 임대차 서류 열람이 필수입니다.`,
@@ -147,6 +287,12 @@ export function analyzeSeniorDeposit(
         hasTenant: true,
         isSenior: true,
         seniorDeposit: dep,
+        seniorCount: 1,
+        unknownSeniorCount: 0,
+        seniorNoPayoutDeposit: dep,
+        seniorPayoutDeposit: 0,
+        juniorCount: 0,
+        totalTenantsCount: 1,
         statusBadge: { text: `🚨 선순위 인수: ${formatMoney(dep)}`, color: 'bg-red-100 text-red-800 border-red-300 font-bold' },
         depositText: `${formatMoney(dep)} 전액 인수`,
         summaryText: `대항력 있는 선순위 임차인이 법원에 배당요구를 하지 않았습니다. 낙찰가 외에 보증금 ${formatMoney(dep)}을 낙찰자가 별도로 전액 물어줘야 합니다.`,
@@ -158,6 +304,12 @@ export function analyzeSeniorDeposit(
         hasTenant: true,
         isSenior: true,
         seniorDeposit: dep,
+        seniorCount: 1,
+        unknownSeniorCount: 0,
+        seniorNoPayoutDeposit: 0,
+        seniorPayoutDeposit: dep,
+        juniorCount: 0,
+        totalTenantsCount: 1,
         statusBadge: { text: `선순위(배당요구): ${formatMoney(dep)}`, color: 'bg-amber-100 text-amber-800 border-amber-300' },
         depositText: `최대 ${formatMoney(dep)} (배당 후 잔여액 인수)`,
         summaryText: `대항력 있는 선순위 임차인이 배당요구를 했습니다. 낙찰대금에서 우선 배당받으나, 낙찰가가 낮거나 세금 체납 등으로 배당받지 못한 잔여 보증금은 낙찰자가 인수합니다.`,
@@ -170,6 +322,12 @@ export function analyzeSeniorDeposit(
       hasTenant: true,
       isSenior: false,
       seniorDeposit: 0,
+      seniorCount: 0,
+      unknownSeniorCount: 0,
+      seniorNoPayoutDeposit: 0,
+      seniorPayoutDeposit: 0,
+      juniorCount: 1,
+      totalTenantsCount: 1,
       statusBadge: { text: '✅ 후순위 (소멸/안전)', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
       depositText: '0원 (낙찰 시 권리 소멸)',
       summaryText: `말소기준권리(${malso.name} ${malso.date}) 이후 전입(${tenantDate})으로 대항력이 없습니다. 경매 낙찰 시 권리가 소멸되어 낙찰자가 인수할 보증금이 없습니다.`,
@@ -559,7 +717,8 @@ export default function AuctionsPage() {
                       selectedDetail.rights_list,
                       selectedDetail.tenant_registration_date,
                       selectedDetail.tenant_deposit,
-                      selectedDetail.is_payout_requested
+                      selectedDetail.is_payout_requested,
+                      aiReport?.tenants
                     );
                     const malso = analysis.malsoStandard;
 

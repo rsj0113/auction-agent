@@ -343,7 +343,8 @@ export default function Home() {
                       selectedDetail.rights_list,
                       selectedDetail.tenant_registration_date,
                       selectedDetail.tenant_deposit,
-                      selectedDetail.is_payout_requested
+                      selectedDetail.is_payout_requested,
+                      aiReport?.tenants
                     );
                     const malso = analysis.malsoStandard;
 
