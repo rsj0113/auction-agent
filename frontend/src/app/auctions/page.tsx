@@ -51,6 +51,19 @@ export function formatMoney(val?: number): string {
   return `${val.toLocaleString()}원`;
 }
 
+export function formatMoneyShort(val?: number): string {
+  if (!val) return '0원';
+  if (val >= 100000000) {
+    const eok = (val / 100000000).toFixed(1).replace(/\.0$/, '');
+    return `${eok}억`;
+  }
+  if (val >= 10000) {
+    const man = Math.round(val / 10000);
+    return `${man.toLocaleString()}만`;
+  }
+  return `${val.toLocaleString()}원`;
+}
+
 export function getMalsoStandard(rightsListJson?: string): { name: string; date: string } | null {
   if (!rightsListJson) return null;
   try {
@@ -152,12 +165,12 @@ export function analyzeSeniorDeposit(
       let badgeText = "";
       if (seniorCount > 1) {
         badgeText = seniorDepositSum > 0 
-          ? `🚨 선순위 ${seniorCount}명 합산: ${formatMoney(seniorDepositSum)}`
-          : `⚠️ 선순위 ${seniorCount}명 (보증금 미상)`;
+          ? `🚨 선순위 ${seniorCount}명 (${formatMoneyShort(seniorDepositSum)})`
+          : `⚠️ 선순위 ${seniorCount}명 (미상)`;
       } else {
         badgeText = seniorDepositSum > 0
-          ? `🚨 선순위 인수: ${formatMoney(seniorDepositSum)}`
-          : `⚠️ 선순위 (보증금 미상)`;
+          ? `🚨 선순위 (${formatMoneyShort(seniorDepositSum)})`
+          : `⚠️ 선순위 (미상)`;
       }
 
       let depText = "";
@@ -169,13 +182,13 @@ export function analyzeSeniorDeposit(
 
       let summary = `말소기준권리(${malso ? `${malso.name} ${malso.date}` : '등기 미확인'})보다 앞선 선순위 임차인이 총 ${seniorCount}명 존재합니다. `;
       if (seniorDepositSum > 0) {
-        summary += `선순위 보증금 총 합계는 ${formatMoney(seniorDepositSum)}원입니다. `;
+        summary += `선순위 보증금 총 합계는 ${formatMoney(seniorDepositSum)}입니다. `;
       }
       if (seniorNoPayoutDeposit > 0) {
-        summary += `이 중 배당 미요구 보증금 ${formatMoney(seniorNoPayoutDeposit)}원은 낙찰자가 전액 인수해야 합니다. `;
+        summary += `이 중 배당 미요구 보증금 ${formatMoney(seniorNoPayoutDeposit)}은 낙찰자가 전액 인수해야 합니다. `;
       }
       if (seniorPayoutDeposit > 0) {
-        summary += `배당 요구 보증금 ${formatMoney(seniorPayoutDeposit)}원은 우선 배당되나 낙찰가 부족 시 잔액을 인수해야 합니다. `;
+        summary += `배당 요구 보증금 ${formatMoney(seniorPayoutDeposit)}은 우선 배당되나 낙찰가 부족 시 잔액을 인수해야 합니다. `;
       }
       if (unknownSeniorCount > 0) {
         summary += `보증금이 확인되지 않은 선순위 임차인이 ${unknownSeniorCount}명 있어 추가 인수 위험이 있으므로 현황조사서 열람이 필수입니다.`;
@@ -212,7 +225,7 @@ export function analyzeSeniorDeposit(
         seniorPayoutDeposit: 0,
         juniorCount,
         totalTenantsCount: tenants.length,
-        statusBadge: { text: `✅ 후순위 ${juniorCount}명 (소멸/안전)`, color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+        statusBadge: { text: `✅ 대항력 없음 (안전)`, color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
         depositText: '0원 (낙찰 시 권리 소멸)',
         summaryText: `등재된 ${juniorCount}명의 임차인 모두 말소기준권리(${malso ? `${malso.name} ${malso.date}` : ''}) 이후 전입하여 대항력이 없습니다. 경매 낙찰 시 권리가 모두 소멸되어 낙찰자가 인수할 보증금이 없습니다.`,
         riskLevel: 'SAFE'
@@ -253,7 +266,7 @@ export function analyzeSeniorDeposit(
       seniorPayoutDeposit: isPayoutRequested ? dep : 0,
       juniorCount: 0,
       totalTenantsCount: 1,
-      statusBadge: { text: '선순위 추정 (주의)', color: 'bg-amber-100 text-amber-800 border-amber-300' },
+      statusBadge: { text: dep > 0 ? `선순위 추정 (${formatMoneyShort(dep)})` : '선순위 추정 (주의)', color: 'bg-amber-100 text-amber-800 border-amber-300' },
       depositText: dep > 0 ? `${formatMoney(dep)} (인수 주의)` : '보증금 미상 (주의)',
       summaryText: '등기상 말소기준권리를 특정할 수 없어 보수적으로 선순위 인수 가능성을 점검해야 합니다.',
       riskLevel: 'WARNING'
@@ -276,7 +289,7 @@ export function analyzeSeniorDeposit(
         seniorPayoutDeposit: 0,
         juniorCount: 0,
         totalTenantsCount: 1,
-        statusBadge: { text: '⚠️ 선순위 (보증금 미상)', color: 'bg-red-100 text-red-800 border-red-300' },
+        statusBadge: { text: '⚠️ 선순위 (미상)', color: 'bg-red-100 text-red-800 border-red-300' },
         depositText: '보증금 미상 (전액 인수 위험)',
         summaryText: `말소기준권리(${malso.name} ${malso.date})보다 앞선 전입(${tenantDate})으로 대항력이 있습니다. 보증금이 미상이므로 낙찰자 전액 인수 위험이 커 현황조사서 및 임대차 서류 열람이 필수입니다.`,
         riskLevel: 'CRITICAL'
@@ -293,7 +306,7 @@ export function analyzeSeniorDeposit(
         seniorPayoutDeposit: 0,
         juniorCount: 0,
         totalTenantsCount: 1,
-        statusBadge: { text: `🚨 선순위 인수: ${formatMoney(dep)}`, color: 'bg-red-100 text-red-800 border-red-300 font-bold' },
+        statusBadge: { text: `🚨 선순위 (${formatMoneyShort(dep)})`, color: 'bg-red-100 text-red-800 border-red-300 font-bold' },
         depositText: `${formatMoney(dep)} 전액 인수`,
         summaryText: `대항력 있는 선순위 임차인이 법원에 배당요구를 하지 않았습니다. 낙찰가 외에 보증금 ${formatMoney(dep)}을 낙찰자가 별도로 전액 물어줘야 합니다.`,
         riskLevel: 'CRITICAL'
@@ -310,7 +323,7 @@ export function analyzeSeniorDeposit(
         seniorPayoutDeposit: dep,
         juniorCount: 0,
         totalTenantsCount: 1,
-        statusBadge: { text: `선순위(배당요구): ${formatMoney(dep)}`, color: 'bg-amber-100 text-amber-800 border-amber-300' },
+        statusBadge: { text: `선순위(배당): ${formatMoneyShort(dep)}`, color: 'bg-amber-100 text-amber-800 border-amber-300' },
         depositText: `최대 ${formatMoney(dep)} (배당 후 잔여액 인수)`,
         summaryText: `대항력 있는 선순위 임차인이 배당요구를 했습니다. 낙찰대금에서 우선 배당받으나, 낙찰가가 낮거나 세금 체납 등으로 배당받지 못한 잔여 보증금은 낙찰자가 인수합니다.`,
         riskLevel: 'WARNING'
@@ -328,7 +341,7 @@ export function analyzeSeniorDeposit(
       seniorPayoutDeposit: 0,
       juniorCount: 1,
       totalTenantsCount: 1,
-      statusBadge: { text: '✅ 후순위 (소멸/안전)', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+      statusBadge: { text: '✅ 대항력 없음 (안전)', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
       depositText: '0원 (낙찰 시 권리 소멸)',
       summaryText: `말소기준권리(${malso.name} ${malso.date}) 이후 전입(${tenantDate})으로 대항력이 없습니다. 경매 낙찰 시 권리가 소멸되어 낙찰자가 인수할 보증금이 없습니다.`,
       riskLevel: 'SAFE'
@@ -495,34 +508,9 @@ export default function AuctionsPage() {
         </div>
       </header>
 
-      <main className="max-w-md mx-auto px-5 pt-6">
-                {/* Filters */}
-        <div className="flex flex-col gap-2 mb-6">
-          <div className="flex gap-2">
-            <select 
-              value={propertyTypeFilter} 
-              onChange={(e) => setPropertyTypeFilter(e.target.value)}
-              className="flex-1 text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
-            >
-              <option value="">전체 매물</option>
-              <option value="apartment">아파트</option>
-              <option value="officetel">오피스텔</option>
-              <option value="villa">빌라/다세대</option>
-              <option value="commercial">상가/근린</option>
-              <option value="land">임야/토지</option>
-            </select>
-
-            <select 
-              value={tenantFilter} 
-              onChange={(e) => setTenantFilter(e.target.value)}
-              className="flex-1 text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
-            >
-              <option value="">임차인 전체</option>
-              <option value="yes">👤 임차인 있음</option>
-              <option value="no">🏠 소유자 점유 (임차인 없음)</option>
-            </select>
-          </div>
-
+      <main className="w-full mx-auto px-4 sm:px-5 pt-6">
+        {/* Filters */}
+        <div className="flex flex-col gap-2.5 mb-6 bg-gray-50/80 p-3.5 rounded-2xl border border-gray-200/80">
           <div className="flex gap-2">
             <input 
               type="text"
@@ -530,34 +518,44 @@ export default function AuctionsPage() {
               value={regionInput}
               onChange={(e) => setRegionInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && setRegionFilter(regionInput)}
-              className="w-full text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+              className="flex-1 text-sm bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-gray-800 outline-none focus:border-blue-500 shadow-2xs"
             />
             <button 
               onClick={() => setRegionFilter(regionInput)}
-              className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 whitespace-nowrap"
+              className="bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-blue-700 transition-colors shadow-2xs shrink-0"
             >
               검색
             </button>
           </div>
 
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2 text-sm">
             <select 
-              value={gradeFilter} 
-              onChange={(e) => setGradeFilter(e.target.value)}
-              className="flex-1 text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+              value={propertyTypeFilter} 
+              onChange={(e) => setPropertyTypeFilter(e.target.value)}
+              className="w-full text-xs sm:text-sm bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-2xs"
             >
-              <option value="">모든 등급</option>
-              <option value="S">S 등급</option>
-              <option value="A">A 등급</option>
-              <option value="B">B 등급</option>
-              <option value="C">C 등급</option>
-              <option value="D">D 등급</option>
+              <option value="">전체 매물</option>
+              <option value="apartment">🏢 아파트</option>
+              <option value="officetel">🏬 오피스텔</option>
+              <option value="villa">🏘️ 빌라/다세대</option>
+              <option value="commercial">🏪 상가/근린</option>
+              <option value="land">🌲 임야/토지</option>
+            </select>
+
+            <select 
+              value={tenantFilter} 
+              onChange={(e) => setTenantFilter(e.target.value)}
+              className="w-full text-xs sm:text-sm bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-2xs"
+            >
+              <option value="">임차인 전체</option>
+              <option value="yes">👤 임차인 있음</option>
+              <option value="no">🏠 소유자 점유</option>
             </select>
 
             <select 
               value={priceFilter} 
               onChange={(e) => setPriceFilter(e.target.value)}
-              className="flex-1 text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+              className="w-full text-xs sm:text-sm bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-2xs"
             >
               <option value="">가격 전체</option>
               <option value="under1">1억 미만</option>
@@ -567,11 +565,27 @@ export default function AuctionsPage() {
             </select>
 
             <select 
+              value={gradeFilter} 
+              onChange={(e) => setGradeFilter(e.target.value)}
+              className="w-full text-xs sm:text-sm bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-2xs"
+            >
+              <option value="">모든 등급</option>
+              <option value="S">S 등급</option>
+              <option value="A">A 등급</option>
+              <option value="B">B 등급</option>
+              <option value="C">C 등급</option>
+              <option value="D">D 등급</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 pt-1 border-t border-gray-200/50">
+            <span className="text-xs text-gray-500 shrink-0 font-medium">정렬:</span>
+            <select 
               value={sortOrder} 
               onChange={(e) => setSortOrder(e.target.value)}
-              className="flex-1 text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-sm"
+              className="flex-1 text-xs sm:text-sm bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-gray-700 outline-none focus:border-blue-500 shadow-2xs"
             >
-              <option value="recommend">추천순(S/A)</option>
+              <option value="recommend">⭐ AI 추천순(S/A)</option>
               <option value="recent">최신 등록순</option>
               <option value="oldest">오래된 등록순</option>
               <option value="price_asc">낮은 가격순</option>
@@ -585,12 +599,15 @@ export default function AuctionsPage() {
             <article 
               key={item.case_number} 
               onClick={() => handleSelectAuction(item)}
-              className="bg-white border border-gray-200 hover:border-blue-500/50 rounded-2xl p-5 shadow-sm transition-all cursor-pointer group"
+              className="bg-white border border-gray-200 hover:border-blue-500/50 rounded-2xl p-4 sm:p-5 shadow-sm transition-all cursor-pointer group"
             >
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-lg">
+              <div className="flex justify-between items-start mb-2.5 gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap flex-1 min-w-0">
+                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-lg shrink-0">
                     {item.case_number}
+                  </span>
+                  <span className="text-xs font-medium text-gray-700 bg-gray-100 px-2 py-0.5 rounded-lg shrink-0">
+                    {getPropertyType(item.location, item.usage)}
                   </span>
                   {(() => {
                     const analysis = analyzeSeniorDeposit(
@@ -600,20 +617,20 @@ export default function AuctionsPage() {
                       item.is_payout_requested
                     );
                     return (
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-md border ${analysis.statusBadge.color}`}>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-md border shrink-0 ${analysis.statusBadge.color}`}>
                         {analysis.statusBadge.text}
                       </span>
                     );
                   })()}
                 </div>
-                <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${getGradeColor(item.ai_grade)}`}>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border shrink-0 ${getGradeColor(item.ai_grade)}`}>
                   {item.ai_grade} 등급
                 </span>
               </div>
-              <h3 className="text-sm font-medium text-gray-800 mb-4 line-clamp-2 leading-snug group-hover:text-blue-700 transition-colors">
+              <h3 className="text-sm font-medium text-gray-800 mb-3 line-clamp-2 min-h-[2.5rem] leading-snug group-hover:text-blue-700 transition-colors">
                 {item.location}
               </h3>
-              <div className="grid grid-cols-2 gap-y-3 gap-x-4">
+              <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                 <div>
                   <p className="text-[11px] text-gray-400 font-medium mb-0.5">감정가</p>
                   <p className="text-sm font-semibold text-gray-900">{formatMoney(item.appraisal)}</p>
@@ -622,7 +639,7 @@ export default function AuctionsPage() {
                   <p className="text-[11px] text-gray-400 font-medium mb-0.5">최저가 <span className="text-red-500 ml-1">유찰 {item.failed_count}회</span></p>
                   <p className="text-sm font-bold text-blue-600">{formatMoney(item.min_bid)}</p>
                   {item.auction_date && (
-                    <p className="text-xs text-gray-500 mt-1">기일: {item.auction_date.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3')}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">기일: {item.auction_date.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3')}</p>
                   )}
                 </div>
               </div>
@@ -652,9 +669,9 @@ export default function AuctionsPage() {
 
       {/* 모달 (page.tsx와 동일 로직) */}
       {selectedDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setSelectedDetail(null)}></div>
-          <div className="bg-white rounded-3xl w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setSelectedDetail(null)}></div>
+          <div className="bg-white rounded-3xl w-full max-w-lg md:max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
             {detailLoading ? (
                <div className="p-8 text-center text-gray-500">
                  <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
@@ -662,30 +679,33 @@ export default function AuctionsPage() {
                </div>
             ) : (
               <div>
-                <div className="sticky top-0 bg-white/90 backdrop-blur-md px-6 py-4 border-b border-gray-100 flex justify-between items-center z-20">
-                  <h3 className="font-bold text-gray-900">{selectedDetail.case_number} 상세 분석</h3>
-                  <button onClick={() => setSelectedDetail(null)} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600 transition-colors">
+                <div className="sticky top-0 bg-white/95 backdrop-blur-md px-5 sm:px-6 py-4 border-b border-gray-100 flex justify-between items-center z-20">
+                  <div className="min-w-0 pr-2">
+                    <h3 className="font-bold text-gray-900 text-base truncate">{selectedDetail.case_number} 상세 분석</h3>
+                    <p className="text-xs text-gray-500 truncate">{selectedDetail.location}</p>
+                  </div>
+                  <button onClick={() => setSelectedDetail(null)} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600 transition-colors shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
                 
-                <div className="p-6 space-y-6">
+                <div className="p-4 sm:p-6 space-y-5">
                   <div>
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">물건 소재지</h4>
-                    <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
-                      <span className="inline-block mb-2 text-xs font-bold px-2 py-0.5 bg-gray-200 text-gray-700 rounded mr-2">
+                    <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
+                      <span className="inline-block mb-1.5 text-xs font-bold px-2 py-0.5 bg-gray-200 text-gray-700 rounded mr-2">
                         {getPropertyType(selectedDetail.location, (selectedDetail as any).usage)}
                       </span>
-                      {selectedDetail.location}
-                    </p>
-                    <div className="mt-2 flex gap-2">
+                      <span>{selectedDetail.location}</span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2">
                       <a 
                         href={`https://map.kakao.com/link/search/${encodeURIComponent(selectedDetail.location)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-yellow-700 bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg hover:bg-yellow-100 transition-colors"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-yellow-800 bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg hover:bg-yellow-100 transition-colors"
                       >
                         📍 카카오맵 / 로드뷰
                       </a>
@@ -693,21 +713,21 @@ export default function AuctionsPage() {
                         href={`https://map.naver.com/v5/search/${encodeURIComponent(selectedDetail.location)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-green-800 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors"
                       >
                         🗺️ 네이버지도
                       </a>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                     <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                  <div className="grid grid-cols-2 gap-3">
+                     <div className="bg-blue-50/50 p-3.5 rounded-xl border border-blue-100">
                         <p className="text-xs text-blue-600 font-medium mb-1">감정가</p>
-                        <p className="text-lg font-bold text-gray-900">{formatMoney(selectedDetail.appraisal)}</p>
+                        <p className="text-base sm:text-lg font-bold text-gray-900">{formatMoney(selectedDetail.appraisal)}</p>
                      </div>
-                     <div className="bg-red-50/50 p-4 rounded-xl border border-red-100">
+                     <div className="bg-red-50/50 p-3.5 rounded-xl border border-red-100">
                         <p className="text-xs text-red-600 font-medium mb-1">최저 매각가</p>
-                        <p className="text-lg font-bold text-red-600">{formatMoney(selectedDetail.min_bid)}</p>
+                        <p className="text-base sm:text-lg font-bold text-red-600">{formatMoney(selectedDetail.min_bid)}</p>
                      </div>
                   </div>
 
@@ -730,43 +750,43 @@ export default function AuctionsPage() {
                           ? 'bg-amber-50/70 border-amber-200 shadow-2xs'
                           : 'bg-emerald-50/70 border-emerald-200'
                       }`}>
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-bold flex items-center gap-1.5 text-gray-900">
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                          <h4 className="text-sm font-bold flex items-center gap-1.5 text-gray-900 min-w-0">
                             <span>{analysis.riskLevel === 'CRITICAL' ? '🚨' : analysis.riskLevel === 'WARNING' ? '⚠️' : '🛡️'}</span>
                             <span>선순위 권리 &amp; 인수 보증금 분석</span>
                           </h4>
-                          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${analysis.statusBadge.color}`}>
+                          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border shrink-0 ${analysis.statusBadge.color}`}>
                             {analysis.statusBadge.text}
                           </span>
                         </div>
 
                         {/* 4분할 지표 그리드 */}
                         <div className="grid grid-cols-2 gap-2 text-xs bg-white/90 p-3 rounded-xl border border-gray-100 shadow-2xs mb-2.5">
-                          <div className="border-r border-gray-100 pr-2">
+                          <div className="border-r border-gray-100 pr-2 min-w-0">
                             <span className="text-gray-400 block text-[11px] mb-0.5">말소기준권리</span>
-                            <span className="font-semibold text-gray-800">
+                            <span className="font-semibold text-gray-800 break-words line-clamp-2" title={malso ? `${malso.name} (${malso.date})` : ''}>
                               {malso ? `${malso.name} (${malso.date})` : '등기 미기재 / 확인필요'}
                             </span>
                           </div>
-                          <div className="pl-1">
+                          <div className="pl-1 min-w-0">
                             <span className="text-gray-400 block text-[11px] mb-0.5">최초 전입신고일</span>
-                            <span className="font-semibold text-gray-800">
+                            <span className="font-semibold text-gray-800 break-words">
                               {selectedDetail.tenant_registration_date === '임차인없음'
                                 ? '없음 (소유자 점유)'
                                 : (selectedDetail.tenant_registration_date || '현황조사서 미등재')}
                             </span>
                           </div>
-                          <div className="border-r border-gray-100 pr-2 pt-2 border-t">
+                          <div className="border-r border-gray-100 pr-2 pt-2 border-t min-w-0">
                             <span className="text-gray-400 block text-[11px] mb-0.5">신고 임차보증금</span>
-                            <span className="font-semibold text-gray-900">
+                            <span className="font-semibold text-gray-900 break-words">
                               {selectedDetail.tenant_deposit 
                                 ? formatMoney(selectedDetail.tenant_deposit) 
                                 : (analysis.hasTenant ? '미상 (현황조사서 미표기)' : '해당 없음')}
                             </span>
                           </div>
-                          <div className="pl-1 pt-2 border-t border-gray-100">
+                          <div className="pl-1 pt-2 border-t border-gray-100 min-w-0">
                             <span className="text-gray-400 block text-[11px] mb-0.5">배당요구 여부</span>
-                            <span className="font-semibold text-gray-800">
+                            <span className="font-semibold text-gray-800 break-words">
                               {selectedDetail.is_payout_requested 
                                 ? '✅ 요구함' 
                                 : (analysis.hasTenant ? '❌ 미요구' : '해당 없음')}
@@ -775,22 +795,45 @@ export default function AuctionsPage() {
                         </div>
 
                         {/* 인수 보증금 하이라이트 배너 */}
-                        <div className={`p-3 rounded-xl mb-2 flex items-center justify-between ${
+                        <div className={`p-3 rounded-xl mb-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 ${
                           analysis.riskLevel === 'CRITICAL'
-                            ? 'bg-red-100/80 text-red-950 border border-red-200'
+                            ? 'bg-red-100/90 text-red-950 border border-red-200'
                             : analysis.riskLevel === 'WARNING'
-                            ? 'bg-amber-100/80 text-amber-950 border border-amber-200'
-                            : 'bg-emerald-100/80 text-emerald-950 border border-emerald-200'
+                            ? 'bg-amber-100/90 text-amber-950 border border-amber-200'
+                            : 'bg-emerald-100/90 text-emerald-950 border border-emerald-200'
                         }`}>
-                          <div className="text-xs font-semibold">낙찰자 인수 예상 보증금</div>
-                          <div className={`text-base font-extrabold ${
+                          <div className="text-xs font-semibold text-gray-800">
+                            낙찰자 인수 예상 보증금
+                            {analysis.seniorCount > 1 && (
+                              <span className="text-[11px] text-gray-600 ml-1.5 font-normal">(선순위 {analysis.seniorCount}명 합산)</span>
+                            )}
+                          </div>
+                          <div className={`text-base font-extrabold tracking-tight ${
                             analysis.riskLevel === 'CRITICAL' ? 'text-red-700' : analysis.riskLevel === 'WARNING' ? 'text-amber-700' : 'text-emerald-700'
                           }`}>
                             {analysis.depositText}
                           </div>
                         </div>
 
-                        <p className="text-xs text-gray-700 leading-relaxed">
+                        {/* 다수 선순위 임차인 세부 구분 카드 */}
+                        {analysis.seniorCount > 1 && (
+                          <div className="grid grid-cols-2 gap-1.5 mb-2.5 text-xs">
+                            <div className="bg-white/90 p-2 rounded-lg border border-red-100 shadow-2xs">
+                              <span className="text-[11px] text-gray-500 block mb-0.5">⚠️ 배당 미요구 (전액 인수)</span>
+                              <span className="font-bold text-red-600 text-xs">
+                                {analysis.seniorNoPayoutDeposit > 0 ? formatMoney(analysis.seniorNoPayoutDeposit) : '0원'}
+                              </span>
+                            </div>
+                            <div className="bg-white/90 p-2 rounded-lg border border-amber-100 shadow-2xs">
+                              <span className="text-[11px] text-gray-500 block mb-0.5">ℹ️ 배당 요구 (우선변제)</span>
+                              <span className="font-bold text-amber-700 text-xs">
+                                {analysis.seniorPayoutDeposit > 0 ? formatMoney(analysis.seniorPayoutDeposit) : '0원'}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        <p className="text-xs text-gray-700 leading-relaxed bg-white/60 p-2.5 rounded-xl border border-gray-100/80">
                           {analysis.summaryText}
                         </p>
 
@@ -801,35 +844,44 @@ export default function AuctionsPage() {
                               <span>현황조사서 등재 임차인 상세</span>
                               <span className="text-blue-600 font-bold">총 {aiReport.tenants.length}명</span>
                             </p>
-                            <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+                            <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                               {aiReport.tenants.map((t: any, idx: number) => {
                                 const tClean = (t.move_in_date || '').replace(/[^0-9]/g, '');
                                 const mClean = malso ? malso.date.replace(/[^0-9]/g, '') : '';
                                 const isIndivSenior = mClean && tClean ? tClean < mClean : null;
 
                                 return (
-                                  <div key={idx} className="bg-white p-2.5 rounded-xl border border-gray-100 flex justify-between items-center text-gray-700 shadow-2xs">
-                                    <div>
-                                      <div className="flex items-center gap-1.5">
+                                  <div key={idx} className="bg-white p-2.5 rounded-xl border border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-gray-700 shadow-2xs">
+                                    <div className="min-w-0">
+                                      <div className="flex items-center gap-1.5 flex-wrap">
                                         <span className="font-bold text-gray-900">{t.name || '미상'}</span>
                                         {t.room && <span className="text-gray-500 text-[11px]">({t.room})</span>}
                                         {isIndivSenior === true && (
-                                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-700 border border-red-200">
-                                            선순위 인수주의
+                                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-red-100 text-red-700 border border-red-200 shrink-0">
+                                            선순위 인수
                                           </span>
                                         )}
                                         {isIndivSenior === false && (
-                                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                          <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                                             후순위 소멸
                                           </span>
                                         )}
+                                        {t.is_payout_requested ? (
+                                          <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200 shrink-0">
+                                            배당요구
+                                          </span>
+                                        ) : (
+                                          <span className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.2 rounded border border-gray-200 shrink-0">
+                                            미요구
+                                          </span>
+                                        )}
                                       </div>
-                                      <div className="text-[11px] text-gray-500 mt-1">
-                                        전입: {t.move_in_date || '미상'} {t.fixed_date ? `| 확정: ${t.fixed_date}` : ''}
+                                      <div className="text-[11px] text-gray-400 mt-1 truncate">
+                                        전입: {t.move_in_date || '미상'} {t.fixed_date ? `· 확정: ${t.fixed_date}` : ''}
                                       </div>
                                     </div>
-                                    <div className="text-right">
-                                      <span className={`font-bold block ${isIndivSenior ? 'text-red-600' : 'text-gray-800'}`}>
+                                    <div className="sm:text-right shrink-0 flex sm:flex-col justify-between items-center sm:items-end pt-1 sm:pt-0 border-t sm:border-t-0 border-gray-50">
+                                      <span className={`font-bold block text-xs ${isIndivSenior ? 'text-red-600' : 'text-gray-800'}`}>
                                         {typeof t.deposit === 'number' ? (t.deposit > 0 ? formatMoney(t.deposit) : '미상') : (t.deposit || '미상')}
                                       </span>
                                       {t.monthly_rent && <span className="text-[10px] text-gray-500">월 {t.monthly_rent}</span>}

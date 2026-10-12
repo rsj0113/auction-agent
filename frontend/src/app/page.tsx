@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { analyzeSeniorDeposit } from "./auctions/page";
+import { analyzeSeniorDeposit, formatMoney, formatMoneyShort } from "./auctions/page";
 
 interface SummaryData {
   total_active_auctions: number;
@@ -205,21 +205,14 @@ export default function Home() {
             <article 
               key={item.case_number} 
               onClick={() => handleSelectAuction(item)}
-              className="bg-white border border-gray-200 hover:border-blue-500/50 rounded-2xl p-5 shadow-sm transition-all cursor-pointer group"
+              className="bg-white border border-gray-200 hover:border-blue-500/50 rounded-2xl p-4 sm:p-5 shadow-sm transition-all cursor-pointer group"
             >
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 text-xs font-bold rounded ${
-                    item.ai_grade === 'S' ? 'bg-red-50 text-red-600' :
-                    item.ai_grade === 'A' ? 'bg-blue-50 text-blue-600' :
-                    item.ai_grade === 'B' ? 'bg-green-50 text-green-600' :
-                    item.ai_grade === 'C' ? 'bg-yellow-50 text-yellow-600' :
-                    item.ai_grade === 'D' ? 'bg-gray-50 text-gray-800' :
-                    'bg-gray-100 text-gray-600'
-                  }`}>
+              <div className="flex justify-between items-start mb-2.5 gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap flex-1 min-w-0">
+                  <span className={`px-2 py-0.5 text-xs font-bold rounded-lg border shrink-0 ${getGradeColor(item.ai_grade)}`}>
                     {item.ai_grade || '분석중'} 등급
                   </span>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
+                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg shrink-0">
                     {getPropertyType(item.location, item.usage)}
                   </span>
                   {(() => {
@@ -230,13 +223,13 @@ export default function Home() {
                       item.is_payout_requested
                     );
                     return (
-                      <span className={`px-2 py-1 text-xs font-semibold rounded border ${analysis.statusBadge.color}`}>
+                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-lg border shrink-0 ${analysis.statusBadge.color}`}>
                         {analysis.statusBadge.text}
                       </span>
                     );
                   })()}
                 </div>
-                <span className="text-xs text-gray-500">{item.case_number}</span>
+                <span className="text-xs text-gray-400 font-medium shrink-0">{item.case_number}</span>
               </div>
               
               <h3 className="text-base font-medium text-gray-900 mb-4 line-clamp-2 min-h-[3rem] group-hover:text-blue-600 transition-colors">
@@ -278,9 +271,9 @@ export default function Home() {
 
       {/* 모달 (page.tsx와 동일 로직) */}
       {selectedDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setSelectedDetail(null)}></div>
-          <div className="bg-white rounded-3xl w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setSelectedDetail(null)}></div>
+          <div className="bg-white rounded-3xl w-full max-w-lg md:max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
             {detailLoading ? (
                <div className="p-8 text-center text-gray-500">
                  <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
@@ -288,30 +281,33 @@ export default function Home() {
                </div>
             ) : (
               <div>
-                <div className="sticky top-0 bg-white/90 backdrop-blur-md px-6 py-4 border-b border-gray-100 flex justify-between items-center z-20">
-                  <h3 className="font-bold text-gray-900">{selectedDetail.case_number} 상세 분석</h3>
-                  <button onClick={() => setSelectedDetail(null)} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600 transition-colors">
+                <div className="sticky top-0 bg-white/95 backdrop-blur-md px-5 sm:px-6 py-4 border-b border-gray-100 flex justify-between items-center z-20">
+                  <div className="min-w-0 pr-2">
+                    <h3 className="font-bold text-gray-900 text-base truncate">{selectedDetail.case_number} 상세 분석</h3>
+                    <p className="text-xs text-gray-500 truncate">{selectedDetail.location}</p>
+                  </div>
+                  <button onClick={() => setSelectedDetail(null)} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600 transition-colors shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
                 
-                <div className="p-6 space-y-6">
+                <div className="p-4 sm:p-6 space-y-5">
                   <div>
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">물건 소재지</h4>
-                    <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
-                      <span className="inline-block mb-2 text-xs font-bold px-2 py-0.5 bg-gray-200 text-gray-700 rounded mr-2">
+                    <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
+                      <span className="inline-block mb-1.5 text-xs font-bold px-2 py-0.5 bg-gray-200 text-gray-700 rounded mr-2">
                         {getPropertyType(selectedDetail.location, (selectedDetail as any).usage)}
                       </span>
-                      {selectedDetail.location}
-                    </p>
-                    <div className="mt-2 flex gap-2">
+                      <span>{selectedDetail.location}</span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2">
                       <a 
                         href={`https://map.kakao.com/link/search/${encodeURIComponent(selectedDetail.location)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-yellow-700 bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg hover:bg-yellow-100 transition-colors"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-yellow-800 bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-lg hover:bg-yellow-100 transition-colors"
                       >
                         📍 카카오맵 / 로드뷰
                       </a>
@@ -319,21 +315,21 @@ export default function Home() {
                         href={`https://map.naver.com/v5/search/${encodeURIComponent(selectedDetail.location)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-green-800 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors"
                       >
                         🗺️ 네이버지도
                       </a>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                     <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                  <div className="grid grid-cols-2 gap-3">
+                     <div className="bg-blue-50/50 p-3.5 rounded-xl border border-blue-100">
                         <p className="text-xs text-blue-600 font-medium mb-1">감정가</p>
-                        <p className="text-lg font-bold text-gray-900">{formatPrice(selectedDetail.appraisal)}</p>
+                        <p className="text-base sm:text-lg font-bold text-gray-900">{formatMoney(selectedDetail.appraisal)}</p>
                      </div>
-                     <div className="bg-red-50/50 p-4 rounded-xl border border-red-100">
+                     <div className="bg-red-50/50 p-3.5 rounded-xl border border-red-100">
                         <p className="text-xs text-red-600 font-medium mb-1">최저 매각가</p>
-                        <p className="text-lg font-bold text-red-600">{formatPrice(selectedDetail.min_bid)}</p>
+                        <p className="text-base sm:text-lg font-bold text-red-600">{formatMoney(selectedDetail.min_bid)}</p>
                      </div>
                   </div>
 
@@ -356,43 +352,43 @@ export default function Home() {
                           ? 'bg-amber-50/70 border-amber-200 shadow-2xs'
                           : 'bg-emerald-50/70 border-emerald-200'
                       }`}>
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-bold flex items-center gap-1.5 text-gray-900">
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                          <h4 className="text-sm font-bold flex items-center gap-1.5 text-gray-900 min-w-0">
                             <span>{analysis.riskLevel === 'CRITICAL' ? '🚨' : analysis.riskLevel === 'WARNING' ? '⚠️' : '🛡️'}</span>
                             <span>선순위 권리 &amp; 인수 보증금 분석</span>
                           </h4>
-                          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${analysis.statusBadge.color}`}>
+                          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border shrink-0 ${analysis.statusBadge.color}`}>
                             {analysis.statusBadge.text}
                           </span>
                         </div>
 
                         {/* 4분할 지표 그리드 */}
                         <div className="grid grid-cols-2 gap-2 text-xs bg-white/90 p-3 rounded-xl border border-gray-100 shadow-2xs mb-2.5">
-                          <div className="border-r border-gray-100 pr-2">
+                          <div className="border-r border-gray-100 pr-2 min-w-0">
                             <span className="text-gray-400 block text-[11px] mb-0.5">말소기준권리</span>
-                            <span className="font-semibold text-gray-800">
+                            <span className="font-semibold text-gray-800 break-words line-clamp-2" title={malso ? `${malso.name} (${malso.date})` : ''}>
                               {malso ? `${malso.name} (${malso.date})` : '등기 미기재 / 확인필요'}
                             </span>
                           </div>
-                          <div className="pl-1">
+                          <div className="pl-1 min-w-0">
                             <span className="text-gray-400 block text-[11px] mb-0.5">최초 전입신고일</span>
-                            <span className="font-semibold text-gray-800">
+                            <span className="font-semibold text-gray-800 break-words">
                               {selectedDetail.tenant_registration_date === '임차인없음'
                                 ? '없음 (소유자 점유)'
                                 : (selectedDetail.tenant_registration_date || '현황조사서 미등재')}
                             </span>
                           </div>
-                          <div className="border-r border-gray-100 pr-2 pt-2 border-t">
+                          <div className="border-r border-gray-100 pr-2 pt-2 border-t min-w-0">
                             <span className="text-gray-400 block text-[11px] mb-0.5">신고 임차보증금</span>
-                            <span className="font-semibold text-gray-900">
+                            <span className="font-semibold text-gray-900 break-words">
                               {selectedDetail.tenant_deposit 
-                                ? formatPrice(selectedDetail.tenant_deposit) 
+                                ? formatMoney(selectedDetail.tenant_deposit) 
                                 : (analysis.hasTenant ? '미상 (현황조사서 미표기)' : '해당 없음')}
                             </span>
                           </div>
-                          <div className="pl-1 pt-2 border-t border-gray-100">
+                          <div className="pl-1 pt-2 border-t border-gray-100 min-w-0">
                             <span className="text-gray-400 block text-[11px] mb-0.5">배당요구 여부</span>
-                            <span className="font-semibold text-gray-800">
+                            <span className="font-semibold text-gray-800 break-words">
                               {selectedDetail.is_payout_requested 
                                 ? '✅ 요구함' 
                                 : (analysis.hasTenant ? '❌ 미요구' : '해당 없음')}
@@ -401,22 +397,45 @@ export default function Home() {
                         </div>
 
                         {/* 인수 보증금 하이라이트 배너 */}
-                        <div className={`p-3 rounded-xl mb-2 flex items-center justify-between ${
+                        <div className={`p-3 rounded-xl mb-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 ${
                           analysis.riskLevel === 'CRITICAL'
-                            ? 'bg-red-100/80 text-red-950 border border-red-200'
+                            ? 'bg-red-100/90 text-red-950 border border-red-200'
                             : analysis.riskLevel === 'WARNING'
-                            ? 'bg-amber-100/80 text-amber-950 border border-amber-200'
-                            : 'bg-emerald-100/80 text-emerald-950 border border-emerald-200'
+                            ? 'bg-amber-100/90 text-amber-950 border border-amber-200'
+                            : 'bg-emerald-100/90 text-emerald-950 border border-emerald-200'
                         }`}>
-                          <div className="text-xs font-semibold">낙찰자 인수 예상 보증금</div>
-                          <div className={`text-base font-extrabold ${
+                          <div className="text-xs font-semibold text-gray-800">
+                            낙찰자 인수 예상 보증금
+                            {analysis.seniorCount > 1 && (
+                              <span className="text-[11px] text-gray-600 ml-1.5 font-normal">(선순위 {analysis.seniorCount}명 합산)</span>
+                            )}
+                          </div>
+                          <div className={`text-base font-extrabold tracking-tight ${
                             analysis.riskLevel === 'CRITICAL' ? 'text-red-700' : analysis.riskLevel === 'WARNING' ? 'text-amber-700' : 'text-emerald-700'
                           }`}>
                             {analysis.depositText}
                           </div>
                         </div>
 
-                        <p className="text-xs text-gray-700 leading-relaxed">
+                        {/* 다수 선순위 임차인 세부 구분 카드 */}
+                        {analysis.seniorCount > 1 && (
+                          <div className="grid grid-cols-2 gap-1.5 mb-2.5 text-xs">
+                            <div className="bg-white/90 p-2 rounded-lg border border-red-100 shadow-2xs">
+                              <span className="text-[11px] text-gray-500 block mb-0.5">⚠️ 배당 미요구 (전액 인수)</span>
+                              <span className="font-bold text-red-600 text-xs">
+                                {analysis.seniorNoPayoutDeposit > 0 ? formatMoney(analysis.seniorNoPayoutDeposit) : '0원'}
+                              </span>
+                            </div>
+                            <div className="bg-white/90 p-2 rounded-lg border border-amber-100 shadow-2xs">
+                              <span className="text-[11px] text-gray-500 block mb-0.5">ℹ️ 배당 요구 (우선변제)</span>
+                              <span className="font-bold text-amber-700 text-xs">
+                                {analysis.seniorPayoutDeposit > 0 ? formatMoney(analysis.seniorPayoutDeposit) : '0원'}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        <p className="text-xs text-gray-700 leading-relaxed bg-white/60 p-2.5 rounded-xl border border-gray-100/80">
                           {analysis.summaryText}
                         </p>
 
@@ -427,36 +446,45 @@ export default function Home() {
                               <span>현황조사서 등재 임차인 상세</span>
                               <span className="text-blue-600 font-bold">총 {aiReport.tenants.length}명</span>
                             </p>
-                            <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+                            <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                               {aiReport.tenants.map((t: any, idx: number) => {
                                 const tClean = (t.move_in_date || '').replace(/[^0-9]/g, '');
                                 const mClean = malso ? malso.date.replace(/[^0-9]/g, '') : '';
                                 const isIndivSenior = mClean && tClean ? tClean < mClean : null;
 
                                 return (
-                                  <div key={idx} className="bg-white p-2.5 rounded-xl border border-gray-100 flex justify-between items-center text-gray-700 shadow-2xs">
-                                    <div>
-                                      <div className="flex items-center gap-1.5">
+                                  <div key={idx} className="bg-white p-2.5 rounded-xl border border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-gray-700 shadow-2xs">
+                                    <div className="min-w-0">
+                                      <div className="flex items-center gap-1.5 flex-wrap">
                                         <span className="font-bold text-gray-900">{t.name || '미상'}</span>
                                         {t.room && <span className="text-gray-500 text-[11px]">({t.room})</span>}
                                         {isIndivSenior === true && (
-                                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-700 border border-red-200">
-                                            선순위 인수주의
+                                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-red-100 text-red-700 border border-red-200 shrink-0">
+                                            선순위 인수
                                           </span>
                                         )}
                                         {isIndivSenior === false && (
-                                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                          <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                                             후순위 소멸
                                           </span>
                                         )}
+                                        {t.is_payout_requested ? (
+                                          <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200 shrink-0">
+                                            배당요구
+                                          </span>
+                                        ) : (
+                                          <span className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.2 rounded border border-gray-200 shrink-0">
+                                            미요구
+                                          </span>
+                                        )}
                                       </div>
-                                      <div className="text-[11px] text-gray-500 mt-1">
-                                        전입: {t.move_in_date || '미상'} {t.fixed_date ? `| 확정: ${t.fixed_date}` : ''}
+                                      <div className="text-[11px] text-gray-400 mt-1 truncate">
+                                        전입: {t.move_in_date || '미상'} {t.fixed_date ? `· 확정: ${t.fixed_date}` : ''}
                                       </div>
                                     </div>
-                                    <div className="text-right">
-                                      <span className={`font-bold block ${isIndivSenior ? 'text-red-600' : 'text-gray-800'}`}>
-                                        {typeof t.deposit === 'number' ? (t.deposit > 0 ? formatPrice(t.deposit) : '미상') : (t.deposit || '미상')}
+                                    <div className="sm:text-right shrink-0 flex sm:flex-col justify-between items-center sm:items-end pt-1 sm:pt-0 border-t sm:border-t-0 border-gray-50">
+                                      <span className={`font-bold block text-xs ${isIndivSenior ? 'text-red-600' : 'text-gray-800'}`}>
+                                        {typeof t.deposit === 'number' ? (t.deposit > 0 ? formatMoney(t.deposit) : '미상') : (t.deposit || '미상')}
                                       </span>
                                       {t.monthly_rent && <span className="text-[10px] text-gray-500">월 {t.monthly_rent}</span>}
                                     </div>
