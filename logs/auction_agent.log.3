@@ -2055,3 +2055,1737 @@ Traceback (most recent call last):
   File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
     raise self._make_status_error_from_response(err.response) from None
 openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:12:59 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2021타경11236", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:01 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경1639", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:04 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경98906", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:06 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경96849", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:08 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경11404", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:10 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경10807", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:13 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경10869", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:15 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경11718", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:17 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경12667", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:19 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경55705", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:22 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경13899", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:24 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경60581", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:26 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2020타경59777", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:28 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2021타경50142", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:31 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경60881", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:33 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경3758", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:35 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경4805", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:37 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경5020", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:39 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경5129", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:42 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2020타경30144", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:44 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2022타경2037", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:46 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경2003", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:49 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경2447", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:51 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경33045", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:53 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경33106", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:55 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경36655", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:13:58 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경3099", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:00 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경1065", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:02 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경269", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:04 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경540", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:07 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경792", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:09 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경52296", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:11 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경52639", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:14 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경52706", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:16 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경52927", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:19 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53119", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:21 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53140", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:23 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53205", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:26 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53237", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:28 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53264", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:31 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53302", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:33 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53341", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:35 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53371", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:38 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53380", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:40 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53431", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:43 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53458", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:45 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53490", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:47 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경53544", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:49 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2026타경50414", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:51 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2026타경50870", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:53 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경540", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:55 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경625", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:14:58 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경2140", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:00 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2022타경80158", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:03 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경7556", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:05 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경2957", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:07 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경4304", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:09 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2026타경71264", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:11 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경74754", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:13 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경75023", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:16 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경83055", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:18 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경86924", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:20 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경5731", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:22 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경82813", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:24 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경85102", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:26 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경2548", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:28 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경5515", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:31 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경66282", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:33 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2026타경60768", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:35 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경78643", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:37 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경79325", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:39 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경562", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:42 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경5314", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:44 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경5840", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:46 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경6591", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:48 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경7648", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:50 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경8276", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:53 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경8696", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:55 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경9002", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:15:57 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경9057", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:00 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경9132", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:02 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경9200", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:04 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경62546", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:06 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경64771", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:08 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경62620", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:11 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경66470", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:13 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경67633", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:15 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경70400", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:17 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경69455", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:20 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경69714", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:22 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경75511", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:24 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경76323", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:26 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경76378", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:29 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경78251", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:31 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경79698", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:33 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경80360", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:36 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경80414", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:38 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2023타경5516", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:41 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2025타경72603", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:43 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경5810", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:45 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경6387", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
+2026-10-14 05:16:47 [ERROR] auction_agent — [ErrorCategory.API_ERROR] OpenAI 분석 실패 — RateLimitError | ctx={"case_number": "2024타경75567", "model": "gpt-4.1-nano"}
+Traceback (most recent call last):
+  File "/Users/seonjin/vscode_project/auction_agent/auto_crawling.py", line 1313, in analyze_item
+    response = self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1297, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seonjin/.pyenv/versions/3.11.14/lib/python3.11/site-packages/openai/_base_client.py", line 1070, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}
