@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { analyzeSeniorDeposit, formatMoney, formatMoneyShort } from "./auctions/page";
+import InvestmentCalculator from "@/components/InvestmentCalculator";
 
 interface SummaryData {
   total_active_auctions: number;
@@ -345,6 +346,7 @@ export default function Home() {
                     const malso = analysis.malsoStandard;
 
                     return (
+                      <>
                       <div className={`p-4 rounded-2xl border transition-all ${
                         analysis.riskLevel === 'CRITICAL' 
                           ? 'bg-red-50/70 border-red-200 shadow-2xs' 
@@ -495,6 +497,16 @@ export default function Home() {
                           </div>
                         )}
                       </div>
+
+                      {/* 실전 투자금 & 경락잔금대출 계산기 */}
+                      <InvestmentCalculator
+                        appraisal={selectedDetail.appraisal}
+                        minBid={selectedDetail.min_bid}
+                        seniorDeposit={analysis.seniorDeposit}
+                        isHouse={!getPropertyType(selectedDetail.location, (selectedDetail as any).usage).includes("상가") && !getPropertyType(selectedDetail.location, (selectedDetail as any).usage).includes("토지")}
+                        location={selectedDetail.location}
+                      />
+                    </>
                     );
                   })()}
 
