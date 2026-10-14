@@ -14,6 +14,7 @@ load_dotenv()
 from core.logging_system import ErrorCategory, log_error_event, get_logger, _classify_exception
 
 _logger = get_logger()
+from core.special_rights import extract_special_rights
 
 from playwright.async_api import async_playwright, Page, Frame
 from openai import OpenAI
@@ -99,6 +100,8 @@ class AuctionDBAgent:
                 "area_pyeong REAL",
                 "usage TEXT",
                 "auction_date TEXT",
+                "remarks TEXT",
+                "special_rights TEXT",
             ]:
                 try:
                     cursor.execute(f"ALTER TABLE auction_items ADD COLUMN {col_def}")
@@ -157,8 +160,8 @@ class AuctionDBAgent:
                     case_number, location, usage, appraisal, min_bid, prev_min_bid, failed_count,
                     rights_list, tenant_registration_date, tenant_deposit, is_payout_requested,
                     ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, last_updated, status_flag,
-                    area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd, auction_date
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd, auction_date, remarks, special_rights
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(case_number) DO UPDATE SET
                     location=excluded.location,
                     usage=excluded.usage,
@@ -183,7 +186,9 @@ class AuctionDBAgent:
                     legal_div_no=coalesce(excluded.legal_div_no, auction_items.legal_div_no),
                     addr_sgg=coalesce(excluded.addr_sgg, auction_items.addr_sgg),
                     addr_emd=coalesce(excluded.addr_emd, auction_items.addr_emd),
-                    auction_date=excluded.auction_date
+                    auction_date=excluded.auction_date,
+                    remarks=coalesce(excluded.remarks, auction_items.remarks),
+                    special_rights=coalesce(excluded.special_rights, auction_items.special_rights)
             """, (
                 item['case_number'],
                 item['location'],
@@ -210,6 +215,8 @@ class AuctionDBAgent:
                 item.get('addr_sgg') or '',
                 item.get('addr_emd') or '',
                 item.get('auction_date') or '',
+                item.get('remarks') or '',
+                item.get('special_rights') or '[]',
                 status_flag,
             ))
             conn.commit()
@@ -389,11 +396,24 @@ class AuctionCrawler:
         is_payout_requested = False
         tenants_list = []
         auction_date = ""
+        remarks = ""
 
         try:
             dma = (raw.get('data') or {}).get('dma_result') or {}
             gds = dma.get('dspslGdsDxdyInfo') or {}
             auction_date = gds.get('dspslDxdyYmd') or ""
+
+            # ── 비고란 및 매각조건 수집 (매각물건명세서 비고) ──
+            remarks_parts = []
+            if gds.get('gdsSpcfcRmk'):
+                remarks_parts.append(f"[매각물건명세서 비고]\n{gds['gdsSpcfcRmk'].strip()}")
+            if gds.get('dspslGdsRmk'):
+                remarks_parts.append(f"[매각조건 비고]\n{gds['dspslGdsRmk'].strip()}")
+            if gds.get('sprfcExstcDts'):
+                remarks_parts.append(f"[지상권 관련 내역]\n{gds['sprfcExstcDts'].strip()}")
+            if gds.get('ndstrcRghCtt'):
+                remarks_parts.append(f"[소멸되지 않는 권리]\n{gds['ndstrcRghCtt'].strip()}")
+            remarks = "\n\n".join(remarks_parts)
 
             # 디버그 덤프: --debug-dump 플래그 시 dma_result 전체를 파일로 저장
             if debug_dump_path and dma:
@@ -637,6 +657,8 @@ class AuctionCrawler:
 
         area_pyeong = round(area_m2 / 3.30579, 1) if area_m2 else 0.0
 
+        special_rights = extract_special_rights(remarks=remarks, rights_list=rights_list)
+
         return {
             "rights_list": rights_list,
             "tenant_registration_date": tenant_registration_date,
@@ -650,6 +672,8 @@ class AuctionCrawler:
             "addr_sgg": addr_sgg,
             "addr_emd": addr_emd,
             "auction_date": auction_date,
+            "remarks": remarks,
+            "special_rights": json.dumps(special_rights, ensure_ascii=False),
         }
 
     async def search(self, region: str = "서울", max_items: int = 5, court_code: str = "", debug_dump_path: str = "") -> list:
@@ -1226,6 +1250,8 @@ class AuctionCrawler:
                         "addr_sgg": detail_info["addr_sgg"],
                         "addr_emd": detail_info["addr_emd"],
                         "auction_date": detail_info.get("auction_date", ""),
+                        "remarks": detail_info.get("remarks", ""),
+                        "special_rights": detail_info.get("special_rights", "[]"),
                     })
 
                 await browser.close()

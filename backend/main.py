@@ -52,7 +52,8 @@ def get_auctions(
         query = '''
             SELECT case_number, location, usage, appraisal, min_bid, 
                    auction_date, failed_count, ai_grade, ai_verdict, status_flag,
-                   tenant_registration_date, tenant_deposit, is_payout_requested, rights_list
+                   tenant_registration_date, tenant_deposit, is_payout_requested, rights_list,
+                   remarks, special_rights
             FROM auction_items 
             WHERE 1=1
         '''
@@ -106,6 +107,10 @@ def get_auctions(
                 query += " AND min_bid <= 100000000"
             elif quick_filter == 'top_grade':
                 query += " AND ai_grade IN ('S', 'A')"
+            elif quick_filter == 'special':
+                query += " AND special_rights IS NOT NULL AND special_rights != '[]' AND special_rights != ''"
+            elif quick_filter == 'clean':
+                query += " AND (special_rights IS NULL OR special_rights = '[]' OR special_rights = '')"
 
         # Sorting
         if sort == 'recommend':
@@ -168,6 +173,14 @@ def get_quick_filter_counts():
         # top_grade (S/A 등급)
         cursor.execute("SELECT COUNT(*) FROM auction_items WHERE ai_grade IN ('S', 'A')")
         counts["top_grade"] = cursor.fetchone()[0]
+
+        # special (특수권리 태그 매물)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE special_rights IS NOT NULL AND special_rights != '[]' AND special_rights != ''")
+        counts["special"] = cursor.fetchone()[0]
+
+        # clean (특수권리 없는 매물)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE special_rights IS NULL OR special_rights = '[]' OR special_rights = ''")
+        counts["clean"] = cursor.fetchone()[0]
         
         conn.close()
         return counts

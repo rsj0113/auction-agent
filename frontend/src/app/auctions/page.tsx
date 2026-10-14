@@ -18,6 +18,8 @@ interface AuctionItem {
   tenant_deposit?: number;
   is_payout_requested?: number;
   rights_list?: string;
+  remarks?: string;
+  special_rights?: string;
 }
 
 interface AIReport {
@@ -368,12 +370,13 @@ function getPropertyType(location: string, usage?: string): string {
 
 const QUICK_CHIPS = [
   { id: "", label: "전체", countKey: "total", icon: "📋" },
-  { id: "safe", label: "안전 매물", countKey: "safe", icon: "🛡️" },
+  { id: "clean", label: "깨끗한 일반물건", countKey: "clean", icon: "🛡️" },
   { id: "half_price", label: "반값 경매", countKey: "half_price", icon: "🔥" },
   { id: "owner", label: "소유자 점유", countKey: "owner", icon: "🏠" },
   { id: "apartment", label: "아파트", countKey: "apartment", icon: "🏢" },
   { id: "small_budget", label: "1억 이하", countKey: "small_budget", icon: "💰" },
   { id: "top_grade", label: "AI 추천", countKey: "top_grade", icon: "💎" },
+  { id: "special", label: "특수권리 주의", countKey: "special", icon: "⚠️" },
 ];
 
 export default function AuctionsPage() {
@@ -707,6 +710,19 @@ export default function AuctionsPage() {
                       </span>
                     );
                   })()}
+                  {/* 특수권리 태그 배지 */}
+                  {(() => {
+                    try {
+                      const tags = item.special_rights ? JSON.parse(item.special_rights) : [];
+                      return tags.map((t: any) => (
+                        <span key={t.id} className={`text-xs font-bold px-2 py-0.5 rounded-md border shrink-0 ${t.badge_color || 'bg-amber-100 text-amber-800 border-amber-200'}`} title={t.desc}>
+                          {t.icon || '🏷️'} {t.short || t.name}
+                        </span>
+                      ));
+                    } catch {
+                      return null;
+                    }
+                  })()}
                 </div>
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border shrink-0 ${getGradeColor(item.ai_grade)}`}>
                   {item.ai_grade} 등급
@@ -989,6 +1005,81 @@ export default function AuctionsPage() {
                         location={selectedDetail.location}
                       />
                     </>
+                    );
+                  })()}
+
+                  {/* 매각물건명세서 특수조건 & 비고 분석 카드 */}
+                  {(() => {
+                    let specialTags: any[] = [];
+                    try {
+                      if (selectedDetail.special_rights) {
+                        specialTags = JSON.parse(selectedDetail.special_rights);
+                      }
+                    } catch {}
+
+                    const hasRemarks = Boolean(selectedDetail.remarks && selectedDetail.remarks.trim());
+
+                    return (
+                      <div className="p-4 rounded-2xl border bg-white border-gray-200/80 shadow-2xs space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-bold flex items-center gap-1.5 text-gray-900">
+                            <span>📋</span>
+                            <span>매각물건명세서 특수조건 &amp; 비고 분석</span>
+                          </h4>
+                          {specialTags.length > 0 ? (
+                            <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200">
+                              특수조건 {specialTags.length}건 감지
+                            </span>
+                          ) : (
+                            <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              ✅ 일반 물건 (특수하자 없음)
+                            </span>
+                          )}
+                        </div>
+
+                        {specialTags.length > 0 ? (
+                          <div className="space-y-2">
+                            {specialTags.map((tag: any) => (
+                              <div key={tag.id} className={`p-3 rounded-xl border text-xs ${
+                                tag.risk_level === 'CRITICAL' 
+                                  ? 'bg-red-50/80 border-red-200 text-red-950' 
+                                  : tag.risk_level === 'HIGH'
+                                  ? 'bg-rose-50/80 border-rose-200 text-rose-950'
+                                  : 'bg-amber-50/80 border-amber-200 text-amber-950'
+                              }`}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="font-bold flex items-center gap-1.5 text-xs">
+                                    <span>{tag.icon || '🏷️'}</span>
+                                    <span>{tag.name}</span>
+                                  </div>
+                                  <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded border bg-white/80">
+                                    {tag.risk_level === 'CRITICAL' ? '치명적 위험' : tag.risk_level === 'HIGH' ? '고위험' : '주의 요망'}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] leading-relaxed text-gray-700">
+                                  {tag.desc}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="p-3 rounded-xl bg-emerald-50/60 border border-emerald-100 text-xs text-emerald-800 flex items-start gap-2">
+                            <span className="text-base">🛡️</span>
+                            <p className="leading-relaxed">
+                              법원 매각물건명세서 및 공고상 유치권, 법정지상권, 지분매각 등 매수인이 인수해야 할 특수조건이 없는 일반 권리 물건입니다.
+                            </p>
+                          </div>
+                        )}
+
+                        {hasRemarks && (
+                          <div className="pt-2 border-t border-gray-100">
+                            <span className="text-[11px] font-bold text-gray-500 block mb-1.5">🏛️ 법원 공고 비고란 원문</span>
+                            <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-200/70 text-[11px] text-gray-700 font-mono whitespace-pre-line leading-relaxed max-h-36 overflow-y-auto">
+                              {selectedDetail.remarks}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     );
                   })()}
 
