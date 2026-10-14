@@ -130,6 +130,50 @@ def get_auctions(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/auctions/quick-counts")
+def get_quick_filter_counts():
+    """
+    Get item counts for quick filter chips.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        counts = {}
+        
+        # total
+        cursor.execute("SELECT COUNT(*) FROM auction_items")
+        counts["total"] = cursor.fetchone()[0]
+        
+        # safe (S, A, B 등급)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE ai_grade IN ('S', 'A', 'B')")
+        counts["safe"] = cursor.fetchone()[0]
+        
+        # half_price (min_bid * 2 <= appraisal)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE min_bid * 2 <= appraisal")
+        counts["half_price"] = cursor.fetchone()[0]
+        
+        # owner (소유자 점유)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE ((tenant_registration_date IS NULL OR tenant_registration_date IN ('', '임차인없음', '해당없음')) AND (tenant_deposit IS NULL OR tenant_deposit = 0))")
+        counts["owner"] = cursor.fetchone()[0]
+        
+        # apartment (아파트)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE (usage LIKE '%아파트%' OR location LIKE '%아파트%') AND usage NOT LIKE '%상가%' AND location NOT LIKE '%상가%'")
+        counts["apartment"] = cursor.fetchone()[0]
+        
+        # small_budget (1억 이하)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE min_bid <= 100000000")
+        counts["small_budget"] = cursor.fetchone()[0]
+        
+        # top_grade (S/A 등급)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE ai_grade IN ('S', 'A')")
+        counts["top_grade"] = cursor.fetchone()[0]
+        
+        conn.close()
+        return counts
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/auctions/{case_number}")
 def get_auction_detail(case_number: str):
     """
@@ -175,50 +219,6 @@ def get_dashboard_summary():
             "today_recommended": recommended_items,
             "briefing_text": f"현재 {total_items}건의 경매 물건이 분석되었으며, 그 중 추천할 만한 우량 물건은 {recommended_items}건입니다."
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/auctions/quick-counts")
-def get_quick_filter_counts():
-    """
-    Get item counts for quick filter chips.
-    """
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        counts = {}
-        
-        # total
-        cursor.execute("SELECT COUNT(*) FROM auction_items")
-        counts["total"] = cursor.fetchone()[0]
-        
-        # safe (S, A, B 등급)
-        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE ai_grade IN ('S', 'A', 'B')")
-        counts["safe"] = cursor.fetchone()[0]
-        
-        # half_price (min_bid * 2 <= appraisal)
-        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE min_bid * 2 <= appraisal")
-        counts["half_price"] = cursor.fetchone()[0]
-        
-        # owner (소유자 점유)
-        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE ((tenant_registration_date IS NULL OR tenant_registration_date IN ('', '임차인없음', '해당없음')) AND (tenant_deposit IS NULL OR tenant_deposit = 0))")
-        counts["owner"] = cursor.fetchone()[0]
-        
-        # apartment (아파트)
-        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE (usage LIKE '%아파트%' OR location LIKE '%아파트%') AND usage NOT LIKE '%상가%' AND location NOT LIKE '%상가%'")
-        counts["apartment"] = cursor.fetchone()[0]
-        
-        # small_budget (1억 이하)
-        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE min_bid <= 100000000")
-        counts["small_budget"] = cursor.fetchone()[0]
-        
-        # top_grade (S/A 등급)
-        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE ai_grade IN ('S', 'A')")
-        counts["top_grade"] = cursor.fetchone()[0]
-        
-        conn.close()
-        return counts
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -366,13 +366,27 @@ function getPropertyType(location: string, usage?: string): string {
   return "🏠 주택/기타";
 }
 
+const QUICK_CHIPS = [
+  { id: "", label: "전체", countKey: "total", icon: "📋" },
+  { id: "safe", label: "안전 매물", countKey: "safe", icon: "🛡️" },
+  { id: "half_price", label: "반값 경매", countKey: "half_price", icon: "🔥" },
+  { id: "owner", label: "소유자 점유", countKey: "owner", icon: "🏠" },
+  { id: "apartment", label: "아파트", countKey: "apartment", icon: "🏢" },
+  { id: "small_budget", label: "1억 이하", countKey: "small_budget", icon: "💰" },
+  { id: "top_grade", label: "AI 추천", countKey: "top_grade", icon: "💎" },
+];
+
 export default function AuctionsPage() {
   const [auctions, setAuctions] = useState<AuctionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  // 필터 상태
+  // 퀵 필터 칩 상태
+  const [quickFilter, setQuickFilter] = useState<string>("");
+  const [quickCounts, setQuickCounts] = useState<{ [key: string]: number }>({});
+
+  // 상세 필터 상태
   const [gradeFilter, setGradeFilter] = useState<string>("");
   const [priceFilter, setPriceFilter] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<string>("recent");
@@ -385,7 +399,19 @@ export default function AuctionsPage() {
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  const fetchAuctions = async (pageIndex: number, overrideParams?: { grade?: string, price?: string, sort?: string, propertyType?: string, region?: string, hasTenant?: string }) => {
+  // 퀵 필터 카운트 불러오기
+  useEffect(() => {
+    fetch("/api/auctions/quick-counts", { headers: { "ngrok-skip-browser-warning": "1" } })
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data.total === 'number') {
+          setQuickCounts(data);
+        }
+      })
+      .catch(err => console.error("퀵 필터 카운트 로딩 실패:", err));
+  }, []);
+
+  const fetchAuctions = async (pageIndex: number, overrideParams?: { grade?: string, price?: string, sort?: string, propertyType?: string, region?: string, hasTenant?: string, quickFilter?: string }) => {
     try {
       if (pageIndex === 0) setLoading(true);
       const grade = overrideParams?.grade ?? gradeFilter;
@@ -394,6 +420,7 @@ export default function AuctionsPage() {
       const propertyType = overrideParams?.propertyType ?? propertyTypeFilter;
       const tenant = overrideParams?.hasTenant ?? tenantFilter;
       const region = overrideParams?.region ?? regionFilter;
+      const qf = overrideParams?.quickFilter ?? quickFilter;
       
       let url = `/api/auctions?limit=20&offset=${pageIndex * 20}`;
       if (grade) url += `&grade=${grade}`;
@@ -401,6 +428,7 @@ export default function AuctionsPage() {
       if (propertyType) url += `&property_type=${propertyType}`;
       if (tenant) url += `&has_tenant=${tenant}`;
       if (region) url += `&region=${encodeURIComponent(region)}`;
+      if (qf) url += `&quick_filter=${qf}`;
       if (price) {
         if (price === "under1") url += `&max_price=100000000`;
         else if (price === "1to3") url += `&min_price=100000000&max_price=300000000`;
@@ -436,7 +464,7 @@ export default function AuctionsPage() {
       fetchAuctions(0);
     }, 300);
     return () => clearTimeout(timer);
-  }, [gradeFilter, priceFilter, sortOrder, propertyTypeFilter, tenantFilter, regionFilter]);
+  }, [gradeFilter, priceFilter, sortOrder, propertyTypeFilter, tenantFilter, regionFilter, quickFilter]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -527,6 +555,62 @@ export default function AuctionsPage() {
             >
               검색
             </button>
+          </div>
+
+          {/* Quick Filter Chips (투자자용 원클릭 퀵 필터) */}
+          <div className="pt-1">
+            <div className="flex items-center justify-between mb-1.5 px-0.5">
+              <span className="text-[11px] font-bold text-gray-500 flex items-center gap-1">
+                <span>⚡</span> <span>투자자 퀵 필터</span>
+              </span>
+              {(quickFilter || regionFilter || propertyTypeFilter || tenantFilter || priceFilter || gradeFilter) && (
+                <button
+                  onClick={() => {
+                    setQuickFilter("");
+                    setRegionFilter("");
+                    setRegionInput("");
+                    setPropertyTypeFilter("");
+                    setTenantFilter("");
+                    setPriceFilter("");
+                    setGradeFilter("");
+                  }}
+                  className="text-[11px] text-gray-500 hover:text-red-600 font-semibold flex items-center gap-1 transition-colors bg-white px-2 py-0.5 rounded-lg border border-gray-200"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  초기화
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-1 px-1">
+              {QUICK_CHIPS.map((chip) => {
+                const isActive = quickFilter === chip.id;
+                const count = quickCounts[chip.countKey];
+                return (
+                  <button
+                    key={chip.id}
+                    onClick={() => setQuickFilter(isActive ? "" : chip.id)}
+                    className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      isActive
+                        ? "bg-blue-600 text-white shadow-sm ring-2 ring-blue-600/30 font-bold scale-[1.02]"
+                        : "bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900 border border-gray-200 shadow-2xs"
+                    }`}
+                  >
+                    <span>{chip.icon}</span>
+                    <span>{chip.label}</span>
+                    {typeof count === "number" && (
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
+                        isActive ? "bg-white/25 text-white" : "bg-gray-100 text-gray-500"
+                      }`}>
+                        {count.toLocaleString()}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-sm">
