@@ -16,6 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'auction_db.sqlite')
 
 def get_db_connection():
@@ -53,7 +56,9 @@ def get_auctions(
             SELECT case_number, location, usage, appraisal, min_bid, 
                    auction_date, failed_count, ai_grade, ai_verdict, status_flag,
                    tenant_registration_date, tenant_deposit, is_payout_requested, rights_list,
-                   remarks, special_rights
+                   remarks, special_rights,
+                   market_price, safety_margin, market_discount_pct,
+                   market_match_count, market_match_level, est_monthly_rent, rental_yield
             FROM auction_items 
             WHERE 1=1
         '''
@@ -111,10 +116,20 @@ def get_auctions(
                 query += " AND special_rights IS NOT NULL AND special_rights != '[]' AND special_rights != ''"
             elif quick_filter == 'clean':
                 query += " AND (special_rights IS NULL OR special_rights = '[]' OR special_rights = '')"
+            elif quick_filter == 'margin_100m':
+                query += " AND safety_margin >= 100000000"
+            elif quick_filter == 'market_matched':
+                query += " AND market_match_count > 0"
 
         # Sorting
         if sort == 'recommend':
             query += " ORDER BY CASE WHEN ai_grade='S' THEN 1 WHEN ai_grade='A' THEN 2 WHEN ai_grade='B' THEN 3 WHEN ai_grade='C' THEN 4 WHEN ai_grade='D' THEN 5 ELSE 6 END ASC, last_updated DESC"
+        elif sort == 'margin_desc':
+            query += " ORDER BY safety_margin DESC, last_updated DESC"
+        elif sort == 'market_discount':
+            query += " ORDER BY market_discount_pct DESC, last_updated DESC"
+        elif sort == 'yield_desc':
+            query += " ORDER BY rental_yield DESC, last_updated DESC"
         elif sort == 'price_asc':
             query += " ORDER BY min_bid ASC"
         elif sort == 'price_desc':
@@ -181,6 +196,14 @@ def get_quick_filter_counts():
         # clean (특수권리 없는 매물)
         cursor.execute("SELECT COUNT(*) FROM auction_items WHERE special_rights IS NULL OR special_rights = '[]' OR special_rights = ''")
         counts["clean"] = cursor.fetchone()[0]
+
+        # margin_100m (진짜 안전마진 1억+)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE safety_margin >= 100000000")
+        counts["margin_100m"] = cursor.fetchone()[0]
+
+        # market_matched (네이버 시세 검증 완료)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE market_match_count > 0")
+        counts["market_matched"] = cursor.fetchone()[0]
         
         conn.close()
         return counts
@@ -190,7 +213,7 @@ def get_quick_filter_counts():
 @app.get("/api/auctions/{case_number}")
 def get_auction_detail(case_number: str):
     """
-    Get full details for a specific auction item.
+    Get full details for a specific auction item, including matching Naver listings.
     """
     try:
         conn = get_db_connection()
@@ -206,7 +229,22 @@ def get_auction_detail(case_number: str):
         if row is None:
             raise HTTPException(status_code=404, detail="Auction not found")
             
-        return {"data": dict(row)}
+        item_data = dict(row)
+        
+        # Attach dynamic Naver market comparison listings
+        try:
+            from core.market_matcher import MarketMatcher
+            matcher = MarketMatcher()
+            matched_res = matcher.match_item(item_data)
+            item_data["sample_listings"] = matched_res.get("sample_listings", [])
+            item_data["senior_deposit_assumed"] = matched_res.get("senior_deposit_assumed", 0)
+            item_data["min_market_price"] = matched_res.get("min_market_price", 0)
+        except Exception:
+            item_data["sample_listings"] = []
+            item_data["senior_deposit_assumed"] = 0
+            item_data["min_market_price"] = 0
+            
+        return {"data": item_data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

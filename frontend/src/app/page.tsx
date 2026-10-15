@@ -11,6 +11,18 @@ interface SummaryData {
   briefing_text: string;
 }
 
+interface SampleListing {
+  article_id?: string;
+  article_name?: string;
+  trade_type?: string;
+  price_sale_10k?: number;
+  area_m2?: number;
+  area_pyeong?: number;
+  floor?: number | string | null;
+  total_floor?: number | string | null;
+  detail_url?: string;
+}
+
 interface AuctionItem {
   case_number: string;
   location: string;
@@ -27,6 +39,13 @@ interface AuctionItem {
   rights_list?: string;
   remarks?: string;
   special_rights?: string;
+  market_price?: number;
+  safety_margin?: number;
+  market_discount_pct?: number;
+  market_match_count?: number;
+  market_match_level?: string;
+  est_monthly_rent?: number;
+  rental_yield?: number;
 }
 
 interface AuctionDetail extends AuctionItem {
@@ -37,6 +56,9 @@ interface AuctionDetail extends AuctionItem {
   tenant_deposit?: number;
   is_payout_requested?: number;
   rights_list?: string;
+  sample_listings?: SampleListing[];
+  senior_deposit_assumed?: number;
+  min_market_price?: number;
 }
 
 function getPropertyType(location: string, usage?: string): string {
@@ -262,6 +284,35 @@ export default function Home() {
                   <span className="text-red-500">{formatPrice(item.min_bid)}</span>
                 </div>
               </div>
+
+              {/* 진짜 안전마진 배너 */}
+              {item.market_match_count && item.market_match_count > 0 && item.market_price && item.market_price > 0 ? (
+                <div className="mt-3 p-2.5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/90 flex items-center justify-between text-xs">
+                  <div className="min-w-0 pr-2">
+                    <span className="font-extrabold text-emerald-900 flex items-center gap-1">
+                      <span>🎯 진짜 안전마진</span>
+                      <span className="text-sm text-emerald-700">+{formatMoney(item.safety_margin)}</span>
+                    </span>
+                    <span className="text-[11px] text-emerald-700 font-medium block mt-0.5 truncate">
+                      네이버 시세 {formatMoney(item.market_price)} ({item.market_match_level} {item.market_match_count}건)
+                    </span>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="inline-block px-2 py-0.5 rounded-md font-bold text-[11px] bg-emerald-600 text-white shadow-2xs">
+                      시세 대비 {item.market_discount_pct}%↓
+                    </span>
+                  </div>
+                </div>
+              ) : item.safety_margin && item.safety_margin > 0 ? (
+                <div className="mt-3 p-2 rounded-xl bg-gray-50/80 border border-gray-200/60 flex items-center justify-between text-xs">
+                  <span className="text-gray-600 font-medium">
+                    🏛️ 감정가 기준 마진: <strong className="text-gray-900">+{formatMoney(item.safety_margin)}</strong>
+                  </span>
+                  <span className="text-[11px] text-gray-600 font-semibold bg-gray-200/60 px-1.5 py-0.5 rounded">
+                    할인 {item.market_discount_pct}%
+                  </span>
+                </div>
+              ) : null}
               
               <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
                 <div className="flex flex-col gap-1">
@@ -347,6 +398,134 @@ export default function Home() {
                         <p className="text-xs text-red-600 font-medium mb-1">최저 매각가</p>
                         <p className="text-base sm:text-lg font-bold text-red-600">{formatMoney(selectedDetail.min_bid)}</p>
                      </div>
+                  </div>
+
+                  {/* 네이버 부동산 시세 비교 & 진짜 안전마진 카드 */}
+                  <div className="p-4 rounded-2xl border bg-white border-emerald-200/90 shadow-sm space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h4 className="text-sm font-bold flex items-center gap-1.5 text-gray-900">
+                        <span>📊</span>
+                        <span>네이버 부동산 시세 &amp; 진짜 안전마진</span>
+                      </h4>
+                      {selectedDetail.market_match_count && selectedDetail.market_match_count > 0 ? (
+                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                          <span>🏢 실매물</span>
+                          <span>{selectedDetail.market_match_level} {selectedDetail.market_match_count}건 연동</span>
+                        </span>
+                      ) : (
+                        <span className="text-xs font-medium px-2.5 py-0.5 rounded-lg bg-gray-100 text-gray-600 border border-gray-200">
+                          인근 실매물 수집 대기 (감정가 기준)
+                        </span>
+                      )}
+                    </div>
+
+                    {/* 4분할 시세 vs 최저가 vs 마진 비교 그리드 */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                      <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                        <span className="text-gray-400 block text-[11px] mb-0.5 font-medium">법원 감정가</span>
+                        <span className="font-bold text-gray-900 text-sm">{formatMoney(selectedDetail.appraisal)}</span>
+                        <span className="text-[10px] text-gray-400 block mt-0.5">법원 감정평가액</span>
+                      </div>
+
+                      <div className="bg-blue-50/70 p-2.5 rounded-xl border border-blue-100">
+                        <span className="text-blue-600 block text-[11px] mb-0.5 font-medium">네이버 시세</span>
+                        <span className="font-bold text-blue-900 text-sm">
+                          {selectedDetail.market_price && selectedDetail.market_price > 0 
+                            ? formatMoney(selectedDetail.market_price) 
+                            : formatMoney(selectedDetail.appraisal)}
+                        </span>
+                        <span className="text-[10px] text-blue-500 block mt-0.5">
+                          {selectedDetail.market_match_count && selectedDetail.market_match_count > 0 
+                            ? `${selectedDetail.market_match_level} 평균 호가` 
+                            : '감정가 추정'}
+                        </span>
+                      </div>
+
+                      <div className="bg-amber-50/70 p-2.5 rounded-xl border border-amber-100">
+                        <span className="text-amber-700 block text-[11px] mb-0.5 font-medium">최저가 + 인수금</span>
+                        <span className="font-bold text-amber-900 text-sm">
+                          {formatMoney(selectedDetail.min_bid + (selectedDetail.senior_deposit_assumed || 0))}
+                        </span>
+                        <span className="text-[10px] text-amber-600 block mt-0.5">
+                          {selectedDetail.senior_deposit_assumed && selectedDetail.senior_deposit_assumed > 0
+                            ? `인수 ${formatMoney(selectedDetail.senior_deposit_assumed)} 포함`
+                            : '인수 보증금 0원'}
+                        </span>
+                      </div>
+
+                      <div className="bg-gradient-to-br from-emerald-100 to-teal-100 p-2.5 rounded-xl border border-emerald-300">
+                        <span className="text-emerald-800 block text-[11px] mb-0.5 font-extrabold">🎯 진짜 안전마진</span>
+                        <span className="font-extrabold text-emerald-900 text-sm">
+                          +{formatMoney(selectedDetail.safety_margin)}
+                        </span>
+                        <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">
+                          {selectedDetail.market_discount_pct}% 저렴
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 임대 수익률 시뮬레이션 (월세 매물이 있는 경우) */}
+                    {selectedDetail.est_monthly_rent && selectedDetail.est_monthly_rent > 0 ? (
+                      <div className="p-3 bg-teal-50/60 rounded-xl border border-teal-100 flex items-center justify-between text-xs">
+                        <div>
+                          <span className="font-bold text-teal-900 block">📈 인근 월세 및 예상 임대 수익률</span>
+                          <span className="text-teal-700 text-[11px]">
+                            예상 월세: <strong>{formatMoney(selectedDetail.est_monthly_rent)}/월</strong>
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs font-extrabold text-teal-800 bg-white px-2 py-1 rounded-lg border border-teal-200">
+                            연 {selectedDetail.rental_yield}% 수익률
+                          </span>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {/* 네이버 부동산 인근 비교 매물 목록 (실시간 링크) */}
+                    {selectedDetail.sample_listings && selectedDetail.sample_listings.length > 0 && (
+                      <div className="pt-2 border-t border-gray-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold text-gray-700">🏢 인근 네이버 부동산 비교 매물</span>
+                          <a
+                            href={`https://land.naver.com/search/result.naver?keyword=${encodeURIComponent(selectedDetail.location.split(' ').slice(0, 3).join(' '))}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] text-blue-600 hover:underline font-medium"
+                          >
+                            네이버 부동산에서 더보기 →
+                          </a>
+                        </div>
+                        <div className="space-y-1.5">
+                          {selectedDetail.sample_listings.map((item, idx) => (
+                            <div key={item.article_id || idx} className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100/80 border border-gray-200/70 transition-colors flex items-center justify-between text-xs">
+                              <div className="min-w-0 pr-2">
+                                <span className="font-semibold text-gray-800 block truncate">
+                                  {item.article_name} {item.floor ? `(${item.floor}층)` : ''}
+                                </span>
+                                <span className="text-[11px] text-gray-500">
+                                  {item.area_m2}㎡ ({item.area_pyeong}평) · {item.trade_type}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="font-bold text-gray-900">
+                                  {formatMoney((item.price_sale_10k || 0) * 10000)}
+                                </span>
+                                {item.detail_url && (
+                                  <a
+                                    href={item.detail_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-2 py-1 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium text-[11px] border border-blue-200 transition-colors"
+                                  >
+                                    매물보기 ↗
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* 선순위 권리 & 낙찰자 인수 보증금 핵심 분석 카드 */}

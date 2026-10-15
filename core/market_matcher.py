@@ -168,14 +168,17 @@ class MarketMatcher:
                 elif is_sido:
                     matched_sido_rent.append(n)
 
-        # 매매 매칭 우선순위 선정
-        if matched_emd_sale:
+        # 토지/임야 여부 검사 (상가/빌딩 단가 오적용 방지)
+        is_land = bool(re.search(r'(산\s*\d+|임야|전\s*\d+|답\s*\d+|과수원|잡종지)', loc))
+
+        # 매매 매칭 우선순위 선정 (토지는 일반 상가/빌딩 단가 매칭 제외)
+        if not is_land and matched_emd_sale:
             chosen_sales = matched_emd_sale
             match_level = "동일동"
-        elif matched_sgg_sale:
+        elif not is_land and matched_sgg_sale:
             chosen_sales = matched_sgg_sale
             match_level = "동일구"
-        elif matched_sido_sale:
+        elif not is_land and matched_sido_sale:
             chosen_sales = matched_sido_sale
             match_level = "동일시"
         else:
@@ -192,19 +195,31 @@ class MarketMatcher:
             min_ppm2 = min(prices_per_m2)
             
             if has_area:
-                market_price = int(avg_ppm2 * area_m2)
-                min_market_price = int(min_ppm2 * area_m2)
+                raw_mp = int(avg_ppm2 * area_m2)
+                raw_min_mp = int(min_ppm2 * area_m2)
             else:
-                # 면적이 없는 경우 매물들의 평균 매매가
-                market_price = int(sum(s["price_sale_10k"] * 10000 for s in valid_sales) / len(valid_sales))
-                min_market_price = int(min(s["price_sale_10k"] * 10000 for s in valid_sales))
+                raw_mp = int(sum(s["price_sale_10k"] * 10000 for s in valid_sales) / len(valid_sales))
+                raw_min_mp = int(min(s["price_sale_10k"] * 10000 for s in valid_sales))
+
+            # 이상치 가드: 감정가 대비 0.35배 ~ 2.5배 이내인 경우만 정상 시세로 채택
+            if appraisal > 0:
+                ratio = raw_mp / appraisal
+                if 0.35 <= ratio <= 2.5:
+                    market_price = raw_mp
+                    min_market_price = raw_min_mp
+                else:
+                    valid_sales = []
+                    match_level = "시세괴리"
+            else:
+                market_price = raw_mp
+                min_market_price = raw_min_mp
 
         # 월세 매칭 우선순위 선정
-        if matched_emd_rent:
+        if not is_land and matched_emd_rent:
             chosen_rents = matched_emd_rent
-        elif matched_sgg_rent:
+        elif not is_land and matched_sgg_rent:
             chosen_rents = matched_sgg_rent
-        elif matched_sido_rent:
+        elif not is_land and matched_sido_rent:
             chosen_rents = matched_sido_rent
         else:
             chosen_rents = []
@@ -218,7 +233,7 @@ class MarketMatcher:
         rental_yield = 0.0
         area_pyeong = area_m2 / PYEONG if has_area else 0.0
         
-        if valid_rents:
+        if valid_rents and market_price > 0:
             avg_rpp = sum(r["monthly_rent_10k"] / r["area_pyeong"] for r in valid_rents) / len(valid_rents)
             avg_dep_10k = sum(r.get("deposit_10k") or 0 for r in valid_rents) / len(valid_rents)
             
@@ -229,7 +244,7 @@ class MarketMatcher:
             if denom > 0 and est_monthly_rent > 0:
                 rental_yield = round((est_monthly_rent * 12 / denom) * 100, 2)
 
-        # 선순위 인수 보증금
+        # 선순위 인수 보증금 (여러 임차인 전액 합산 반영)
         senior_deposit = extract_assumed_deposit(item)
         net_cost = min_bid + senior_deposit
 
