@@ -50,7 +50,7 @@ def analyze_auction_data(item_data: dict) -> dict:
     """
     
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=[{"role": "system", "content": "You are a helpful JSON-only assistant."},
                   {"role": "user", "content": prompt}],
         response_format={"type": "json_object"},

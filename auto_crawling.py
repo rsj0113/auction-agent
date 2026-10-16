@@ -28,7 +28,7 @@ from rich import print as rprint
 
 # --- Configurations ---
 COURT_AUCTION_MAIN_URL = "https://www.courtauction.go.kr"
-OPENAI_MODEL = "gpt-4.1-nano"  # 최저가 모델
+OPENAI_MODEL = "gpt-4o-mini"  # 최저가 고성능 경량 모델 (gpt-4o 대비 95% 이상 비용/토큰 절감)
 DB_FILE_PATH = "auction_db.sqlite"
 
 # 법원경매 사이트 용도별 코드 (상가/오피스텔 등). 빈 문자열이면 전체 용도.
