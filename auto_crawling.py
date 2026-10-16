@@ -102,6 +102,8 @@ class AuctionDBAgent:
                 "auction_date TEXT",
                 "remarks TEXT",
                 "special_rights TEXT",
+                "created_at TEXT",
+                "ai_model TEXT",
             ]:
                 try:
                     cursor.execute(f"ALTER TABLE auction_items ADD COLUMN {col_def}")
@@ -132,6 +134,8 @@ class AuctionDBAgent:
         """
         existing = self.get_existing_item(item['case_number'])
         now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        created_at_str = (existing.get('created_at') if existing else None) or now_str
+        ai_model_str = ai_report.get('ai_model') or (existing.get('ai_model') if existing else None) or OPENAI_MODEL
         
         status_flag = "NEW"
         prev_min_bid = None
@@ -159,9 +163,9 @@ class AuctionDBAgent:
                 INSERT INTO auction_items (
                     case_number, location, usage, appraisal, min_bid, prev_min_bid, failed_count,
                     rights_list, tenant_registration_date, tenant_deposit, is_payout_requested,
-                    ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, last_updated, status_flag,
+                    ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, last_updated, created_at, ai_model, status_flag,
                     area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd, auction_date, remarks, special_rights
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(case_number) DO UPDATE SET
                     location=excluded.location,
                     usage=excluded.usage,
@@ -179,6 +183,8 @@ class AuctionDBAgent:
                     ai_suggested_bid=excluded.ai_suggested_bid,
                     ai_report_json=excluded.ai_report_json,
                     last_updated=excluded.last_updated,
+                    created_at=coalesce(auction_items.created_at, excluded.created_at),
+                    ai_model=coalesce(excluded.ai_model, auction_items.ai_model),
                     status_flag=?,
                     area_m2=coalesce(nullif(excluded.area_m2, 0), auction_items.area_m2),
                     area_pyeong=coalesce(nullif(excluded.area_pyeong, 0), auction_items.area_pyeong),
@@ -207,6 +213,8 @@ class AuctionDBAgent:
                 ai_report.get('suggested_bid', ''),
                 json.dumps(ai_report),
                 now_str,
+                created_at_str,
+                ai_model_str,
                 status_flag,
                 item.get('area_m2') or 0.0,
                 item.get('area_pyeong') or 0.0,
@@ -1345,7 +1353,9 @@ class AuctionAnalyzer:
             content = response.choices[0].message.content
             if not content:
                 raise ValueError("API가 빈 응답(Empty content)을 반환했습니다.")
-            return json.loads(content)
+            res = json.loads(content)
+            res["ai_model"] = OPENAI_MODEL
+            return res
         except Exception as e:
             console.print(f"[bold red]⚠️ AI 분석 중 오류 발생: {e}. 엔진 결과 기반 백업 데이터로 대체 출력합니다.[/bold red]")
             log_error_event(
@@ -1365,7 +1375,8 @@ class AuctionAnalyzer:
                 "retained_rights": ["선순위 대항력 임차보증금 인수 가능성 확인 필요" if rights.get('risk_level') == "CRITICAL" else "없음"],
                 "key_points": ["추천 입찰 및 세무 상담 후 낙찰 계획 수립 필요"],
                 "risks": [rights.get('reason', '상세 리스크 분석 대기')],
-                "analysis_detail": f"OpenAI API 호출이 비활성화되었거나 API 키 미등록 등의 문제로 룰 기반 권리분석 결과를 토대로 시스템 리포트를 구성했습니다. 본 부동산의 권리 판정 등급은 공식적으로 {rights.get('risk_level')} 상태입니다."
+                "analysis_detail": f"OpenAI API 호출이 비활성화되었거나 API 키 미등록 등의 문제로 룰 기반 권리분석 결과를 토대로 시스템 리포트를 구성했습니다. 본 부동산의 권리 판정 등급은 공식적으로 {rights.get('risk_level')} 상태입니다.",
+                "ai_model": "Rule-Engine"
             }
 
 # --- Main Execution ---

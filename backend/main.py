@@ -58,7 +58,8 @@ def get_auctions(
                    tenant_registration_date, tenant_deposit, is_payout_requested, rights_list,
                    remarks, special_rights,
                    market_price, safety_margin, market_discount_pct,
-                   market_match_count, market_match_level, est_monthly_rent, rental_yield
+                   market_match_count, market_match_level, est_monthly_rent, rental_yield,
+                   last_updated, created_at, ai_model
             FROM auction_items 
             WHERE 1=1
         '''
@@ -304,17 +305,21 @@ def analyze_auction_on_demand(case_number: str):
             raise HTTPException(status_code=500, detail=ai_report["error"])
             
         # Update DB
+        from datetime import datetime
+        now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         ai_report_json = json.dumps(ai_report, ensure_ascii=False)
         ai_score = ai_report.get("score", 0)
         ai_grade = ai_report.get("grade", "C")
         ai_verdict = ai_report.get("verdict", "")
         ai_suggested_bid = ai_report.get("suggested_bid", "")
+        ai_model = ai_report.get("ai_model", "gpt-4o-mini")
         
         cursor.execute('''
             UPDATE auction_items 
-            SET ai_score = ?, ai_grade = ?, ai_verdict = ?, ai_suggested_bid = ?, ai_report_json = ?
+            SET ai_score = ?, ai_grade = ?, ai_verdict = ?, ai_suggested_bid = ?, ai_report_json = ?,
+                last_updated = ?, ai_model = ?
             WHERE case_number = ?
-        ''', (ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, case_number))
+        ''', (ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, now_str, ai_model, case_number))
         
         conn.commit()
         

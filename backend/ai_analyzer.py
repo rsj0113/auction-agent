@@ -56,5 +56,6 @@ def analyze_auction_data(item_data: dict) -> dict:
         response_format={"type": "json_object"},
         temperature=0.2
     )
-    
-    return json.loads(response.choices[0].message.content)
+    result = json.loads(response.choices[0].message.content)
+    result["ai_model"] = "gpt-4o-mini"
+    return result

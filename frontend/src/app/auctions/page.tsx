@@ -39,6 +39,9 @@ interface AuctionItem {
   market_match_level?: string;
   est_monthly_rent?: number;
   rental_yield?: number;
+  last_updated?: string;
+  created_at?: string;
+  ai_model?: string;
 }
 
 interface AIReport {
@@ -49,6 +52,7 @@ interface AIReport {
   suggested_bid: string;
   analysis_detail?: string;
   tenants?: any[];
+  ai_model?: string;
 }
 
 interface AuctionDetail extends AuctionItem {
@@ -60,6 +64,16 @@ interface AuctionDetail extends AuctionItem {
   sample_listings?: SampleListing[];
   senior_deposit_assumed?: number;
   min_market_price?: number;
+}
+
+export function formatDateShort(dateStr?: string): string {
+  if (!dateStr) return '-';
+  // "2026-10-16 18:05:12" -> "10.16 18:05" or "2026.10.16"
+  const m = dateStr.match(/(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}):(\d{2}))?/);
+  if (m) {
+    return m[4] ? `${m[1].slice(2)}.${m[2]}.${m[3]} ${m[4]}:${m[5]}` : `${m[1].slice(2)}.${m[2]}.${m[3]}`;
+  }
+  return dateStr;
 }
 
 export function formatMoney(val?: number): string {
@@ -805,6 +819,28 @@ export default function AuctionsPage() {
                   </span>
                 </div>
               ) : null}
+
+              {/* 분석 모델 · 최초 추가일 · 최근 업데이트일 메타 정보 */}
+              <div className="mt-3 pt-2.5 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-400">
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-semibold border ${
+                  item.ai_model === 'gpt-4o-mini'
+                    ? 'bg-violet-50 text-violet-700 border-violet-200'
+                    : item.ai_model === 'gpt-4o'
+                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                    : 'bg-gray-50 text-gray-600 border-gray-200'
+                }`}>
+                  <span>🤖</span>
+                  <span>{item.ai_model || 'gpt-4o-mini'}</span>
+                </span>
+                <div className="flex items-center gap-2.5 text-[11px] text-gray-400">
+                  {item.created_at && (
+                    <span>📥 등록 {formatDateShort(item.created_at)}</span>
+                  )}
+                  {item.last_updated && (
+                    <span>🔄 갱신 {formatDateShort(item.last_updated)}</span>
+                  )}
+                </div>
+              </div>
             </article>
           ))}
           
@@ -1273,7 +1309,7 @@ export default function AuctionsPage() {
                   })()}
 
                   <div className="pt-4 border-t border-gray-100">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <span className="text-xl">🤖</span>
                         <h4 className="font-bold text-gray-900">AI 권리분석 리포트</h4>
@@ -1281,6 +1317,26 @@ export default function AuctionsPage() {
                       <span className={`text-sm font-bold px-3 py-1 rounded-full border ${getGradeColor(selectedDetail.ai_grade)}`}>
                         {selectedDetail.ai_grade} 등급
                       </span>
+                    </div>
+
+                    {/* 모델 및 업데이트/추가 일자 배지 바 */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-4 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200/80 text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-gray-500 font-medium">분석 모델:</span>
+                        <span className={`px-2 py-0.5 rounded-md font-bold border ${
+                          (selectedDetail.ai_model || aiReport?.ai_model) === 'gpt-4o-mini'
+                            ? 'bg-violet-50 text-violet-700 border-violet-200'
+                            : (selectedDetail.ai_model || aiReport?.ai_model) === 'gpt-4o'
+                            ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                            : 'bg-white text-gray-700 border-gray-200'
+                        }`}>
+                          {selectedDetail.ai_model || aiReport?.ai_model || 'gpt-4o-mini'}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-500">
+                        <span>📥 최초 추가: <strong className="text-gray-700">{formatDateShort(selectedDetail.created_at || selectedDetail.last_updated)}</strong></span>
+                        <span>🔄 업데이트: <strong className="text-gray-700">{formatDateShort(selectedDetail.last_updated)}</strong></span>
+                      </div>
                     </div>
 
                     {aiReport ? (
