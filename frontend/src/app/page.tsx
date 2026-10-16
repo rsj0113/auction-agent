@@ -329,24 +329,24 @@ export default function Home() {
                     {item.status_flag?.toUpperCase() === 'UNCHANGED' ? '기일변경' : item.status_flag}
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-400">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-semibold border ${
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-gray-600">
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-bold border ${
                     item.ai_model === 'gpt-4o-mini'
                       ? 'bg-violet-50 text-violet-700 border-violet-200'
                       : item.ai_model === 'gpt-4o'
                       ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-                      : 'bg-gray-50 text-gray-600 border-gray-200'
+                      : 'bg-gray-100 text-gray-700 border-gray-200'
                   }`}>
                     <span>🤖</span>
                     <span>{item.ai_model || 'gpt-4o-mini'}</span>
                   </span>
-                  <div className="flex items-center gap-2.5">
-                    {item.created_at && (
-                      <span>📥 등록 {formatDateShort(item.created_at)}</span>
-                    )}
-                    {item.last_updated && (
-                      <span>🔄 갱신 {formatDateShort(item.last_updated)}</span>
-                    )}
+                  <div className="flex flex-wrap items-center gap-2 text-[11px] sm:text-xs font-medium text-gray-600">
+                    <span className="bg-gray-50 px-2 py-0.5 rounded border border-gray-200/80">
+                      📥 추가일 <strong className="text-gray-800">{formatDateShort(item.created_at || item.last_updated)}</strong>
+                    </span>
+                    <span className="bg-blue-50/60 px-2 py-0.5 rounded border border-blue-100 text-blue-800">
+                      🔄 업데이트 <strong className="font-bold">{formatDateShort(item.last_updated)}</strong>
+                    </span>
                   </div>
                 </div>
               </div>
