@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# 1. 시간 가드: crontab이 매시 정각(0 * * * *) 호출하더라도 새벽 3시(03시)에만 실행 (--force 인자 시 예외)
+CURRENT_HOUR="$(date '+%H')"
+if [[ "${1:-}" != "--force" && "$CURRENT_HOUR" != "03" ]]; then
+    exit 0
+fi
+
+# 2. 중복 실행 방지 락(PID Lock)
+LOCKFILE="/tmp/auction_crawl_nightly.lock"
+if [[ -f "$LOCKFILE" ]]; then
+    OLD_PID="$(cat "$LOCKFILE" 2>/dev/null || true)"
+    if [[ -n "$OLD_PID" ]] && kill -0 "$OLD_PID" 2>/dev/null; then
+        echo "=== $(date '+%Y-%m-%d %H:%M:%S') 이미 크롤링이 실행 중입니다 (PID: $OLD_PID). 종료합니다. ===" >> "$(cd "$(dirname "$0")" && pwd)/logs/crawl_nightly.log"
+        exit 0
+    fi
+fi
+echo $$ > "$LOCKFILE"
+trap 'rm -f "$LOCKFILE"' EXIT
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PYTHON="/Users/seonjin/.pyenv/versions/3.11.14/bin/python3"
 LOG="$SCRIPT_DIR/logs/crawl_nightly.log"
@@ -17,13 +35,13 @@ for region in "서울" "경기"; do
     done
 done
 
-# 상가(0203): 살아있는 전체 매물 수집 (max-items 9999)
+# 상가(0203): 법원당 최대 50개씩 수집 (기존 9999개 무제한 호출로 인한 토큰/시간 과소모 방지)
 for region in "서울" "경기"; do
-    echo "[$region] 상가(0203) 전체 수집 - $(date '+%H:%M:%S')" >> "$LOG"
-    $PYTHON auto_crawling.py --region "$region" --property-type "0203" --max-items 9999 >> "$LOG" 2>&1
+    echo "[$region] 상가(0203) 수집 (최대 50개) - $(date '+%H:%M:%S')" >> "$LOG"
+    $PYTHON auto_crawling.py --region "$region" --property-type "0203" --max-items 50 >> "$LOG" 2>&1
 done
 
-echo "[정리] $(date '+%H:%M:%S') 3일 이상 지난 오래된 매물 삭제" >> "$LOG"
-$PYTHON cleanup_db.py --days 3 >> "$LOG" 2>&1
+echo "[정리] $(date '+%H:%M:%S') 7일 이상 지난 오래된 매물 삭제" >> "$LOG"
+$PYTHON cleanup_db.py --days 7 >> "$LOG" 2>&1
 
 echo "=== $(date '+%Y-%m-%d %H:%M:%S') 완료 ===" >> "$LOG"
