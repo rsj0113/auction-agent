@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { analyzeSeniorDeposit, formatMoney, formatMoneyShort, formatDateShort, QUICK_CHIPS } from "./auctions/page";
 import InvestmentCalculator from "@/components/InvestmentCalculator";
-import AuctionMap from "@/components/AuctionMap";
+import AuctionMap, { formatNaverPrice10k } from "@/components/AuctionMap";
 
 interface SummaryData {
   total_active_auctions: number;
@@ -73,6 +73,33 @@ interface AuctionItem {
   floor?: number;
   area_m2?: number;
   area_pyeong?: number;
+  is_favorite?: number;
+  recommend_tag?: string;
+}
+
+interface NaverListing {
+  article_id: string;
+  region_name?: string;
+  addr_sgg?: string;
+  addr_emd: string;
+  article_name?: string;
+  trade_type: string;
+  trade_type_cd?: string;
+  realty_type_cd?: string;
+  price_sale_10k: number;
+  deposit_10k: number;
+  monthly_rent_10k: number;
+  floor: number;
+  total_floor: number;
+  area_m2: number;
+  area_pyeong: number;
+  detail_url?: string;
+  confirm_date?: string;
+  realtor?: string;
+  lat?: number;
+  lng?: number;
+  is_favorite?: number;
+  recommend_tag?: string;
 }
 
 interface AuctionDetail extends AuctionItem {
@@ -119,6 +146,8 @@ function getGradeColor(grade: string) {
 export default function Home() {
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [auctions, setAuctions] = useState<AuctionItem[]>([]);
+  const [recommendedNaver, setRecommendedNaver] = useState<NaverListing[]>([]);
+  const [recommendTab, setRecommendTab] = useState<"auction" | "naver">("auction");
   const [loading, setLoading] = useState(true);
   const [quickFilter, setQuickFilter] = useState<string>("");
   const [quickCounts, setQuickCounts] = useState<{ [key: string]: number }>({});
@@ -133,7 +162,7 @@ export default function Home() {
       aiReport = JSON.parse(selectedDetail.ai_report_json);
     } catch (e) {}
   }
-    const handleSelectAuction = async (item: AuctionItem) => {
+  const handleSelectAuction = async (item: AuctionItem) => {
     setSelectedDetail({ ...item, ai_report_json: "{}" } as AuctionDetail);
     setDetailLoading(true);
     try {
@@ -149,12 +178,51 @@ export default function Home() {
     }
   };
 
+  const handleToggleFavorite = async (itemType: "auction" | "naver", itemId: string) => {
+    try {
+      if (itemType === "auction") {
+        setAuctions((prev) =>
+          prev.map((a) =>
+            a.case_number === itemId ? { ...a, is_favorite: a.is_favorite ? 0 : 1 } : a
+          )
+        );
+        if (selectedDetail && selectedDetail.case_number === itemId) {
+          setSelectedDetail((prev) =>
+            prev ? { ...prev, is_favorite: prev.is_favorite ? 0 : 1 } : null
+          );
+        }
+      } else {
+        setRecommendedNaver((prev) =>
+          prev.map((n) =>
+            n.article_id === itemId ? { ...n, is_favorite: n.is_favorite ? 0 : 1 } : n
+          )
+        );
+      }
+      const res = await fetch("/api/favorites/toggle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "1" },
+        body: JSON.stringify({ item_type: itemType, item_id: itemId }),
+      });
+      if (res.ok) {
+        fetch("/api/auctions/quick-counts", { headers: { "ngrok-skip-browser-warning": "1" } })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data && typeof data.total === "number") setQuickCounts(data);
+          })
+          .catch(() => {});
+      }
+    } catch (e) {
+      console.error("관심매물 토글 실패:", e);
+    }
+  };
+
   useEffect(() => {
     const fetchInitial = async () => {
       try {
-        const [summaryRes, countsRes] = await Promise.all([
+        const [summaryRes, countsRes, naverFavRes] = await Promise.all([
           fetch("/api/dashboard/summary", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
           fetch("/api/auctions/quick-counts", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
+          fetch("/api/naver-listings?favorite_only=true", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
         ]);
 
         if (summaryRes?.ok) {
@@ -165,6 +233,12 @@ export default function Home() {
           const cData = await countsRes.json();
           if (cData && typeof cData.total === "number") {
             setQuickCounts(cData);
+          }
+        }
+        if (naverFavRes?.ok) {
+          const nData = await naverFavRes.json();
+          if (nData?.data && Array.isArray(nData.data)) {
+            setRecommendedNaver(nData.data);
           }
         }
       } catch (error) {
@@ -449,33 +523,73 @@ export default function Home() {
         </section>
       )}
 
-      {/* 2. 추천 물건 리스트 */}
-      <section>
-        <div className="flex justify-between items-end mb-4">
+      {/* 2. 임장 추천 매물 & 전체 물건 리스트 */}
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-gray-700">
-              {quickFilter
-                ? `${QUICK_CHIPS.find((c) => c.id === quickFilter)?.icon || "⚡"} ${QUICK_CHIPS.find((c) => c.id === quickFilter)?.label || ""} 매물`
-                : "AI 추천 물건 Top 6"}
+            <h2 className="text-lg font-extrabold text-gray-900 flex items-center gap-2">
+              <span>{quickFilter ? `${QUICK_CHIPS.find((c) => c.id === quickFilter)?.icon || "⚡"} ${QUICK_CHIPS.find((c) => c.id === quickFilter)?.label || ""} 매물` : "🎯 성남 상가 임장 추천 매물"}</span>
             </h2>
             {quickFilter && (
               <button
                 onClick={() => setQuickFilter("")}
-                className="text-xs text-gray-500 hover:text-red-600 bg-gray-100 px-2 py-0.5 rounded-md font-medium"
+                className="text-xs text-gray-500 hover:text-red-600 bg-gray-100 px-2 py-0.5 rounded-md font-medium cursor-pointer"
               >
                 필터 해제 ✕
               </button>
             )}
           </div>
-          <Link href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"} className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
-            전체 매물 더보기 &rarr;
-          </Link>
+
+          <div className="flex items-center gap-2">
+            {!quickFilter && (
+              <div className="inline-flex bg-gray-100 p-1 rounded-xl border border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setRecommendTab("auction")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    recommendTab === "auction"
+                      ? "bg-white text-blue-700 shadow-2xs font-extrabold"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  <span>⚖️ 법원경매 추천</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                    recommendTab === "auction" ? "bg-blue-100 text-blue-800" : "bg-gray-200 text-gray-700"
+                  }`}>
+                    6건
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRecommendTab("naver")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    recommendTab === "naver"
+                      ? "bg-[#03c75a] text-white shadow-2xs font-extrabold"
+                      : "text-gray-600 hover:text-emerald-700"
+                  }`}
+                >
+                  <span>🟢 네이버 1층 실매물</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                    recommendTab === "naver" ? "bg-white/25 text-white" : "bg-emerald-100 text-emerald-800"
+                  }`}>
+                    {recommendedNaver.length > 0 ? `${recommendedNaver.length}건` : "11선"}
+                  </span>
+                </button>
+              </div>
+            )}
+
+            <Link href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"} className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+              전체 매물 더보기 &rarr;
+            </Link>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 gap-4">
-          {loading && [1,2,3].map(i => (
-            <div key={i} className="bg-white h-48 rounded-2xl border border-gray-100 animate-pulse"></div>
-          ))}
+
+        {/* 탭 1: 법원경매 추천 매물 리스트 (또는 퀵필터 결과) */}
+        {(recommendTab === "auction" || quickFilter) && (
+          <div className="grid grid-cols-1 gap-4">
+            {loading && [1,2,3].map(i => (
+              <div key={i} className="bg-white h-48 rounded-2xl border border-gray-100 animate-pulse"></div>
+            ))}
           
           {!loading && auctions.map((item) => (
             <article 
@@ -529,8 +643,29 @@ export default function Home() {
                     }
                   })()}
                 </div>
-                <span className="text-xs text-gray-400 font-medium shrink-0">{item.case_number}</span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleFavorite("auction", item.case_number);
+                    }}
+                    className={`p-1 rounded-lg text-base transition-transform hover:scale-125 cursor-pointer ${
+                      item.is_favorite ? "text-amber-500 font-black" : "text-gray-300 hover:text-amber-400"
+                    }`}
+                    title={item.is_favorite ? "관심매물 해제" : "관심매물 등록"}
+                  >
+                    {item.is_favorite ? "⭐" : "☆"}
+                  </button>
+                  <span className="text-xs text-gray-400 font-medium">{item.case_number}</span>
+                </div>
               </div>
+
+              {item.recommend_tag && (
+                <div className="mb-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-900 font-extrabold text-xs shadow-xs">
+                  <span>{item.recommend_tag}</span>
+                </div>
+              )}
               
               <h3 className="text-base font-medium text-gray-900 mb-4 line-clamp-2 min-h-[3rem] group-hover:text-blue-600 transition-colors">
                 {item.location}
@@ -618,6 +753,111 @@ export default function Home() {
             </div>
           )}
         </div>
+        )}
+
+        {/* 탭 2: 네이버 부동산 1층 실매물 추천 11선 */}
+        {recommendTab === "naver" && !quickFilter && (
+          <div className="grid grid-cols-1 gap-4">
+            {recommendedNaver.length === 0 ? (
+              <div className="py-12 text-center text-gray-500 bg-white rounded-2xl border border-gray-200">
+                추천된 네이버 상가 실매물을 불러오는 중입니다...
+              </div>
+            ) : (
+              recommendedNaver.map((item) => (
+                <article
+                  key={item.article_id}
+                  className="bg-white border border-gray-200 hover:border-emerald-500/50 rounded-2xl p-4 sm:p-5 shadow-sm transition-all group"
+                >
+                  <div className="flex justify-between items-start mb-2.5 gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap flex-1 min-w-0">
+                      <span className="px-2 py-0.5 rounded-lg bg-[#03c75a] text-white text-xs font-black">
+                        N 실매물 ({item.trade_type})
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-orange-100 text-orange-800 border border-orange-300 text-xs font-bold">
+                        ✨ 1층 상가
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium">
+                        {item.addr_sgg} {item.addr_emd}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleFavorite("naver", item.article_id)}
+                        className={`p-1 rounded-lg text-base transition-transform hover:scale-125 cursor-pointer ${
+                          item.is_favorite ? "text-amber-500 font-black" : "text-gray-300 hover:text-amber-400"
+                        }`}
+                        title={item.is_favorite ? "관심매물 해제" : "관심매물 등록"}
+                      >
+                        {item.is_favorite ? "⭐" : "☆"}
+                      </button>
+                      <span className="text-xs text-gray-400 font-medium">#{item.article_id}</span>
+                    </div>
+                  </div>
+
+                  {item.recommend_tag && (
+                    <div className="mb-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-900 font-extrabold text-xs shadow-xs">
+                      <span>{item.recommend_tag}</span>
+                    </div>
+                  )}
+
+                  <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-emerald-700 transition-colors">
+                    {item.article_name || "일반상가 점포"}
+                  </h3>
+
+                  <p className="text-xs text-gray-500 mb-3">
+                    📍 {item.addr_sgg} {item.addr_emd} · 층수: <strong>{item.floor}층</strong> / {item.total_floor || "-"}층 · 전용면적: <strong className="text-gray-900">{item.area_pyeong}평</strong> ({item.area_m2}㎡)
+                  </p>
+
+                  <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-xl p-3 mb-3 flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-emerald-800">
+                        {item.trade_type === "매매" ? "네이버 호가 (매매)" : "보증금 / 월세"}
+                      </span>
+                      <p className="text-lg font-black text-emerald-700">
+                        {item.trade_type === "매매"
+                          ? `${formatNaverPrice10k(item.price_sale_10k)}원`
+                          : `${formatNaverPrice10k(item.deposit_10k)} / 월 ${formatNaverPrice10k(item.monthly_rent_10k)}`}
+                      </p>
+                    </div>
+                    {item.trade_type === "매매" && item.area_pyeong > 0 && (
+                      <div className="text-right">
+                        <span className="text-[11px] text-gray-500">평당 매매가</span>
+                        <p className="text-sm font-extrabold text-gray-800">
+                          {Math.round(item.price_sale_10k / item.area_pyeong).toLocaleString()}만원/평
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-100 text-xs">
+                    <span className="text-gray-500 truncate max-w-xs">
+                      🏢 {item.realtor || "중개업소"} {item.confirm_date ? `· 확인 ${item.confirm_date}` : ""}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`https://map.kakao.com/link/search/${encodeURIComponent(item.addr_sgg + " " + item.addr_emd + " " + (item.article_name || ""))}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-200 font-bold transition-colors"
+                      >
+                        📍 카카오 로드뷰
+                      </a>
+                      <a
+                        href={item.detail_url || `https://m.land.naver.com/article/info/${item.article_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 rounded-lg bg-[#03c75a] hover:bg-emerald-600 text-white font-extrabold transition-colors shadow-2xs"
+                      >
+                        네이버 부동산 확인 ↗
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
       </section>
 
       {/* 모달 (page.tsx와 동일 로직) */}
@@ -634,8 +874,30 @@ export default function Home() {
               <div>
                 <div className="sticky top-0 bg-white/95 backdrop-blur-md px-5 sm:px-6 py-4 border-b border-gray-100 flex justify-between items-center z-20">
                   <div className="min-w-0 pr-2">
-                    <h3 className="font-bold text-gray-900 text-base truncate">{selectedDetail.case_number} 상세 분석</h3>
-                    <p className="text-xs text-gray-500 truncate">{selectedDetail.location}</p>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-gray-900 text-base truncate">{selectedDetail.case_number} 상세 분석</h3>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleFavorite("auction", selectedDetail.case_number)}
+                        className={`text-sm font-bold flex items-center gap-1 px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
+                          selectedDetail.is_favorite 
+                            ? "bg-amber-50 text-amber-800 border-amber-300" 
+                            : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-amber-50 hover:text-amber-700"
+                        }`}
+                        title={selectedDetail.is_favorite ? "관심매물 해제" : "관심매물 등록"}
+                      >
+                        <span>{selectedDetail.is_favorite ? "⭐" : "☆"}</span>
+                        <span>{selectedDetail.is_favorite ? "관심매물" : "관심등록"}</span>
+                      </button>
+                    </div>
+                    {selectedDetail.recommend_tag && (
+                      <div className="mt-1">
+                        <span className="inline-block text-[11px] font-bold text-purple-900 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-md">
+                          {selectedDetail.recommend_tag}
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-xs text-gray-500 truncate mt-0.5">{selectedDetail.location}</p>
                   </div>
                   <button onClick={() => setSelectedDetail(null)} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600 transition-colors shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

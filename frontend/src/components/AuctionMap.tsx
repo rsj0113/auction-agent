@@ -16,6 +16,8 @@ interface MapItem {
   floor?: number | null;
   lat?: number;
   lng?: number;
+  is_favorite?: number;
+  recommend_tag?: string;
 }
 
 export interface NaverShopItem {
@@ -39,6 +41,8 @@ export interface NaverShopItem {
   lat?: number;
   lng?: number;
   article_name?: string;
+  is_favorite?: number;
+  recommend_tag?: string;
 }
 
 interface AuctionMapProps {
@@ -106,6 +110,7 @@ export default function AuctionMap({
   const [naverRegionInput, setNaverRegionInput] = useState<string>(focusRegion || "");
   const [naverPriceRange, setNaverPriceRange] = useState<string>(priceRange || "");
   const [naverSort, setNaverSort] = useState<string>("default");
+  const [naverFavoriteOnly, setNaverFavoriteOnly] = useState(false);
   const [naverItems, setNaverItems] = useState<NaverShopItem[]>([]);
   const [naverTotalMatching, setNaverTotalMatching] = useState<number>(0);
   const [selectedNaver, setSelectedNaver] = useState<NaverShopItem | null>(null);
@@ -178,6 +183,9 @@ export default function AuctionMap({
     if (naverFirstFloorOnly) {
       params.set("first_floor_only", "true");
     }
+    if (naverFavoriteOnly) {
+      params.set("favorite_only", "true");
+    }
     if (naverSort && naverSort !== "default") {
       params.set("sort", naverSort);
     }
@@ -201,7 +209,7 @@ export default function AuctionMap({
         }
       })
       .catch(() => {});
-  }, [showNaver, naverRegion, naverFirstFloorOnly, naverTradeType, naverPriceRange, naverSort]);
+  }, [showNaver, naverRegion, naverFirstFloorOnly, naverTradeType, naverPriceRange, naverSort, naverFavoriteOnly]);
 
   // Initialize map
   useEffect(() => {
@@ -512,6 +520,18 @@ export default function AuctionMap({
                 🏪 1층 상가만
               </button>
 
+              {/* 관심 매물만 토글 */}
+              <button
+                onClick={() => setNaverFavoriteOnly(!naverFavoriteOnly)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                  naverFavoriteOnly
+                    ? "bg-amber-500 text-white border-amber-500 shadow-xs"
+                    : "bg-white text-amber-800 border-amber-300 hover:bg-amber-50"
+                }`}
+              >
+                ⭐ 관심 상가만
+              </button>
+
               {/* 매매/월세 토글 */}
               <div className="inline-flex bg-white border border-gray-200 rounded-lg p-0.5">
                 {(["", "매매", "월세"] as const).map((t) => (
@@ -541,7 +561,7 @@ export default function AuctionMap({
                 <option value="area_desc">넓은 면적순</option>
               </select>
 
-              {(naverRegion || naverPriceRange || naverFirstFloorOnly || naverTradeType) && (
+              {(naverRegion || naverPriceRange || naverFirstFloorOnly || naverTradeType || naverFavoriteOnly) && (
                 <button
                   onClick={() => {
                     setNaverRegion("");
@@ -549,6 +569,7 @@ export default function AuctionMap({
                     setNaverPriceRange("");
                     setNaverFirstFloorOnly(false);
                     setNaverTradeType("");
+                    setNaverFavoriteOnly(false);
                   }}
                   className="px-2 py-1 rounded-lg text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 cursor-pointer"
                 >
@@ -606,13 +627,49 @@ export default function AuctionMap({
                     </span>
                   ) : null}
                 </div>
-                <button
-                  onClick={() => setSelectedNaver(null)}
-                  className="text-gray-400 hover:text-gray-700 text-sm font-bold px-1.5 cursor-pointer"
-                >
-                  ✕
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      const nextFav = selectedNaver.is_favorite ? 0 : 1;
+                      setSelectedNaver({ ...selectedNaver, is_favorite: nextFav });
+                      setNaverItems((prev) =>
+                        prev.map((n) =>
+                          n.article_id === selectedNaver.article_id ? { ...n, is_favorite: nextFav } : n
+                        )
+                      );
+                      try {
+                        await fetch("/api/favorites/toggle", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "1" },
+                          body: JSON.stringify({ item_type: "naver", item_id: selectedNaver.article_id }),
+                        });
+                      } catch (err) {
+                        console.error("관심등록 실패:", err);
+                      }
+                    }}
+                    className={`p-1 text-base transition-transform hover:scale-125 cursor-pointer ${
+                      selectedNaver.is_favorite ? "text-amber-500 font-bold" : "text-gray-300 hover:text-amber-400"
+                    }`}
+                    title={selectedNaver.is_favorite ? "관심매물 해제" : "관심매물 등록"}
+                  >
+                    {selectedNaver.is_favorite ? "⭐" : "☆"}
+                  </button>
+                  <button
+                    onClick={() => setSelectedNaver(null)}
+                    className="text-gray-400 hover:text-gray-700 text-sm font-bold px-1.5 cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
+
+              {selectedNaver.recommend_tag && (
+                <div className="mb-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-900 font-extrabold text-xs shadow-xs">
+                  <span>{selectedNaver.recommend_tag}</span>
+                </div>
+              )}
 
               <h4 className="text-sm font-extrabold text-gray-900 mb-1 line-clamp-2">
                 {selectedNaver.article_name || "일반상가"}

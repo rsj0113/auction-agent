@@ -60,7 +60,9 @@ def get_auctions(
                    market_price, safety_margin, market_discount_pct,
                    market_match_count, market_match_level, est_monthly_rent, rental_yield,
                    last_updated, created_at, ai_model, lat, lng,
-                   floor, area_m2, area_pyeong
+                   floor, area_m2, area_pyeong,
+                   COALESCE(is_favorite, 0) as is_favorite,
+                   COALESCE(recommend_tag, '') as recommend_tag
             FROM auction_items 
             WHERE 1=1
         '''
@@ -107,7 +109,9 @@ def get_auctions(
                 query += " AND ((tenant_registration_date IS NULL OR tenant_registration_date = '') AND (tenant_deposit IS NULL OR tenant_deposit = 0))"
 
         if quick_filter:
-            if quick_filter == 'safe':
+            if quick_filter == 'favorite':
+                query += " AND COALESCE(is_favorite, 0) = 1"
+            elif quick_filter == 'safe':
                 query += " AND ai_grade IN ('S', 'A', 'B')"
             elif quick_filter == 'half_price':
                 query += " AND min_bid * 2 <= appraisal"
@@ -132,7 +136,13 @@ def get_auctions(
 
         # Sorting
         if sort == 'recommend':
-            query += " ORDER BY CASE WHEN ai_grade='S' THEN 1 WHEN ai_grade='A' THEN 2 WHEN ai_grade='B' THEN 3 WHEN ai_grade='C' THEN 4 WHEN ai_grade='D' THEN 5 ELSE 6 END ASC, last_updated DESC"
+            query += """
+                ORDER BY
+                    CASE WHEN recommend_tag IS NOT NULL AND recommend_tag != '' THEN 0 ELSE 1 END ASC,
+                    CASE WHEN COALESCE(is_favorite, 0) = 1 THEN 0 ELSE 1 END ASC,
+                    CASE WHEN ai_grade='S' THEN 1 WHEN ai_grade='A' THEN 2 WHEN ai_grade='B' THEN 3 WHEN ai_grade='C' THEN 4 WHEN ai_grade='D' THEN 5 ELSE 6 END ASC,
+                    last_updated DESC
+            """
         elif sort == 'margin_desc':
             query += " ORDER BY safety_margin DESC, last_updated DESC"
         elif sort == 'market_discount':
@@ -173,6 +183,18 @@ def get_quick_filter_counts():
         # total
         cursor.execute("SELECT COUNT(*) FROM auction_items")
         counts["total"] = cursor.fetchone()[0]
+
+        # favorite (관심매물)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE COALESCE(is_favorite, 0) = 1")
+        fav_auc = cursor.fetchone()[0]
+        try:
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE COALESCE(is_favorite, 0) = 1")
+            fav_nav = cursor.fetchone()[0]
+        except Exception:
+            fav_nav = 0
+        counts["favorite"] = fav_auc
+        counts["favorite_naver"] = fav_nav
+        counts["favorite_total"] = fav_auc + fav_nav
         
         # safe (S, A, B 등급)
         cursor.execute("SELECT COUNT(*) FROM auction_items WHERE ai_grade IN ('S', 'A', 'B')")
@@ -234,11 +256,52 @@ def get_quick_filter_counts():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+class FavoriteToggleRequest(BaseModel):
+    item_type: str  # "auction" or "naver"
+    item_id: str
+
+
+@app.post("/api/favorites/toggle")
+def toggle_favorite(req: FavoriteToggleRequest):
+    """
+    Toggle star/favorite status for a court auction item or a Naver commercial listing.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        if req.item_type == "naver":
+            cursor.execute("SELECT COALESCE(is_favorite, 0) FROM naver_listings WHERE article_id = ?", (req.item_id,))
+            row = cursor.fetchone()
+            if not row:
+                conn.close()
+                raise HTTPException(status_code=404, detail="Naver listing not found")
+            new_val = 0 if row[0] == 1 else 1
+            cursor.execute("UPDATE naver_listings SET is_favorite = ? WHERE article_id = ?", (new_val, req.item_id))
+        else:
+            cursor.execute("SELECT COALESCE(is_favorite, 0) FROM auction_items WHERE case_number = ?", (req.item_id,))
+            row = cursor.fetchone()
+            if not row:
+                conn.close()
+                raise HTTPException(status_code=404, detail="Auction item not found")
+            new_val = 0 if row[0] == 1 else 1
+            cursor.execute("UPDATE auction_items SET is_favorite = ? WHERE case_number = ?", (new_val, req.item_id))
+
+        conn.commit()
+        conn.close()
+        return {"item_type": req.item_type, "item_id": req.item_id, "is_favorite": new_val}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/naver-listings")
 def get_naver_listings(
     region: Optional[str] = None,
     trade_type: Optional[str] = None,
     first_floor_only: bool = False,
+    favorite_only: bool = False,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
     sort: Optional[str] = "default",
@@ -246,7 +309,7 @@ def get_naver_listings(
 ):
     """
     Get Naver Real Estate commercial (상가) listings for map overlay & side-by-side comparison.
-    Supports multi-keyword region filtering and price filtering (won unit).
+    Supports multi-keyword region filtering, favorite filtering, and price filtering (won unit).
     """
     try:
         import re as _re
@@ -256,9 +319,11 @@ def get_naver_listings(
         where_clause = " WHERE realty_type_cd IN ('D02', 'D04', 'D03')"
         params = []
 
+        if favorite_only:
+            where_clause += " AND COALESCE(is_favorite, 0) = 1"
+
         if region and region.strip():
             raw_reg = region.strip()
-            # '서울 전체' -> '서울', '성남·분당' -> ['성남', '분당'] 등 다중 키워드 지원
             cleaned_reg = raw_reg.replace("전체", "").replace("남부", "").replace("북부", "").strip()
             tokens = [t.strip() for t in _re.split(r"[·,/|()\s]+", cleaned_reg) if len(t.strip()) >= 2]
             if not tokens:
@@ -277,7 +342,6 @@ def get_naver_listings(
         if first_floor_only:
             where_clause += " AND floor = 1"
 
-        # 가격 필터 (원 단위 입력 -> 만원 단위 price_sale_10k / deposit_10k 비교)
         if min_price is not None and min_price > 0:
             min_10k = min_price // 10000
             where_clause += " AND ((trade_type = '매매' AND price_sale_10k >= ?) OR (trade_type != '매매' AND (deposit_10k + monthly_rent_10k * 100) >= ?))"
@@ -301,6 +365,8 @@ def get_naver_listings(
         else:
             order_clause = """
                 ORDER BY
+                    CASE WHEN recommend_tag IS NOT NULL AND recommend_tag != '' THEN 0 ELSE 1 END ASC,
+                    CASE WHEN COALESCE(is_favorite, 0) = 1 THEN 0 ELSE 1 END ASC,
                     CASE WHEN realty_type_cd = 'D02' THEN 0 ELSE 1 END ASC,
                     CASE WHEN floor = 1 THEN 0 ELSE 1 END ASC,
                     scraped_at DESC
@@ -311,7 +377,9 @@ def get_naver_listings(
                    trade_type, trade_type_cd, realty_type_cd, area_m2, area_pyeong,
                    price_sale_10k, deposit_10k, monthly_rent_10k,
                    floor, total_floor, detail_url, confirm_date, realtor,
-                   lat, lng, article_name, scraped_at
+                   lat, lng, article_name, scraped_at,
+                   COALESCE(is_favorite, 0) as is_favorite,
+                   COALESCE(recommend_tag, '') as recommend_tag
             FROM naver_listings
         """ + where_clause + order_clause + " LIMIT ?"
 

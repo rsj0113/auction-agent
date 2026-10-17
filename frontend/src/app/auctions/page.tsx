@@ -48,6 +48,8 @@ interface AuctionItem {
   floor?: number;
   area_m2?: number;
   area_pyeong?: number;
+  is_favorite?: number;
+  recommend_tag?: string;
 }
 
 interface AIReport {
@@ -412,6 +414,7 @@ function getPropertyType(location: string, usage?: string): string {
 
 export const QUICK_CHIPS = [
   { id: "", label: "전체", countKey: "total", icon: "📋" },
+  { id: "favorite", label: "관심매물", countKey: "favorite", icon: "⭐" },
   { id: "margin_100m", label: "안전마진 1억+", countKey: "margin_100m", icon: "🎯" },
   { id: "market_matched", label: "네이버 시세 검증", countKey: "market_matched", icon: "🏢" },
   { id: "clean", label: "깨끗한 일반물건", countKey: "clean", icon: "🛡️" },
@@ -551,6 +554,38 @@ export default function AuctionsPage() {
       console.error("상세 데이터 로딩 실패:", error);
     } finally {
       setDetailLoading(false);
+    }
+  };
+
+  const handleToggleFavorite = async (itemType: "auction" | "naver", itemId: string) => {
+    try {
+      if (itemType === "auction") {
+        setAuctions((prev) =>
+          prev.map((a) =>
+            a.case_number === itemId ? { ...a, is_favorite: a.is_favorite ? 0 : 1 } : a
+          )
+        );
+        if (selectedDetail && selectedDetail.case_number === itemId) {
+          setSelectedDetail((prev) =>
+            prev ? { ...prev, is_favorite: prev.is_favorite ? 0 : 1 } : null
+          );
+        }
+      }
+      const res = await fetch("/api/favorites/toggle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "1" },
+        body: JSON.stringify({ item_type: itemType, item_id: itemId }),
+      });
+      if (res.ok) {
+        fetch("/api/auctions/quick-counts", { headers: { "ngrok-skip-browser-warning": "1" } })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data && typeof data.total === "number") setQuickCounts(data);
+          })
+          .catch(() => {});
+      }
+    } catch (e) {
+      console.error("관심매물 토글 실패:", e);
     }
   };
 
@@ -854,10 +889,30 @@ export default function AuctionsPage() {
                     }
                   })()}
                 </div>
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border shrink-0 ${getGradeColor(item.ai_grade)}`}>
-                  {item.ai_grade} 등급
-                </span>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleFavorite("auction", item.case_number);
+                    }}
+                    className={`p-1 rounded-lg text-base transition-transform hover:scale-125 cursor-pointer ${
+                      item.is_favorite ? "text-amber-500 font-black" : "text-gray-300 hover:text-amber-400"
+                    }`}
+                    title={item.is_favorite ? "관심매물 해제" : "관심매물 등록"}
+                  >
+                    {item.is_favorite ? "⭐" : "☆"}
+                  </button>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border shrink-0 ${getGradeColor(item.ai_grade)}`}>
+                    {item.ai_grade} 등급
+                  </span>
+                </div>
               </div>
+              {item.recommend_tag && (
+                <div className="mb-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-900 font-extrabold text-xs shadow-xs">
+                  <span>{item.recommend_tag}</span>
+                </div>
+              )}
               <h3 className="text-sm font-medium text-gray-800 mb-3 line-clamp-2 min-h-[2.5rem] leading-snug group-hover:text-blue-700 transition-colors">
                 {item.location}
               </h3>
@@ -968,8 +1023,30 @@ export default function AuctionsPage() {
               <div>
                 <div className="sticky top-0 bg-white/95 backdrop-blur-md px-5 sm:px-6 py-4 border-b border-gray-100 flex justify-between items-center z-20">
                   <div className="min-w-0 pr-2">
-                    <h3 className="font-bold text-gray-900 text-base truncate">{selectedDetail.case_number} 상세 분석</h3>
-                    <p className="text-xs text-gray-500 truncate">{selectedDetail.location}</p>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-gray-900 text-base truncate">{selectedDetail.case_number} 상세 분석</h3>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleFavorite("auction", selectedDetail.case_number)}
+                        className={`text-sm font-bold flex items-center gap-1 px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
+                          selectedDetail.is_favorite 
+                            ? "bg-amber-50 text-amber-800 border-amber-300" 
+                            : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-amber-50 hover:text-amber-700"
+                        }`}
+                        title={selectedDetail.is_favorite ? "관심매물 해제" : "관심매물 등록"}
+                      >
+                        <span>{selectedDetail.is_favorite ? "⭐" : "☆"}</span>
+                        <span>{selectedDetail.is_favorite ? "관심매물" : "관심등록"}</span>
+                      </button>
+                    </div>
+                    {selectedDetail.recommend_tag && (
+                      <div className="mt-1">
+                        <span className="inline-block text-[11px] font-bold text-purple-900 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-md">
+                          {selectedDetail.recommend_tag}
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-xs text-gray-500 truncate mt-0.5">{selectedDetail.location}</p>
                   </div>
                   <button onClick={() => setSelectedDetail(null)} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600 transition-colors shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
