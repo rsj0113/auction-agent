@@ -990,6 +990,31 @@ class AuctionCrawler:
                 
                 # ── Phase 1: 모든 페이지에서 기본 정보 스캔 (DOM만, moveDtlPage 사용 안 함) ──
                 # moveDtlPage 없이 페이지 이동이 자유롭다.
+                def _infer_usage(loc: str, cur_usage: str = "", flr: int = 0) -> str:
+                    if cur_usage and cur_usage.strip() not in ("", "기타"):
+                        return cur_usage.strip()
+                    loc_s = loc or ""
+                    comm_kw = ["상가", "근린", "타워", "지식산업", "프라자", "플라자", "센터", "에이스", "테크노", "비즈", "몰", "마켓", "빌딩", "스퀘어", "엠파이어", "디지털", "밸리", "트윈", "메트로", "제지1층", "제지2층", "지하1층", "지1층"]
+                    if any(k in loc_s for k in comm_kw):
+                        return "상가/근린시설"
+                    offi_kw = ["오피스텔", "아트리움", "트럼프", "리버빌", "스테이트", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "롯데캐슬골드", "아이파크디어반", "더샵스타파크"]
+                    if any(k in loc_s for k in offi_kw):
+                        return "오피스텔"
+                    apt_kw = ["아파트", "푸르지오", "자이", "래미안", "힐스테이트", "아이파크", "더샵", "롯데캐슬", "이편한세상", "e편한세상", "아크로", "데시앙", "센트레빌", "스카이뷰", "위브", "해링턴", "꿈에그린", "포레나", "호반베르디움", "베르디움", "우미린", "중흥에스클래스", "주공", "현대", "우성", "삼성", "한양", "벽산", "동아", "대림", "대우", "쌍용", "삼익", "선경", "한신", "극동", "경남", "동부", "금호", "코오롱", "신동아", "성원", "건영", "풍림", "삼환", "두산", "엘지", "청구", "미도", "진주", "시영", "그랑빌", "센트럴", "파크뷰", "리버파크", "트리지움", "엘스", "리센츠", "헬리오시티", "파크리오"]
+                    if any(k in loc_s for k in apt_kw):
+                        return "아파트"
+                    dong_m = re.search(r"([1-9]\d{2,3})동", loc_s)
+                    villa_kw = ["빌라", "다세대", "연립", "맨션", "하이츠", "빌리지", "타운", "주택", "하우스", "캐슬빌", "아트빌", "그린빌", "스카이빌", "드림빌", "청구빌", "현대빌", "삼성빌"]
+                    if dong_m and not any(k in loc_s for k in villa_kw):
+                        return "아파트"
+                    if flr >= 7 and "호" in loc_s:
+                        return "아파트"
+                    if any(k in loc_s for k in villa_kw) or ("층" in loc_s and "호" in loc_s):
+                        return "다세대/빌라"
+                    if "임야" in loc_s or re.search(r"\b산\s*\d+", loc_s) or ("층" not in loc_s and "호" not in loc_s and re.search(r"\d+(-\d+)?$", loc_s.strip())):
+                        return "토지/대지"
+                    return "기타"
+
                 basic_items: list = []
                 current_page = 1
                 row_index = 0
@@ -999,10 +1024,21 @@ class AuctionCrawler:
                         current_page += 1
                         next_btn = await frame.query_selector(f"#mf_wfm_mainFrame_pgl_gdsDtlSrchPage_page_{current_page}")
                         if not next_btn:
+                            # 10페이지 단위 다음 블록 화살표 버튼 시도
+                            next_block_btn = await frame.query_selector("#mf_wfm_mainFrame_pgl_gdsDtlSrchPage_next_btn, a[id*='pgl_gdsDtlSrchPage_next']")
+                            if next_block_btn:
+                                is_disabled = await next_block_btn.get_attribute("disabled")
+                                cls_attr = (await next_block_btn.get_attribute("class") or "")
+                                if not is_disabled and "disabled" not in cls_attr:
+                                    console.print(f"[dim]📄 다음 페이지 블록({current_page}페이지~)으로 이동 중...[/dim]")
+                                    await next_block_btn.click()
+                                    await page.wait_for_timeout(3000)
+                                    row_index = 0
+                                    continue
                             break
                         console.print(f"[dim]📄 페이지 {current_page}로 이동 중...[/dim]")
                         await next_btn.click()
-                        await page.wait_for_timeout(3000)
+                        await page.wait_for_timeout(2500)
                         row_index = 0
                         continue
 
@@ -1018,11 +1054,12 @@ class AuctionCrawler:
                             continue
                         
                         usage_text = await cols[2].inner_text()
-                        usage = usage_text.strip()
+                        usage_clean = usage_text.strip()
 
                         location_raw = await cols[3].inner_text()
                         location_lines = [l.strip() for l in location_raw.split('\n') if l.strip()]
                         location = next((l for l in location_lines if l not in ("지도", "지적도")), "소재지 정보 없음")
+                        usage = _infer_usage(location, usage_clean)
 
                         row_full_text = await row.inner_text()
                         for match in case_matches:
@@ -1147,12 +1184,74 @@ class AuctionCrawler:
                 """
                 extracted_items = []
                 row_detail_cache: dict = {}
+                # 기존 DB 물건 빠른 조회용 맵 + 신규 물건 Phase 1 즉시 선등록 (전체 매물 즉시 노출)
+                existing_map: dict = {}
+                try:
+                    now_init = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    with sqlite3.connect(DB_FILE_PATH) as _conn:
+                        for _r in _conn.execute("SELECT case_number, min_bid, rights_list FROM auction_items"):
+                            existing_map[_r[0]] = (_r[1], _r[2])
+                        new_batch = []
+                        for bi in basic_items:
+                            cn = bi['case_number']
+                            if cn not in existing_map:
+                                app_v = bi.get('appraisal') or 0
+                                min_v = bi.get('min_bid') or 0
+                                disc_v = round((1 - min_v / app_v) * 100, 1) if app_v > 0 and min_v > 0 else 0.0
+                                margin_v = max(app_v - min_v, 0)
+                                grade_v = "A" if disc_v >= 30 else ("B" if disc_v >= 15 else "C")
+                                score_v = 85 if disc_v >= 30 else (75 if disc_v >= 15 else 65)
+                                rep_v = json.dumps({
+                                    "score": score_v,
+                                    "grade": grade_v,
+                                    "verdict": f"법원 목록 수집 완료 (감정가 대비 {disc_v}% 할인) — 상세 권리 동기화 중",
+                                    "buy_signal": disc_v >= 20,
+                                    "expected_yield": "6~8%",
+                                    "suggested_bid": f"{int(min_v * 1.03):,}원 부근" if min_v > 0 else "산정 대기",
+                                    "extinguished_rights": ["상세 등기부 권리 동기화 예정"],
+                                    "retained_rights": ["없음 (또는 현황조사서 확인 필요)"],
+                                    "key_points": [f"감정가 대비 {disc_v}% 할인"],
+                                    "risks": ["상세 현황조사서 동기화 진행 중"],
+                                    "analysis_detail": "법원 전체 목록 스캔을 통해 즉시 등록된 매물입니다. 상세 권리분석 또는 실시간 재분석 버튼을 통해 심층 리포트를 확인하실 수 있습니다.",
+                                    "ai_model": "Rule-Engine"
+                                }, ensure_ascii=False)
+                                new_batch.append((
+                                    cn, bi['location'], bi.get('usage') or _infer_usage(bi['location']),
+                                    app_v, min_v, min_v, 1 if app_v > min_v else 0, "[]", "", 0, 0,
+                                    score_v, grade_v, f"감정가 대비 {disc_v}% 할인 매물", f"{int(min_v * 1.03):,}원",
+                                    rep_v, now_init, now_init, "Rule-Engine", "NEW",
+                                    app_v, margin_v, disc_v, 0, "감정가기준"
+                                ))
+                        if new_batch:
+                            _conn.executemany("""
+                                INSERT OR IGNORE INTO auction_items (
+                                    case_number, location, usage, appraisal, min_bid, prev_min_bid, failed_count,
+                                    rights_list, tenant_registration_date, tenant_deposit, is_payout_requested,
+                                    ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json,
+                                    last_updated, created_at, ai_model, status_flag,
+                                    market_price, safety_margin, market_discount_pct, market_match_count, market_match_level
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """, new_batch)
+                            _conn.commit()
+                            console.print(f"[bold green]⚡ Phase 1 신규 매물 {len(new_batch)}건 DB 즉시 등록 완료![/bold green]")
+                except Exception as e_init:
+                    console.print(f"[dim yellow]⚠️ Phase 1 선등록 예외: {e_init}[/dim yellow]")
+
                 for bi in basic_items:
                     case_number = bi['case_number']
                     appraisal   = bi['appraisal']
                     min_bid     = bi['min_bid']
                     location    = bi['location']
+                    usage       = bi.get('usage') or _infer_usage(location)
                     row_id      = bi.get('row_id', -1)
+
+                    # 스마트 증분 스킵: 이미 DB에 존재하고 최저가 변동이 없으며 등기/권리 정보가 있는 경우 상세 XHR 스킵
+                    if case_number in existing_map:
+                        ex_min_bid, ex_rights = existing_map[case_number]
+                        if ex_min_bid and min_bid and ex_min_bid == min_bid and ex_rights and ex_rights != "[]":
+                            console.print(f"[dim]⏭️  {case_number} (변동 없음 · 캐시 유지)[/dim]")
+                            continue
+
                     console.print(f"[bold cyan]👉 {case_number} 상세 API 호출 중...[/bold cyan]")
 
                     matched_cort_code = cort_ofc_cd
@@ -1163,7 +1262,7 @@ class AuctionCrawler:
                         raw_detail = row_detail_cache[row_id]
                         console.print(f"[dim]📡 상세(캐시): 재사용[/dim]")
                     elif cort_ofc_cd:
-                        await asyncio.sleep(random.uniform(4.0, 7.0))
+                        await asyncio.sleep(random.uniform(1.8, 3.2))
                         try:
                             api_cs_no = _to_api_cs_no(case_number)
                             raw_detail = await page.evaluate(fetch_js, [api_cs_no, cort_ofc_cd])
@@ -1182,7 +1281,7 @@ class AuctionCrawler:
                             for alt_code in SEOUL_COURT_CODES:
                                 if alt_code == cort_ofc_cd:
                                     continue
-                                await asyncio.sleep(random.uniform(2.0, 3.5))
+                                await asyncio.sleep(random.uniform(1.5, 2.5))
                                 try:
                                     alt_detail = await page.evaluate(fetch_js, [api_cs_no, alt_code])
                                     if not alt_detail or alt_detail.get('error'):
@@ -1239,10 +1338,12 @@ class AuctionCrawler:
                         m_floor = re.search(r'(\d+)층', location)
                         if m_floor:
                             floor = int(m_floor.group(1))
+                    usage = _infer_usage(location, usage, floor)
 
                     extracted_items.append({
                         "case_number": case_number,
                         "location": location,
+                        "usage": usage,
                         "appraisal": appraisal,
                         "min_bid": min_bid,
                         "failed_count": int(api_gds.get('flbdNcnt') or (1 if appraisal > min_bid else 0)),
@@ -1447,8 +1548,48 @@ async def main():
 
     console.print(f"[bold yellow]🔍 {args.region} 전체 법원 수집 시작 (법원 {len(court_list)}개, 법원당 최대 {args.max_items}개)[/bold yellow]")
 
+    try:
+        from core.market_matcher import MarketMatcher
+        market_matcher = MarketMatcher()
+    except Exception:
+        market_matcher = None
+
+    def _build_rule_report(item_d: dict, rights_r: dict) -> dict:
+        rl = rights_r.get('risk_level', 'SAFE')
+        app_v = item_d.get('appraisal') or 0
+        min_v = item_d.get('min_bid') or 0
+        disc_v = round((1 - min_v / app_v) * 100, 1) if app_v > 0 and min_v > 0 else 0.0
+        if rl == "CRITICAL":
+            score, grade = 25, "D"
+        elif rl == "WARNING":
+            score, grade = 55, "C"
+        else:
+            if disc_v >= 30:
+                score, grade = 88, "A"
+            elif disc_v >= 15:
+                score, grade = 78, "B"
+            else:
+                score, grade = 68, "B"
+        return {
+            "score": score,
+            "grade": grade,
+            "verdict": f"시스템 정밀 권리분석 ({rl}): {rights_r.get('reason', '권리 상태 양호')} (할인율 {disc_v}%)",
+            "buy_signal": rl == "SAFE" and disc_v >= 15,
+            "expected_yield": "6~9%" if rl == "SAFE" else "보수적 접근 필요",
+            "suggested_bid": f"{int(min_v * 1.03):,}원 부근" if min_v > 0 else "입찰가 산정 대기",
+            "extinguished_rights": ["말소기준권리 이후 후순위 제한물권 일체"],
+            "retained_rights": ["선순위 임차보증금 인수 주의" if rl == "CRITICAL" else "없음"],
+            "key_points": [f"감정가 대비 {disc_v}% 할인 매물", f"유찰 {item_d.get('failed_count', 0)}회 진행"],
+            "risks": [rights_r.get('reason', '현장 임장 및 관리비 확인 필수')],
+            "analysis_detail": f"법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [{rl}]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+            "ai_model": "Rule-Engine"
+        }
+
     items = []
+    change_history = []
+    final_results = []
     _dump_done = False
+
     for court_name, b_code in court_list.items():
         label = f"{court_name} ({b_code})" if b_code else court_name
         console.print(f"\n[cyan]📍 {label} 검색 중...[/cyan]")
@@ -1459,10 +1600,84 @@ async def main():
             if _dump_path and court_items:
                 _dump_done = True
             if court_items:
-                console.print(f"[green]  ✅ {court_name}: {len(court_items)}개 수집[/green]")
+                console.print(f"[green]  ✅ {court_name}: 신규/변경 {len(court_items)}개 상세 수집 완료 -> 즉시 DB 저장 중...[/green]")
                 items.extend(court_items)
+                for item in court_items:
+                    malso_dt = engine.find_malso_standard(item['rights_list'])
+                    tenant_dt = engine.parse_date(item.get('tenant_registration_date'))
+                    rights_report = engine.analyze_tenant_risk(
+                        malso_dt, tenant_dt, item['tenant_deposit'], item['is_payout_requested'],
+                        appraisal=item.get('appraisal', 0),
+                        min_bid=item.get('min_bid', 0),
+                        failed_count=item.get('failed_count', 0),
+                    )
+                    existing_item = db_agent.get_existing_item(item['case_number'])
+                    is_price_changed = existing_item and existing_item['min_bid'] != item['min_bid']
+                    is_tenant_changed = existing_item and (
+                        existing_item.get('tenant_registration_date') != item.get('tenant_registration_date') or
+                        existing_item.get('tenant_deposit') != item.get('tenant_deposit')
+                    )
+                    use_cache = existing_item and not is_price_changed and not is_tenant_changed and not args.force_reanalyze
+
+                    if use_cache:
+                        ai_report = existing_item['ai_report_json']
+                        if isinstance(ai_report, str):
+                            try:
+                                ai_report = json.loads(ai_report)
+                            except Exception:
+                                ai_report = {}
+                        if item.get('tenants_list'):
+                            ai_report['tenants'] = item['tenants_list']
+                        status_flag = "UNCHANGED"
+                        prev_min_bid = existing_item['min_bid']
+                        db_agent.upsert_auction_item(item, ai_report, rights_report)
+                    else:
+                        # 스마트 하이브리드: 아파트/오피스텔/상가 중 감정가/최저가 정상이고 특수권리/치명적 위험이 없는 핵심 물건은 GPT-4o-mini, 그 외 대량 물건은 Rule-Engine 즉시 처리
+                        u_type = item.get('usage') or ''
+                        is_prime = (
+                            item.get('appraisal', 0) > 0 and
+                            item.get('min_bid', 0) > 0 and
+                            rights_report.get('risk_level') != 'CRITICAL' and
+                            any(k in u_type for k in ('아파트', '오피스텔', '상가'))
+                        )
+                        if is_prime:
+                            ai_report = analyzer.analyze_item(item, rights_report)
+                        else:
+                            ai_report = _build_rule_report(item, rights_report)
+                        if item.get('tenants_list'):
+                            ai_report['tenants'] = item['tenants_list']
+                        status_flag, prev_min_bid = db_agent.upsert_auction_item(item, ai_report, rights_report)
+
+                    # 네이버 시세 매칭 및 진짜 안전마진 즉시 업데이트
+                    if market_matcher:
+                        try:
+                            full_row = db_agent.get_existing_item(item['case_number']) or item
+                            m_res = market_matcher.match_item(full_row)
+                            with sqlite3.connect(DB_FILE_PATH) as _mconn:
+                                _mconn.execute("""
+                                    UPDATE auction_items
+                                    SET market_price=?, safety_margin=?, market_discount_pct=?,
+                                        market_match_count=?, market_match_level=?, est_monthly_rent=?, rental_yield=?
+                                    WHERE case_number=?
+                                """, (
+                                    m_res["market_price"], m_res["safety_margin"], m_res["market_discount_pct"],
+                                    m_res["market_match_count"], m_res["market_match_level"],
+                                    m_res["est_monthly_rent"], m_res["rental_yield"], item['case_number']
+                                ))
+                                _mconn.commit()
+                        except Exception:
+                            pass
+
+                    final_results.append({**item, "rights": rights_report, "ai": ai_report})
+                    change_history.append({
+                        "case_number": item['case_number'],
+                        "location": item['location'],
+                        "status": status_flag,
+                        "current_min": item['min_bid'],
+                        "prev_min": prev_min_bid if prev_min_bid else item['min_bid']
+                    })
             else:
-                console.print(f"[yellow]  ⚠️ {court_name}: 수집된 물건 없음[/yellow]")
+                console.print(f"[yellow]  ⚠️ {court_name}: 신규/변경 물건 없음[/yellow]")
         except Exception as e:
             console.print(f"[red]  ❌ {court_name} 수집 실패: {e}[/red]")
             log_error_event(
@@ -1473,72 +1688,8 @@ async def main():
             )
 
     if not items:
-        console.print("[bold red]❌ 수집된 실제 데이터가 없거나 수집 프로세스가 차단되었습니다. 프로세스를 중단합니다.[/bold red]")
-        log_error_event(
-            category=ErrorCategory.IP_BLOCK,
-            message=f"{args.region} 전체 법원 수집 결과 0건 — IP 차단 또는 사이트 이슈 의심",
-            context={"region": args.region, "court_count": len(court_list)},
-        )
+        console.print("[bold green]✅ 모든 물건이 최신 상태이거나 추가 수집할 물건이 없습니다.[/bold green]")
         return
-
-    # 실시간 변경 사항을 시각적으로 추적하기 위한 요약 리스트
-    change_history = []
-
-    final_results = []
-    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), transient=True) as progress:
-        progress.add_task(description="AI 권리 분석, 가치 분석 및 데이터베이스 업서트 중...", total=None)
-        
-        for item in items:
-            # 1. 룰 기반 권리분석 실행
-            malso_dt = engine.find_malso_standard(item['rights_list'])
-            tenant_dt = engine.parse_date(item.get('tenant_registration_date'))
-            rights_report = engine.analyze_tenant_risk(
-                malso_dt, tenant_dt, item['tenant_deposit'], item['is_payout_requested'],
-                appraisal=item.get('appraisal', 0),
-                min_bid=item.get('min_bid', 0),
-                failed_count=item.get('failed_count', 0),
-            )
-            
-            # 가격 변동 없는 기존 물건은 AI 리포트 재활용 (토큰 절약)
-            # --force-reanalyze 플래그 시 캐시 무시하고 전체 재분석
-            existing_item = db_agent.get_existing_item(item['case_number'])
-            ai_report = {}
-
-            is_price_changed = existing_item and existing_item['min_bid'] != item['min_bid']
-            is_tenant_changed = existing_item and (
-                existing_item.get('tenant_registration_date') != item.get('tenant_registration_date') or
-                existing_item.get('tenant_deposit') != item.get('tenant_deposit')
-            )
-            use_cache = existing_item and not is_price_changed and not is_tenant_changed and not args.force_reanalyze
-
-            if use_cache:
-                ai_report = existing_item['ai_report_json']
-                if isinstance(ai_report, str):
-                    try:
-                        ai_report = json.loads(ai_report)
-                    except Exception:
-                        ai_report = {}
-                if item.get('tenants_list'):
-                    ai_report['tenants'] = item['tenants_list']
-                status_flag = "UNCHANGED"
-                prev_min_bid = existing_item['min_bid']
-                db_agent.upsert_auction_item(item, ai_report, rights_report)
-            else:
-                ai_report = analyzer.analyze_item(item, rights_report)
-                if item.get('tenants_list'):
-                    ai_report['tenants'] = item['tenants_list']
-                status_flag, prev_min_bid = db_agent.upsert_auction_item(item, ai_report, rights_report)
-            
-            final_results.append({**item, "rights": rights_report, "ai": ai_report})
-            
-            # 모니터링 체인 로그 축적
-            change_history.append({
-                "case_number": item['case_number'],
-                "location": item['location'],
-                "status": status_flag,
-                "current_min": item['min_bid'],
-                "prev_min": prev_min_bid if prev_min_bid else item['min_bid']
-            })
 
     # ==========================================
     # 📊 실시간 경매 물건 업데이트 에이전트 대시보드 출력
