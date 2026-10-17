@@ -50,6 +50,9 @@ interface AuctionItem {
   last_updated?: string;
   created_at?: string;
   ai_model?: string;
+  floor?: number;
+  area_m2?: number;
+  area_pyeong?: number;
 }
 
 interface AuctionDetail extends AuctionItem {
@@ -344,6 +347,17 @@ export default function Home() {
                   <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg shrink-0">
                     {getPropertyType(item.location, item.usage)}
                   </span>
+                  {item.floor !== undefined && item.floor !== 0 && (
+                    item.floor === 1 && getPropertyType(item.location, item.usage).includes("상가") ? (
+                      <span className="px-2 py-0.5 text-xs font-bold text-orange-800 bg-orange-100 border border-orange-300 rounded-lg shrink-0">
+                        ✨ 1층 상가
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200 rounded-lg shrink-0">
+                        {item.floor > 0 ? `${item.floor}층` : `지하${Math.abs(item.floor)}층`}
+                      </span>
+                    )
+                  )}
                   {(() => {
                     const analysis = analyzeSeniorDeposit(
                       item.rights_list,

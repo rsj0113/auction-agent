@@ -45,6 +45,9 @@ interface AuctionItem {
   ai_model?: string;
   lat?: number;
   lng?: number;
+  floor?: number;
+  area_m2?: number;
+  area_pyeong?: number;
 }
 
 interface AIReport {
@@ -415,6 +418,7 @@ export const QUICK_CHIPS = [
   { id: "half_price", label: "반값 경매", countKey: "half_price", icon: "🔥" },
   { id: "owner", label: "소유자 점유", countKey: "owner", icon: "🏠" },
   { id: "apartment", label: "아파트", countKey: "apartment", icon: "🏢" },
+  { id: "first_floor_shop", label: "1층 상가", countKey: "first_floor_shop", icon: "🏪" },
   { id: "small_budget", label: "1억 이하", countKey: "small_budget", icon: "💰" },
   { id: "top_grade", label: "AI 추천", countKey: "top_grade", icon: "💎" },
   { id: "special", label: "특수권리 주의", countKey: "special", icon: "⚠️" },
@@ -791,6 +795,17 @@ export default function AuctionsPage() {
                   <span className="text-xs font-medium text-gray-700 bg-gray-100 px-2 py-0.5 rounded-lg shrink-0">
                     {getPropertyType(item.location, item.usage)}
                   </span>
+                  {item.floor !== undefined && item.floor !== 0 && (
+                    item.floor === 1 && getPropertyType(item.location, item.usage).includes("상가") ? (
+                      <span className="text-xs font-bold text-orange-800 bg-orange-100 border border-orange-300 px-2 py-0.5 rounded-lg shrink-0">
+                        ✨ 1층 상가
+                      </span>
+                    ) : (
+                      <span className="text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-lg shrink-0">
+                        {item.floor > 0 ? `${item.floor}층` : `지하${Math.abs(item.floor)}층`}
+                      </span>
+                    )
+                  )}
                   {(() => {
                     const analysis = analyzeSeniorDeposit(
                       item.rights_list,

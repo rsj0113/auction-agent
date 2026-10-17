@@ -59,7 +59,8 @@ def get_auctions(
                    remarks, special_rights,
                    market_price, safety_margin, market_discount_pct,
                    market_match_count, market_match_level, est_monthly_rent, rental_yield,
-                   last_updated, created_at, ai_model, lat, lng
+                   last_updated, created_at, ai_model, lat, lng,
+                   floor, area_m2, area_pyeong
             FROM auction_items 
             WHERE 1=1
         '''
@@ -109,6 +110,8 @@ def get_auctions(
                 query += " AND ((tenant_registration_date IS NULL OR tenant_registration_date IN ('', '임차인없음', '해당없음')) AND (tenant_deposit IS NULL OR tenant_deposit = 0))"
             elif quick_filter == 'apartment':
                 query += " AND (usage LIKE '%아파트%' OR location LIKE '%아파트%') AND usage NOT LIKE '%상가%' AND location NOT LIKE '%상가%'"
+            elif quick_filter == 'first_floor_shop':
+                query += " AND usage = '상가/근린시설' AND floor = 1"
             elif quick_filter == 'small_budget':
                 query += " AND min_bid <= 100000000"
             elif quick_filter == 'top_grade':
@@ -181,6 +184,10 @@ def get_quick_filter_counts():
         # apartment (아파트)
         cursor.execute("SELECT COUNT(*) FROM auction_items WHERE (usage LIKE '%아파트%' OR location LIKE '%아파트%') AND usage NOT LIKE '%상가%' AND location NOT LIKE '%상가%'")
         counts["apartment"] = cursor.fetchone()[0]
+
+        # first_floor_shop (1층 상가)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE usage = '상가/근린시설' AND floor = 1")
+        counts["first_floor_shop"] = cursor.fetchone()[0]
         
         # small_budget (1억 이하)
         cursor.execute("SELECT COUNT(*) FROM auction_items WHERE min_bid <= 100000000")
