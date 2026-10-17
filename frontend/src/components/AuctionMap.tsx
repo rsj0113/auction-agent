@@ -82,9 +82,9 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
         zoomControl: true,
       });
 
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        subdomains: "abcd",
+      // API 키가 전혀 필요 없고 한글 지명/지하철역이 선명하게 나오는 OpenStreetMap 공식 타일
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19,
       }).addTo(map);
 
@@ -154,7 +154,10 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
         iconSize: [0, 0],
       });
 
-      const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+      const zBoost =
+        grade === "S" ? 1000 : grade === "A" ? 800 : grade === "B" ? 500 : grade === "C" ? 200 : 0;
+
+      const marker = L.marker([item.lat, item.lng], { icon: customIcon, zIndexOffset: zBoost });
       marker.bindTooltip(
         `<div style="font-size:12px;font-weight:700;">${item.case_number} (${item.usage || "매물"})</div>
          <div style="font-size:11px;color:#374151;max-width:220px;white-space:normal;">${item.location}</div>
