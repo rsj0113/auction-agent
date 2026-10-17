@@ -212,11 +212,77 @@ def get_quick_filter_counts():
         # market_matched (네이버 시세 검증 완료)
         cursor.execute("SELECT COUNT(*) FROM auction_items WHERE market_match_count > 0")
         counts["market_matched"] = cursor.fetchone()[0]
+
+        # naver_shops (네이버 상가 실매물 총 건수)
+        try:
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03')")
+            counts["naver_shops"] = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND floor = 1")
+            counts["naver_first_floor"] = cursor.fetchone()[0]
+        except Exception:
+            counts["naver_shops"] = 0
+            counts["naver_first_floor"] = 0
         
         conn.close()
         return counts
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/naver-listings")
+def get_naver_listings(
+    region: Optional[str] = None,
+    trade_type: Optional[str] = None,
+    first_floor_only: bool = False,
+    limit: int = 500,
+):
+    """
+    Get Naver Real Estate commercial (상가) listings for map overlay & side-by-side comparison.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT article_id, legal_div_no, region_name, addr_sgg, addr_emd,
+                   trade_type, trade_type_cd, realty_type_cd, area_m2, area_pyeong,
+                   price_sale_10k, deposit_10k, monthly_rent_10k,
+                   floor, total_floor, detail_url, confirm_date, realtor,
+                   lat, lng, article_name, scraped_at
+            FROM naver_listings
+            WHERE realty_type_cd IN ('D02', 'D04', 'D03')
+        """
+        params = []
+
+        if region:
+            query += " AND (region_name LIKE ? OR addr_sgg LIKE ? OR addr_emd LIKE ?)"
+            like = f"%{region}%"
+            params.extend([like, like, like])
+
+        if trade_type and trade_type in ("매매", "월세", "전세"):
+            query += " AND trade_type = ?"
+            params.append(trade_type)
+
+        if first_floor_only:
+            query += " AND floor = 1"
+
+        # 일반 구분상가(D02) 및 1층 매물 우선 정렬
+        query += """
+            ORDER BY
+                CASE WHEN realty_type_cd = 'D02' THEN 0 ELSE 1 END ASC,
+                CASE WHEN floor = 1 THEN 0 ELSE 1 END ASC,
+                scraped_at DESC
+            LIMIT ?
+        """
+        params.append(limit)
+
+        cursor.execute(query, params)
+        rows = [dict(r) for r in cursor.fetchall()]
+        conn.close()
+        return {"data": rows, "count": len(rows)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/api/auctions/{case_number}")
 def get_auction_detail(case_number: str):

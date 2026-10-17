@@ -92,7 +92,7 @@ class MarketMatcher:
             conn.row_factory = sqlite3.Row
             rows = conn.execute("""
                 SELECT article_id, legal_div_no, region_name, addr_sgg, addr_emd,
-                       trade_type, trade_type_cd, area_m2, area_pyeong,
+                       trade_type, trade_type_cd, realty_type_cd, area_m2, area_pyeong,
                        price_sale_10k, deposit_10k, monthly_rent_10k,
                        floor, total_floor, detail_url, article_name
                 FROM naver_listings
@@ -104,20 +104,35 @@ class MarketMatcher:
         """
         단일 경매 물건에 대해 네이버 시세 및 안전마진을 계산하여 반환
         """
-        area_m2 = float(item.get("area_m2") or 0.0)
+        raw_area_m2 = float(item.get("area_m2") or 0.0)
         min_bid = int(item.get("min_bid") or 0)
         appraisal = int(item.get("appraisal") or 0)
-        
+        item_floor = item.get("floor")
+
         adiv = str(item.get("legal_div_no") or "")
         aemd = str(item.get("addr_emd") or "")
         asgg = str(item.get("addr_sgg") or "")
         loc = str(item.get("location") or "")
         sido = loc.split()[0] if loc else ""
 
+        # location에서 시군구/읍면동 보조 추출
+        if not asgg and loc:
+            m_sgg = re.search(r"([가-힣]+시\s+[가-힣]+구|[가-힣]+구|[가-힣]+시|[가-힣]+군)", loc)
+            if m_sgg:
+                asgg = m_sgg.group(1)
+        if not aemd and loc:
+            m_emd = re.search(r"([가-힣0-9]+동|[가-힣]+읍|[가-힣]+면)\b", loc)
+            if m_emd:
+                aemd = m_emd.group(1)
+
+        # 집합건물(호실)인데 대지 전체 면적(300㎡ 초과)이 들어간 경우 전용면적 미상으로 간주
+        is_unit = "호" in loc
+        area_m2 = 0.0 if (is_unit and raw_area_m2 > 300.0) else raw_area_m2
+
         # 면적 범위 설정 (면적 정보가 있을 경우 ±40%)
         has_area = area_m2 > 0
-        min_area = area_m2 * 0.6 if has_area else 0
-        max_area = area_m2 * 1.4 if has_area else 999999
+        min_area = area_m2 * 0.6 if has_area else 10.0
+        max_area = area_m2 * 1.4 if has_area else (250.0 if is_unit else 999999.0)
 
         matched_emd_sale = []
         matched_sgg_sale = []
@@ -129,7 +144,11 @@ class MarketMatcher:
 
         for n in self.naver_listings:
             n_area = float(n.get("area_m2") or 0.0)
-            if has_area and not (min_area <= n_area <= max_area):
+            if not (min_area <= n_area <= max_area):
+                continue
+
+            # 구분상가 호실인 경우 일반상가(D02) 우선 매칭
+            if is_unit and n.get("realty_type_cd") not in ("D02", None, ""):
                 continue
 
             n_div = str(n.get("legal_div_no") or "")
@@ -143,7 +162,7 @@ class MarketMatcher:
             is_sido = False
 
             # 1. 동일동 매칭 (법정동코드 일치 또는 동일 시/구 + 읍/면/동)
-            if (adiv and n_div == adiv) or (aemd and asgg and n_emd == aemd and (n_sgg == asgg or asgg in n_sgg or n_sgg in asgg)):
+            if (adiv and n_div == adiv) or (aemd and n_emd == aemd and (not asgg or n_sgg == asgg or asgg in n_sgg or n_sgg in asgg)):
                 is_emd = True
             # 2. 동일구 매칭
             elif asgg and (n_sgg == asgg or asgg in n_sgg or n_sgg in asgg):
@@ -185,6 +204,12 @@ class MarketMatcher:
             chosen_sales = []
             match_level = "매칭없음"
 
+        # 동일 층수(특히 1층 상가 vs 비1층 상가) 우선 정렬
+        if item_floor == 1:
+            same_floor_sales = [s for s in chosen_sales if s.get("floor") == 1]
+            if same_floor_sales:
+                chosen_sales = same_floor_sales + [s for s in chosen_sales if s.get("floor") != 1]
+
         # 시세 단가 계산 (원/㎡)
         valid_sales = [s for s in chosen_sales if (s.get("price_sale_10k") or 0) > 0 and (s.get("area_m2") or 0) > 0]
         market_price = 0
@@ -197,6 +222,15 @@ class MarketMatcher:
             if has_area:
                 raw_mp = int(avg_ppm2 * area_m2)
                 raw_min_mp = int(min_ppm2 * area_m2)
+            elif appraisal > 0:
+                # 전용면적이 미상인 호실은 감정가 근처(0.6~1.8배) 실매물 평균 또는 감정가 기준 보정
+                near_sales = [s["price_sale_10k"] * 10000 for s in valid_sales if 0.5 * appraisal <= s["price_sale_10k"] * 10000 <= 1.8 * appraisal]
+                if near_sales:
+                    raw_mp = int(sum(near_sales) / len(near_sales))
+                    raw_min_mp = int(min(near_sales))
+                else:
+                    raw_mp = appraisal
+                    raw_min_mp = int(appraisal * 0.85)
             else:
                 raw_mp = int(sum(s["price_sale_10k"] * 10000 for s in valid_sales) / len(valid_sales))
                 raw_min_mp = int(min(s["price_sale_10k"] * 10000 for s in valid_sales))
@@ -294,7 +328,7 @@ class MarketMatcher:
             cursor = conn.cursor()
             
             items = cursor.execute("""
-                SELECT case_number, location, appraisal, min_bid, area_m2,
+                SELECT case_number, location, appraisal, min_bid, area_m2, floor,
                        legal_div_no, addr_sgg, addr_emd, tenant_deposit,
                        is_payout_requested, ai_verdict, ai_report_json
                 FROM auction_items

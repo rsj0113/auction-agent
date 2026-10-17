@@ -210,7 +210,7 @@ export default function Home() {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              🗺️ 지도보기
+              🗺️ 지도 + N상가
             </button>
           </div>
         </div>
@@ -254,7 +254,7 @@ export default function Home() {
               href="/auctions?region=성남&view=map"
               className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition-colors"
             >
-              📍 성남·분당 지도보기
+              📍 성남·분당 지도 + N상가 보기
             </Link>
             <Link
               href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"}
@@ -291,6 +291,26 @@ export default function Home() {
               </button>
             );
           })}
+
+          {/* 네이버 부동산 상가 실매물 같이보기 퀵 버튼 */}
+          <button
+            onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              viewMode === "map"
+                ? "bg-[#03c75a] text-white shadow-sm ring-2 ring-emerald-500/30 scale-[1.02]"
+                : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300"
+            }`}
+          >
+            <span className="px-1 py-0.2 rounded bg-[#03c75a] text-white text-[9px] font-black">N</span>
+            <span>네이버 상가 실매물 같이보기</span>
+            {typeof quickCounts["naver_shops"] === "number" && quickCounts["naver_shops"] > 0 && (
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                viewMode === "map" ? "bg-white/25 text-white" : "bg-emerald-200/70 text-emerald-900"
+              }`}>
+                {quickCounts["naver_shops"].toLocaleString()}
+              </span>
+            )}
+          </button>
         </div>
       </section>
 
@@ -300,7 +320,7 @@ export default function Home() {
           <AuctionMap
             items={auctions}
             onSelectItem={(item) => handleSelectAuction(item)}
-            focusRegion={quickFilter}
+            focusRegion=""
           />
         </section>
       )}

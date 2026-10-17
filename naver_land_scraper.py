@@ -38,8 +38,8 @@ from playwright_stealth import Stealth
 # 상수
 # ─────────────────────────────────────────────────────────────
 
-# 상가·업무 관련 realEstateType 코드
-COMMERCIAL_TYPES = ["D03", "D04", "E01", "Z00"]
+# 상가 전용 realEstateType 코드 (D02=일반상가/점포, D04=상가건물, D03=상업시설/빌딩)
+COMMERCIAL_TYPES = ["D02", "D04", "D03"]
 
 TRADE_CODES: Dict[str, str] = {"A1": "매매", "B1": "전세", "B2": "월세"}
 
@@ -49,27 +49,38 @@ SITE_BASE = "https://fin.land.naver.com"
 
 DB_FILE = "auction_db.sqlite"
 
-# 수원/성남/안양 주요 상권 — (approx_lng, approx_lat)
+# 성남/분당/판교/위례 + 서울/수원/안양 주요 상권 — (approx_lng, approx_lat)
 # 런타임에 searchByCoordinate API로 정확한 legalDivisionNumber 조회
 GYEONGGI_REGIONS: Dict[str, Tuple[float, float]] = {
-    "수원시 팔달구 인계동"   : (127.020, 37.264),
-    "수원시 팔달구 매산동"   : (127.004, 37.270),
-    "수원시 팔달구 우만동"   : (127.027, 37.272),
-    "수원시 영통구 영통동"   : (127.059, 37.252),
-    "수원시 영통구 매탄동"   : (127.046, 37.263),
+    # 성남시 분당구 핵심 상권
     "성남시 분당구 서현동"   : (127.122, 37.383),
     "성남시 분당구 야탑동"   : (127.127, 37.410),
     "성남시 분당구 정자동"   : (127.113, 37.360),
-    "성남시 분당구 수내동"   : (127.108, 37.375),
-    "성남시 중원구 성남동"   : (127.138, 37.441),
+    "성남시 분당구 수내동"   : (127.115, 37.378),
+    "성남시 분당구 삼평동"   : (127.111, 37.401),
+    "성남시 분당구 백현동"   : (127.111, 37.388),
+    "성남시 분당구 구미동"   : (127.111, 37.340),
+    "성남시 분당구 금곡동"   : (127.108, 37.350),
+    "성남시 분당구 이매동"   : (127.128, 37.397),
+    # 성남시 중원구·수정구 핵심 상권
+    "성남시 중원구 성남동"   : (127.130, 37.432),
+    "성남시 중원구 상대원동" : (127.169, 37.436),
+    "성남시 수정구 신흥동"   : (127.145, 37.442),
+    "성남시 수정구 태평동"   : (127.132, 37.445),
+    "성남시 수정구 창곡동"   : (127.142, 37.468),
+    "성남시 수정구 수진동"   : (127.134, 37.438),
+    # 서울 핵심 상권
+    "서울 강남구 역삼동"     : (127.036, 37.500),
+    "서울 강남구 논현동"     : (127.028, 37.511),
+    "서울 서초구 서초동"     : (127.015, 37.492),
+    "서울 송파구 문정동"     : (127.122, 37.485),
+    "서울 송파구 방이동"     : (127.115, 37.512),
+    "서울 마포구 서교동"     : (126.921, 37.555),
+    # 경기 남부 주요 상권
+    "수원시 팔달구 인계동"   : (127.020, 37.264),
+    "수원시 영통구 영통동"   : (127.059, 37.252),
     "안양시 동안구 평촌동"   : (126.952, 37.390),
     "안양시 동안구 관양동"   : (126.961, 37.400),
-    "안양시 만안구 안양동"   : (126.914, 37.395),
-    "평택시 평택동"         : (127.086, 36.992),
-    "파주시 금촌동"         : (126.777, 37.760),
-    "양평군 양평읍"         : (127.491, 37.493),
-    "가평군 가평읍"         : (127.510, 37.831),
-    "화성시 반송동"         : (127.072, 37.204),
 }
 
 # 기본 필터 (빈 값 필드 포함 필요)
@@ -146,6 +157,19 @@ async def lookup_region_code(page, lng: float, lat: float) -> Optional[str]:
 # 파서
 # ─────────────────────────────────────────────────────────────
 
+def _parse_floor_part(part: str) -> Optional[int]:
+    part = part.strip().upper()
+    if not part or part == "-":
+        return None
+    if part.startswith("B") or part.startswith("지"):
+        num_str = re.sub(r"[^0-9]", "", part)
+        return -int(num_str) if num_str else None
+    try:
+        return int(part)
+    except ValueError:
+        return None
+
+
 def _parse_article(raw: Dict[str, Any], region_name: str, legal_div_no: str) -> Optional[Dict[str, Any]]:
     info = raw.get("representativeArticleInfo")
     if not info:
@@ -161,28 +185,27 @@ def _parse_article(raw: Dict[str, Any], region_name: str, legal_div_no: str) -> 
     monthly    = won_to_10k(price_node.get("rentPrice") or 0)
 
     space = info.get("spaceInfo", {})
-    area_m2 = float(space.get("floorSpace") or space.get("exclusiveSpace") or space.get("landSpace") or 0)
+    # 일반상가(D02)는 exclusiveSpace(전용면적) 우선, 통건물은 floorSpace(연면적) 우선
+    area_m2 = float(space.get("exclusiveSpace") or space.get("floorSpace") or space.get("supplySpace") or space.get("landSpace") or 0)
     area_pyeong = round(area_m2 / PYEONG, 2) if area_m2 > 0 else 0.0
 
     detail = info.get("articleDetail", {})
-    floor_raw = detail.get("floorInfo") or ""          # e.g. "2/6" or "-2/6"
+    floor_raw = detail.get("floorInfo") or ""          # e.g. "1/5", "2/6", "B1/5", "-2/6"
     floor_parts = floor_raw.replace(" ", "").split("/")
     floor       = None
     total_floor = None
     if len(floor_parts) == 2:
-        try:
-            floor       = int(floor_parts[0])
-        except ValueError:
-            pass
-        try:
-            total_floor = int(floor_parts[1])
-        except ValueError:
-            pass
+        floor       = _parse_floor_part(floor_parts[0])
+        total_floor = _parse_floor_part(floor_parts[1])
 
     addr = info.get("address", {})
     addr_sgg = addr.get("division") or ""
     addr_emd = addr.get("sector") or ""
     coords   = addr.get("coordinates", {})
+
+    base_name = str(info.get("articleName") or "상가")
+    desc = str(detail.get("articleFeatureDescription") or "").strip()
+    full_name = f"{base_name} · {desc}" if desc else base_name
 
     return {
         "article_id"       : article_id,
@@ -205,7 +228,7 @@ def _parse_article(raw: Dict[str, Any], region_name: str, legal_div_no: str) -> 
         "realtor"          : str(info.get("brokerInfo", {}).get("brokerageName") or ""),
         "lat"              : coords.get("yCoordinate"),
         "lng"              : coords.get("xCoordinate"),
-        "article_name"     : str(info.get("articleName") or ""),
+        "article_name"     : full_name[:80],
     }
 
 
@@ -261,9 +284,17 @@ def _upsert_listings(db_path: str, items: List[Dict]):
                 lat, lng, article_name, scraped_at
             ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             ON CONFLICT(article_id) DO UPDATE SET
+                realty_type_cd=excluded.realty_type_cd,
+                area_m2=excluded.area_m2,
+                area_pyeong=excluded.area_pyeong,
                 price_sale_10k=excluded.price_sale_10k,
                 deposit_10k=excluded.deposit_10k,
                 monthly_rent_10k=excluded.monthly_rent_10k,
+                floor=excluded.floor,
+                total_floor=excluded.total_floor,
+                lat=excluded.lat,
+                lng=excluded.lng,
+                article_name=excluded.article_name,
                 scraped_at=excluded.scraped_at
         """, [
             (
@@ -293,11 +324,14 @@ async def fetch_region_articles(
     region_name: str,
     trade_types: List[str],
     max_pages: int = 5,
+    realty_types: List[str] = None,
 ) -> List[Dict]:
     """
     article/boundedArticles 로 한 지역·거래유형 매물 수집.
     lastInfo 커서 기반 페이지네이션.
     """
+    if realty_types is None:
+        realty_types = COMMERCIAL_TYPES
     margin = 0.025
     bbox   = {"left": lng-margin, "right": lng+margin,
               "top": lat+margin,  "bottom": lat-margin}
@@ -310,7 +344,7 @@ async def fetch_region_articles(
         payload = {
             "filter": {
                 "tradeTypes": trade_types,
-                "realEstateTypes": COMMERCIAL_TYPES,
+                "realEstateTypes": realty_types,
                 "legalDivisionNumbers": [legal_div_no],
                 "legalDivisionType": "EUP",
                 **_BASE_FILTER_EXTRA,
@@ -344,7 +378,7 @@ async def fetch_region_articles(
         last_info = r.get("lastInfo") or []
         if not last_info:
             break
-        await asyncio.sleep(1.5)
+        await asyncio.sleep(0.5)
 
     return collected
 
@@ -352,14 +386,14 @@ async def fetch_region_articles(
 async def crawl_all_regions(
     regions: Dict[str, Tuple[float, float]] = None,
     trade_types: List[str] = None,
-    max_pages: int = 5,
+    max_pages: int = 3,
     headless: bool = True,
     db_path: str = DB_FILE,
 ) -> Dict[str, List[Dict]]:
     if regions is None:
         regions = GYEONGGI_REGIONS
     if trade_types is None:
-        trade_types = ["A1", "B1", "B2"]
+        trade_types = ["A1", "B2"]
 
     _init_naver_table(db_path)
     all_results: Dict[str, List[Dict]] = {}
@@ -383,10 +417,10 @@ async def crawl_all_regions(
 
         print("세션 초기화 중...")
         try:
-            await page.goto(f"{SITE_BASE}/map", wait_until="networkidle", timeout=30000)
+            await page.goto(f"{SITE_BASE}/map", wait_until="networkidle", timeout=25000)
         except Exception:
             pass
-        await asyncio.sleep(4)
+        await asyncio.sleep(2.5)
 
         for region_name, (lng, lat) in regions.items():
             print(f"\n[{region_name}] 코드 조회 중...")
@@ -400,13 +434,14 @@ async def crawl_all_regions(
                 region_items: List[Dict] = []
                 for trade_cd in trade_types:
                     trade_name = TRADE_CODES.get(trade_cd, trade_cd)
-                    items = await fetch_region_articles(
+                    # 일반상가(D02) 우선 수집 + 상가건물(D04)
+                    items_shop = await fetch_region_articles(
                         page, legal_div_no, lng, lat, region_name,
-                        [trade_cd], max_pages
+                        [trade_cd], max_pages, realty_types=["D02"]
                     )
-                    print(f"  {trade_name}: {len(items)}건")
-                    region_items.extend(items)
-                    await asyncio.sleep(2.0)
+                    print(f"  {trade_name} 일반상가(D02): {len(items_shop)}건")
+                    region_items.extend(items_shop)
+                    await asyncio.sleep(0.5)
 
                 all_results[region_name] = region_items
 
@@ -414,7 +449,7 @@ async def crawl_all_regions(
                     _upsert_listings(db_path, region_items)
                     print(f"  → DB 저장: {len(region_items)}건")
 
-                await asyncio.sleep(3.0)
+                await asyncio.sleep(0.8)
 
             except Exception as e:
                 print(f"  [오류] {region_name}: {e}")
