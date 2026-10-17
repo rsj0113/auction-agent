@@ -252,7 +252,7 @@ export default function Home() {
     const fetchAuctions = async () => {
       setLoading(true);
       try {
-        const limit = viewMode === "map" ? 300 : (quickFilter ? 12 : 6);
+        const limit = viewMode === "map" ? 300 : (quickFilter ? 15 : 12);
         let url = `/api/auctions?limit=${limit}&sort=recommend`;
         if (quickFilter) {
           url += `&quick_filter=${quickFilter}`;
@@ -528,7 +528,7 @@ export default function Home() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-extrabold text-gray-900 flex items-center gap-2">
-              <span>{quickFilter ? `${QUICK_CHIPS.find((c) => c.id === quickFilter)?.icon || "⚡"} ${QUICK_CHIPS.find((c) => c.id === quickFilter)?.label || ""} 매물` : "🎯 성남 상가 임장 추천 매물"}</span>
+              <span>{quickFilter ? `${QUICK_CHIPS.find((c) => c.id === quickFilter)?.icon || "⚡"} ${QUICK_CHIPS.find((c) => c.id === quickFilter)?.label || ""} 매물` : "🎯 1층 상가 임장 추천 매물"}</span>
             </h2>
             {quickFilter && (
               <button
@@ -553,10 +553,10 @@ export default function Home() {
                   }`}
                 >
                   <span>⚖️ 법원경매 추천</span>
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                     recommendTab === "auction" ? "bg-blue-100 text-blue-800" : "bg-gray-200 text-gray-700"
                   }`}>
-                    6건
+                    {quickCounts["favorite"] ? `${quickCounts["favorite"]}건` : "10건"}
                   </span>
                 </button>
                 <button
@@ -569,10 +569,10 @@ export default function Home() {
                   }`}
                 >
                   <span>🟢 네이버 1층 실매물</span>
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                     recommendTab === "naver" ? "bg-white/25 text-white" : "bg-emerald-100 text-emerald-800"
                   }`}>
-                    {recommendedNaver.length > 0 ? `${recommendedNaver.length}건` : "11선"}
+                    {recommendedNaver.length > 0 ? `${recommendedNaver.length}선` : "18선"}
                   </span>
                 </button>
               </div>
