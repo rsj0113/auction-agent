@@ -404,7 +404,7 @@ function getPropertyType(location: string, usage?: string): string {
   return "🏠 주택/기타";
 }
 
-const QUICK_CHIPS = [
+export const QUICK_CHIPS = [
   { id: "", label: "전체", countKey: "total", icon: "📋" },
   { id: "margin_100m", label: "안전마진 1억+", countKey: "margin_100m", icon: "🎯" },
   { id: "market_matched", label: "네이버 시세 검증", countKey: "market_matched", icon: "🏢" },
@@ -440,8 +440,15 @@ export default function AuctionsPage() {
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  // 퀵 필터 카운트 불러오기
+  // URL 파라미터(?qf=...) 및 퀵 필터 카운트 불러오기
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const qfParam = params.get("qf");
+      if (qfParam) {
+        setQuickFilter(qfParam);
+      }
+    }
     fetch("/api/auctions/quick-counts", { headers: { "ngrok-skip-browser-warning": "1" } })
       .then(res => res.json())
       .then(data => {
@@ -625,7 +632,7 @@ export default function AuctionsPage() {
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-1 px-1">
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
               {QUICK_CHIPS.map((chip) => {
                 const isActive = quickFilter === chip.id;
                 const count = quickCounts[chip.countKey];
@@ -633,7 +640,7 @@ export default function AuctionsPage() {
                   <button
                     key={chip.id}
                     onClick={() => setQuickFilter(isActive ? "" : chip.id)}
-                    className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                       isActive
                         ? "bg-blue-600 text-white shadow-sm ring-2 ring-blue-600/30 font-bold scale-[1.02]"
                         : "bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900 border border-gray-200 shadow-2xs"

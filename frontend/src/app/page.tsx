@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { analyzeSeniorDeposit, formatMoney, formatMoneyShort, formatDateShort } from "./auctions/page";
+import { analyzeSeniorDeposit, formatMoney, formatMoneyShort, formatDateShort, QUICK_CHIPS } from "./auctions/page";
 import InvestmentCalculator from "@/components/InvestmentCalculator";
 
 interface SummaryData {
@@ -96,6 +96,8 @@ export default function Home() {
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [auctions, setAuctions] = useState<AuctionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [quickFilter, setQuickFilter] = useState<string>("");
+  const [quickCounts, setQuickCounts] = useState<{ [key: string]: number }>({});
   const [selectedAuction, setSelectedAuction] = useState<AuctionItem | null>(null);
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -123,31 +125,52 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // API 서버 호출 (uvicorn이 켜져있어야 함)
-    const fetchData = async () => {
+    const fetchInitial = async () => {
       try {
-        const [summaryRes, auctionsRes] = await Promise.all([
+        const [summaryRes, countsRes] = await Promise.all([
           fetch("/api/dashboard/summary", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
-          fetch("/api/auctions?limit=6&sort=recommend", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null)
+          fetch("/api/auctions/quick-counts", { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
         ]);
 
         if (summaryRes?.ok) {
           const sData = await summaryRes.json();
           setSummary(sData);
         }
+        if (countsRes?.ok) {
+          const cData = await countsRes.json();
+          if (cData && typeof cData.total === "number") {
+            setQuickCounts(cData);
+          }
+        }
+      } catch (error) {
+        console.error("초기 요약 로딩 실패:", error);
+      }
+    };
+    fetchInitial();
+  }, []);
+
+  useEffect(() => {
+    const fetchAuctions = async () => {
+      setLoading(true);
+      try {
+        const limit = quickFilter ? 12 : 6;
+        let url = `/api/auctions?limit=${limit}&sort=recommend`;
+        if (quickFilter) {
+          url += `&quick_filter=${quickFilter}`;
+        }
+        const auctionsRes = await fetch(url, { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null);
         if (auctionsRes?.ok) {
           const aData = await auctionsRes.json();
           setAuctions(aData.data);
         }
       } catch (error) {
-        console.error("데이터 로딩 실패:", error);
+        console.error("매물 로딩 실패:", error);
       } finally {
         setLoading(false);
       }
     };
-    
-    fetchData();
-  }, []);
+    fetchAuctions();
+  }, [quickFilter]);
 
   // 금액 포맷 (ex: 5억 2,000만)
   const formatPrice = (price: number) => {
@@ -163,7 +186,7 @@ export default function Home() {
       <section>
         <h2 className="text-lg font-semibold mb-4 text-gray-700">오늘의 요약 브리핑</h2>
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          {loading ? (
+          {loading && !summary ? (
             <div className="animate-pulse flex space-x-4">
               <div className="flex-1 space-y-4 py-1">
                 <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -190,37 +213,70 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 전체 매물 검색 & 필터 바로가기 배너 */}
-      <section>
-        <Link 
-          href="/auctions" 
-          className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 rounded-2xl hover:border-blue-400 hover:shadow-md transition-all group cursor-pointer"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
-              🔍
-            </div>
-            <div>
-              <div className="text-sm font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
-                전체 매물 조건별 검색 & 필터링
-              </div>
-              <div className="text-xs text-gray-500 mt-0.5">
-                매물종류 · 지역 · 👤 임차인 유무 · 가격 · 등급 필터
-              </div>
-            </div>
+      {/* 투자자 원클릭 퀵 필터 & 전체 검색 배너 */}
+      <section className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-3.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <span className="text-base">⚡</span>
+            <h3 className="text-sm font-bold text-gray-900">투자자 원클릭 퀵 필터</h3>
           </div>
-          <span className="text-blue-600 font-bold text-sm bg-white px-3 py-1.5 rounded-lg border border-blue-100 group-hover:translate-x-1 transition-all shadow-2xs">
-            필터 열기 &rarr;
-          </span>
-        </Link>
+          <Link
+            href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"}
+            className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 transition-colors"
+          >
+            상세 조건 검색 열기 &rarr;
+          </Link>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5">
+          {QUICK_CHIPS.map((chip) => {
+            const isActive = quickFilter === chip.id;
+            const count = quickCounts[chip.countKey];
+            return (
+              <button
+                key={chip.id}
+                onClick={() => setQuickFilter(isActive ? "" : chip.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  isActive
+                    ? "bg-blue-600 text-white shadow-sm ring-2 ring-blue-600/30 font-bold scale-[1.02]"
+                    : "bg-gray-50 text-gray-700 hover:bg-gray-100 hover:text-gray-900 border border-gray-200"
+                }`}
+              >
+                <span>{chip.icon}</span>
+                <span>{chip.label}</span>
+                {typeof count === "number" && (
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
+                    isActive ? "bg-white/25 text-white" : "bg-white text-gray-500 border border-gray-200/60"
+                  }`}>
+                    {count.toLocaleString()}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       {/* 2. 추천 물건 리스트 */}
       <section>
         <div className="flex justify-between items-end mb-4">
-          <h2 className="text-lg font-semibold text-gray-700">AI 추천 물건 Top 6</h2>
-          <Link href="/auctions" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
-            전체 매물/필터 보기 &rarr;
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-gray-700">
+              {quickFilter
+                ? `${QUICK_CHIPS.find((c) => c.id === quickFilter)?.icon || "⚡"} ${QUICK_CHIPS.find((c) => c.id === quickFilter)?.label || ""} 매물`
+                : "AI 추천 물건 Top 6"}
+            </h2>
+            {quickFilter && (
+              <button
+                onClick={() => setQuickFilter("")}
+                className="text-xs text-gray-500 hover:text-red-600 bg-gray-100 px-2 py-0.5 rounded-md font-medium"
+              >
+                필터 해제 ✕
+              </button>
+            )}
+          </div>
+          <Link href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"} className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+            전체 매물 더보기 &rarr;
           </Link>
         </div>
         
