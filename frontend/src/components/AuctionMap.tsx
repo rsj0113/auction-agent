@@ -125,19 +125,30 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
       setNaverItems([]);
       return;
     }
+    const QUICK_FILTER_IDS = new Set([
+      "safe", "half_price", "owner", "apartment", "first_floor_shop",
+      "small_budget", "top_grade", "special", "clean", "margin_100m", "market_matched"
+    ]);
+    const cleanRegion =
+      focusRegion && !QUICK_FILTER_IDS.has(focusRegion.trim())
+        ? focusRegion.trim()
+        : "";
+
     const params = new URLSearchParams();
-    params.set("limit", "350");
-    if (focusRegion && focusRegion.trim()) {
-      params.set("region", focusRegion.trim());
+    params.set("limit", "400");
+    if (cleanRegion) {
+      params.set("region", cleanRegion);
     }
     if (naverTradeType) {
       params.set("trade_type", naverTradeType);
     }
-    if (naverFirstFloorOnly) {
+    if (naverFirstFloorOnly || focusRegion === "first_floor_shop") {
       params.set("first_floor_only", "true");
     }
 
-    fetch(`/api/naver-listings?${params.toString()}`)
+    fetch(`/api/naver-listings?${params.toString()}`, {
+      headers: { "ngrok-skip-browser-warning": "1" },
+    })
       .then((res) => (res.ok ? res.json() : { data: [] }))
       .then((json) => {
         if (json && Array.isArray(json.data)) {

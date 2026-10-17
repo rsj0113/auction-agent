@@ -41,6 +41,13 @@ for region in "서울" "경기"; do
     $PYTHON auto_crawling.py --region "$region" --property-type "0203" --max-items 50 >> "$LOG" 2>&1
 done
 
+# 네이버 부동산 상가 실매물(D02/D04) 정기 수집 및 시세 매칭 업데이트
+echo "[네이버 상가] $(date '+%H:%M:%S') 성남·서울·경기 주요 상권 상가 실매물 수집 시작" >> "$LOG"
+$PYTHON -c "from naver_land_scraper import run; run(max_pages=3, headless=True)" >> "$LOG" 2>&1
+
+echo "[시세 매칭] $(date '+%H:%M:%S') 경매 물건 ↔ 네이버 상가 시세 및 안전마진 재계산" >> "$LOG"
+$PYTHON core/market_matcher.py >> "$LOG" 2>&1
+
 echo "[정리] $(date '+%H:%M:%S') 7일 이상 지난 오래된 매물 삭제" >> "$LOG"
 $PYTHON cleanup_db.py --days 7 >> "$LOG" 2>&1
 

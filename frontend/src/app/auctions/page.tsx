@@ -795,7 +795,7 @@ export default function AuctionsPage() {
             <AuctionMap
               items={auctions}
               onSelectItem={(item) => handleSelectAuction(item)}
-              focusRegion={regionFilter || quickFilter}
+              focusRegion={regionFilter}
             />
           </div>
         )}
