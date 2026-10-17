@@ -204,14 +204,29 @@ class MarketMatcher:
             chosen_sales = []
             match_level = "매칭없음"
 
-        # 동일 층수(특히 1층 상가 vs 비1층 상가) 우선 정렬
-        if item_floor == 1:
-            same_floor_sales = [s for s in chosen_sales if s.get("floor") == 1]
-            if same_floor_sales:
-                chosen_sales = same_floor_sales + [s for s in chosen_sales if s.get("floor") != 1]
+        # 동일 층수(특히 1층 상가 vs 비1층 상가) 및 면적 유사도 순 정렬
+        def _similarity_key(s: Dict[str, Any]):
+            floor_diff = 0 if (item_floor and s.get("floor") == item_floor) else 1
+            area_diff = abs(float(s.get("area_m2") or 0) - area_m2) if has_area else 0
+            price_diff = abs((s.get("price_sale_10k") or 0) * 10000 - appraisal) if appraisal > 0 else 0
+            return (floor_diff, area_diff, price_diff)
+
+        chosen_sales.sort(key=_similarity_key)
+
+        # 만약 ±40% 면적 필터 때문에 동일동/동일구 매칭이 비었다면, 면적 제한을 완화해 가장 비슷한 동일동/동일구 상가를 후보로 확보
+        fallback_Candidates = []
+        if not chosen_sales and not is_land:
+            for n in self.naver_listings:
+                if (n.get("trade_type_cd") == "A1" or n.get("trade_type") == "매매") and (n.get("price_sale_10k") or 0) > 0:
+                    n_emd = str(n.get("addr_emd") or "")
+                    n_sgg = str(n.get("addr_sgg") or "")
+                    if (aemd and n_emd == aemd) or (asgg and (n_sgg == asgg or asgg in n_sgg or n_sgg in asgg)):
+                        fallback_Candidates.append(n)
+            fallback_Candidates.sort(key=_similarity_key)
 
         # 시세 단가 계산 (원/㎡)
         valid_sales = [s for s in chosen_sales if (s.get("price_sale_10k") or 0) > 0 and (s.get("area_m2") or 0) > 0]
+        display_sales = valid_sales if valid_sales else fallback_Candidates
         market_price = 0
         min_market_price = 0
         if valid_sales:
@@ -235,15 +250,14 @@ class MarketMatcher:
                 raw_mp = int(sum(s["price_sale_10k"] * 10000 for s in valid_sales) / len(valid_sales))
                 raw_min_mp = int(min(s["price_sale_10k"] * 10000 for s in valid_sales))
 
-            # 이상치 가드: 감정가 대비 0.35배 ~ 2.5배 이내인 경우만 정상 시세로 채택
+            # 이상치 가드: 감정가 대비 0.35배 ~ 2.5배 이내인 경우만 정상 시세로 채택 (단, 비교 매물 리스트인 display_sales는 유지)
             if appraisal > 0:
                 ratio = raw_mp / appraisal
                 if 0.35 <= ratio <= 2.5:
                     market_price = raw_mp
                     min_market_price = raw_min_mp
                 else:
-                    valid_sales = []
-                    match_level = "시세괴리"
+                    match_level = "인근참고"
             else:
                 market_price = raw_mp
                 min_market_price = raw_min_mp
@@ -267,7 +281,7 @@ class MarketMatcher:
         rental_yield = 0.0
         area_pyeong = area_m2 / PYEONG if has_area else 0.0
         
-        if valid_rents and market_price > 0:
+        if valid_rents and (market_price > 0 or appraisal > 0):
             avg_rpp = sum(r["monthly_rent_10k"] / r["area_pyeong"] for r in valid_rents) / len(valid_rents)
             avg_dep_10k = sum(r.get("deposit_10k") or 0 for r in valid_rents) / len(valid_rents)
             
@@ -291,9 +305,9 @@ class MarketMatcher:
             safety_margin = appraisal - net_cost if appraisal > 0 else 0
             market_discount_pct = round((appraisal - net_cost) / appraisal * 100, 1) if appraisal > 0 else 0.0
 
-        # 대표 비교 매물 (최대 3건)
+        # 대표 비교 매물 (최대 5건)
         sample_listings = []
-        for s in valid_sales[:3]:
+        for s in display_sales[:5]:
             sample_listings.append({
                 "article_id": s.get("article_id"),
                 "article_name": s.get("article_name") or f"{s.get('addr_emd','')} 매물",
@@ -311,8 +325,8 @@ class MarketMatcher:
             "min_market_price": min_market_price,
             "safety_margin": safety_margin,
             "market_discount_pct": market_discount_pct,
-            "market_match_count": len(valid_sales),
-            "market_match_level": match_level if len(valid_sales) > 0 else "미매칭",
+            "market_match_count": len(display_sales),
+            "market_match_level": match_level if len(display_sales) > 0 else "미매칭",
             "senior_deposit_assumed": senior_deposit,
             "est_monthly_rent": est_monthly_rent,
             "rental_yield": rental_yield,

@@ -45,13 +45,22 @@ interface AuctionMapProps {
   items: MapItem[];
   onSelectItem: (item: any) => void;
   focusRegion?: string;
+  priceRange?: string; // "", "under1", "1to3", "3to5", "over5"
 }
 
 const PRESET_REGIONS = [
-  { label: "🎯 성남·분당", lat: 37.395, lng: 127.125, zoom: 13 },
-  { label: "🏙️ 서울 전체", lat: 37.525, lng: 127.025, zoom: 12 },
-  { label: "💎 강남·서초·송파", lat: 37.502, lng: 127.055, zoom: 13 },
-  { label: "🌳 수원·안양", lat: 37.315, lng: 127.005, zoom: 12 },
+  { label: "🌐 수도권 전체", regionKey: "", lat: 37.43, lng: 127.08, zoom: 11 },
+  { label: "🎯 성남·분당·판교", regionKey: "성남·분당", lat: 37.395, lng: 127.125, zoom: 13 },
+  { label: "💎 강남·서초·송파·마포", regionKey: "강남·서초·송파·마포", lat: 37.505, lng: 127.045, zoom: 12 },
+  { label: "🌳 수원·안양", regionKey: "수원·안양", lat: 37.315, lng: 127.005, zoom: 12 },
+];
+
+const PRICE_OPTIONS = [
+  { id: "", label: "가격 전체", min: undefined, max: undefined },
+  { id: "under1", label: "1억 이하", min: undefined, max: 100000000 },
+  { id: "1to3", label: "1억 ~ 3억", min: 100000000, max: 300000000 },
+  { id: "3to5", label: "3억 ~ 5억", min: 300000000, max: 500000000 },
+  { id: "over5", label: "5억 이상", min: 500000000, max: undefined },
 ];
 
 export function formatNaverPrice10k(val10k: number): string {
@@ -71,22 +80,53 @@ export function formatNaverPinPrice(n: NaverShopItem): string {
     }
     return `매매 ${n.price_sale_10k.toLocaleString()}만`;
   }
-  const dep = n.deposit_10k >= 10000 ? `${(n.deposit_10k / 10000).toFixed(1).replace(/\.0$/, "")}억` : `${n.deposit_10k}`;
+  const dep =
+    n.deposit_10k >= 10000
+      ? `${(n.deposit_10k / 10000).toFixed(1).replace(/\.0$/, "")}억`
+      : `${n.deposit_10k}`;
   return `월세 ${dep}/${n.monthly_rent_10k}`;
 }
 
-export default function AuctionMap({ items, onSelectItem, focusRegion }: AuctionMapProps) {
+export default function AuctionMap({
+  items,
+  onSelectItem,
+  focusRegion = "",
+  priceRange = "",
+}: AuctionMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersLayerRef = useRef<any>(null);
   const [mapReady, setMapReady] = useState(false);
 
-  // 네이버 상가 실매물 오버레이 상태
+  // 네이버 상가 실매물 오버레이 & 필터 상태
   const [showNaver, setShowNaver] = useState(true);
   const [naverFirstFloorOnly, setNaverFirstFloorOnly] = useState(false);
   const [naverTradeType, setNaverTradeType] = useState<"" | "매매" | "월세">("");
+  const [naverRegion, setNaverRegion] = useState<string>(focusRegion || "");
+  const [naverRegionInput, setNaverRegionInput] = useState<string>(focusRegion || "");
+  const [naverPriceRange, setNaverPriceRange] = useState<string>(priceRange || "");
+  const [naverSort, setNaverSort] = useState<string>("default");
   const [naverItems, setNaverItems] = useState<NaverShopItem[]>([]);
+  const [naverTotalMatching, setNaverTotalMatching] = useState<number>(0);
   const [selectedNaver, setSelectedNaver] = useState<NaverShopItem | null>(null);
+
+  // 상위 페이지의 지역/가격 필터가 바뀌면 네이버 상가 필터도 자동 동기화
+  useEffect(() => {
+    const QUICK_FILTER_IDS = new Set([
+      "safe", "half_price", "owner", "apartment", "first_floor_shop",
+      "small_budget", "top_grade", "special", "clean", "margin_100m", "market_matched",
+    ]);
+    const clean =
+      focusRegion && !QUICK_FILTER_IDS.has(focusRegion.trim())
+        ? focusRegion.trim()
+        : "";
+    setNaverRegion(clean);
+    setNaverRegionInput(clean);
+  }, [focusRegion]);
+
+  useEffect(() => {
+    setNaverPriceRange(priceRange || "");
+  }, [priceRange]);
 
   // Load Leaflet CSS & JS dynamically via CDN
   useEffect(() => {
@@ -119,44 +159,49 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
     document.body.appendChild(script);
   }, []);
 
-  // Fetch Naver commercial listings
+  // Fetch Naver commercial listings with region, price, floor, trade_type, and sort
   useEffect(() => {
     if (!showNaver) {
       setNaverItems([]);
+      setNaverTotalMatching(0);
       return;
     }
-    const QUICK_FILTER_IDS = new Set([
-      "safe", "half_price", "owner", "apartment", "first_floor_shop",
-      "small_budget", "top_grade", "special", "clean", "margin_100m", "market_matched"
-    ]);
-    const cleanRegion =
-      focusRegion && !QUICK_FILTER_IDS.has(focusRegion.trim())
-        ? focusRegion.trim()
-        : "";
 
     const params = new URLSearchParams();
     params.set("limit", "400");
-    if (cleanRegion) {
-      params.set("region", cleanRegion);
+    if (naverRegion && naverRegion.trim()) {
+      params.set("region", naverRegion.trim());
     }
     if (naverTradeType) {
       params.set("trade_type", naverTradeType);
     }
-    if (naverFirstFloorOnly || focusRegion === "first_floor_shop") {
+    if (naverFirstFloorOnly) {
       params.set("first_floor_only", "true");
+    }
+    if (naverSort && naverSort !== "default") {
+      params.set("sort", naverSort);
+    }
+
+    const priceOpt = PRICE_OPTIONS.find((p) => p.id === naverPriceRange);
+    if (priceOpt) {
+      if (priceOpt.min !== undefined) params.set("min_price", String(priceOpt.min));
+      if (priceOpt.max !== undefined) params.set("max_price", String(priceOpt.max));
     }
 
     fetch(`/api/naver-listings?${params.toString()}`, {
       headers: { "ngrok-skip-browser-warning": "1" },
     })
-      .then((res) => (res.ok ? res.json() : { data: [] }))
+      .then((res) => (res.ok ? res.json() : { data: [], total_matching: 0 }))
       .then((json) => {
         if (json && Array.isArray(json.data)) {
           setNaverItems(json.data);
+          setNaverTotalMatching(
+            typeof json.total_matching === "number" ? json.total_matching : json.data.length
+          );
         }
       })
       .catch(() => {});
-  }, [showNaver, focusRegion, naverFirstFloorOnly, naverTradeType]);
+  }, [showNaver, naverRegion, naverFirstFloorOnly, naverTradeType, naverPriceRange, naverSort]);
 
   // Initialize map
   useEffect(() => {
@@ -166,7 +211,7 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
 
     if (!mapInstanceRef.current) {
       const map = L.map(mapContainerRef.current, {
-        center: [37.395, 127.125], // 성남·분당 중심 기본 시작
+        center: [37.395, 127.125],
         zoom: 12,
         zoomControl: true,
       });
@@ -196,70 +241,76 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
     layerGroup.clearLayers();
 
     // 1. 네이버 부동산 상가 핀 렌더링
-    if (showNaver && naverItems.length > 0) {
-      const validNaver = naverItems.filter(
-        (n) => typeof n.lat === "number" && typeof n.lng === "number" && n.lat > 33 && n.lng > 124
+    const validNaver = showNaver
+      ? naverItems.filter(
+          (n) => typeof n.lat === "number" && typeof n.lng === "number" && n.lat > 33 && n.lng > 124
+        )
+      : [];
+
+    validNaver.forEach((n) => {
+      const isFirstFloor = n.floor === 1;
+      const floorText = isFirstFloor
+        ? "1층 "
+        : n.floor && n.floor < 0
+        ? `B${Math.abs(n.floor)} `
+        : n.floor
+        ? `${n.floor}층 `
+        : "";
+      const pinLabel = formatNaverPinPrice(n);
+
+      const naverHtml = `
+        <div style="
+          display:inline-flex;
+          align-items:center;
+          gap:3px;
+          background:${isFirstFloor ? "#059669" : "#ffffff"};
+          color:${isFirstFloor ? "#ffffff" : "#047857"};
+          padding:2px 7px;
+          border-radius:8px;
+          font-size:10.5px;
+          font-weight:800;
+          white-space:nowrap;
+          box-shadow:0 2px 6px rgba(0,0,0,0.22);
+          border:2px solid #03c75a;
+          transform:translate(-50%, -50%);
+          cursor:pointer;
+        ">
+          <span style="background:#03c75a;color:#fff;padding:0 3.5px;border-radius:4px;font-size:9.5px;font-weight:900;">N</span>
+          ${floorText ? `<span style="color:${isFirstFloor ? "#fde047" : "#d97706"};font-weight:900;">${floorText}</span>` : ""}
+          <span>${pinLabel}</span>
+        </div>
+      `;
+
+      const naverIcon = L.divIcon({
+        html: naverHtml,
+        className: "naver-shop-pin",
+        iconSize: [0, 0],
+      });
+
+      const marker = L.marker([n.lat, n.lng], {
+        icon: naverIcon,
+        zIndexOffset: isFirstFloor ? 450 : 150,
+      });
+
+      const priceDetail =
+        n.trade_type === "매매"
+          ? `매매 ${formatNaverPrice10k(n.price_sale_10k)}`
+          : `보증금 ${formatNaverPrice10k(n.deposit_10k)} / 월세 ${formatNaverPrice10k(n.monthly_rent_10k)}`;
+
+      marker.bindTooltip(
+        `<div style="font-size:12px;font-weight:800;color:#047857;">🟢 [네이버 상가] ${n.article_name || "일반상가"}</div>
+         <div style="font-size:11px;color:#374151;">${n.addr_sgg} ${n.addr_emd} · 전용 ${n.area_pyeong}평 (${n.floor ? `${n.floor}층/${n.total_floor || "-"}층` : "층수미상"})</div>
+         <div style="font-size:11.5px;color:#059669;font-weight:800;margin-top:2px;">${priceDetail}</div>`,
+        { direction: "top", offset: [0, -10] }
       );
 
-      validNaver.forEach((n) => {
-        const isFirstFloor = n.floor === 1;
-        const floorText = isFirstFloor ? "1층 " : n.floor && n.floor < 0 ? `B${Math.abs(n.floor)} ` : n.floor ? `${n.floor}층 ` : "";
-        const pinLabel = formatNaverPinPrice(n);
-
-        const naverHtml = `
-          <div style="
-            display:inline-flex;
-            align-items:center;
-            gap:3px;
-            background:${isFirstFloor ? "#059669" : "#ffffff"};
-            color:${isFirstFloor ? "#ffffff" : "#047857"};
-            padding:2px 7px;
-            border-radius:8px;
-            font-size:10.5px;
-            font-weight:800;
-            white-space:nowrap;
-            box-shadow:0 2px 6px rgba(0,0,0,0.22);
-            border:2px solid #03c75a;
-            transform:translate(-50%, -50%);
-            cursor:pointer;
-          ">
-            <span style="background:#03c75a;color:#fff;padding:0 3.5px;border-radius:4px;font-size:9.5px;font-weight:900;">N</span>
-            ${floorText ? `<span style="color:${isFirstFloor ? "#fde047" : "#d97706"};font-weight:900;">${floorText}</span>` : ""}
-            <span>${pinLabel}</span>
-          </div>
-        `;
-
-        const naverIcon = L.divIcon({
-          html: naverHtml,
-          className: "naver-shop-pin",
-          iconSize: [0, 0],
-        });
-
-        const marker = L.marker([n.lat, n.lng], {
-          icon: naverIcon,
-          zIndexOffset: isFirstFloor ? 450 : 150,
-        });
-
-        const priceDetail =
-          n.trade_type === "매매"
-            ? `매매 ${formatNaverPrice10k(n.price_sale_10k)}`
-            : `보증금 ${formatNaverPrice10k(n.deposit_10k)} / 월세 ${formatNaverPrice10k(n.monthly_rent_10k)}`;
-
-        marker.bindTooltip(
-          `<div style="font-size:12px;font-weight:800;color:#047857;">🟢 [네이버 상가] ${n.article_name || "일반상가"}</div>
-           <div style="font-size:11px;color:#374151;">${n.addr_sgg} ${n.addr_emd} · 전용 ${n.area_pyeong}평 (${n.floor ? `${n.floor}층/${n.total_floor || "-"}층` : "층수미상"})</div>
-           <div style="font-size:11.5px;color:#059669;font-weight:800;margin-top:2px;">${priceDetail}</div>`,
-          { direction: "top", offset: [0, -10] }
-        );
-
-        marker.on("click", () => {
-          setSelectedNaver(n);
-        });
-        marker.addTo(layerGroup);
+      marker.on("click", () => {
+        setSelectedNaver(n);
       });
-    }
+      marker.addTo(layerGroup);
+    });
 
-    // 2. 법원 경매 핀 렌더링 (항상 상단 레이어 우선)
+    // 2. 법원 경매 핀 렌더링
     const validItems = items.filter(
       (it) => typeof it.lat === "number" && typeof it.lng === "number" && it.lat > 33 && it.lng > 124
     );
@@ -327,18 +378,26 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
     });
   }, [items, naverItems, showNaver, mapReady]);
 
-  // Move map only when focusRegion changes explicitly
+  // 지역 검색 시 해당 핀들이 있는 곳으로 지도 자동 이동
   useEffect(() => {
-    if (!mapReady || !mapInstanceRef.current || !focusRegion) return;
+    if (!mapReady || !mapInstanceRef.current || !naverRegion) return;
     const L = (window as any).L;
-    const validItems = items.filter(
+    const validNaver = naverItems.filter(
+      (n) => typeof n.lat === "number" && typeof n.lng === "number" && n.lat > 33 && n.lng > 124
+    );
+    const validAuctions = items.filter(
       (it) => typeof it.lat === "number" && typeof it.lng === "number" && it.lat > 33 && it.lng > 124
     );
-    if (validItems.length > 0 && validItems.length <= 150) {
-      const bounds = L.latLngBounds(validItems.map((i) => [i.lat, i.lng]));
+    const points =
+      validNaver.length > 0
+        ? validNaver.map((n) => [n.lat, n.lng])
+        : validAuctions.map((i) => [i.lat, i.lng]);
+
+    if (points.length > 0 && points.length <= 350) {
+      const bounds = L.latLngBounds(points);
       mapInstanceRef.current.fitBounds(bounds, { padding: [36, 36], maxZoom: 14 });
     }
-  }, [focusRegion, mapReady]);
+  }, [naverRegion, naverItems.length, mapReady]);
 
   const handleFlyTo = (lat: number, lng: number, zoom: number) => {
     if (mapInstanceRef.current) {
@@ -349,68 +408,155 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
   return (
     <div className="space-y-4">
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-        {/* 상단 지역 이동 + 네이버 상가 오버레이 컨트롤 바 */}
-        <div className="px-3.5 py-2.5 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-bold text-gray-700 mr-1">📍 빠른 지역 이동:</span>
-            {PRESET_REGIONS.map((reg) => (
-              <button
-                key={reg.label}
-                onClick={() => handleFlyTo(reg.lat, reg.lng, reg.zoom)}
-                className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-200 transition-colors cursor-pointer shadow-2xs"
-              >
-                {reg.label}
-              </button>
-            ))}
-          </div>
+        {/* 1단: 지역 점프 & 네이버 상가 전용 위치·가격·거래유형 필터 바 */}
+        <div className="p-3.5 bg-gray-50 border-b border-gray-200 space-y-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-bold text-gray-700 mr-1">📍 권역 선택 (지도 이동 + 상가 필터):</span>
+              {PRESET_REGIONS.map((reg) => {
+                const isActive = naverRegion === reg.regionKey;
+                return (
+                  <button
+                    key={reg.label}
+                    onClick={() => {
+                      setNaverRegion(reg.regionKey);
+                      setNaverRegionInput(reg.regionKey);
+                      handleFlyTo(reg.lat, reg.lng, reg.zoom);
+                    }}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
+                      isActive
+                        ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                        : "bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-700 border-gray-200"
+                    }`}
+                  >
+                    {reg.label}
+                  </button>
+                );
+              })}
+            </div>
 
-          {/* 네이버 부동산 상가 필터 토글 */}
-          <div className="flex flex-wrap items-center gap-1.5">
             <button
               onClick={() => setShowNaver(!showNaver)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
                 showNaver
-                  ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
+                  ? "bg-[#03c75a] text-white border-[#03c75a] shadow-xs"
                   : "bg-white text-gray-600 border-gray-200 hover:bg-gray-100"
               }`}
             >
-              <span>🟢 네이버 상가 같이보기</span>
+              <span>🟢 네이버 상가 표시</span>
               <span className="px-1.5 py-0.2 rounded bg-black/15 text-[10px]">
-                {showNaver ? `${naverItems.length}건 ON` : "OFF"}
+                {showNaver ? `${naverTotalMatching.toLocaleString()}건` : "OFF"}
               </span>
             </button>
-
-            {showNaver && (
-              <>
-                <button
-                  onClick={() => setNaverFirstFloorOnly(!naverFirstFloorOnly)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                    naverFirstFloorOnly
-                      ? "bg-orange-500 text-white border-orange-500 shadow-xs"
-                      : "bg-white text-orange-700 border-orange-200 hover:bg-orange-50"
-                  }`}
-                >
-                  🏪 네이버 1층 상가만
-                </button>
-
-                <div className="inline-flex bg-white border border-gray-200 rounded-lg p-0.5">
-                  {(["", "매매", "월세"] as const).map((t) => (
-                    <button
-                      key={t || "all"}
-                      onClick={() => setNaverTradeType(t)}
-                      className={`px-2 py-0.5 rounded-md text-[11px] font-bold cursor-pointer transition-colors ${
-                        naverTradeType === t
-                          ? "bg-emerald-600 text-white"
-                          : "text-gray-600 hover:text-gray-900"
-                      }`}
-                    >
-                      {t || "전체"}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
           </div>
+
+          {/* 2단: 네이버 상가 세부 필터 (동네 검색, 가격대, 1층 상가, 매매/월세, 정렬) */}
+          {showNaver && (
+            <div className="pt-2 border-t border-gray-200/80 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-extrabold text-emerald-800 flex items-center gap-1">
+                <span className="px-1.5 py-0.2 rounded bg-[#03c75a] text-white text-[10px] font-black">N</span>
+                상가 상세필터:
+              </span>
+
+              {/* 동네 직접 검색 */}
+              <div className="flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden shadow-2xs">
+                <input
+                  type="text"
+                  placeholder="동네/역 검색 (예: 서현, 야탑, 판교, 역삼)"
+                  value={naverRegionInput}
+                  onChange={(e) => setNaverRegionInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && setNaverRegion(naverRegionInput)}
+                  className="px-2.5 py-1 text-xs text-gray-800 outline-none w-44 sm:w-52"
+                />
+                {naverRegionInput && (
+                  <button
+                    onClick={() => {
+                      setNaverRegionInput("");
+                      setNaverRegion("");
+                    }}
+                    className="px-1.5 text-gray-400 hover:text-gray-600 text-xs cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
+                <button
+                  onClick={() => setNaverRegion(naverRegionInput)}
+                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer"
+                >
+                  적용
+                </button>
+              </div>
+
+              {/* 가격대 필터 */}
+              <select
+                value={naverPriceRange}
+                onChange={(e) => setNaverPriceRange(e.target.value)}
+                className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white border border-gray-200 text-gray-700 outline-none focus:border-emerald-500 cursor-pointer"
+              >
+                {PRICE_OPTIONS.map((p) => (
+                  <option key={p.id || "all"} value={p.id}>
+                    💰 {p.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* 1층 상가만 토글 */}
+              <button
+                onClick={() => setNaverFirstFloorOnly(!naverFirstFloorOnly)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                  naverFirstFloorOnly
+                    ? "bg-orange-500 text-white border-orange-500 shadow-xs"
+                    : "bg-white text-orange-700 border-orange-200 hover:bg-orange-50"
+                }`}
+              >
+                🏪 1층 상가만
+              </button>
+
+              {/* 매매/월세 토글 */}
+              <div className="inline-flex bg-white border border-gray-200 rounded-lg p-0.5">
+                {(["", "매매", "월세"] as const).map((t) => (
+                  <button
+                    key={t || "all"}
+                    onClick={() => setNaverTradeType(t)}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold cursor-pointer transition-colors ${
+                      naverTradeType === t
+                        ? "bg-emerald-600 text-white"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    {t || "전체"}
+                  </button>
+                ))}
+              </div>
+
+              {/* 정렬 */}
+              <select
+                value={naverSort}
+                onChange={(e) => setNaverSort(e.target.value)}
+                className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-gray-200 text-gray-700 outline-none focus:border-emerald-500 cursor-pointer"
+              >
+                <option value="default">정렬: 1층·일반상가 우선</option>
+                <option value="price_asc">낮은 가격순</option>
+                <option value="price_desc">높은 가격순</option>
+                <option value="area_desc">넓은 면적순</option>
+              </select>
+
+              {(naverRegion || naverPriceRange || naverFirstFloorOnly || naverTradeType) && (
+                <button
+                  onClick={() => {
+                    setNaverRegion("");
+                    setNaverRegionInput("");
+                    setNaverPriceRange("");
+                    setNaverFirstFloorOnly(false);
+                    setNaverTradeType("");
+                  }}
+                  className="px-2 py-1 rounded-lg text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 cursor-pointer"
+                >
+                  필터 초기화
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 범례 바 */}
@@ -428,10 +574,7 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
             <span className="text-gray-300">|</span>
             <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
               <span className="px-1 py-0.2 bg-[#03c75a] text-white rounded text-[9px] font-black">N</span>
-              네이버 상가 실매물 ({naverItems.length}건)
-            </span>
-            <span className="text-gray-400 text-[10px]">
-              * 지도에서 N(초록 핀)을 클릭하면 상가 시세 상세 및 네이버 부동산 원문으로 이동합니다
+              네이버 상가 검색결과: {naverTotalMatching.toLocaleString()}건 (지도 표시 {naverItems.length}건)
             </span>
           </div>
         </div>
@@ -529,98 +672,114 @@ export default function AuctionMap({ items, onSelectItem, focusRegion }: Auction
         </div>
       </div>
 
-      {/* 하단 네이버 상가 실매물 카드 리스트 (같이보기 ON 일 때 표시) */}
-      {showNaver && naverItems.length > 0 && (
+      {/* 하단 네이버 상가 실매물 카드 리스트 */}
+      {showNaver && (
         <div className="bg-white border border-emerald-200 rounded-2xl p-4 sm:p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="px-2 py-0.5 rounded-md bg-[#03c75a] text-white text-xs font-black">N</span>
               <h3 className="text-sm sm:text-base font-extrabold text-gray-900">
-                네이버 부동산 상가 실매물 ({naverItems.length.toLocaleString()}건)
+                네이버 부동산 상가 실매물 ({naverTotalMatching.toLocaleString()}건)
               </h3>
-              <span className="text-xs text-gray-500">
-                경매 물건과 주변 실제 상가 매매·월세 호가를 즉시 비교하세요
-              </span>
+              {naverRegion && (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                  📍 {naverRegion}
+                </span>
+              )}
+              {naverPriceRange && (
+                <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-bold">
+                  💰 {PRICE_OPTIONS.find((p) => p.id === naverPriceRange)?.label}
+                </span>
+              )}
             </div>
+            <span className="text-xs text-gray-500">
+              카드를 클릭하면 지도에서 해당 상가 위치로 즉시 이동합니다
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto pr-1">
-            {naverItems.slice(0, 60).map((n) => {
-              const is1F = n.floor === 1;
-              return (
-                <div
-                  key={n.article_id}
-                  onClick={() => {
-                    setSelectedNaver(n);
-                    if (n.lat && n.lng) handleFlyTo(n.lat, n.lng, 16);
-                  }}
-                  className="border border-gray-200 hover:border-emerald-500 rounded-xl p-3 transition-all cursor-pointer bg-gray-50/50 hover:bg-emerald-50/30 flex flex-col justify-between gap-2"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-1.5 mb-1">
-                      <div className="flex items-center gap-1">
-                        <span
-                          className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${
-                            n.trade_type === "매매"
-                              ? "bg-emerald-100 text-emerald-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}
-                        >
-                          {n.trade_type}
-                        </span>
-                        {is1F ? (
-                          <span className="px-1.5 py-0.5 rounded bg-orange-500 text-white text-[10px] font-extrabold">
-                            ✨ 1층 상가
+          {naverItems.length === 0 ? (
+            <div className="py-10 text-center text-sm text-gray-500 bg-gray-50 rounded-xl border border-gray-200">
+              해당 조건에 맞는 네이버 상가 매물이 없습니다. 필터 조건을 완화해 보세요.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[460px] overflow-y-auto pr-1">
+              {naverItems.slice(0, 90).map((n) => {
+                const is1F = n.floor === 1;
+                return (
+                  <div
+                    key={n.article_id}
+                    onClick={() => {
+                      setSelectedNaver(n);
+                      if (n.lat && n.lng) handleFlyTo(n.lat, n.lng, 16);
+                    }}
+                    className="border border-gray-200 hover:border-emerald-500 rounded-xl p-3 transition-all cursor-pointer bg-gray-50/50 hover:bg-emerald-50/30 flex flex-col justify-between gap-2"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-1.5 mb-1">
+                        <div className="flex items-center gap-1 flex-wrap">
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${
+                              n.trade_type === "매매"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {n.trade_type}
                           </span>
-                        ) : n.floor ? (
-                          <span className="px-1.5 py-0.5 rounded bg-gray-200 text-gray-700 text-[10px] font-bold">
-                            {n.floor < 0 ? `B${Math.abs(n.floor)}층` : `${n.floor}층`}/{n.total_floor || "-"}층
+                          {is1F ? (
+                            <span className="px-1.5 py-0.5 rounded bg-orange-500 text-white text-[10px] font-extrabold">
+                              ✨ 1층 상가
+                            </span>
+                          ) : n.floor ? (
+                            <span className="px-1.5 py-0.5 rounded bg-gray-200 text-gray-700 text-[10px] font-bold">
+                              {n.floor < 0 ? `B${Math.abs(n.floor)}층` : `${n.floor}층`}/{n.total_floor || "-"}층
+                            </span>
+                          ) : null}
+                          <span className="text-[11px] font-bold text-gray-600">
+                            {n.addr_sgg} {n.addr_emd}
                           </span>
-                        ) : null}
-                        <span className="text-[11px] font-bold text-gray-600">
-                          {n.addr_sgg} {n.addr_emd}
+                        </div>
+                        <span className="text-[11px] font-extrabold text-gray-700 shrink-0">
+                          전용 {n.area_pyeong}평
                         </span>
                       </div>
-                      <span className="text-[11px] font-extrabold text-gray-700">
-                        전용 {n.area_pyeong}평
-                      </span>
+                      <p className="text-xs font-bold text-gray-900 line-clamp-1">
+                        {n.article_name || "일반상가"}
+                      </p>
                     </div>
-                    <p className="text-xs font-bold text-gray-900 line-clamp-1">
-                      {n.article_name || "일반상가"}
-                    </p>
-                  </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-200/70">
-                    <div>
-                      {n.trade_type === "매매" ? (
-                        <span className="text-xs font-black text-emerald-700">
-                          매매 {formatNaverPrice10k(n.price_sale_10k)}원
-                          {n.area_pyeong > 0 && (
-                            <span className="text-[10px] font-semibold text-gray-500 ml-1">
-                              (평당 {Math.round(n.price_sale_10k / n.area_pyeong).toLocaleString()}만)
-                            </span>
-                          )}
-                        </span>
-                      ) : (
-                        <span className="text-xs font-black text-blue-700">
-                          보증금 {formatNaverPrice10k(n.deposit_10k)} / 월 {formatNaverPrice10k(n.monthly_rent_10k)}
-                        </span>
-                      )}
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-200/70">
+                      <div>
+                        {n.trade_type === "매매" ? (
+                          <span className="text-xs font-black text-emerald-700">
+                            매매 {formatNaverPrice10k(n.price_sale_10k)}원
+                            {n.area_pyeong > 0 && (
+                              <span className="text-[10px] font-semibold text-gray-500 ml-1">
+                                (평당 {Math.round(n.price_sale_10k / n.area_pyeong).toLocaleString()}만)
+                              </span>
+                            )}
+                          </span>
+                        ) : (
+                          <span className="text-xs font-black text-blue-700">
+                            보증금 {formatNaverPrice10k(n.deposit_10k)} / 월 {formatNaverPrice10k(n.monthly_rent_10k)}
+                          </span>
+                        )}
+                      </div>
+                      <a
+                        href={n.detail_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-[11px] font-bold text-emerald-700 hover:underline shrink-0"
+                      >
+                        네이버 원문 ↗
+                      </a>
                     </div>
-                    <a
-                      href={n.detail_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-[11px] font-bold text-emerald-700 hover:underline shrink-0"
-                    >
-                      네이버 원문 ↗
-                    </a>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -92,8 +92,13 @@ def get_auctions(
                 query += " AND (usage LIKE '%임야%' OR usage LIKE '%대지%' OR location LIKE '%임야%' OR location LIKE '%산 %' OR location LIKE '%번지%')"
                 
         if region:
-            query += " AND location LIKE ?"
-            params.append(f"%{region}%")
+            import re as _re
+            tokens = [t.strip() for t in _re.split(r"[·,/|\s]+", region) if t.strip() and t.strip() not in ("전체", "서울", "경기")]
+            if not tokens:
+                tokens = [region.strip()]
+            sub_clauses = ["location LIKE ?" for _ in tokens]
+            query += " AND (" + " OR ".join(sub_clauses) + ")"
+            params.extend([f"%{t}%" for t in tokens])
 
         if has_tenant:
             if has_tenant.lower() in ('yes', 'true', '1', 'y'):
@@ -234,14 +239,72 @@ def get_naver_listings(
     region: Optional[str] = None,
     trade_type: Optional[str] = None,
     first_floor_only: bool = False,
+    min_price: Optional[int] = None,
+    max_price: Optional[int] = None,
+    sort: Optional[str] = "default",
     limit: int = 500,
 ):
     """
     Get Naver Real Estate commercial (상가) listings for map overlay & side-by-side comparison.
+    Supports multi-keyword region filtering and price filtering (won unit).
     """
     try:
+        import re as _re
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        where_clause = " WHERE realty_type_cd IN ('D02', 'D04', 'D03')"
+        params = []
+
+        if region and region.strip():
+            raw_reg = region.strip()
+            # '서울 전체' -> '서울', '성남·분당' -> ['성남', '분당'] 등 다중 키워드 지원
+            cleaned_reg = raw_reg.replace("전체", "").replace("남부", "").replace("북부", "").strip()
+            tokens = [t.strip() for t in _re.split(r"[·,/|()\s]+", cleaned_reg) if len(t.strip()) >= 2]
+            if not tokens:
+                tokens = [raw_reg]
+            token_ors = []
+            for t in tokens:
+                like = f"%{t}%"
+                token_ors.append("(region_name LIKE ? OR addr_sgg LIKE ? OR addr_emd LIKE ? OR article_name LIKE ?)")
+                params.extend([like, like, like, like])
+            where_clause += " AND (" + " OR ".join(token_ors) + ")"
+
+        if trade_type and trade_type in ("매매", "월세", "전세"):
+            where_clause += " AND trade_type = ?"
+            params.append(trade_type)
+
+        if first_floor_only:
+            where_clause += " AND floor = 1"
+
+        # 가격 필터 (원 단위 입력 -> 만원 단위 price_sale_10k / deposit_10k 비교)
+        if min_price is not None and min_price > 0:
+            min_10k = min_price // 10000
+            where_clause += " AND ((trade_type = '매매' AND price_sale_10k >= ?) OR (trade_type != '매매' AND (deposit_10k + monthly_rent_10k * 100) >= ?))"
+            params.extend([min_10k, min_10k])
+
+        if max_price is not None and max_price > 0:
+            max_10k = max_price // 10000
+            where_clause += " AND ((trade_type = '매매' AND price_sale_10k > 0 AND price_sale_10k <= ?) OR (trade_type != '매매' AND (deposit_10k + monthly_rent_10k * 100) <= ?))"
+            params.extend([max_10k, max_10k])
+
+        count_query = "SELECT COUNT(*) FROM naver_listings" + where_clause
+        cursor.execute(count_query, params)
+        total_matching = cursor.fetchone()[0]
+
+        if sort == "price_asc":
+            order_clause = " ORDER BY CASE WHEN trade_type='매매' THEN price_sale_10k ELSE deposit_10k END ASC"
+        elif sort == "price_desc":
+            order_clause = " ORDER BY CASE WHEN trade_type='매매' THEN price_sale_10k ELSE deposit_10k END DESC"
+        elif sort == "area_desc":
+            order_clause = " ORDER BY area_pyeong DESC"
+        else:
+            order_clause = """
+                ORDER BY
+                    CASE WHEN realty_type_cd = 'D02' THEN 0 ELSE 1 END ASC,
+                    CASE WHEN floor = 1 THEN 0 ELSE 1 END ASC,
+                    scraped_at DESC
+            """
 
         query = """
             SELECT article_id, legal_div_no, region_name, addr_sgg, addr_emd,
@@ -250,36 +313,12 @@ def get_naver_listings(
                    floor, total_floor, detail_url, confirm_date, realtor,
                    lat, lng, article_name, scraped_at
             FROM naver_listings
-            WHERE realty_type_cd IN ('D02', 'D04', 'D03')
-        """
-        params = []
+        """ + where_clause + order_clause + " LIMIT ?"
 
-        if region:
-            query += " AND (region_name LIKE ? OR addr_sgg LIKE ? OR addr_emd LIKE ?)"
-            like = f"%{region}%"
-            params.extend([like, like, like])
-
-        if trade_type and trade_type in ("매매", "월세", "전세"):
-            query += " AND trade_type = ?"
-            params.append(trade_type)
-
-        if first_floor_only:
-            query += " AND floor = 1"
-
-        # 일반 구분상가(D02) 및 1층 매물 우선 정렬
-        query += """
-            ORDER BY
-                CASE WHEN realty_type_cd = 'D02' THEN 0 ELSE 1 END ASC,
-                CASE WHEN floor = 1 THEN 0 ELSE 1 END ASC,
-                scraped_at DESC
-            LIMIT ?
-        """
-        params.append(limit)
-
-        cursor.execute(query, params)
+        cursor.execute(query, params + [limit])
         rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
-        return {"data": rows, "count": len(rows)}
+        return {"data": rows, "count": len(rows), "total_matching": total_matching}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -325,7 +364,7 @@ def get_auction_detail(case_number: str):
 @app.get("/api/dashboard/summary")
 def get_dashboard_summary():
     """
-    Get summary stats for the Today's Briefing dashboard.
+    Get summary stats, data coverage breakdown, and latest update timestamps for the Home dashboard.
     """
     try:
         conn = get_db_connection()
@@ -336,13 +375,73 @@ def get_dashboard_summary():
         
         cursor.execute("SELECT COUNT(*) as recommended FROM auction_items WHERE ai_grade IN ('A', 'S')")
         recommended_items = cursor.fetchone()['recommended']
+
+        cursor.execute("SELECT MAX(last_updated) FROM auction_items")
+        auction_last_updated = cursor.fetchone()[0] or "-"
+
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE location LIKE '%서울%'")
+        auc_seoul = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE location LIKE '%성남%'")
+        auc_seongnam = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE location LIKE '%하남%' OR location LIKE '%광주시%' OR location LIKE '%이천%' OR location LIKE '%여주%'")
+        auc_seongnam_court_etc = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE usage = '상가/근린시설'")
+        auc_commercial = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE usage = '상가/근린시설' AND floor = 1")
+        auc_first_floor = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE market_match_count > 0")
+        auc_matched = cursor.fetchone()[0]
+
+        # 네이버 상가 통계
+        cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03')")
+        naver_total = cursor.fetchone()[0]
+
+        cursor.execute("SELECT MAX(scraped_at) FROM naver_listings")
+        naver_last_updated = cursor.fetchone()[0] or "-"
+
+        cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND floor = 1")
+        naver_1f = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND (region_name LIKE '%성남%' OR addr_sgg LIKE '%성남%')")
+        naver_seongnam = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND (region_name LIKE '%서울%' OR addr_sgg LIKE '%강남%' OR addr_sgg LIKE '%서초%' OR addr_sgg LIKE '%송파%' OR addr_sgg LIKE '%마포%')")
+        naver_seoul = cursor.fetchone()[0]
+
+        naver_gyeonggi_etc = max(0, naver_total - naver_seongnam - naver_seoul)
+        auc_gyeonggi_etc = max(0, total_items - auc_seoul - auc_seongnam - auc_seongnam_court_etc)
         
         conn.close()
         
         return {
             "total_active_auctions": total_items,
             "today_recommended": recommended_items,
-            "briefing_text": f"현재 {total_items}건의 경매 물건이 분석되었으며, 그 중 추천할 만한 우량 물건은 {recommended_items}건입니다."
+            "briefing_text": f"현재 수도권 법원 경매 {total_items:,}건과 네이버 상가 실매물 {naver_total:,}건이 연동되어 실시간 시세·안전마진 비교가 가능합니다.",
+            "auction_last_updated": auction_last_updated,
+            "naver_last_updated": naver_last_updated,
+            "schedule_text": "매일 새벽 03:00 자동 수집·갱신 (Gemini AI 권리분석 + 네이버 상가 실매물 매칭)",
+            "auction_coverage": {
+                "total": total_items,
+                "seoul": auc_seoul,
+                "seongnam": auc_seongnam,
+                "seongnam_court_total": auc_seongnam + auc_seongnam_court_etc,
+                "gyeonggi_etc": auc_gyeonggi_etc,
+                "commercial": auc_commercial,
+                "first_floor_shop": auc_first_floor,
+                "market_matched": auc_matched,
+            },
+            "naver_coverage": {
+                "total": naver_total,
+                "first_floor": naver_1f,
+                "seongnam": naver_seongnam,
+                "seoul": naver_seoul,
+                "gyeonggi_etc": naver_gyeonggi_etc,
+            }
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
