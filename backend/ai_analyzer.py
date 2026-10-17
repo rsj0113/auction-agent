@@ -1,15 +1,39 @@
 import os
 import json
+import urllib.request
 from openai import OpenAI
 from typing import Dict
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def _call_gemini_json(prompt: str, api_key: str, model_name: str = "gemini-3.8-flash") -> dict:
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.2
+        }
+    }
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"}
+    )
+    with urllib.request.urlopen(req, timeout=25) as resp:
+        body = json.loads(resp.read().decode("utf-8"))
+        text = body["candidates"][0]["content"]["parts"][0]["text"]
+        res = json.loads(text)
+        res["ai_model"] = model_name
+        return res
 
 def analyze_auction_data(item_data: dict) -> dict:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        return {"error": "OPENAI_API_KEY is not set."}
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if not gemini_key and not openai_key:
+        return {"error": "GEMINI_API_KEY or OPENAI_API_KEY is not set."}
         
-    client = OpenAI(api_key=api_key)
-    
     # Calculate discount
     discount_rate = 0
     appraisal = item_data.get('appraisal') or 0
@@ -49,6 +73,16 @@ def analyze_auction_data(item_data: dict) -> dict:
     }}
     """
     
+    # 1순위: Gemini 무료 티어 / Pro API 키 우선 호출
+    if gemini_key:
+        for g_model in ("gemini-3.8-flash", "gemini-flash-latest"):
+            try:
+                return _call_gemini_json(prompt, gemini_key, g_model)
+            except Exception:
+                continue
+
+    # 2순위: OpenAI 폴백
+    client = OpenAI(api_key=openai_key)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "system", "content": "You are a helpful JSON-only assistant."},
@@ -59,3 +93,4 @@ def analyze_auction_data(item_data: dict) -> dict:
     result = json.loads(response.choices[0].message.content)
     result["ai_model"] = "gpt-4o-mini"
     return result
+

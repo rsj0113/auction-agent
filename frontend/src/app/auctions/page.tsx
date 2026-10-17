@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import InvestmentCalculator from "@/components/InvestmentCalculator";
+import AuctionMap from "@/components/AuctionMap";
 
 interface SampleListing {
   article_id?: string;
@@ -42,6 +43,8 @@ interface AuctionItem {
   last_updated?: string;
   created_at?: string;
   ai_model?: string;
+  lat?: number;
+  lng?: number;
 }
 
 interface AIReport {
@@ -423,6 +426,9 @@ export default function AuctionsPage() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
+  // 보기 모드 ('list' | 'map')
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+
   // 퀵 필터 칩 상태
   const [quickFilter, setQuickFilter] = useState<string>("");
   const [quickCounts, setQuickCounts] = useState<{ [key: string]: number }>({});
@@ -440,13 +446,18 @@ export default function AuctionsPage() {
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  // URL 파라미터(?qf=...) 및 퀵 필터 카운트 불러오기
+  // URL 파라미터(?qf=... & ?view=map & ?region=...) 및 퀵 필터 카운트 불러오기
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const qfParam = params.get("qf");
-      if (qfParam) {
-        setQuickFilter(qfParam);
+      const viewParam = params.get("view");
+      const regParam = params.get("region");
+      if (qfParam) setQuickFilter(qfParam);
+      if (viewParam === "map") setViewMode("map");
+      if (regParam) {
+        setRegionInput(regParam);
+        setRegionFilter(regParam);
       }
     }
     fetch("/api/auctions/quick-counts", { headers: { "ngrok-skip-browser-warning": "1" } })
@@ -469,8 +480,9 @@ export default function AuctionsPage() {
       const tenant = overrideParams?.hasTenant ?? tenantFilter;
       const region = overrideParams?.region ?? regionFilter;
       const qf = overrideParams?.quickFilter ?? quickFilter;
+      const pageSize = viewMode === "map" ? 300 : 20;
       
-      let url = `/api/auctions?limit=20&offset=${pageIndex * 20}`;
+      let url = `/api/auctions?limit=${pageSize}&offset=${pageIndex * pageSize}`;
       if (grade) url += `&grade=${grade}`;
       if (sort) url += `&sort=${sort}`;
       if (propertyType) url += `&property_type=${propertyType}`;
@@ -487,7 +499,7 @@ export default function AuctionsPage() {
       const res = await fetch(url, { headers: { "ngrok-skip-browser-warning": "1" } });
       if (res.ok) {
         const data = await res.json();
-        if (data.data.length < 20) {
+        if (data.data.length < pageSize) {
           setHasMore(false);
         } else {
           setHasMore(true);
@@ -512,7 +524,7 @@ export default function AuctionsPage() {
       fetchAuctions(0);
     }, 300);
     return () => clearTimeout(timer);
-  }, [gradeFilter, priceFilter, sortOrder, propertyTypeFilter, tenantFilter, regionFilter, quickFilter]);
+  }, [gradeFilter, priceFilter, sortOrder, propertyTypeFilter, tenantFilter, regionFilter, quickFilter, viewMode]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -581,6 +593,29 @@ export default function AuctionsPage() {
               </svg>
             </Link>
             <h1 className="text-xl font-bold text-gray-900 tracking-tight">전체 매물 보기</h1>
+          </div>
+          {/* 리스트 / 지도 보기 전환 탭 */}
+          <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200">
+            <button
+              onClick={() => setViewMode("list")}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "list"
+                  ? "bg-white text-blue-600 shadow-2xs"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              📋 리스트
+            </button>
+            <button
+              onClick={() => setViewMode("map")}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "map"
+                  ? "bg-blue-600 text-white shadow-2xs"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              🗺️ 지도보기
+            </button>
           </div>
         </div>
       </header>
@@ -729,6 +764,17 @@ export default function AuctionsPage() {
             </select>
           </div>
         </div>
+
+        {/* 지도 보기 모드 */}
+        {viewMode === "map" && (
+          <div className="mb-6">
+            <AuctionMap
+              items={auctions}
+              onSelectItem={(item) => handleSelectAuction(item)}
+              focusRegion={regionFilter || quickFilter}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-4">
           {auctions.map((item) => (

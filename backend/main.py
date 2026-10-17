@@ -59,7 +59,7 @@ def get_auctions(
                    remarks, special_rights,
                    market_price, safety_margin, market_discount_pct,
                    market_match_count, market_match_level, est_monthly_rent, rental_yield,
-                   last_updated, created_at, ai_model
+                   last_updated, created_at, ai_model, lat, lng
             FROM auction_items 
             WHERE 1=1
         '''

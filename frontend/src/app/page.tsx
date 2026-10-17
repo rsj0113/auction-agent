@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { analyzeSeniorDeposit, formatMoney, formatMoneyShort, formatDateShort, QUICK_CHIPS } from "./auctions/page";
 import InvestmentCalculator from "@/components/InvestmentCalculator";
+import AuctionMap from "@/components/AuctionMap";
 
 interface SummaryData {
   total_active_auctions: number;
@@ -98,6 +99,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [quickFilter, setQuickFilter] = useState<string>("");
   const [quickCounts, setQuickCounts] = useState<{ [key: string]: number }>({});
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [selectedAuction, setSelectedAuction] = useState<AuctionItem | null>(null);
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -153,7 +155,7 @@ export default function Home() {
     const fetchAuctions = async () => {
       setLoading(true);
       try {
-        const limit = quickFilter ? 12 : 6;
+        const limit = viewMode === "map" ? 300 : (quickFilter ? 12 : 6);
         let url = `/api/auctions?limit=${limit}&sort=recommend`;
         if (quickFilter) {
           url += `&quick_filter=${quickFilter}`;
@@ -170,7 +172,7 @@ export default function Home() {
       }
     };
     fetchAuctions();
-  }, [quickFilter]);
+  }, [quickFilter, viewMode]);
 
   // 금액 포맷 (ex: 5억 2,000만)
   const formatPrice = (price: number) => {
@@ -184,7 +186,31 @@ export default function Home() {
     <div className="space-y-8 animate-fade-in relative">
       {/* 1. 요약 브리핑 섹션 */}
       <section>
-        <h2 className="text-lg font-semibold mb-4 text-gray-700">오늘의 요약 브리핑</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-700">오늘의 요약 브리핑</h2>
+          <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200">
+            <button
+              onClick={() => setViewMode("list")}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "list"
+                  ? "bg-white text-blue-600 shadow-2xs"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              📋 리스트
+            </button>
+            <button
+              onClick={() => setViewMode("map")}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "map"
+                  ? "bg-blue-600 text-white shadow-2xs"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              🗺️ 지도보기
+            </button>
+          </div>
+        </div>
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           {loading && !summary ? (
             <div className="animate-pulse flex space-x-4">
@@ -215,17 +241,25 @@ export default function Home() {
 
       {/* 투자자 원클릭 퀵 필터 & 전체 검색 배너 */}
       <section className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-3.5">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <span className="text-base">⚡</span>
             <h3 className="text-sm font-bold text-gray-900">투자자 원클릭 퀵 필터</h3>
           </div>
-          <Link
-            href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"}
-            className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 transition-colors"
-          >
-            상세 조건 검색 열기 &rarr;
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/auctions?region=성남&view=map"
+              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition-colors"
+            >
+              📍 성남·분당 지도보기
+            </Link>
+            <Link
+              href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"}
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 transition-colors"
+            >
+              상세 조건 검색 열기 &rarr;
+            </Link>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
@@ -256,6 +290,17 @@ export default function Home() {
           })}
         </div>
       </section>
+
+      {/* 지도 보기 활성화 시 인터랙티브 지도 표시 */}
+      {viewMode === "map" && (
+        <section>
+          <AuctionMap
+            items={auctions}
+            onSelectItem={(item) => handleSelectAuction(item)}
+            focusRegion={quickFilter}
+          />
+        </section>
+      )}
 
       {/* 2. 추천 물건 리스트 */}
       <section>

@@ -979,7 +979,27 @@ class AuctionCrawler:
                     # '인쇄하기' 텍스트는 검색 성공 시 하단 제어 바가 활성화될 때 나타납니다.
                     await frame.wait_for_selector("text='인쇄하기'", timeout=30000)
                     # 데이터가 DOM 트리 가상 그리드 상에 안전하게 매핑되도록 대기 보장
-                    await page.wait_for_timeout(4000)
+                    await page.wait_for_timeout(3000)
+                    # 페이지당 표시 건수를 10건 -> 40건(최대)으로 변경하여 대량 수집 가속
+                    changed_size = await frame.evaluate("""() => {
+                        try {
+                            const comp = window.WebSquare && window.WebSquare.util && window.WebSquare.util.getComponentById("mf_wfm_mainFrame_sbx_pageSize");
+                            if (comp && comp.setSelectedIndex) {
+                                comp.setSelectedIndex(3); // 40건
+                                comp.trigger("onchange");
+                                return true;
+                            }
+                            const sel = document.getElementById("mf_wfm_mainFrame_sbx_pageSize");
+                            if (sel) {
+                                sel.value = "40";
+                                sel.dispatchEvent(new Event("change", { bubbles: true }));
+                                return true;
+                            }
+                        } catch (e) {}
+                        return false;
+                    }""")
+                    if changed_size:
+                        await page.wait_for_timeout(3500)
                 except Exception:
                     no_data_element = await frame.query_selector("text='검색결과가 존재하지 않습니다'")
                     if no_data_element:
@@ -1018,27 +1038,44 @@ class AuctionCrawler:
                 basic_items: list = []
                 current_page = 1
                 row_index = 0
+                prev_count = 0
                 while len(basic_items) < max_items:
                     current_rows = await frame.query_selector_all("tr")
                     if row_index >= len(current_rows):
-                        current_page += 1
-                        next_btn = await frame.query_selector(f"#mf_wfm_mainFrame_pgl_gdsDtlSrchPage_page_{current_page}")
-                        if not next_btn:
-                            # 10페이지 단위 다음 블록 화살표 버튼 시도
-                            next_block_btn = await frame.query_selector("#mf_wfm_mainFrame_pgl_gdsDtlSrchPage_next_btn, a[id*='pgl_gdsDtlSrchPage_next']")
-                            if next_block_btn:
-                                is_disabled = await next_block_btn.get_attribute("disabled")
-                                cls_attr = (await next_block_btn.get_attribute("class") or "")
-                                if not is_disabled and "disabled" not in cls_attr:
-                                    console.print(f"[dim]📄 다음 페이지 블록({current_page}페이지~)으로 이동 중...[/dim]")
-                                    await next_block_btn.click()
-                                    await page.wait_for_timeout(3000)
-                                    row_index = 0
-                                    continue
+                        # 현재 페이지에서 신규 수집된 건이 하나도 없으면 마지막 페이지 도달
+                        if current_page > 1 and len(basic_items) == prev_count:
                             break
-                        console.print(f"[dim]📄 페이지 {current_page}로 이동 중...[/dim]")
-                        await next_btn.click()
-                        await page.wait_for_timeout(2500)
+                        prev_count = len(basic_items)
+                        current_page += 1
+                        moved = await frame.evaluate(f"""(targetPage) => {{
+                            try {{
+                                const pgl = window.WebSquare && window.WebSquare.util && window.WebSquare.util.getComponentById("mf_wfm_mainFrame_pgl_gdsDtlSrchPage");
+                                if (pgl && typeof pgl.setValue === "function") {{
+                                    pgl.setValue(targetPage);
+                                    if (typeof pgl.trigger === "function") {{
+                                        pgl.trigger("onchange");
+                                        pgl.trigger("onclick", targetPage);
+                                    }}
+                                }}
+                                const btn = document.getElementById("mf_wfm_mainFrame_pgl_gdsDtlSrchPage_page_" + targetPage);
+                                if (btn) {{
+                                    btn.click();
+                                    return true;
+                                }}
+                                if (targetPage % 10 === 1) {{
+                                    const nextBlock = document.querySelector("#mf_wfm_mainFrame_pgl_gdsDtlSrchPage_next_btn a, #mf_wfm_mainFrame_pgl_gdsDtlSrchPage_next_btn");
+                                    if (nextBlock) {{
+                                        nextBlock.click();
+                                        return true;
+                                    }}
+                                }}
+                            }} catch (e) {{}}
+                            return false;
+                        }}""", current_page)
+                        if not moved:
+                            break
+                        console.print(f"[dim]📄 페이지 {current_page}로 이동 중... (누적 {len(basic_items)}건)[/dim]")
+                        await page.wait_for_timeout(3000)
                         row_index = 0
                         continue
 
@@ -1215,12 +1252,14 @@ class AuctionCrawler:
                                     "analysis_detail": "법원 전체 목록 스캔을 통해 즉시 등록된 매물입니다. 상세 권리분석 또는 실시간 재분석 버튼을 통해 심층 리포트를 확인하실 수 있습니다.",
                                     "ai_model": "Rule-Engine"
                                 }, ensure_ascii=False)
+                                from core.geocoder import geocode_address
+                                lat_v, lng_v = geocode_address(bi['location'])
                                 new_batch.append((
                                     cn, bi['location'], bi.get('usage') or _infer_usage(bi['location']),
                                     app_v, min_v, min_v, 1 if app_v > min_v else 0, "[]", "", 0, 0,
                                     score_v, grade_v, f"감정가 대비 {disc_v}% 할인 매물", f"{int(min_v * 1.03):,}원",
                                     rep_v, now_init, now_init, "Rule-Engine", "NEW",
-                                    app_v, margin_v, disc_v, 0, "감정가기준"
+                                    app_v, margin_v, disc_v, 0, "감정가기준", lat_v, lng_v
                                 ))
                         if new_batch:
                             _conn.executemany("""
@@ -1229,8 +1268,9 @@ class AuctionCrawler:
                                     rights_list, tenant_registration_date, tenant_deposit, is_payout_requested,
                                     ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json,
                                     last_updated, created_at, ai_model, status_flag,
-                                    market_price, safety_margin, market_discount_pct, market_match_count, market_match_level
-                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    market_price, safety_margin, market_discount_pct, market_match_count, market_match_level,
+                                    lat, lng
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             """, new_batch)
                             _conn.commit()
                             console.print(f"[bold green]⚡ Phase 1 신규 매물 {len(new_batch)}건 DB 즉시 등록 완료![/bold green]")
@@ -1385,12 +1425,35 @@ class AuctionCrawler:
                 await browser.close()
                 return []
 
-# --- Module 3: AI Analyzer (GPT-4o) ---
+# --- Module 3: AI Analyzer (Gemini / GPT-4o) ---
 class AuctionAnalyzer:
     def __init__(self, api_key: Optional[str] = None):
         resolved_key = api_key if api_key else os.environ.get("OPENAI_API_KEY")
         self.api_key = resolved_key if resolved_key and resolved_key.strip() != "" else None
+        self.gemini_key = os.environ.get("GEMINI_API_KEY")
         self.client = OpenAI(api_key=self.api_key) if self.api_key else None
+
+    def _call_gemini(self, prompt: str, model_name: str = "gemini-3.8-flash") -> dict:
+        import urllib.request
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.gemini_key}"
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {
+                "responseMimeType": "application/json",
+                "temperature": 0.2
+            }
+        }
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=25) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+            text = body["candidates"][0]["content"]["parts"][0]["text"]
+            res = json.loads(text)
+            res["ai_model"] = model_name
+            return res
 
     def analyze_item(self, item: dict, rights: dict) -> dict:
         discount_rate = rights.get('discount_rate', 0)
@@ -1442,8 +1505,16 @@ class AuctionAnalyzer:
         }}
         """
         try:
+            # 1순위: Gemini API (무료 티어 / Gemini Pro 키)
+            if self.gemini_key:
+                for g_model in ("gemini-3.8-flash", "gemini-flash-latest"):
+                    try:
+                        return self._call_gemini(prompt, g_model)
+                    except Exception:
+                        continue
+
             if not self.client or not self.api_key:
-                raise ValueError("OpenAI API Key가 설정되지 않았거나 올바르지 않습니다.")
+                raise ValueError("Gemini 또는 OpenAI API Key가 설정되지 않았거나 올바르지 않습니다.")
 
             response = self.client.chat.completions.create(
                 model=OPENAI_MODEL,
@@ -1539,12 +1610,15 @@ async def main():
     analyzer = AuctionAnalyzer(api_key=args.api_key)
 
     # 지역에 따라 법원 목록 결정
+    all_known_courts = {**SEOUL_COURTS, **GYEONGGI_COURTS}
     if args.region == "서울":
         court_list = SEOUL_COURTS
     elif args.region == "경기":
         court_list = GYEONGGI_COURTS
+    elif args.region in ("전체", "수도권"):
+        court_list = all_known_courts
     else:
-        court_list = {args.region: ""}
+        court_list = {args.region: all_known_courts.get(args.region, "")}
 
     console.print(f"[bold yellow]🔍 {args.region} 전체 법원 수집 시작 (법원 {len(court_list)}개, 법원당 최대 {args.max_items}개)[/bold yellow]")
 
