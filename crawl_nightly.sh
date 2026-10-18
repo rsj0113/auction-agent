@@ -45,6 +45,10 @@ done
 echo "[네이버 상가] $(date '+%H:%M:%S') 성남·서울·경기 주요 상권 상가 실매물 수집 시작" >> "$LOG"
 $PYTHON -c "from naver_land_scraper import run; run(max_pages=3, headless=True)" >> "$LOG" 2>&1
 
+# 온비드(KAMCO) 공매 상가/근린시설 정기 수집
+echo "[온비드 공매] $(date '+%H:%M:%S') 온비드 상가·근린생활시설 공매 매물 수집 시작" >> "$LOG"
+$PYTHON onbid_scraper.py >> "$LOG" 2>&1
+
 echo "[시세 매칭] $(date '+%H:%M:%S') 경매 물건 ↔ 네이버 상가 시세 및 안전마진 재계산" >> "$LOG"
 $PYTHON core/market_matcher.py >> "$LOG" 2>&1
 
