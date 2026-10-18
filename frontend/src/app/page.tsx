@@ -188,6 +188,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [quickFilter, setQuickFilter] = useState<string>("");
   const [quickCounts, setQuickCounts] = useState<{ [key: string]: number }>({});
+  const [floorFilter, setFloorFilter] = useState<string>("");
+  const [pyeongFilter, setPyeongFilter] = useState<string>("");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [selectedAuction, setSelectedAuction] = useState<AuctionItem | null>(null);
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
@@ -299,27 +301,55 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const fetchAuctions = async () => {
+    const fetchFilteredListings = async () => {
       setLoading(true);
       try {
+        let pyeongQuery = "";
+        if (pyeongFilter === "under10") pyeongQuery = "&max_pyeong=10";
+        else if (pyeongFilter === "10to30") pyeongQuery = "&min_pyeong=10&max_pyeong=30";
+        else if (pyeongFilter === "30to60") pyeongQuery = "&min_pyeong=30&max_pyeong=60";
+        else if (pyeongFilter === "over60") pyeongQuery = "&min_pyeong=60";
+
+        let floorQuery = floorFilter ? `&floor_type=${floorFilter}` : "";
+
+        // 1. 법원경매
         const limit = viewMode === "map" ? 300 : (quickFilter ? 15 : 12);
-        let url = `/api/auctions?limit=${limit}&sort=recommend`;
-        if (quickFilter) {
-          url += `&quick_filter=${quickFilter}`;
+        let aucUrl = `/api/auctions?limit=${limit}&sort=recommend${floorQuery}${pyeongQuery}`;
+        if (quickFilter) aucUrl += `&quick_filter=${quickFilter}`;
+        
+        // 2. 네이버 상가
+        let naverUrl = `/api/naver-listings?limit=18${floorQuery}${pyeongQuery}`;
+        if (!floorFilter && !pyeongFilter) naverUrl += `&favorite_only=true`;
+
+        // 3. 온비드 공매
+        let onbidUrl = `/api/onbid-items?limit=18${floorQuery}${pyeongQuery}`;
+
+        const [aucRes, naverRes, onbidRes] = await Promise.all([
+          fetch(aucUrl, { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
+          fetch(naverUrl, { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
+          fetch(onbidUrl, { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null),
+        ]);
+
+        if (aucRes?.ok) {
+          const aData = await aucRes.json();
+          setAuctions(aData.data || []);
         }
-        const auctionsRes = await fetch(url, { headers: { "ngrok-skip-browser-warning": "1" } }).catch(() => null);
-        if (auctionsRes?.ok) {
-          const aData = await auctionsRes.json();
-          setAuctions(aData.data);
+        if (naverRes?.ok) {
+          const nData = await naverRes.json();
+          setRecommendedNaver(nData.data || []);
+        }
+        if (onbidRes?.ok) {
+          const oData = await onbidRes.json();
+          setOnbidItems(oData.data || []);
         }
       } catch (error) {
-        console.error("매물 로딩 실패:", error);
+        console.error("필터 매물 로딩 실패:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchAuctions();
-  }, [quickFilter, viewMode]);
+    fetchFilteredListings();
+  }, [quickFilter, floorFilter, pyeongFilter, viewMode]);
 
   // 금액 포맷 (ex: 5억 2,000만)
   const formatPrice = (price: number) => {
@@ -630,11 +660,25 @@ export default function Home() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-extrabold text-gray-900 flex items-center gap-2">
-              <span>{quickFilter ? `${QUICK_CHIPS.find((c) => c.id === quickFilter)?.icon || "⚡"} ${QUICK_CHIPS.find((c) => c.id === quickFilter)?.label || ""} 매물` : "🎯 1층 상가 임장 추천 매물"}</span>
+              <span>
+                {quickFilter
+                  ? `${QUICK_CHIPS.find((c) => c.id === quickFilter)?.icon || "⚡"} ${QUICK_CHIPS.find((c) => c.id === quickFilter)?.label || ""} 매물`
+                  : floorFilter === "b1"
+                  ? "⛳ 지하 1층 골프연습장·체육시설용 알짜 매물"
+                  : floorFilter === "1f"
+                  ? "🎯 1층 상가 임장 추천 매물"
+                  : pyeongFilter === "over60"
+                  ? "🏢 60평 이상 대형 상가 매물"
+                  : "🎯 상가 임장 추천 매물"}
+              </span>
             </h2>
-            {quickFilter && (
+            {(quickFilter || floorFilter || pyeongFilter) && (
               <button
-                onClick={() => setQuickFilter("")}
+                onClick={() => {
+                  setQuickFilter("");
+                  setFloorFilter("");
+                  setPyeongFilter("");
+                }}
                 className="text-xs text-gray-500 hover:text-red-600 bg-gray-100 px-2 py-0.5 rounded-md font-medium cursor-pointer"
               >
                 필터 해제 ✕
@@ -654,11 +698,11 @@ export default function Home() {
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
-                  <span>⚖️ 법원경매 추천</span>
+                  <span>⚖️ 법원경매</span>
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                     recommendTab === "auction" ? "bg-blue-100 text-blue-800" : "bg-gray-200 text-gray-700"
                   }`}>
-                    {quickCounts["favorite"] ? `${quickCounts["favorite"]}건` : "10건"}
+                    {auctions.length}건
                   </span>
                 </button>
                 <button
@@ -670,11 +714,11 @@ export default function Home() {
                       : "text-gray-600 hover:text-emerald-700"
                   }`}
                 >
-                  <span>🟢 네이버 1층</span>
+                  <span>🟢 네이버 상가</span>
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                     recommendTab === "naver" ? "bg-white/25 text-white" : "bg-emerald-100 text-emerald-800"
                   }`}>
-                    {recommendedNaver.length > 0 ? `${recommendedNaver.length}선` : "18선"}
+                    {recommendedNaver.length}선
                   </span>
                 </button>
                 <button
@@ -690,7 +734,7 @@ export default function Home() {
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                     recommendTab === "onbid" ? "bg-white/25 text-white" : "bg-purple-100 text-purple-800"
                   }`}>
-                    {onbidItems.length > 0 ? `${onbidItems.length}선` : "18선"}
+                    {onbidItems.length}선
                   </span>
                 </button>
               </div>
@@ -699,6 +743,83 @@ export default function Home() {
             <Link href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"} className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
               전체 매물 더보기 &rarr;
             </Link>
+          </div>
+        </div>
+
+        {/* 층수 & 평수 원클릭 인터랙티브 필터 컨트롤러 */}
+        <div className="bg-white border border-gray-200/80 rounded-2xl p-3 sm:p-3.5 shadow-2xs space-y-2.5">
+          {/* 층수 필터 */}
+          <div className="flex flex-wrap items-center gap-1.5 text-xs">
+            <span className="text-[11px] font-extrabold text-gray-500 mr-1 flex items-center gap-1">
+              <span>🏢</span> <span>층수:</span>
+            </span>
+            {[
+              { id: "", label: "전체 층" },
+              { id: "1f", label: "🏪 1층만" },
+              { id: "b1", label: "⛳ 지하1층 (B1 골프·체육)", highlight: true },
+              { id: "upper", label: "🏢 2층 이상" },
+            ].map((f) => {
+              const active = floorFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setFloorFilter(active ? "" : f.id)}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                    active
+                      ? f.id === "b1"
+                        ? "bg-purple-600 text-white shadow-xs ring-2 ring-purple-600/30 scale-[1.02]"
+                        : f.id === "1f"
+                        ? "bg-orange-500 text-white shadow-xs ring-2 ring-orange-500/30 scale-[1.02]"
+                        : "bg-blue-600 text-white shadow-xs ring-2 ring-blue-600/30 scale-[1.02]"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200/60"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 평수 필터 */}
+          <div className="flex flex-wrap items-center gap-1.5 text-xs pt-1.5 border-t border-gray-100">
+            <span className="text-[11px] font-extrabold text-gray-500 mr-1 flex items-center gap-1">
+              <span>📐</span> <span>평수:</span>
+            </span>
+            {[
+              { id: "", label: "전체 평수" },
+              { id: "under10", label: "소형 (~10평)" },
+              { id: "10to30", label: "중형 (10~30평)" },
+              { id: "30to60", label: "중대형 (30~60평)" },
+              { id: "over60", label: "대형 (60평+ 골프장용)", highlight: true },
+            ].map((p) => {
+              const active = pyeongFilter === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setPyeongFilter(active ? "" : p.id)}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                    active
+                      ? p.id === "over60"
+                        ? "bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-600/30 scale-[1.02]"
+                        : "bg-blue-600 text-white shadow-xs ring-2 ring-blue-600/30 scale-[1.02]"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200/60"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+            {(floorFilter || pyeongFilter) && (
+              <button
+                onClick={() => {
+                  setFloorFilter("");
+                  setPyeongFilter("");
+                }}
+                className="text-[11px] text-gray-500 hover:text-red-600 font-semibold ml-auto px-2 py-1 rounded-lg bg-gray-50 hover:bg-red-50 border border-gray-200 cursor-pointer"
+              >
+                필터 해제 ✕
+              </button>
+            )}
           </div>
         </div>
 

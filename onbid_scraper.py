@@ -104,18 +104,24 @@ def get_base_payload():
     ]
     return payload
 
-def parse_floor_and_tags(cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method):
-    """물건명 및 금액에서 층수 및 추천 태그 판별"""
+def parse_floor_and_tags(cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method, bld_area_pyeong=0.0):
+    """물건명 및 금액에서 층수 및 추천 태그 판별 (지하1층/B1 골프·체육시설 감지 포함)"""
     floor = 0
     is_first_floor = 0
     
     nm = cltr_nm or ""
-    # 1층 탐지 패턴
-    if re.search(r'(1층|지상\s*1층|제1층|10[1-9]호|1[1-9][0-9]호\b)', nm) and not re.search(r'(1[1-9]층|21층|31층|지하\s*1층|b1|B1)', nm):
+    # 1. 지하층/B1 탐지 (골프연습장/체육시설용 지하 1층 우선 감지)
+    if re.search(r'(지하\s*[1-9]층|지하\s*도상가|지하\s*상가|제지\s*[1-9]층|제\s*비[0-9]+호|비[0-9]{3}호|[bB][1-9]층|[bB][0-9]{2,4}호)', nm):
+        m_under = re.search(r'지하\s*([1-9])층|제지\s*([1-9])층|[bB]([1-9])층', nm)
+        if m_under:
+            floor = -int(m_under.group(1) or m_under.group(2) or m_under.group(3))
+        else:
+            floor = -1
+    # 2. 1층 탐지
+    elif re.search(r'(1층|지상\s*1층|제1층|10[1-9]호|1[1-9][0-9]호\b)', nm) and not re.search(r'(1[1-9]층|21층|31층)', nm):
         floor = 1
         is_first_floor = 1
-    elif re.search(r'(지하\s*1층|b1|B1)', nm, re.I):
-        floor = -1
+    # 3. 지상층 탐지
     elif m := re.search(r'([2-9]|[1-4][0-9])층', nm):
         try:
             floor = int(m.group(1))
@@ -125,6 +131,12 @@ def parse_floor_and_tags(cltr_nm, min_bid, appraisal, discount_pct, prpt_div, di
     tags = []
     if is_first_floor:
         tags.append("🏪 1층상가")
+    elif floor < 0:
+        if bld_area_pyeong >= 30:
+            tags.append(f"⛳ 지하{abs(floor)}층·{int(bld_area_pyeong)}평(골프/체육)")
+        else:
+            tags.append(f"🏢 지하{abs(floor)}층")
+
     if discount_pct >= 40:
         tags.append(f"🔥 {int(discount_pct)}%할인")
     elif discount_pct >= 20:
@@ -241,7 +253,7 @@ def save_to_db(items):
         
         # 층수 및 태그 추출
         floor, is_first_floor, recommend_tag = parse_floor_and_tags(
-            cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method
+            cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method, bld_area_pyeong
         )
         
         # 상세 URL 조립

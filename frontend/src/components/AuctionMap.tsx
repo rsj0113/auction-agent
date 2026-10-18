@@ -105,6 +105,8 @@ export default function AuctionMap({
   // 네이버 상가 실매물 오버레이 & 필터 상태
   const [showNaver, setShowNaver] = useState(true);
   const [naverFirstFloorOnly, setNaverFirstFloorOnly] = useState(false);
+  const [naverFloorType, setNaverFloorType] = useState<string>("");
+  const [naverPyeongRange, setNaverPyeongRange] = useState<string>("");
   const [naverTradeType, setNaverTradeType] = useState<"" | "매매" | "월세">("");
   const [naverRegion, setNaverRegion] = useState<string>(focusRegion || "");
   const [naverRegionInput, setNaverRegionInput] = useState<string>(focusRegion || "");
@@ -119,7 +121,7 @@ export default function AuctionMap({
   useEffect(() => {
     const QUICK_FILTER_IDS = new Set([
       "safe", "half_price", "owner", "apartment", "first_floor_shop",
-      "small_budget", "top_grade", "special", "clean", "margin_100m", "market_matched",
+      "small_budget", "top_grade", "special", "clean", "margin_100m", "market_matched", "golf_b1", "underground",
     ]);
     const clean =
       focusRegion && !QUICK_FILTER_IDS.has(focusRegion.trim())
@@ -180,8 +182,16 @@ export default function AuctionMap({
     if (naverTradeType) {
       params.set("trade_type", naverTradeType);
     }
-    if (naverFirstFloorOnly) {
-      params.set("first_floor_only", "true");
+    if (naverFloorType) {
+      params.set("floor_type", naverFloorType);
+    } else if (naverFirstFloorOnly) {
+      params.set("floor_type", "1f");
+    }
+    if (naverPyeongRange) {
+      if (naverPyeongRange === "under10") params.set("max_pyeong", "10");
+      else if (naverPyeongRange === "10to30") { params.set("min_pyeong", "10"); params.set("max_pyeong", "30"); }
+      else if (naverPyeongRange === "30to60") { params.set("min_pyeong", "30"); params.set("max_pyeong", "60"); }
+      else if (naverPyeongRange === "over60") params.set("min_pyeong", "60");
     }
     if (naverFavoriteOnly) {
       params.set("favorite_only", "true");
@@ -209,7 +219,7 @@ export default function AuctionMap({
         }
       })
       .catch(() => {});
-  }, [showNaver, naverRegion, naverFirstFloorOnly, naverTradeType, naverPriceRange, naverSort, naverFavoriteOnly]);
+  }, [showNaver, naverRegion, naverFirstFloorOnly, naverFloorType, naverPyeongRange, naverTradeType, naverPriceRange, naverSort, naverFavoriteOnly]);
 
   // Initialize map
   useEffect(() => {
@@ -508,17 +518,50 @@ export default function AuctionMap({
                 ))}
               </select>
 
-              {/* 1층 상가만 토글 */}
+              {/* 1층 상가 토글 */}
               <button
-                onClick={() => setNaverFirstFloorOnly(!naverFirstFloorOnly)}
+                onClick={() => {
+                  setNaverFloorType(naverFloorType === "1f" ? "" : "1f");
+                  setNaverFirstFloorOnly(false);
+                }}
                 className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                  naverFirstFloorOnly
+                  naverFloorType === "1f" || (naverFirstFloorOnly && !naverFloorType)
                     ? "bg-orange-500 text-white border-orange-500 shadow-xs"
                     : "bg-white text-orange-700 border-orange-200 hover:bg-orange-50"
                 }`}
               >
-                🏪 1층 상가만
+                🏪 1층
               </button>
+
+              {/* 지하 1층 (골프/체육용) 토글 */}
+              <button
+                onClick={() => {
+                  setNaverFloorType(naverFloorType === "b1" ? "" : "b1");
+                  setNaverFirstFloorOnly(false);
+                }}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                  naverFloorType === "b1"
+                    ? "bg-purple-600 text-white border-purple-600 shadow-xs ring-2 ring-purple-600/30"
+                    : "bg-white text-purple-700 border-purple-200 hover:bg-purple-50"
+                }`}
+              >
+                ⛳ 지하1층 (B1 골프·체육)
+              </button>
+
+              {/* 평수 셀렉트 */}
+              <select
+                value={naverPyeongRange}
+                onChange={(e) => setNaverPyeongRange(e.target.value)}
+                className={`px-2 py-1 rounded-lg text-xs font-bold border outline-none cursor-pointer ${
+                  naverPyeongRange ? "border-blue-400 text-blue-700 bg-blue-50/50" : "bg-white border-gray-200 text-gray-700"
+                }`}
+              >
+                <option value="">평수 전체</option>
+                <option value="under10">소형 (~10평)</option>
+                <option value="10to30">중형 (10~30평)</option>
+                <option value="30to60">중대형 (30~60평)</option>
+                <option value="over60">대형 (60평+ 골프장용)</option>
+              </select>
 
               {/* 관심 매물만 토글 */}
               <button
@@ -529,7 +572,7 @@ export default function AuctionMap({
                     : "bg-white text-amber-800 border-amber-300 hover:bg-amber-50"
                 }`}
               >
-                ⭐ 관심 상가만
+                ⭐ 관심
               </button>
 
               {/* 매매/월세 토글 */}
@@ -561,19 +604,21 @@ export default function AuctionMap({
                 <option value="area_desc">넓은 면적순</option>
               </select>
 
-              {(naverRegion || naverPriceRange || naverFirstFloorOnly || naverTradeType || naverFavoriteOnly) && (
+              {(naverRegion || naverPriceRange || naverFirstFloorOnly || naverFloorType || naverPyeongRange || naverTradeType || naverFavoriteOnly) && (
                 <button
                   onClick={() => {
                     setNaverRegion("");
                     setNaverRegionInput("");
                     setNaverPriceRange("");
                     setNaverFirstFloorOnly(false);
+                    setNaverFloorType("");
+                    setNaverPyeongRange("");
                     setNaverTradeType("");
                     setNaverFavoriteOnly(false);
                   }}
                   className="px-2 py-1 rounded-lg text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 cursor-pointer"
                 >
-                  필터 초기화
+                  초기화
                 </button>
               )}
             </div>

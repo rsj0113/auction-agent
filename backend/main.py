@@ -43,7 +43,10 @@ def get_auctions(
     property_type: Optional[str] = None,
     region: Optional[str] = None,
     has_tenant: Optional[str] = None,
-    quick_filter: Optional[str] = None
+    quick_filter: Optional[str] = None,
+    floor_type: Optional[str] = None,
+    min_pyeong: Optional[float] = None,
+    max_pyeong: Optional[float] = None,
 ):
     """
     Get a list of auction items with filtering and sorting.
@@ -133,6 +136,27 @@ def get_auctions(
                 query += " AND safety_margin >= 100000000"
             elif quick_filter == 'market_matched':
                 query += " AND market_match_count > 0"
+            elif quick_filter == 'golf_b1':
+                query += " AND floor < 0 AND area_pyeong >= 30"
+            elif quick_filter == 'underground':
+                query += " AND floor < 0"
+
+        # 층수 필터 (1층 / 지하1층 / 2층이상)
+        if floor_type:
+            if floor_type == '1f':
+                query += " AND floor = 1"
+            elif floor_type == 'b1':
+                query += " AND floor < 0"
+            elif floor_type == 'upper':
+                query += " AND floor >= 2"
+
+        # 평수 필터 (area_pyeong)
+        if min_pyeong is not None and min_pyeong > 0:
+            query += " AND area_pyeong >= ?"
+            params.append(min_pyeong)
+        if max_pyeong is not None and max_pyeong > 0:
+            query += " AND area_pyeong <= ?"
+            params.append(max_pyeong)
 
         # Sorting
         if sort == 'recommend':
@@ -240,15 +264,28 @@ def get_quick_filter_counts():
         cursor.execute("SELECT COUNT(*) FROM auction_items WHERE market_match_count > 0")
         counts["market_matched"] = cursor.fetchone()[0]
 
+        # golf_b1 (골프연습장/체육시설용 지하 30평 이상)
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE floor < 0 AND area_pyeong >= 30")
+        counts["golf_b1"] = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM auction_items WHERE floor < 0")
+        counts["auction_b1"] = cursor.fetchone()[0]
+
         # naver_shops (네이버 상가 실매물 총 건수)
         try:
             cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03')")
             counts["naver_shops"] = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND floor = 1")
             counts["naver_first_floor"] = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND floor < 0")
+            counts["naver_b1"] = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND floor < 0 AND area_pyeong >= 30")
+            counts["naver_golf_b1"] = cursor.fetchone()[0]
         except Exception:
             counts["naver_shops"] = 0
             counts["naver_first_floor"] = 0
+            counts["naver_b1"] = 0
+            counts["naver_golf_b1"] = 0
 
         # onbid_items (온비드 공매 상가 건수)
         try:
@@ -256,12 +293,17 @@ def get_quick_filter_counts():
             counts["onbid_total"] = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE is_first_floor = 1")
             counts["onbid_first_floor"] = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE floor < 0")
+            counts["onbid_b1"] = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE discount_pct >= 30")
             counts["onbid_discounted"] = cursor.fetchone()[0]
         except Exception:
             counts["onbid_total"] = 0
             counts["onbid_first_floor"] = 0
+            counts["onbid_b1"] = 0
             counts["onbid_discounted"] = 0
+
+        counts["b1_total"] = counts.get("auction_b1", 0) + counts.get("naver_b1", 0) + counts.get("onbid_b1", 0)
         
         conn.close()
         return counts
@@ -322,15 +364,19 @@ def get_naver_listings(
     region: Optional[str] = None,
     trade_type: Optional[str] = None,
     first_floor_only: bool = False,
+    floor_type: Optional[str] = None,
     favorite_only: bool = False,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
+    min_pyeong: Optional[float] = None,
+    max_pyeong: Optional[float] = None,
     sort: Optional[str] = "default",
     limit: int = 500,
+    offset: int = 0,
 ):
     """
     Get Naver Real Estate commercial (상가) listings for map overlay & side-by-side comparison.
-    Supports multi-keyword region filtering, favorite filtering, and price filtering (won unit).
+    Supports multi-keyword region filtering, favorite filtering, floor filtering (1F, B1, upper), and pyeong range.
     """
     try:
         import re as _re
@@ -360,8 +406,24 @@ def get_naver_listings(
             where_clause += " AND trade_type = ?"
             params.append(trade_type)
 
-        if first_floor_only:
+        # 층수 필터 (하위 호환 first_floor_only 포함)
+        if floor_type:
+            if floor_type == '1f':
+                where_clause += " AND floor = 1"
+            elif floor_type == 'b1':
+                where_clause += " AND floor < 0"
+            elif floor_type == 'upper':
+                where_clause += " AND floor >= 2"
+        elif first_floor_only:
             where_clause += " AND floor = 1"
+
+        # 평수 필터
+        if min_pyeong is not None and min_pyeong > 0:
+            where_clause += " AND area_pyeong >= ?"
+            params.append(min_pyeong)
+        if max_pyeong is not None and max_pyeong > 0:
+            where_clause += " AND area_pyeong <= ?"
+            params.append(max_pyeong)
 
         if min_price is not None and min_price > 0:
             min_10k = min_price // 10000
@@ -402,9 +464,9 @@ def get_naver_listings(
                    COALESCE(is_favorite, 0) as is_favorite,
                    COALESCE(recommend_tag, '') as recommend_tag
             FROM naver_listings
-        """ + where_clause + order_clause + " LIMIT ?"
+        """ + where_clause + order_clause + " LIMIT ? OFFSET ?"
 
-        cursor.execute(query, params + [limit])
+        cursor.execute(query, params + [limit, offset])
         rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return {"data": rows, "count": len(rows), "total_matching": total_matching}
@@ -418,15 +480,19 @@ def get_onbid_items(
     disposal_method: Optional[str] = None,
     prpt_div: Optional[str] = None,
     first_floor_only: bool = False,
+    floor_type: Optional[str] = None,
     favorite_only: bool = False,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
+    min_pyeong: Optional[float] = None,
+    max_pyeong: Optional[float] = None,
     sort: Optional[str] = "default",
     limit: int = 100,
+    offset: int = 0,
 ):
     """
     Get KAMCO OnBid (온비드 공매) commercial properties.
-    Supports filtering by region, disposal method (매각/임대), 1st floor, favorites, and price.
+    Supports filtering by region, disposal method (매각/임대), floor (1F, B1, upper), pyeong range, favorites, and price.
     """
     try:
         import re as _re
@@ -439,8 +505,24 @@ def get_onbid_items(
         if favorite_only:
             where_clause += " AND COALESCE(is_favorite, 0) = 1"
 
-        if first_floor_only:
-            where_clause += " AND is_first_floor = 1"
+        # 층수 필터 (하위 호환 first_floor_only 포함)
+        if floor_type:
+            if floor_type == '1f':
+                where_clause += " AND (is_first_floor = 1 OR floor = 1)"
+            elif floor_type == 'b1':
+                where_clause += " AND floor < 0"
+            elif floor_type == 'upper':
+                where_clause += " AND floor >= 2"
+        elif first_floor_only:
+            where_clause += " AND (is_first_floor = 1 OR floor = 1)"
+
+        # 평수 필터 (bld_area_pyeong)
+        if min_pyeong is not None and min_pyeong > 0:
+            where_clause += " AND bld_area_pyeong >= ?"
+            params.append(min_pyeong)
+        if max_pyeong is not None and max_pyeong > 0:
+            where_clause += " AND bld_area_pyeong <= ?"
+            params.append(max_pyeong)
 
         if disposal_method:
             where_clause += " AND disposal_method LIKE ?"
@@ -503,9 +585,9 @@ def get_onbid_items(
                    COALESCE(recommend_tag, '') as recommend_tag,
                    scraped_at
             FROM onbid_items
-        """ + where_clause + order_clause + " LIMIT ?"
+        """ + where_clause + order_clause + " LIMIT ? OFFSET ?"
 
-        cursor.execute(query, params + [limit])
+        cursor.execute(query, params + [limit, offset])
         rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return {"data": rows, "count": len(rows), "total_matching": total_matching}
