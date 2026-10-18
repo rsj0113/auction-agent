@@ -525,11 +525,15 @@ export default function AuctionsPage() {
       const srcParam = params.get("source");
       const qfParam = params.get("qf");
       const viewParam = params.get("view");
+      const floorParam = params.get("floor");
+      const pyeongParam = params.get("pyeong");
       const regParam = params.get("region");
       if (srcParam === "onbid" || srcParam === "naver" || srcParam === "auction") {
         setAssetSource(srcParam);
       }
       if (qfParam) setQuickFilter(qfParam);
+      if (floorParam) setFloorFilter(floorParam);
+      if (pyeongParam) setPyeongFilter(pyeongParam);
       if (viewParam === "map") setViewMode("map");
       if (regParam) {
         setRegionInput(regParam);

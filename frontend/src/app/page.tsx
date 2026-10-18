@@ -740,8 +740,18 @@ export default function Home() {
               </div>
             )}
 
-            <Link href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"} className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
-              전체 매물 더보기 &rarr;
+            <Link 
+              href={
+                recommendTab === "onbid"
+                  ? `/auctions?source=onbid${floorFilter ? `&floor=${floorFilter}` : ""}${quickFilter ? `&qf=${quickFilter}` : ""}`
+                  : recommendTab === "naver"
+                  ? `/auctions?source=naver${floorFilter ? `&floor=${floorFilter}` : ""}${quickFilter ? `&qf=${quickFilter}` : ""}`
+                  : `/auctions?source=auction${floorFilter ? `&floor=${floorFilter}` : ""}${quickFilter ? `&qf=${quickFilter}` : ""}`
+              } 
+              className="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
+            >
+              <span>{recommendTab === "onbid" ? "🏛️ 온비드 공매 전체검색" : recommendTab === "naver" ? "🟢 네이버 상가 전체검색" : "⚖️ 법원경매 전체검색"}</span>
+              <span>&rarr;</span>
             </Link>
           </div>
         </div>
