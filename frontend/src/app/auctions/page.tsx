@@ -518,6 +518,46 @@ export default function AuctionsPage() {
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
+  // 임장 플래너 토스트 알림 상태
+  const [plannerToast, setPlannerToast] = useState<string | null>(null);
+
+  const handleAddToPlanner = (item: any, source: "auction" | "onbid" | "naver") => {
+    try {
+      const LOCAL_STORAGE_KEY = "auction_field_trip_planner_v1";
+      const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const existing = raw ? JSON.parse(raw) : [];
+      const id = String(item.case_number || item.cltr_no || item.article_id);
+      if (existing.some((x: any) => String(x.id) === id)) {
+        setPlannerToast("⚠️ 이미 임장 플래너에 담긴 매물입니다!");
+        setTimeout(() => setPlannerToast(null), 2500);
+        return;
+      }
+      const newItem = {
+        id,
+        source,
+        title: item.location || item.cltr_nm || item.article_name || "매물",
+        location: item.location || item.addr_full || `${item.addr_sgg || ""} ${item.addr_emd || ""}`.trim() || item.cltr_nm || "",
+        lat: item.lat || 37.44,
+        lng: item.lng || 127.14,
+        usage: item.usage || item.trade_type || "상가",
+        floorText: item.floor > 0 ? `${item.floor}층` : item.floor < 0 ? `지하${Math.abs(item.floor)}층` : item.is_first_floor === 1 ? "1층" : "미상",
+        priceText: source === "auction" ? `최저 ${formatMoney(item.min_bid)}` : source === "onbid" ? `${formatMoney(item.min_bid)}` : `${item.trade_type === '매매' ? formatNaverPrice10k(item.price_sale_10k) : `${formatNaverPrice10k(item.deposit_10k)}/${formatNaverPrice10k(item.monthly_rent_10k)}`}`,
+        appraisalText: item.appraisal ? `감정 ${formatMoney(item.appraisal)}` : "-",
+        discountText: item.discount_pct ? `${item.discount_pct}% 할인` : item.failed_count ? `유찰 ${item.failed_count}회` : "",
+        keyFeatures: [item.recommend_tag, item.realtor, item.ai_grade ? `${item.ai_grade}등급` : ""].filter(Boolean),
+        checklist: { leakChecked: false, vacancyChecked: false, feeChecked: false, parkingChecked: false, realtorChecked: false },
+        memo: "",
+        completed: false,
+      };
+      existing.push(newItem);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(existing));
+      setPlannerToast("📍 임장 플래너에 매물을 담았습니다!");
+      setTimeout(() => setPlannerToast(null), 2500);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   // URL 파라미터(?source=... & ?qf=... & ?view=map & ?region=...) 및 퀵 필터 카운트 불러오기
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -830,30 +870,51 @@ export default function AuctionsPage() {
               </p>
             </div>
           </div>
-          {/* 리스트 / 지도 보기 전환 탭 */}
-          <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200">
-            <button
-              onClick={() => setViewMode("list")}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === "list"
-                  ? "bg-white text-blue-600 shadow-2xs"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+          {/* 리스트 / 지도 보기 전환 탭 & 임장 플래너 */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Link
+              href="/planner"
+              className="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-extrabold transition-colors flex items-center gap-1 shadow-2xs"
+              title="임장 플래너 열기"
             >
-              📋 리스트
-            </button>
-            <button
-              onClick={() => setViewMode("map")}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === "map"
-                  ? "bg-blue-600 text-white shadow-2xs"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              🗺️ 지도 + N상가
-            </button>
+              <span>📍</span>
+              <span className="hidden sm:inline">임장 플래너</span>
+            </Link>
+
+            <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200">
+              <button
+                onClick={() => setViewMode("list")}
+                className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === "list"
+                    ? "bg-white text-blue-600 shadow-2xs"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                📋 리스트
+              </button>
+              <button
+                onClick={() => setViewMode("map")}
+                className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === "map"
+                    ? "bg-blue-600 text-white shadow-2xs"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                🗺️ 지도
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* 임장 플래너 담기 토스트 알림 */}
+        {plannerToast && (
+          <div className="fixed bottom-6 right-6 z-50 bg-gray-900/90 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-200">
+            <span>{plannerToast}</span>
+            <Link href="/planner" className="underline text-blue-300 hover:text-white ml-1">
+              플래너 보기 &rarr;
+            </Link>
+          </div>
+        )}
       </header>
 
       <main className="w-full mx-auto px-4 sm:px-5 pt-5 max-w-5xl">
@@ -1318,24 +1379,43 @@ export default function AuctionsPage() {
                 </div>
               ) : null}
 
-              {/* 메타 정보 */}
+              {/* 메타 정보 & 임장 액션 버튼 */}
               <div className="mt-3 pt-2.5 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-600">
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-bold border ${
-                  item.ai_model === 'gpt-4o-mini'
-                    ? 'bg-violet-50 text-violet-700 border-violet-200'
-                    : item.ai_model === 'gpt-4o'
-                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-                    : 'bg-gray-100 text-gray-700 border-gray-200'
-                }`}>
-                  <span>🤖</span>
-                  <span>{item.ai_model || 'gpt-4o-mini'}</span>
-                </span>
-                <div className="flex flex-wrap items-center gap-2 text-[11px] sm:text-xs font-medium text-gray-600">
-                  <span className="bg-gray-50 px-2 py-0.5 rounded border border-gray-200/80">
-                    📥 추가일 <strong className="text-gray-800">{formatDateShort(item.created_at || item.last_updated)}</strong>
+                <div className="flex items-center gap-1.5 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToPlanner(item, "auction");
+                    }}
+                    className="flex-1 sm:flex-initial px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-extrabold transition-colors cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+                  >
+                    <span>📍</span> <span>임장 담기</span>
+                  </button>
+                  <a
+                    href={`https://map.kakao.com/link/search/${encodeURIComponent(item.location)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-1 sm:flex-initial text-center px-2.5 py-1 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-200 text-xs font-bold transition-colors"
+                  >
+                    📍 로드뷰
+                  </a>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5 text-[11px] sm:text-xs font-medium text-gray-500">
+                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md font-bold border ${
+                    item.ai_model === 'gpt-4o-mini'
+                      ? 'bg-violet-50 text-violet-700 border-violet-200'
+                      : item.ai_model === 'gpt-4o'
+                      ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                      : 'bg-gray-100 text-gray-700 border-gray-200'
+                  }`}>
+                    <span>🤖</span>
+                    <span>{item.ai_model || 'gpt-4o-mini'}</span>
                   </span>
-                  <span className="bg-blue-50/60 px-2 py-0.5 rounded border border-blue-100 text-blue-800">
-                    🔄 업데이트 <strong className="font-bold">{formatDateShort(item.last_updated)}</strong>
+                  <span className="bg-gray-50 px-2 py-0.5 rounded border border-gray-200/80">
+                    📥 {formatDateShort(item.created_at || item.last_updated)}
                   </span>
                 </div>
               </div>
@@ -1445,24 +1525,34 @@ export default function AuctionsPage() {
 
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-100 text-xs">
                 <span className="text-gray-500 truncate max-w-xs">
-                  🏛️ 기관: <strong className="text-gray-800">{item.reg_org_nm || "한국자산관리공사"}</strong> · 용도: {item.usage || "근린생활시설"}
+                  🏛️ {item.reg_org_nm || "한국자산관리공사"} · {item.usage || "근린생활시설"}
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToPlanner(item, "onbid");
+                    }}
+                    className="flex-1 sm:flex-initial px-2.5 py-1 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-300 font-extrabold transition-colors cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+                  >
+                    <span>📍</span> <span>임장 담기</span>
+                  </button>
                   <a
                     href={`https://map.kakao.com/link/search/${encodeURIComponent(item.addr_full || item.cltr_nm)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2.5 py-1 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-200 font-bold transition-colors"
+                    className="flex-1 sm:flex-initial text-center px-2 py-1 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-200 font-bold transition-colors"
                   >
-                    📍 카카오 로드뷰
+                    📍 로드뷰
                   </a>
                   <a
                     href={item.detail_url || `https://www.onbid.co.kr/op/cltrpbancinf/cltr/cltrcdtnsrch/CltrCdtnSrchController/mvmnCltrCdtnSrchClg.do`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-extrabold transition-colors shadow-2xs"
+                    className="flex-1 sm:flex-initial text-center px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-extrabold transition-colors shadow-2xs"
                   >
-                    온비드 공매 원문 ↗
+                    온비드 ↗
                   </a>
                 </div>
               </div>
@@ -1549,24 +1639,34 @@ export default function AuctionsPage() {
 
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-100 text-xs">
                 <span className="text-gray-500 truncate max-w-xs">
-                  🏢 {item.realtor || "중개업소"} {item.confirm_date ? `· 확인 ${item.confirm_date}` : ""}
+                  🏢 {item.realtor || "중개업소"} {item.confirm_date ? `· ${item.confirm_date}` : ""}
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToPlanner(item, "naver");
+                    }}
+                    className="flex-1 sm:flex-initial px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold transition-colors cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+                  >
+                    <span>📍</span> <span>임장 담기</span>
+                  </button>
                   <a
                     href={`https://map.kakao.com/link/search/${encodeURIComponent(item.addr_sgg + " " + item.addr_emd + " " + (item.article_name || ""))}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2.5 py-1 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-200 font-bold transition-colors"
+                    className="flex-1 sm:flex-initial text-center px-2 py-1 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-200 font-bold transition-colors"
                   >
-                    📍 카카오 로드뷰
+                    📍 로드뷰
                   </a>
                   <a
                     href={item.detail_url || `https://m.land.naver.com/article/info/${item.article_id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1 rounded-lg bg-[#03c75a] hover:bg-emerald-600 text-white font-extrabold transition-colors shadow-2xs"
+                    className="flex-1 sm:flex-initial text-center px-2.5 py-1 rounded-lg bg-[#03c75a] hover:bg-emerald-600 text-white font-extrabold transition-colors shadow-2xs"
                   >
-                    네이버 부동산 확인 ↗
+                    네이버 ↗
                   </a>
                 </div>
               </div>

@@ -28,8 +28,11 @@ export default function RootLayout({
               <Link href="/" className="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-100 text-gray-700 transition-colors">
                 홈
               </Link>
+              <Link href="/planner" className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 shadow-2xs flex items-center gap-1 transition-all">
+                <span>📍</span> <span>임장 플래너</span>
+              </Link>
               <Link href="/auctions" className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-sm flex items-center gap-1 transition-colors">
-                🔍 필터 검색
+                🔍 검색
               </Link>
             </div>
           </nav>
