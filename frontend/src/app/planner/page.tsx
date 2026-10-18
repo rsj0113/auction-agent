@@ -244,6 +244,61 @@ export default function FieldTripPlannerPage() {
   const [activeTab, setActiveTab] = useState<"both" | "timeline" | "map">("both");
   const [expandedChecklistId, setExpandedChecklistId] = useState<string | null>(null);
 
+  // 직접 매물 추가 모달 상태
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addTitle, setAddTitle] = useState("");
+  const [addLocation, setAddLocation] = useState("");
+  const [addPrice, setAddPrice] = useState("");
+  const [addFloor, setAddFloor] = useState("지상 1층");
+  const [addUsage, setAddUsage] = useState("다세대/빌라");
+  const [addNote, setAddNote] = useState("");
+
+  const handleDirectAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!addLocation.trim()) {
+      alert("소재지(주소)를 입력해주세요.");
+      return;
+    }
+    let lat = 37.441;
+    let lng = 127.135;
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addLocation)}&format=json&limit=1`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          lat = parseFloat(data[0].lat);
+          lng = parseFloat(data[0].lon);
+        }
+      }
+    } catch {}
+
+    const newItem: InspectionItem = {
+      id: `custom-${Date.now()}`,
+      source: "naver",
+      title: addTitle.trim() || addLocation.trim(),
+      location: addLocation.trim(),
+      lat,
+      lng,
+      usage: addUsage,
+      floorText: addFloor,
+      priceText: addPrice || "가격 미정",
+      appraisalText: "-",
+      discountText: "직접 추가",
+      detailUrl: `https://map.kakao.com/link/search/${encodeURIComponent(addLocation)}`,
+      keyFeatures: [addUsage, addNote].filter(Boolean),
+      checklist: { leakChecked: false, vacancyChecked: false, feeChecked: false, parkingChecked: false, realtorChecked: false },
+      memo: addNote,
+      completed: false,
+    };
+
+    setItems((prev) => [...prev, newItem]);
+    setIsAddModalOpen(false);
+    setAddTitle("");
+    setAddLocation("");
+    setAddPrice("");
+    setAddNote("");
+  };
+
   // Leaflet 지도 Ref
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -625,14 +680,21 @@ export default function FieldTripPlannerPage() {
               className="text-xs font-extrabold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1"
             >
               <span>🏛️</span>
-              <span>성남 원도심 빌라+상가 코스 (5곳)</span>
+              <span>성남 원도심 빌라+상가 (5곳)</span>
             </button>
             <button
               onClick={() => handleLoadPreset(PRESET_BUNDANG_GWANGJU)}
               className="text-xs font-extrabold bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1"
             >
               <span>🌲</span>
-              <span>분당·판교·광주 엠포빌리지 코스 (4곳)</span>
+              <span>분당·판교·광주 코스 (4곳)</span>
+            </button>
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="text-xs font-extrabold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300 px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+            >
+              <span>➕</span>
+              <span>직접 매물 추가</span>
             </button>
             {items.length > 0 && (
               <button
@@ -1016,6 +1078,120 @@ export default function FieldTripPlannerPage() {
           </div>
         </div>
       </main>
+
+      {/* 직접 매물 추가 모달 */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl max-w-md w-full p-5 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+              <h3 className="text-base font-extrabold text-gray-900 flex items-center gap-1.5">
+                <span>➕</span> <span>새 임장 매물 직접 추가</span>
+              </h3>
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="text-gray-400 hover:text-gray-700 text-sm font-bold p-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleDirectAdd} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">
+                  소재지 (주소) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="예: 경기도 성남시 수정구 태평동 1234"
+                  value={addLocation}
+                  onChange={(e) => setAddLocation(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-gray-800 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">
+                  물건 이름 / 애칭
+                </label>
+                <input
+                  type="text"
+                  placeholder="예: 태평동 현대빌라 201호 / 서현동 1층 카페"
+                  value={addTitle}
+                  onChange={(e) => setAddTitle(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-gray-800 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">용도</label>
+                  <select
+                    value={addUsage}
+                    onChange={(e) => setAddUsage(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-xl px-2.5 py-2 text-gray-800 outline-none focus:border-blue-500"
+                  >
+                    <option value="다세대/빌라">다세대/빌라</option>
+                    <option value="상가/근린">상가/근린시설</option>
+                    <option value="단독/다가구">단독/다가구</option>
+                    <option value="아파트">아파트</option>
+                    <option value="오피스텔">오피스텔</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">층수</label>
+                  <input
+                    type="text"
+                    placeholder="예: 1층, 3층, B1"
+                    value={addFloor}
+                    onChange={(e) => setAddFloor(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-gray-800 outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">희망가 / 호가 / 최저가</label>
+                <input
+                  type="text"
+                  placeholder="예: 2억 3,000만원 / 보증금 3천·월 150"
+                  value={addPrice}
+                  onChange={(e) => setAddPrice(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-gray-800 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">사전 메모 / 방문 목적</label>
+                <textarea
+                  rows={2}
+                  placeholder="예: 전세 갭투자 타당성 검토, 주변 1층 공실률 및 상권 확인"
+                  value={addNote}
+                  onChange={(e) => setAddNote(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl p-2 text-gray-800 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="px-3.5 py-2 rounded-xl text-gray-600 hover:bg-gray-100 font-bold"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold shadow-sm"
+                >
+                  플래너에 추가하기
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
