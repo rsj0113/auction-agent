@@ -249,6 +249,19 @@ def get_quick_filter_counts():
         except Exception:
             counts["naver_shops"] = 0
             counts["naver_first_floor"] = 0
+
+        # onbid_items (온비드 공매 상가 건수)
+        try:
+            cursor.execute("SELECT COUNT(*) FROM onbid_items")
+            counts["onbid_total"] = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE is_first_floor = 1")
+            counts["onbid_first_floor"] = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE discount_pct >= 30")
+            counts["onbid_discounted"] = cursor.fetchone()[0]
+        except Exception:
+            counts["onbid_total"] = 0
+            counts["onbid_first_floor"] = 0
+            counts["onbid_discounted"] = 0
         
         conn.close()
         return counts
@@ -257,14 +270,14 @@ def get_quick_filter_counts():
 
 
 class FavoriteToggleRequest(BaseModel):
-    item_type: str  # "auction" or "naver"
+    item_type: str  # "auction", "naver", or "onbid"
     item_id: str
 
 
 @app.post("/api/favorites/toggle")
 def toggle_favorite(req: FavoriteToggleRequest):
     """
-    Toggle star/favorite status for a court auction item or a Naver commercial listing.
+    Toggle star/favorite status for a court auction item, Naver listing, or OnBid item.
     """
     try:
         conn = get_db_connection()
@@ -278,6 +291,14 @@ def toggle_favorite(req: FavoriteToggleRequest):
                 raise HTTPException(status_code=404, detail="Naver listing not found")
             new_val = 0 if row[0] == 1 else 1
             cursor.execute("UPDATE naver_listings SET is_favorite = ? WHERE article_id = ?", (new_val, req.item_id))
+        elif req.item_type == "onbid":
+            cursor.execute("SELECT COALESCE(is_favorite, 0) FROM onbid_items WHERE cltr_no = ?", (req.item_id,))
+            row = cursor.fetchone()
+            if not row:
+                conn.close()
+                raise HTTPException(status_code=404, detail="OnBid item not found")
+            new_val = 0 if row[0] == 1 else 1
+            cursor.execute("UPDATE onbid_items SET is_favorite = ? WHERE cltr_no = ?", (new_val, req.item_id))
         else:
             cursor.execute("SELECT COALESCE(is_favorite, 0) FROM auction_items WHERE case_number = ?", (req.item_id,))
             row = cursor.fetchone()
@@ -391,6 +412,107 @@ def get_naver_listings(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/onbid-items")
+def get_onbid_items(
+    region: Optional[str] = None,
+    disposal_method: Optional[str] = None,
+    prpt_div: Optional[str] = None,
+    first_floor_only: bool = False,
+    favorite_only: bool = False,
+    min_price: Optional[int] = None,
+    max_price: Optional[int] = None,
+    sort: Optional[str] = "default",
+    limit: int = 100,
+):
+    """
+    Get KAMCO OnBid (온비드 공매) commercial properties.
+    Supports filtering by region, disposal method (매각/임대), 1st floor, favorites, and price.
+    """
+    try:
+        import re as _re
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        where_clause = " WHERE 1=1"
+        params = []
+
+        if favorite_only:
+            where_clause += " AND COALESCE(is_favorite, 0) = 1"
+
+        if first_floor_only:
+            where_clause += " AND is_first_floor = 1"
+
+        if disposal_method:
+            where_clause += " AND disposal_method LIKE ?"
+            params.append(f"%{disposal_method}%")
+
+        if prpt_div:
+            where_clause += " AND prpt_div LIKE ?"
+            params.append(f"%{prpt_div}%")
+
+        if region and region.strip():
+            raw_reg = region.strip()
+            cleaned_reg = raw_reg.replace("전체", "").replace("남부", "").replace("북부", "").strip()
+            tokens = [t.strip() for t in _re.split(r"[·,/|()\s]+", cleaned_reg) if len(t.strip()) >= 2]
+            if not tokens:
+                tokens = [raw_reg]
+            token_ors = []
+            for t in tokens:
+                like = f"%{t}%"
+                token_ors.append("(addr_sido LIKE ? OR addr_sgg LIKE ? OR addr_emd LIKE ? OR addr_full LIKE ? OR cltr_nm LIKE ?)")
+                params.extend([like, like, like, like, like])
+            where_clause += " AND (" + " OR ".join(token_ors) + ")"
+
+        if min_price is not None and min_price > 0:
+            where_clause += " AND min_bid >= ?"
+            params.append(min_price)
+
+        if max_price is not None and max_price > 0:
+            where_clause += " AND min_bid <= ?"
+            params.append(max_price)
+
+        count_query = "SELECT COUNT(*) FROM onbid_items" + where_clause
+        cursor.execute(count_query, params)
+        total_matching = cursor.fetchone()[0]
+
+        if sort == "price_asc":
+            order_clause = " ORDER BY min_bid ASC"
+        elif sort == "price_desc":
+            order_clause = " ORDER BY min_bid DESC"
+        elif sort == "discount_desc":
+            order_clause = " ORDER BY discount_pct DESC"
+        elif sort == "area_desc":
+            order_clause = " ORDER BY bld_area_pyeong DESC"
+        else:
+            order_clause = """
+                ORDER BY
+                    CASE WHEN COALESCE(is_favorite, 0) = 1 THEN 0 ELSE 1 END ASC,
+                    CASE WHEN is_first_floor = 1 THEN 0 ELSE 1 END ASC,
+                    CASE WHEN discount_pct >= 30 THEN 0 ELSE 1 END ASC,
+                    discount_pct DESC,
+                    scraped_at DESC
+            """
+
+        query = """
+            SELECT cltr_no, onbid_cltr_no, cltr_nm, addr_sido, addr_sgg, addr_emd, addr_full,
+                   prpt_div, disposal_method, usage, appraisal, min_bid, discount_pct,
+                   bid_status, remain_time, bid_start_date, bid_end_date,
+                   floor, is_first_floor, land_area_m2, bld_area_m2, bld_area_pyeong,
+                   reg_org_nm, detail_url,
+                   COALESCE(is_favorite, 0) as is_favorite,
+                   COALESCE(recommend_tag, '') as recommend_tag,
+                   scraped_at
+            FROM onbid_items
+        """ + where_clause + order_clause + " LIMIT ?"
+
+        cursor.execute(query, params + [limit])
+        rows = [dict(r) for r in cursor.fetchall()]
+        conn.close()
+        return {"data": rows, "count": len(rows), "total_matching": total_matching}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/auctions/{case_number}")
 def get_auction_detail(case_number: str):
     """
@@ -483,16 +605,33 @@ def get_dashboard_summary():
 
         naver_gyeonggi_etc = max(0, naver_total - naver_seongnam - naver_seoul)
         auc_gyeonggi_etc = max(0, total_items - auc_seoul - auc_seongnam - auc_seongnam_court_etc)
+
+        # 온비드 공매 통계
+        try:
+            cursor.execute("SELECT COUNT(*) FROM onbid_items")
+            onbid_total = cursor.fetchone()[0]
+            cursor.execute("SELECT MAX(scraped_at) FROM onbid_items")
+            onbid_last_updated = cursor.fetchone()[0] or "-"
+            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE is_first_floor = 1")
+            onbid_1f = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE discount_pct >= 30")
+            onbid_discounted = cursor.fetchone()[0]
+        except Exception:
+            onbid_total = 0
+            onbid_last_updated = "-"
+            onbid_1f = 0
+            onbid_discounted = 0
         
         conn.close()
         
         return {
             "total_active_auctions": total_items,
             "today_recommended": recommended_items,
-            "briefing_text": f"현재 수도권 법원 경매 {total_items:,}건과 네이버 상가 실매물 {naver_total:,}건이 연동되어 실시간 시세·안전마진 비교가 가능합니다.",
+            "briefing_text": f"현재 수도권 법원 경매 {total_items:,}건, 온비드 공매 {onbid_total:,}건, 네이버 상가 실매물 {naver_total:,}건이 실시간 연동되어 입찰가 대비 시세·안전마진 비교가 가능합니다.",
             "auction_last_updated": auction_last_updated,
             "naver_last_updated": naver_last_updated,
-            "schedule_text": "매일 새벽 03:00 자동 수집·갱신 (Gemini AI 권리분석 + 네이버 상가 실매물 매칭)",
+            "onbid_last_updated": onbid_last_updated,
+            "schedule_text": "매일 새벽 03:00 자동 수집·갱신 (Gemini AI 권리분석 + 온비드 공매 + 네이버 상가 실매물 매칭)",
             "auction_coverage": {
                 "total": total_items,
                 "seoul": auc_seoul,
@@ -509,6 +648,11 @@ def get_dashboard_summary():
                 "seongnam": naver_seongnam,
                 "seoul": naver_seoul,
                 "gyeonggi_etc": naver_gyeonggi_etc,
+            },
+            "onbid_coverage": {
+                "total": onbid_total,
+                "first_floor": onbid_1f,
+                "discounted_30": onbid_discounted,
             }
         }
     except Exception as e:
