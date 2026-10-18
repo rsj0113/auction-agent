@@ -110,23 +110,26 @@ def parse_floor_and_tags(cltr_nm, min_bid, appraisal, discount_pct, prpt_div, di
     is_first_floor = 0
     
     nm = cltr_nm or ""
-    # 1. 지하층/B1 탐지 (골프연습장/체육시설용 지하 1층 우선 감지)
-    if re.search(r'(지하\s*[1-9]층|지하\s*도상가|지하\s*상가|제지\s*[1-9]층|제\s*비[0-9]+호|비[0-9]{3}호|[bB][1-9]층|[bB][0-9]{2,4}호)', nm):
-        m_under = re.search(r'지하\s*([1-9])층|제지\s*([1-9])층|[bB]([1-9])층', nm)
-        if m_under:
-            floor = -int(m_under.group(1) or m_under.group(2) or m_under.group(3))
-        else:
-            floor = -1
-    # 2. 1층 탐지
-    elif re.search(r'(1층|지상\s*1층|제1층|10[1-9]호|1[1-9][0-9]호\b)', nm) and not re.search(r'(1[1-9]층|21층|31층)', nm):
-        floor = 1
-        is_first_floor = 1
-    # 3. 지상층 탐지
-    elif m := re.search(r'([2-9]|[1-4][0-9])층', nm):
+    # 1. 지하층/B1 탐지 (명확한 지하 표기)
+    m_under = re.search(r'(?:제?지하|제지|(?<![가-힣A-Za-z])지|(?<![A-Za-z])[bB])\s*([1-9])\s*(?:층|,|~)', nm)
+    if m_under:
+        floor = -int(m_under.group(1))
+    elif re.search(r'(?:지하도상가|지하상가|지하층|지하\s*도)', nm):
+        floor = -1
+    # 2. 지상층 탐지 (앞에 '단지', '빌리지', '파크빌비' 등 한글 단어가 붙은 경우 지하로 오인하지 않도록 방어)
+    elif m_ground := re.search(r'(?<!지하)(?<!제지하)(?<!제지)(?<!(?<![가-힣])지)(?<!(?<![A-Za-z])[bB])(?:제)?\s*([1-9][0-9]?)\s*층', nm):
         try:
-            floor = int(m.group(1))
+            floor = int(m_ground.group(1))
+            if floor == 1:
+                is_first_floor = 1
         except:
             floor = 0
+    # 3. 호수 기반 fallback
+    elif re.search(r'(?<![A-Za-z0-9])[bB](?:0?[1-9]|[1-9][0-9]{2,3})호', nm):
+        floor = -1
+    elif re.search(r'(?<![0-9])10[1-9]호|1[1-9][0-9]호\b', nm) and not re.search(r'[2-9][0-9]{2}호|[1-9][0-9]{3}호', nm):
+        floor = 1
+        is_first_floor = 1
 
     tags = []
     if is_first_floor:

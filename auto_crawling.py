@@ -1375,9 +1375,15 @@ class AuctionCrawler:
                     # 층수: API 미제공 시 location 문자열에서 fallback 파싱
                     floor = detail_info.get("floor") or 0
                     if not floor:
-                        m_floor = re.search(r'(\d+)층', location)
-                        if m_floor:
-                            floor = int(m_floor.group(1))
+                        m_under = re.search(r'(?:제?지하|제지|(?<![가-힣A-Za-z])지|(?<![A-Za-z])[bB])\s*([1-9])\s*(?:층|,|~)', location)
+                        if m_under:
+                            floor = -int(m_under.group(1))
+                        elif re.search(r'(?:지하도상가|지하상가|지하층|지하\s*도)', location):
+                            floor = -1
+                        else:
+                            m_ground = re.search(r'(?<!지하)(?<!제지하)(?<!제지)(?<!(?<![가-힣])지)(?<!(?<![A-Za-z])[bB])(?:제)?\s*([1-9][0-9]?)\s*층', location)
+                            if m_ground:
+                                floor = int(m_ground.group(1))
                     usage = _infer_usage(location, usage, floor)
 
                     extracted_items.append({
