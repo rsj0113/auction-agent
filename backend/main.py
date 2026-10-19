@@ -316,6 +316,39 @@ def get_quick_filter_counts():
             counts["onbid_discounted"] = 0
 
         counts["b1_total"] = counts.get("auction_b1", 0) + counts.get("naver_b1", 0) + counts.get("onbid_b1", 0)
+
+        # inflow / outflow counts (일일 신규 유입 및 마감/삭제 건수)
+        try:
+            cursor.execute("SELECT COUNT(*) FROM auction_items WHERE date(created_at) >= date('now', 'localtime')")
+            today_new_court = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM auction_items WHERE auction_date = strftime('%Y%m%d', 'now', 'localtime')")
+            today_closed_court = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE date(scraped_at) >= date('now', 'localtime')")
+            today_new_onbid = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE remain_time LIKE '%마감%' OR bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%'")
+            today_closed_onbid = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE date(scraped_at) >= date('now', 'localtime')")
+            today_new_naver = cursor.fetchone()[0]
+
+            counts["inflow_outflow"] = {
+                "today_new_court": today_new_court,
+                "today_closed_court": today_closed_court,
+                "today_new_onbid": today_new_onbid,
+                "today_closed_onbid": today_closed_onbid,
+                "today_new_naver": today_new_naver,
+                "today_new_total": today_new_court + today_new_onbid + today_new_naver,
+                "today_closed_total": today_closed_court + today_closed_onbid,
+            }
+        except Exception:
+            counts["inflow_outflow"] = {
+                "today_new_court": 0,
+                "today_closed_court": 0,
+                "today_new_onbid": 0,
+                "today_closed_onbid": 0,
+                "today_new_naver": 0,
+                "today_new_total": 0,
+                "today_closed_total": 0,
+            }
         
         conn.close()
         return counts
@@ -382,6 +415,7 @@ def get_naver_listings(
     max_price: Optional[int] = None,
     min_pyeong: Optional[float] = None,
     max_pyeong: Optional[float] = None,
+    date_range: Optional[str] = None,
     sort: Optional[str] = "default",
     limit: int = 500,
     offset: int = 0,
@@ -447,6 +481,17 @@ def get_naver_listings(
             where_clause += " AND ((trade_type = '매매' AND price_sale_10k > 0 AND price_sale_10k <= ?) OR (trade_type != '매매' AND (deposit_10k + monthly_rent_10k * 100) <= ?))"
             params.extend([max_10k, max_10k])
 
+        # 등록/수집일자 필터 (date_range: today, 3days, 7days, 30days)
+        if date_range:
+            if date_range == 'today':
+                where_clause += " AND date(scraped_at) >= date('now', 'localtime')"
+            elif date_range == '3days':
+                where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-3 days')"
+            elif date_range == '7days':
+                where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-7 days')"
+            elif date_range == '30days':
+                where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-30 days')"
+
         count_query = "SELECT COUNT(*) FROM naver_listings" + where_clause
         cursor.execute(count_query, params)
         total_matching = cursor.fetchone()[0]
@@ -498,6 +543,7 @@ def get_onbid_items(
     max_price: Optional[int] = None,
     min_pyeong: Optional[float] = None,
     max_pyeong: Optional[float] = None,
+    date_range: Optional[str] = None,
     sort: Optional[str] = "default",
     limit: int = 100,
     offset: int = 0,
@@ -535,6 +581,17 @@ def get_onbid_items(
         if max_pyeong is not None and max_pyeong > 0:
             where_clause += " AND bld_area_pyeong <= ?"
             params.append(max_pyeong)
+
+        # 등록/수집일자 필터 (date_range: today, 3days, 7days, 30days)
+        if date_range:
+            if date_range == 'today':
+                where_clause += " AND date(scraped_at) >= date('now', 'localtime')"
+            elif date_range == '3days':
+                where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-3 days')"
+            elif date_range == '7days':
+                where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-7 days')"
+            elif date_range == '30days':
+                where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-30 days')"
 
         if disposal_method:
             where_clause += " AND disposal_method LIKE ?"
@@ -716,6 +773,39 @@ def get_dashboard_summary():
             onbid_1f = 0
             onbid_discounted = 0
         
+        # 일일 신규 유입 및 마감/삭제 집계
+        try:
+            cursor.execute("SELECT COUNT(*) FROM auction_items WHERE date(created_at) >= date('now', 'localtime')")
+            today_new_court = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM auction_items WHERE auction_date = strftime('%Y%m%d', 'now', 'localtime')")
+            today_closed_court = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE date(scraped_at) >= date('now', 'localtime')")
+            today_new_onbid = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE remain_time LIKE '%마감%' OR bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%'")
+            today_closed_onbid = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE date(scraped_at) >= date('now', 'localtime')")
+            today_new_naver = cursor.fetchone()[0]
+
+            inflow_outflow = {
+                "today_new_court": today_new_court,
+                "today_closed_court": today_closed_court,
+                "today_new_onbid": today_new_onbid,
+                "today_closed_onbid": today_closed_onbid,
+                "today_new_naver": today_new_naver,
+                "today_new_total": today_new_court + today_new_onbid + today_new_naver,
+                "today_closed_total": today_closed_court + today_closed_onbid,
+            }
+        except Exception:
+            inflow_outflow = {
+                "today_new_court": 0,
+                "today_closed_court": 0,
+                "today_new_onbid": 0,
+                "today_closed_onbid": 0,
+                "today_new_naver": 0,
+                "today_new_total": 0,
+                "today_closed_total": 0,
+            }
+
         conn.close()
         
         return {
@@ -726,6 +816,7 @@ def get_dashboard_summary():
             "naver_last_updated": naver_last_updated,
             "onbid_last_updated": onbid_last_updated,
             "schedule_text": "매일 새벽 03:00 자동 수집·갱신 (Gemini AI 권리분석 + 온비드 공매 + 네이버 상가 실매물 매칭)",
+            "inflow_outflow": inflow_outflow,
             "auction_coverage": {
                 "total": total_items,
                 "seoul": auc_seoul,

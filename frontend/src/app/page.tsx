@@ -36,6 +36,15 @@ interface SummaryData {
     first_floor: number;
     discounted_30: number;
   };
+  inflow_outflow?: {
+    today_new_court: number;
+    today_closed_court: number;
+    today_new_onbid: number;
+    today_closed_onbid: number;
+    today_new_naver: number;
+    today_new_total: number;
+    today_closed_total: number;
+  };
 }
 
 export interface OnbidItem {
@@ -418,6 +427,37 @@ export default function Home() {
               🤖 AI 권리분석: <strong className="text-purple-700">Gemini 3.8 Flash</strong> (근저당·선순위 임차인·실매물 시세 대조)
             </span>
           </div>
+
+          {/* 일일 신규 유입 및 마감/진행 건수 라이브 인포 바 */}
+          {summary?.inflow_outflow && (
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-emerald-50/90 rounded-xl border border-blue-200/80 shadow-2xs text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-sm">📊</span>
+                <span className="font-extrabold text-gray-900">오늘의 실시간 매물 변동 현황</span>
+                <span className="hidden sm:inline text-[11px] text-gray-500 font-medium">
+                  (법원경매 + 온비드공매 + 네이버상가 실시간 유입 및 오늘 마감 집계)
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/auctions?date_range=today"
+                  className="px-2.5 py-1 rounded-lg text-xs font-black bg-blue-600 text-white hover:bg-blue-700 shadow-2xs flex items-center gap-1.5 transition-all"
+                  title="오늘 신규 등록된 매물 검색하기"
+                >
+                  <span>✨ 오늘 신규 유입</span>
+                  <span className="bg-white/20 px-1.5 py-0.2 rounded font-extrabold">
+                    +{(summary.inflow_outflow.today_new_total || 0).toLocaleString()}건
+                  </span>
+                </Link>
+                <div className="px-2.5 py-1 rounded-lg text-xs font-black bg-white text-rose-700 border border-rose-200 shadow-2xs flex items-center gap-1.5">
+                  <span>⏳ 오늘 마감/진행</span>
+                  <span className="bg-rose-50 px-1.5 py-0.2 rounded font-extrabold text-rose-600">
+                    -{(summary.inflow_outflow.today_closed_total || 0).toLocaleString()}건
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* 3단 커버리지 카드 (법원 경매 vs 온비드 공매 vs 네이버 상가 실매물) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">

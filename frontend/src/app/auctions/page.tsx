@@ -501,7 +501,7 @@ export default function AuctionsPage() {
 
   // 퀵 필터 칩 상태
   const [quickFilter, setQuickFilter] = useState<string>("");
-  const [quickCounts, setQuickCounts] = useState<{ [key: string]: number }>({});
+  const [quickCounts, setQuickCounts] = useState<{ [key: string]: any }>({});
 
   // 상세 필터 상태
   const [gradeFilter, setGradeFilter] = useState<string>("");
@@ -513,6 +513,7 @@ export default function AuctionsPage() {
   const [pyeongFilter, setPyeongFilter] = useState<string>("");
   const [regionFilter, setRegionFilter] = useState<string>("");
   const [regionInput, setRegionInput] = useState<string>("");
+  const [dateRangeFilter, setDateRangeFilter] = useState<string>("");
 
   // 모달 상태 (법원경매 상세)
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
@@ -558,7 +559,7 @@ export default function AuctionsPage() {
     }
   };
 
-  // URL 파라미터(?source=... & ?qf=... & ?view=map & ?region=...) 및 퀵 필터 카운트 불러오기
+  // URL 파라미터(?source=... & ?qf=... & ?view=map & ?region=... & ?date_range=...) 및 퀵 필터 카운트 불러오기
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -568,6 +569,7 @@ export default function AuctionsPage() {
       const floorParam = params.get("floor");
       const pyeongParam = params.get("pyeong");
       const regParam = params.get("region");
+      const dateParam = params.get("date_range");
       if (srcParam === "onbid" || srcParam === "naver" || srcParam === "auction") {
         setAssetSource(srcParam);
       }
@@ -578,6 +580,9 @@ export default function AuctionsPage() {
       if (regParam) {
         setRegionInput(regParam);
         setRegionFilter(regParam);
+      }
+      if (dateParam) {
+        setDateRangeFilter(dateParam);
       }
     }
     fetch("/api/auctions/quick-counts", { headers: { "ngrok-skip-browser-warning": "1" } })
@@ -603,6 +608,7 @@ export default function AuctionsPage() {
       quickFilter?: string;
       floor?: string;
       pyeong?: string;
+      dateRange?: string;
     }
   ) => {
     try {
@@ -617,6 +623,7 @@ export default function AuctionsPage() {
       const pyeong = overrideParams?.pyeong ?? pyeongFilter;
       const region = overrideParams?.region ?? regionFilter;
       const qf = overrideParams?.quickFilter ?? quickFilter;
+      const dateRange = overrideParams?.dateRange ?? dateRangeFilter;
       const pageSize = viewMode === "map" ? 300 : 20;
 
       let minP: number | undefined;
@@ -661,6 +668,7 @@ export default function AuctionsPage() {
         if (effectiveMaxP) url += `&max_price=${effectiveMaxP}`;
         if (effectiveMinPy) url += `&min_pyeong=${effectiveMinPy}`;
         if (maxPy) url += `&max_pyeong=${maxPy}`;
+        if (dateRange) url += `&date_range=${dateRange}`;
 
         const res = await fetch(url, { headers: { "ngrok-skip-browser-warning": "1" } });
         if (res.ok) {
@@ -679,6 +687,7 @@ export default function AuctionsPage() {
         if (effectiveMaxP) url += `&max_price=${effectiveMaxP}`;
         if (effectiveMinPy) url += `&min_pyeong=${effectiveMinPy}`;
         if (maxPy) url += `&max_pyeong=${maxPy}`;
+        if (dateRange) url += `&date_range=${dateRange}`;
         if (sort && sort !== "recent") url += `&sort=${sort}`;
         if (propertyType) {
           if (propertyType === "rent") url += `&disposal_method=임대`;
@@ -702,6 +711,7 @@ export default function AuctionsPage() {
         if (effectiveMaxP) url += `&max_price=${effectiveMaxP}`;
         if (effectiveMinPy) url += `&min_pyeong=${effectiveMinPy}`;
         if (maxPy) url += `&max_pyeong=${maxPy}`;
+        if (dateRange) url += `&date_range=${dateRange}`;
         if (sort && sort !== "recent") url += `&sort=${sort}`;
         if (propertyType) {
           if (propertyType === "rent") url += `&trade_type=월세`;
@@ -731,7 +741,7 @@ export default function AuctionsPage() {
       fetchListings(0);
     }, 250);
     return () => clearTimeout(timer);
-  }, [assetSource, gradeFilter, priceFilter, sortOrder, propertyTypeFilter, tenantFilter, floorFilter, pyeongFilter, regionFilter, quickFilter, viewMode]);
+  }, [assetSource, gradeFilter, priceFilter, sortOrder, propertyTypeFilter, tenantFilter, floorFilter, pyeongFilter, regionFilter, quickFilter, viewMode, dateRangeFilter]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -812,6 +822,7 @@ export default function AuctionsPage() {
     setPyeongFilter("");
     setPriceFilter("");
     setGradeFilter("");
+    setDateRangeFilter("");
   };
 
   const getGradeColor = (grade: string) => {
@@ -969,6 +980,44 @@ export default function AuctionsPage() {
           </button>
         </div>
 
+        {/* 📊 일일 신규 유입 및 마감/삭제 건수 라이브 인포 바 */}
+        {quickCounts?.inflow_outflow && (
+          <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 sm:p-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-emerald-50/90 rounded-2xl border border-blue-200/80 shadow-2xs mb-4 text-xs">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-sm">📊</span>
+              <span className="font-extrabold text-gray-900">오늘의 실시간 매물 유입 & 변동 현황</span>
+              <span className="hidden sm:inline text-[11px] text-gray-500 font-medium">
+                (오늘 기준 수도권 신규 수집 및 마감 집계)
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                type="button"
+                onClick={() => setDateRangeFilter(dateRangeFilter === "today" ? "" : "today")}
+                className={`px-2.5 py-1 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                  dateRangeFilter === "today"
+                    ? "bg-blue-600 text-white shadow-sm ring-2 ring-blue-500/30"
+                    : "bg-white text-blue-700 hover:bg-blue-50 border border-blue-200 shadow-2xs"
+                }`}
+                title="오늘 신규 등록된 매물만 필터링"
+              >
+                <span>✨ 오늘 신규 유입</span>
+                <span className={`px-1.5 py-0.2 rounded-md font-bold ${
+                  dateRangeFilter === "today" ? "bg-white/20 text-white" : "bg-blue-50 text-blue-700"
+                }`}>
+                  +{(quickCounts.inflow_outflow.today_new_total || 0).toLocaleString()}건
+                </span>
+              </button>
+              <div className="px-2.5 py-1 rounded-xl text-xs font-black bg-white text-rose-700 border border-rose-200 shadow-2xs flex items-center gap-1.5">
+                <span>⏳ 오늘 마감/진행</span>
+                <span className="px-1.5 py-0.2 rounded-md font-bold bg-rose-50 text-rose-700">
+                  -{(quickCounts.inflow_outflow.today_closed_total || 0).toLocaleString()}건
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Filters */}
         <div className="flex flex-col gap-2 sm:gap-2.5 mb-5 bg-gray-50/80 p-2.5 sm:p-3.5 rounded-2xl border border-gray-200/80">
           <div className="flex gap-1.5 sm:gap-2">
@@ -994,7 +1043,7 @@ export default function AuctionsPage() {
               <span className="text-[11px] font-bold text-gray-500 flex items-center gap-1">
                 <span>⚡</span> <span>투자자 퀵 필터</span>
               </span>
-              {(quickFilter || regionFilter || propertyTypeFilter || tenantFilter || floorFilter || pyeongFilter || priceFilter || gradeFilter) && (
+              {(quickFilter || regionFilter || propertyTypeFilter || tenantFilter || floorFilter || pyeongFilter || priceFilter || gradeFilter || dateRangeFilter) && (
                 <button
                   onClick={handleResetFilters}
                   className="text-[10px] sm:text-[11px] text-gray-500 hover:text-red-600 font-semibold flex items-center gap-1 transition-colors bg-white px-1.5 sm:px-2 py-0.5 rounded-lg border border-gray-200 cursor-pointer"
@@ -1054,7 +1103,7 @@ export default function AuctionsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-sm pt-1">
             {/* 1. 자산별 맞춤 유형/방식 */}
             {assetSource === "auction" ? (
               <select 
@@ -1131,6 +1180,21 @@ export default function AuctionsPage() {
               <option value="1to3">1억 ~ 3억</option>
               <option value="3to5">3억 ~ 5억</option>
               <option value="over5">5억 이상</option>
+            </select>
+
+            {/* 5. 등록/수집일자 (신규 유입 필터) */}
+            <select 
+              value={dateRangeFilter} 
+              onChange={(e) => setDateRangeFilter(e.target.value)}
+              className={`w-full text-xs sm:text-sm bg-white border rounded-xl px-3 py-2 outline-none shadow-2xs font-bold ${
+                dateRangeFilter ? "border-indigo-400 text-indigo-700 bg-indigo-50/50" : "border-gray-200 text-gray-700 focus:border-blue-500"
+              }`}
+            >
+              <option value="">📅 등록일자 전체</option>
+              <option value="today">⚡ 오늘 등록 (NEW)</option>
+              <option value="3days">최근 3일 이내</option>
+              <option value="7days">최근 1주일 이내</option>
+              <option value="30days">최근 1개월 이내</option>
             </select>
           </div>
 
