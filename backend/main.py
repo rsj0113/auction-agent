@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 app = FastAPI(title="AI Auction Agent API", version="1.0.0")
 
@@ -1086,7 +1086,7 @@ def get_dashboard_summary():
 
 # Run locally using: uvicorn backend.main:app --reload
 
-from .ai_analyzer import analyze_auction_data
+from .ai_analyzer import analyze_auction_data, chat_with_auction_ai
 import json
 
 @app.post("/api/auctions/{case_number}/analyze")
@@ -1142,3 +1142,47 @@ def analyze_auction_on_demand(case_number: str):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class AuctionChatRequest(BaseModel):
+    message: str
+    chat_history: Optional[List[Dict[str, Any]]] = None
+
+@app.post("/api/auctions/{case_number}/chat")
+def chat_auction_advisor(case_number: str, req: AuctionChatRequest):
+    """
+    Real-time interactive Q&A endpoint with AI advisor for a specific auction or result item.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 1. First look in auction_items
+        cursor.execute('SELECT * FROM auction_items WHERE case_number = ?', (case_number,))
+        row = cursor.fetchone()
+        item_dict = dict(row) if row else {}
+        
+        # 2. Also merge from auction_results if exists (to get winning_bid, runner_up_bid, etc.)
+        cursor.execute('SELECT * FROM auction_results WHERE case_number = ?', (case_number,))
+        res_row = cursor.fetchone()
+        if res_row:
+            res_dict = dict(res_row)
+            for k, v in res_dict.items():
+                if v is not None and (k not in item_dict or not item_dict[k]):
+                    item_dict[k] = v
+                    
+        conn.close()
+        
+        if not item_dict:
+            raise HTTPException(status_code=404, detail="물건 정보를 찾을 수 없습니다.")
+            
+        reply_data = chat_with_auction_ai(item_dict, req.message, req.chat_history)
+        if "error" in reply_data:
+            raise HTTPException(status_code=500, detail=reply_data["error"])
+            
+        return reply_data
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

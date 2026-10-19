@@ -651,6 +651,43 @@ export default function AuctionsPage() {
   // 임장 플래너 토스트 알림 상태
   const [plannerToast, setPlannerToast] = useState<string | null>(null);
 
+  // AI 낙찰 분석가 실시간 Q&A 대화 상태
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+
+  const handleSendChat = async (customMsg?: string) => {
+    const textToSend = (customMsg || chatInput).trim();
+    if (!textToSend || !selectedDetail || chatLoading) return;
+    
+    const newHistory = [...chatMessages, { role: 'user' as const, content: textToSend }];
+    setChatMessages(newHistory);
+    if (!customMsg) setChatInput("");
+    setChatLoading(true);
+
+    try {
+      const res = await fetch(`/api/auctions/${encodeURIComponent(selectedDetail.case_number)}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "1" },
+        body: JSON.stringify({
+          message: textToSend,
+          chat_history: chatMessages
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setChatMessages([...newHistory, { role: 'assistant', content: data.reply }]);
+      } else {
+        setChatMessages([...newHistory, { role: 'assistant', content: "⚠️ AI 답변 생성 중 일시적인 오류가 발생했습니다." }]);
+      }
+    } catch (e) {
+      console.error(e);
+      setChatMessages([...newHistory, { role: 'assistant', content: "⚠️ 서버 통신 에러가 발생했습니다." }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   const handleAddToPlanner = (item: any, source: "auction" | "onbid" | "naver" | "results") => {
     try {
       const LOCAL_STORAGE_KEY = "auction_field_trip_planner_v1";
@@ -905,6 +942,8 @@ export default function AuctionsPage() {
 
   const handleSelectAuction = async (item: any) => {
     setSelectedDetail({ ...item, ai_report_json: item.ai_report_json || "{}" } as AuctionDetail);
+    setChatMessages([]);
+    setChatInput("");
     setDetailLoading(true);
     try {
       const res = await fetch(`/api/auctions/${item.case_number}`, {
@@ -2655,6 +2694,123 @@ export default function AuctionsPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* 💬 실시간 AI 낙찰 분석가 Q&A 문답 카드 */}
+                  <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-700/60 rounded-2xl p-4 sm:p-5 text-white shadow-md space-y-3.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-800/70 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">💬</span>
+                        <h4 className="text-sm font-black bg-gradient-to-r from-indigo-300 via-cyan-200 to-white bg-clip-text text-transparent">
+                          AI 낙찰 분석가 실시간 문답 (Q&amp;A)
+                        </h4>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-600/80 text-violet-100 border border-violet-400/30">
+                          🤖 gpt-4o-mini 연동
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-indigo-300 font-medium">
+                        가격 형성 이유 · 2등 격차 · 권리 리스크 즉시 질문
+                      </span>
+                    </div>
+
+                    {/* 추천 퀵 질문 칩 4종 */}
+                    <div>
+                      <span className="text-[11px] font-bold text-indigo-300 block mb-1.5">⚡ 빠른 질문 추천:</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSendChat("왜 이 가격에 낙찰되었고, 시장 가치 대비 적정한가요?")}
+                          disabled={chatLoading}
+                          className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-indigo-100 transition-colors cursor-pointer text-left disabled:opacity-50"
+                        >
+                          💡 왜 이 가격에 낙찰됐나요?
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSendChat("2등 차순위 입찰자와 금액 격차가 왜 이렇게 형성되었나요?")}
+                          disabled={chatLoading}
+                          className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-indigo-100 transition-colors cursor-pointer text-left disabled:opacity-50"
+                        >
+                          🥈 2등과 입찰가 차이 분석
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSendChat("등기부 근저당이나 임차인 등 낙찰자가 인수해야 할 리스크가 있나요?")}
+                          disabled={chatLoading}
+                          className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-indigo-100 transition-colors cursor-pointer text-left disabled:opacity-50"
+                        >
+                          🛡️ 인수할 숨겨진 권리 리스크 확인
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSendChat("낙찰 후 전세나 월세 세팅 시 예상 실투자금과 임대수익률을 알려주세요.")}
+                          disabled={chatLoading}
+                          className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-indigo-100 transition-colors cursor-pointer text-left disabled:opacity-50"
+                        >
+                          📈 낙찰 후 엑시트/수익률 계산
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 대화 메시지 히스토리 */}
+                    {chatMessages.length > 0 && (
+                      <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1 text-xs pt-1 border-t border-indigo-900/80">
+                        {chatMessages.map((msg, idx) => (
+                          <div
+                            key={idx}
+                            className={`p-3 rounded-xl leading-relaxed break-keep ${
+                              msg.role === 'user'
+                                ? 'bg-indigo-600/50 border border-indigo-400/40 text-white ml-6 font-semibold'
+                                : 'bg-white/10 border border-white/15 text-slate-100 mr-2 whitespace-pre-wrap font-medium'
+                            }`}
+                          >
+                            <span className="text-[10px] block text-indigo-300 font-bold mb-1">
+                              {msg.role === 'user' ? '👤 내 질문' : '🤖 AI 분석가 답변'}
+                            </span>
+                            {msg.content}
+                          </div>
+                        ))}
+                        {chatLoading && (
+                          <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-indigo-200 animate-pulse flex items-center gap-2">
+                            <span className="inline-block animate-spin">⏳</span>
+                            <span>AI 분석가가 해당 물건의 감정가, 실거래가, 권리내역을 정밀 분석 중입니다...</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* 질문 입력 인풋 & 전송 버튼 */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <input
+                        type="text"
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendChat();
+                          }
+                        }}
+                        placeholder="이 낙찰 가격의 이유나 리스크, 엑시트 전략을 자유롭게 물어보세요..."
+                        disabled={chatLoading}
+                        className="flex-1 text-xs sm:text-sm bg-white/10 border border-white/20 rounded-xl px-3.5 py-2.5 text-white placeholder-slate-400 outline-none focus:border-cyan-400 shadow-inner"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleSendChat()}
+                        disabled={chatLoading || !chatInput.trim()}
+                        className="px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 disabled:opacity-50 text-white font-extrabold text-xs sm:text-sm rounded-xl transition-all cursor-pointer shadow-md shrink-0 flex items-center gap-1"
+                      >
+                        {chatLoading ? (
+                          <span>분석중...</span>
+                        ) : (
+                          <>
+                            <span>전송</span>
+                            <span>→</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
 
                   <div className="grid grid-cols-2 gap-3">
                      <div className="bg-blue-50/50 p-3.5 rounded-xl border border-blue-100">

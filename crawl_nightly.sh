@@ -49,8 +49,11 @@ $PYTHON -c "from naver_land_scraper import run; run(max_pages=3, headless=True)"
 echo "[온비드 공매] $(date '+%H:%M:%S') 온비드 상가·근린생활시설 공매 매물 수집 시작" >> "$LOG"
 $PYTHON onbid_scraper.py >> "$LOG" 2>&1
 
-echo "[시세 매칭] $(date '+%H:%M:%S') 경매 물건 ↔ 네이버 상가 시세 및 안전마진 재계산" >> "$LOG"
+echo "[시세 매칭] $(date '+%H:%M:%S') 경매 물건 ↔ 네이버 상가/빌라 시세 및 안전마진 재계산" >> "$LOG"
 $PYTHON core/market_matcher.py >> "$LOG" 2>&1
+
+echo "[낙찰 결과 최신화] $(date '+%H:%M:%S') 매각기일 경과 매물 마감 및 낙찰 결과 DB 최신화" >> "$LOG"
+$PYTHON init_auction_results.py >> "$LOG" 2>&1
 
 echo "[정리] $(date '+%H:%M:%S') 7일 이상 지난 오래된 매물 삭제" >> "$LOG"
 $PYTHON cleanup_db.py --days 7 >> "$LOG" 2>&1
