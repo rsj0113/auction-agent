@@ -47,6 +47,7 @@ def get_auctions(
     floor_type: Optional[str] = None,
     min_pyeong: Optional[float] = None,
     max_pyeong: Optional[float] = None,
+    date_range: Optional[str] = None,
 ):
     """
     Get a list of auction items with filtering and sorting.
@@ -157,6 +158,17 @@ def get_auctions(
         if max_pyeong is not None and max_pyeong > 0:
             query += " AND area_pyeong <= ?"
             params.append(max_pyeong)
+
+        # 등록일자 필터 (date_range: today, 3days, 7days, 30days)
+        if date_range:
+            if date_range == 'today':
+                query += " AND date(created_at) >= date('now', 'localtime')"
+            elif date_range == '3days':
+                query += " AND date(created_at) >= date('now', 'localtime', '-3 days')"
+            elif date_range == '7days':
+                query += " AND date(created_at) >= date('now', 'localtime', '-7 days')"
+            elif date_range == '30days':
+                query += " AND date(created_at) >= date('now', 'localtime', '-30 days')"
 
         # Sorting
         if sort == 'recommend':
