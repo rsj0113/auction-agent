@@ -142,14 +142,24 @@ class MarketMatcher:
         matched_sgg_rent = []
         matched_sido_rent = []
 
+        is_villa_item = any(k in str(item.get("usage") or "") or k in loc for k in ["다세대", "빌라", "연립"])
+
         for n in self.naver_listings:
             n_area = float(n.get("area_m2") or 0.0)
             if not (min_area <= n_area <= max_area):
                 continue
 
-            # 구분상가 호실인 경우 일반상가(D02) 우선 매칭
-            if is_unit and n.get("realty_type_cd") not in ("D02", None, ""):
-                continue
+            n_realty = n.get("realty_type_cd") or ""
+            # 빌라인 경우 네이버 빌라(C02, C03, VL) 우선 매칭
+            if is_villa_item:
+                if n_realty not in ("C02", "C03", "VL"):
+                    continue
+            else:
+                # 상가 호실인 경우 일반상가(D02) 우선 매칭, 빌라는 제외
+                if is_unit and n_realty not in ("D02", None, ""):
+                    continue
+                elif n_realty in ("C02", "C03", "VL"):
+                    continue
 
             n_div = str(n.get("legal_div_no") or "")
             n_emd = str(n.get("addr_emd") or "")

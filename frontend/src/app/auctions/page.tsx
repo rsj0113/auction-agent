@@ -60,6 +60,64 @@ export interface NaverListing {
   recommend_tag?: string;
 }
 
+export interface NearbyTrade {
+  building_name: string;
+  trade_date: string;
+  floor: number;
+  area_pyeong: number;
+  area_m2: number;
+  price: number;
+  is_subject?: boolean;
+}
+
+export interface VillaTradeInfo {
+  is_villa: boolean;
+  region_matched: string;
+  recent_price: number;
+  recent_date: string;
+  recent_floor: number;
+  recent_area_pyeong: number;
+  recent_area_m2: number;
+  building_name: string;
+  price_gap_vs_min: number;
+  discount_pct_vs_min: number;
+  price_gap_vs_win: number;
+  discount_pct_vs_win: number;
+  est_jeonse_price: number;
+  gap_investment_cash: number;
+  nearby_trades: NearbyTrade[];
+  rtms_url?: string;
+}
+
+export interface PostAuctionAnalysis {
+  verdict_badge: string;
+  badge_color: string;
+  score: number;
+  verdict_title: string;
+  summary: string;
+  winning_bid: number;
+  appraisal: number;
+  appraisal_savings: number;
+  appraisal_savings_pct: number;
+  effective_market: number;
+  net_realized_margin: number;
+  margin_pct: number;
+  runner_up: number;
+  money_left_on_table: number;
+  money_left_pct: number;
+  bidder_count: number;
+  ai_suggested_bid?: string;
+  rights_clearance_note?: string;
+  exit_scenarios: {
+    est_jeonse: number;
+    gap_cash_needed: number;
+    est_monthly: number;
+    monthly_yield: number;
+    target_resale: number;
+    resale_gross_profit: number;
+  };
+}
+
 interface SampleListing {
   article_id?: string;
   article_name?: string;
@@ -105,6 +163,8 @@ interface AuctionItem {
   area_pyeong?: number;
   is_favorite?: number;
   recommend_tag?: string;
+  villa_trade_info?: VillaTradeInfo;
+  post_auction_analysis?: PostAuctionAnalysis;
 }
 
 interface AIReport {
@@ -133,6 +193,8 @@ interface AuctionDetail extends AuctionItem {
   runner_up_bid?: number;
   result_date?: string;
   result_status?: string;
+  villa_trade_info?: VillaTradeInfo;
+  post_auction_analysis?: PostAuctionAnalysis;
 }
 
 export interface AuctionResultItem {
@@ -181,6 +243,8 @@ export interface AuctionResultItem {
   disposal_method?: string;
   prpt_div?: string;
   reg_org_nm?: string;
+  villa_trade_info?: VillaTradeInfo;
+  post_auction_analysis?: PostAuctionAnalysis;
 }
 
 export interface AuctionResultStats {
@@ -781,6 +845,8 @@ export default function AuctionsPage() {
         if (propertyType) {
           if (propertyType === "rent") url += `&trade_type=월세`;
           else if (propertyType === "sale") url += `&trade_type=매매`;
+          else if (propertyType === "villa" || propertyType.includes("빌라") || propertyType.includes("다세대")) url += `&property_type=villa`;
+          else if (propertyType === "commercial" || propertyType.includes("상가") || propertyType.includes("근린")) url += `&property_type=commercial`;
         }
 
         const res = await fetch(url, { headers: { "ngrok-skip-browser-warning": "1" } });
@@ -854,6 +920,8 @@ export default function AuctionsPage() {
           runner_up_bid: item.runner_up_bid ?? data.data.runner_up_bid,
           result_date: item.result_date ?? data.data.result_date,
           result_status: item.result_status ?? data.data.result_status,
+          villa_trade_info: data.data.villa_trade_info ?? item.villa_trade_info,
+          post_auction_analysis: data.data.post_auction_analysis ?? item.post_auction_analysis,
         });
       }
     } catch (error) {
@@ -1069,11 +1137,11 @@ export default function AuctionsPage() {
                 : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             }`}
           >
-            <span>🟢 네이버</span>
+            <span>🟢 네이버 (상가·빌라)</span>
             <span className={`text-[9px] sm:text-[11px] px-1.5 py-0.2 rounded-full font-bold ${
               assetSource === "naver" ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-700"
             }`}>
-              {quickCounts.naver_shops ? quickCounts.naver_shops.toLocaleString() : "4,740"}
+              {quickCounts.naver_total ? quickCounts.naver_total.toLocaleString() : (quickCounts.naver_shops ? quickCounts.naver_shops.toLocaleString() : "5,544")}
             </span>
           </button>
 
@@ -1250,7 +1318,9 @@ export default function AuctionsPage() {
                 onChange={(e) => setPropertyTypeFilter(e.target.value)}
                 className="w-full text-xs sm:text-sm bg-white border border-emerald-200 rounded-xl px-3 py-2 text-emerald-900 font-semibold outline-none focus:border-emerald-500 shadow-2xs"
               >
-                <option value="">거래유형 전체</option>
+                <option value="">유형 전체 (상가·빌라)</option>
+                <option value="commercial">🏪 상가/근린 매물</option>
+                <option value="villa">🏡 빌라/다세대 매물</option>
                 <option value="sale">🏷️ 매매만</option>
                 <option value="rent">🔑 월세만</option>
               </select>
@@ -1626,6 +1696,32 @@ export default function AuctionsPage() {
                 </div>
               ) : null}
 
+              {/* 빌라 최근 실거래가 뱃지 & 마진 */}
+              {item.villa_trade_info && (
+                <div className="mt-2.5 p-2 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="shrink-0 bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded text-[10px]">
+                      🏡 인근 실거래
+                    </span>
+                    <span className="text-gray-700 font-medium truncate">
+                      {item.villa_trade_info.building_name} {item.villa_trade_info.recent_floor}층 · 최근 <strong className="text-amber-900 font-bold">{formatMoney(item.villa_trade_info.recent_price)}</strong>
+                      <span className="text-gray-400 text-[10px] ml-1">({item.villa_trade_info.recent_date})</span>
+                    </span>
+                  </div>
+                  {item.villa_trade_info.discount_pct_vs_min !== null && (
+                    <span className={`shrink-0 text-[11px] font-bold px-2 py-0.5 rounded ${
+                      item.villa_trade_info.discount_pct_vs_min > 0 
+                        ? 'bg-rose-100 text-rose-700' 
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {item.villa_trade_info.discount_pct_vs_min > 0 
+                        ? `실거래 대비 -${item.villa_trade_info.discount_pct_vs_min}%`
+                        : `실거래 대비 +${Math.abs(item.villa_trade_info.discount_pct_vs_min)}%`}
+                    </span>
+                  )}
+                </div>
+              )}
+
               {/* 메타 정보 & 임장 액션 버튼 */}
               <div className="mt-3 pt-2.5 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-600">
                 <div className="flex items-center gap-1.5 w-full sm:w-auto">
@@ -1814,8 +1910,14 @@ export default function AuctionsPage() {
             >
               <div className="flex justify-between items-start mb-2.5 gap-2">
                 <div className="flex items-center gap-1.5 flex-wrap flex-1 min-w-0">
-                  <span className="px-2 py-0.5 rounded-lg bg-[#03c75a] text-white text-xs font-black shrink-0">
-                    N 실매물 ({item.trade_type})
+                  <span className={`px-2 py-0.5 rounded-lg text-xs font-black shrink-0 ${
+                    item.realty_type_cd === 'C02' || item.realty_type_cd === 'C03' || item.realty_type_cd === 'VL'
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-[#03c75a] text-white'
+                  }`}>
+                    {item.realty_type_cd === 'C02' || item.realty_type_cd === 'C03' || item.realty_type_cd === 'VL'
+                      ? `🏡 N 실매물 (빌라/다세대 · ${item.trade_type})`
+                      : `N 실매물 (${item.trade_type})`}
                   </span>
                   {item.floor !== undefined && item.floor < 0 ? (
                     <span className="px-2 py-0.5 rounded-lg bg-purple-100 text-purple-800 border border-purple-300 text-xs font-extrabold shrink-0">
@@ -2119,6 +2221,50 @@ export default function AuctionsPage() {
                   )}
                 </div>
 
+                {/* 🤖 AI 사후 정밀 낙찰가 분석 뱃지 & 마진 배너 */}
+                {item.post_auction_analysis && (
+                  <div className="mb-3 p-3.5 bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200 rounded-xl text-xs space-y-2">
+                    <div className="flex items-center justify-between gap-1 flex-wrap">
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 rounded-md bg-violet-600 text-white font-black text-[11px] shadow-2xs">
+                          {item.post_auction_analysis.verdict_badge}
+                        </span>
+                        <strong className="text-violet-950 font-extrabold">{item.post_auction_analysis.verdict_title}</strong>
+                      </div>
+                      <span className="text-[11px] font-bold text-violet-700 bg-white px-2 py-0.5 rounded border border-violet-200">
+                        실현 마진 {item.post_auction_analysis.margin_pct}% (+{formatMoney(item.post_auction_analysis.net_realized_margin)})
+                      </span>
+                    </div>
+                    <p className="text-slate-600 font-medium leading-relaxed break-keep text-[11px]">
+                      {item.post_auction_analysis.summary}
+                    </p>
+                    <div className="flex flex-wrap items-center justify-between gap-1 pt-1.5 border-t border-violet-200/60 text-[10px] sm:text-[11px] text-violet-900 font-medium">
+                      <span>🥈 2등 대비 세이빙: <strong className="text-violet-950">+{formatMoney(item.post_auction_analysis.money_left_on_table)}</strong> ({item.post_auction_analysis.money_left_pct}%)</span>
+                      <span>🎯 전세갭 <strong>{formatMoney(item.post_auction_analysis.exit_scenarios.gap_cash_needed)}</strong> · 월수익 <strong>{item.post_auction_analysis.exit_scenarios.monthly_yield}%</strong></span>
+                    </div>
+                  </div>
+                )}
+
+                {/* 🏡 인근 빌라 최근 실거래가 배너 */}
+                {item.villa_trade_info && (
+                  <div className="mb-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200/90 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="shrink-0 bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">
+                        🏡 인근 빌라 최근 실거래
+                      </span>
+                      <span className="text-amber-950 font-medium truncate">
+                        {item.villa_trade_info.building_name} {item.villa_trade_info.recent_floor}층 · 최근 <strong className="text-amber-900 font-bold">{formatMoney(item.villa_trade_info.recent_price)}</strong>
+                        <span className="text-amber-700 text-[10px] ml-1">({item.villa_trade_info.recent_date})</span>
+                      </span>
+                    </div>
+                    {item.villa_trade_info.discount_pct_vs_win !== null && (
+                      <span className="shrink-0 text-[11px] font-bold px-2 py-0.5 rounded bg-amber-200/80 text-amber-900">
+                        낙찰가 vs 실거래 {item.villa_trade_info.discount_pct_vs_win > 0 ? `-${item.villa_trade_info.discount_pct_vs_win}%` : `+${Math.abs(item.villa_trade_info.discount_pct_vs_win)}%`}
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 {/* 5. 📋 등기부 권리 및 근저당 분석 요약 박스 (사용자 요청: 근저당 정보 & 권리관계 노출) */}
                 <div className="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1.5">
                   <div className="flex items-center justify-between">
@@ -2383,6 +2529,133 @@ export default function AuctionsPage() {
                     </div>
                   )}
 
+                  {/* 🤖 AI 사후 정밀 낙찰가 분석 리포트 (Post-Auction Analysis Report) */}
+                  {selectedDetail.post_auction_analysis && (
+                    <div className="bg-gradient-to-br from-violet-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-md border border-violet-700/60 space-y-4">
+                      {/* 상단 뱃지 & 종합 판정 */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-violet-800/80 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl sm:text-2xl font-black bg-gradient-to-r from-violet-400 to-indigo-300 bg-clip-text text-transparent">
+                            🤖 AI 낙찰가 사후 정밀 분석
+                          </span>
+                          <span className="px-2.5 py-0.5 rounded-lg bg-violet-600 text-white text-xs font-black shadow-xs">
+                            {selectedDetail.post_auction_analysis.verdict_badge}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-violet-800/60 px-3 py-1 rounded-xl border border-violet-600/50 text-xs">
+                          <span className="text-violet-300">종합 입찰 적정 점수:</span>
+                          <strong className="text-amber-300 font-black text-sm">{selectedDetail.post_auction_analysis.score}점</strong>
+                          <span className="text-violet-400">/ 100점</span>
+                        </div>
+                      </div>
+
+                      {/* AI 총평 및 분석 코멘트 */}
+                      <div className="bg-white/10 backdrop-blur-xs rounded-xl p-3 sm:p-3.5 border border-white/10">
+                        <div className="flex items-center gap-1.5 mb-1 text-xs font-bold text-violet-200">
+                          <span>💡</span>
+                          <span>낙찰 총평: {selectedDetail.post_auction_analysis.verdict_title}</span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-slate-100 font-medium leading-relaxed break-keep">
+                          {selectedDetail.post_auction_analysis.summary}
+                        </p>
+                      </div>
+
+                      {/* 4분할 사후 정밀 지표 그리드 */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-2.5">
+                          <span className="text-violet-300 block text-[10px] mb-0.5">감정가 대비 절감</span>
+                          <span className="text-sm font-black text-emerald-400 block">
+                            +{formatMoney(selectedDetail.post_auction_analysis.appraisal_savings)}
+                          </span>
+                          <span className="text-[10px] text-emerald-300/80">-{selectedDetail.post_auction_analysis.appraisal_savings_pct}% 할인 낙찰</span>
+                        </div>
+
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-2.5">
+                          <span className="text-violet-300 block text-[10px] mb-0.5">실현 안전마진</span>
+                          <span className="text-sm font-black text-cyan-400 block">
+                            +{formatMoney(selectedDetail.post_auction_analysis.net_realized_margin)}
+                          </span>
+                          <span className="text-[10px] text-cyan-300/80">시세 대비 {selectedDetail.post_auction_analysis.margin_pct}%</span>
+                        </div>
+
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-2.5">
+                          <span className="text-violet-300 block text-[10px] mb-0.5">2등 차순위 방어력</span>
+                          <span className="text-sm font-black text-amber-300 block">
+                            {formatMoney(selectedDetail.post_auction_analysis.money_left_on_table)}
+                          </span>
+                          <span className="text-[10px] text-amber-300/80">격차 {selectedDetail.post_auction_analysis.money_left_pct}%</span>
+                        </div>
+
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-2.5">
+                          <span className="text-violet-300 block text-[10px] mb-0.5">입찰 전 적정가 권고</span>
+                          <span className="text-sm font-black text-rose-300 block">
+                            {selectedDetail.post_auction_analysis.ai_suggested_bid || '감정가 75%'}
+                          </span>
+                          <span className="text-[10px] text-violet-300/80">경쟁률 {selectedDetail.post_auction_analysis.bidder_count}:1</span>
+                        </div>
+                      </div>
+
+                      {/* 등기 및 권리인수 안전성 메모 */}
+                      {selectedDetail.post_auction_analysis.rights_clearance_note && (
+                        <div className="flex items-center gap-2 text-xs bg-emerald-950/60 border border-emerald-500/40 px-3 py-2 rounded-xl text-emerald-200">
+                          <span>🛡️</span>
+                          <span className="font-semibold">{selectedDetail.post_auction_analysis.rights_clearance_note}</span>
+                        </div>
+                      )}
+
+                      {/* 🎯 출구 엑시트 시나리오 3종 세트 */}
+                      <div>
+                        <div className="text-xs font-bold text-violet-200 mb-2 flex items-center gap-1.5">
+                          <span>🎯</span>
+                          <span>낙찰 후 맞춤 엑시트 시뮬레이션 (3가지 출구 전략)</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                          {/* 1. 전세 갭투자 */}
+                          <div className="bg-white/10 border border-white/15 rounded-xl p-3 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-extrabold text-white">🏠 전세 갭 세팅</span>
+                              <span className="text-[10px] bg-blue-500/30 text-blue-200 px-1.5 py-0.2 rounded border border-blue-400/30">전세가율 75%</span>
+                            </div>
+                            <div className="text-[11px] text-violet-200">
+                              예상 전세: <strong className="text-white">{formatMoney(selectedDetail.post_auction_analysis.exit_scenarios.est_jeonse)}</strong>
+                            </div>
+                            <div className="text-[11px] text-amber-300 font-bold">
+                              실투자금: {formatMoney(selectedDetail.post_auction_analysis.exit_scenarios.gap_cash_needed)}
+                            </div>
+                          </div>
+
+                          {/* 2. 월세 임대수익 */}
+                          <div className="bg-white/10 border border-white/15 rounded-xl p-3 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-extrabold text-white">💰 월세 수익 세팅</span>
+                              <span className="text-[10px] bg-emerald-500/30 text-emerald-200 px-1.5 py-0.2 rounded border border-emerald-400/30">연 {selectedDetail.post_auction_analysis.exit_scenarios.monthly_yield}%</span>
+                            </div>
+                            <div className="text-[11px] text-violet-200">
+                              예상 월세: <strong className="text-white">{formatMoney(selectedDetail.post_auction_analysis.exit_scenarios.est_monthly)}/월</strong>
+                            </div>
+                            <div className="text-[11px] text-emerald-300 font-bold">
+                              연간 수입: {formatMoney(selectedDetail.post_auction_analysis.exit_scenarios.est_monthly * 12)}
+                            </div>
+                          </div>
+
+                          {/* 3. 단기 매매/전매 엑시트 */}
+                          <div className="bg-white/10 border border-white/15 rounded-xl p-3 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-extrabold text-white">📈 단기 매매 차익</span>
+                              <span className="text-[10px] bg-rose-500/30 text-rose-200 px-1.5 py-0.2 rounded border border-rose-400/30">시세 95%</span>
+                            </div>
+                            <div className="text-[11px] text-violet-200">
+                              목표 매도가: <strong className="text-white">{formatMoney(selectedDetail.post_auction_analysis.exit_scenarios.target_resale)}</strong>
+                            </div>
+                            <div className="text-[11px] text-rose-300 font-bold">
+                              예상 차익: +{formatMoney(selectedDetail.post_auction_analysis.exit_scenarios.resale_gross_profit)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-3">
                      <div className="bg-blue-50/50 p-3.5 rounded-xl border border-blue-100">
                         <p className="text-xs text-blue-600 font-medium mb-1">감정가</p>
@@ -2521,6 +2794,126 @@ export default function AuctionsPage() {
                       </div>
                     )}
                   </div>
+
+                  {/* 🏡 국토교통부 인근 빌라 최근 실거래가 & 시세 분석 카드 */}
+                  {selectedDetail.villa_trade_info && (
+                    <div className="p-4 sm:p-5 rounded-2xl border bg-amber-50/40 border-amber-300/80 shadow-sm space-y-3.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🏡</span>
+                          <h4 className="text-sm font-black text-amber-950 flex items-center gap-1.5">
+                            <span>국토교통부 인근 빌라 실거래가 &amp; 시세 분석</span>
+                          </h4>
+                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-200 text-amber-900 border border-amber-300">
+                            {selectedDetail.villa_trade_info.region_matched}
+                          </span>
+                        </div>
+                        {selectedDetail.villa_trade_info.rtms_url && (
+                          <a
+                            href={selectedDetail.villa_trade_info.rtms_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] font-bold text-amber-800 hover:text-amber-950 hover:underline flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-amber-200 shadow-2xs"
+                          >
+                            <span>🏛️ 국토부 실거래가 공개시스템 ↗</span>
+                          </a>
+                        )}
+                      </div>
+
+                      {/* 4분할 실거래가 지표 */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <div className="bg-white p-2.5 rounded-xl border border-amber-200 shadow-2xs">
+                          <span className="text-amber-700 block text-[11px] mb-0.5 font-bold">인근 최근 실거래</span>
+                          <span className="font-black text-amber-950 text-sm block">
+                            {formatMoney(selectedDetail.villa_trade_info.recent_price)}
+                          </span>
+                          <span className="text-[10px] text-gray-500 block mt-0.5 truncate">
+                            {selectedDetail.villa_trade_info.building_name} ({selectedDetail.villa_trade_info.recent_date})
+                          </span>
+                        </div>
+
+                        <div className="bg-white p-2.5 rounded-xl border border-amber-200 shadow-2xs">
+                          <span className="text-rose-700 block text-[11px] mb-0.5 font-bold">최저가 대비 마진</span>
+                          <span className="font-black text-rose-600 text-sm block">
+                            {selectedDetail.villa_trade_info.discount_pct_vs_min > 0 
+                              ? `-${selectedDetail.villa_trade_info.discount_pct_vs_min}% 할인` 
+                              : `+${Math.abs(selectedDetail.villa_trade_info.discount_pct_vs_min)}%`}
+                          </span>
+                          <span className="text-[10px] text-gray-500 block mt-0.5">
+                            격차 {formatMoney(selectedDetail.villa_trade_info.price_gap_vs_min)}
+                          </span>
+                        </div>
+
+                        <div className="bg-white p-2.5 rounded-xl border border-amber-200 shadow-2xs">
+                          <span className="text-blue-700 block text-[11px] mb-0.5 font-bold">추정 전세 시세 (75%)</span>
+                          <span className="font-black text-blue-900 text-sm block">
+                            {formatMoney(selectedDetail.villa_trade_info.est_jeonse_price)}
+                          </span>
+                          <span className="text-[10px] text-gray-500 block mt-0.5">
+                            전세가율 75% 기준
+                          </span>
+                        </div>
+
+                        <div className="bg-white p-2.5 rounded-xl border border-amber-200 shadow-2xs">
+                          <span className="text-emerald-700 block text-[11px] mb-0.5 font-bold">필요 갭투자금</span>
+                          <span className="font-black text-emerald-900 text-sm block">
+                            {formatMoney(selectedDetail.villa_trade_info.gap_investment_cash)}
+                          </span>
+                          <span className="text-[10px] text-gray-500 block mt-0.5">
+                            낙찰 후 전세 세팅 시
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 인근 유사 빌라 최근 3~4건 실거래 내역 리스트 */}
+                      {selectedDetail.villa_trade_info.nearby_trades && selectedDetail.villa_trade_info.nearby_trades.length > 0 && (
+                        <div className="pt-2 border-t border-amber-200/70">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-bold text-amber-950 flex items-center gap-1">
+                              <span>📋</span> <span>인근 유사 빌라 최근 매매 실거래 내역 ({selectedDetail.villa_trade_info.nearby_trades.length}건)</span>
+                            </span>
+                            <span className="text-[10px] text-gray-400">국토부 신고 기준</span>
+                          </div>
+                          <div className="space-y-1.5">
+                            {selectedDetail.villa_trade_info.nearby_trades.map((trade, idx) => (
+                              <div
+                                key={idx}
+                                className={`p-2.5 rounded-xl border transition-colors flex items-center justify-between text-xs ${
+                                  trade.is_subject 
+                                    ? 'bg-amber-100/70 border-amber-400/80 font-bold' 
+                                    : 'bg-white hover:bg-amber-50/50 border-amber-200/60'
+                                }`}
+                              >
+                                <div className="min-w-0 pr-2">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-bold text-gray-900 truncate">
+                                      {trade.building_name} {trade.floor}층
+                                    </span>
+                                    {trade.is_subject && (
+                                      <span className="text-[10px] bg-amber-600 text-white px-1.5 py-0.2 rounded font-black shrink-0">
+                                        최근거래
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-[11px] text-gray-500">
+                                    {trade.area_pyeong}평 ({trade.area_m2}㎡) · 계약일: {trade.trade_date}
+                                  </span>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <span className="font-extrabold text-amber-950 text-sm">
+                                    {formatMoney(trade.price)}
+                                  </span>
+                                  <span className="text-[10px] text-gray-400 block">
+                                    평당 {Math.round(trade.price / (trade.area_pyeong || 1) / 10000).toLocaleString()}만원
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* 선순위 권리 & 낙찰자 인수 보증금 핵심 분석 카드 */}
                   {(() => {

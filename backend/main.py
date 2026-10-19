@@ -206,6 +206,16 @@ def get_auctions(
         
         items = [dict(row) for row in cursor.fetchall()]
         conn.close()
+        
+        try:
+            from core.villa_transactions import get_villa_trade_info
+            for it in items:
+                v_info = get_villa_trade_info(it)
+                if v_info:
+                    it["villa_trade_info"] = v_info
+        except Exception:
+            pass
+
         return {"data": items}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -288,17 +298,23 @@ def get_quick_filter_counts():
         cursor.execute("SELECT COUNT(*) FROM auction_items WHERE floor < 0")
         counts["auction_b1"] = cursor.fetchone()[0]
 
-        # naver_shops (네이버 상가 실매물 총 건수)
+        # naver_shops & naver_villas (네이버 실매물 총 건수)
         try:
+            cursor.execute("SELECT COUNT(*) FROM naver_listings")
+            counts["naver_total"] = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('C02', 'C03', 'VL')")
+            counts["naver_villas"] = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03')")
             counts["naver_shops"] = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND floor = 1")
             counts["naver_first_floor"] = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND floor < 0")
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE floor < 0")
             counts["naver_b1"] = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE realty_type_cd IN ('D02', 'D04', 'D03') AND floor < 0 AND area_pyeong >= 30")
+            cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE floor < 0 AND area_pyeong >= 30")
             counts["naver_golf_b1"] = cursor.fetchone()[0]
         except Exception:
+            counts["naver_total"] = 0
+            counts["naver_villas"] = 0
             counts["naver_shops"] = 0
             counts["naver_first_floor"] = 0
             counts["naver_b1"] = 0
@@ -420,6 +436,7 @@ def toggle_favorite(req: FavoriteToggleRequest):
 def get_naver_listings(
     region: Optional[str] = None,
     trade_type: Optional[str] = None,
+    property_type: Optional[str] = None,
     first_floor_only: bool = False,
     floor_type: Optional[str] = None,
     favorite_only: bool = False,
@@ -433,16 +450,26 @@ def get_naver_listings(
     offset: int = 0,
 ):
     """
-    Get Naver Real Estate commercial (상가) listings for map overlay & side-by-side comparison.
-    Supports multi-keyword region filtering, favorite filtering, floor filtering (1F, B1, upper), and pyeong range.
+    Get Naver Real Estate commercial (상가) and villa (빌라/다세대) listings.
+    Supports multi-keyword region filtering, favorite filtering, floor filtering, and pyeong range.
     """
     try:
         import re as _re
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        where_clause = " WHERE realty_type_cd IN ('D02', 'D04', 'D03')"
+        where_clause = " WHERE 1=1"
         params = []
+
+        if property_type:
+            if any(k in property_type for k in ("villa", "빌라", "다세대", "연립")):
+                where_clause += " AND realty_type_cd IN ('C02', 'C03', 'VL')"
+            elif any(k in property_type for k in ("commercial", "상가", "근린")):
+                where_clause += " AND realty_type_cd IN ('D02', 'D04', 'D03')"
+            elif property_type not in ("all", ""):
+                where_clause += " AND realty_type_cd IN ('D02', 'D04', 'D03', 'C02', 'C03', 'VL')"
+        else:
+            where_clause += " AND realty_type_cd IN ('D02', 'D04', 'D03', 'C02', 'C03', 'VL')"
 
         if favorite_only:
             where_clause += " AND COALESCE(is_favorite, 0) = 1"
@@ -805,6 +832,20 @@ def get_auction_results(
         rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
 
+        from core.post_auction_analyzer import analyze_post_auction
+        from core.villa_transactions import get_villa_trade_info
+        for r in rows:
+            try:
+                r["post_auction_analysis"] = analyze_post_auction(r)
+            except Exception:
+                pass
+            try:
+                v_info = get_villa_trade_info(r)
+                if v_info:
+                    r["villa_trade_info"] = v_info
+            except Exception:
+                pass
+
         return {
             "data": rows,
             "count": len(rows),
@@ -834,22 +875,22 @@ def get_auction_detail(case_number: str):
         cursor.execute('''
             SELECT * FROM auction_items WHERE case_number = ?
         ''', (case_number,))
-        
         row = cursor.fetchone()
         
-        # Fallback to auction_results if not found in active auction_items
-        if row is None:
-            cursor.execute('''
-                SELECT * FROM auction_results WHERE case_number = ?
-            ''', (case_number,))
-            row = cursor.fetchone()
-            
+        cursor.execute('''
+            SELECT * FROM auction_results WHERE case_number = ?
+        ''', (case_number,))
+        result_row = cursor.fetchone()
         conn.close()
         
-        if row is None:
+        if row is None and result_row is None:
             raise HTTPException(status_code=404, detail="Auction not found")
             
-        item_data = dict(row)
+        item_data = dict(row) if row is not None else dict(result_row)
+        if result_row is not None and row is not None:
+            for k in ["winning_bid", "winning_rate", "bidder_count", "runner_up_bid", "result_date", "result_status"]:
+                if result_row[k] is not None:
+                    item_data[k] = result_row[k]
         
         # Attach dynamic Naver market comparison listings
         try:
@@ -863,6 +904,23 @@ def get_auction_detail(case_number: str):
             item_data["sample_listings"] = []
             item_data["senior_deposit_assumed"] = 0
             item_data["min_market_price"] = 0
+
+        # Attach villa recent transaction info
+        try:
+            from core.villa_transactions import get_villa_trade_info
+            v_info = get_villa_trade_info(item_data)
+            if v_info:
+                item_data["villa_trade_info"] = v_info
+        except Exception:
+            pass
+
+        # Attach AI post-auction analysis if winning_bid exists
+        if item_data.get("winning_bid") and item_data["winning_bid"] > 0:
+            try:
+                from core.post_auction_analyzer import analyze_post_auction
+                item_data["post_auction_analysis"] = analyze_post_auction(item_data)
+            except Exception:
+                pass
             
         return {"data": item_data}
     except Exception as e:
