@@ -422,6 +422,14 @@ export default function Home() {
                 <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold text-[11px]">🟢 네이버상가</span>
                 <strong className="text-gray-900">{summary?.naver_last_updated || "2026-10-18"}</strong>
               </span>
+              <span className="text-gray-300">|</span>
+              <Link
+                href="/auctions?source=results"
+                className="inline-flex items-center gap-1.5 font-semibold hover:underline"
+              >
+                <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-bold text-[11px]">🏆 낙찰결과</span>
+                <strong className="text-gray-900">{(summary as any)?.results_coverage?.total || 100}건</strong>
+              </Link>
             </div>
             <span className="text-[11px] font-medium text-gray-500">
               🤖 AI 권리분석: <strong className="text-purple-700">Gemini 3.8 Flash</strong> (근저당·선순위 임차인·실매물 시세 대조)
@@ -619,18 +627,24 @@ export default function Home() {
             <span className="text-base">⚡</span>
             <h3 className="text-sm font-bold text-gray-900">투자자 원클릭 퀵 필터</h3>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <Link
+              href="/auctions?source=results"
+              className="text-xs font-bold text-amber-800 hover:text-amber-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 transition-colors flex items-center gap-1 shadow-2xs"
+            >
+              <span>🏆</span> <span>실거래 낙찰결과 탭</span>
+            </Link>
             <Link
               href="/auctions?region=성남&view=map"
               className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition-colors"
             >
-              📍 성남·분당 지도 + N상가 보기
+              📍 지도 보기
             </Link>
             <Link
               href={quickFilter ? `/auctions?qf=${quickFilter}` : "/auctions"}
               className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 transition-colors"
             >
-              상세 조건 검색 열기 &rarr;
+              전체 검색 &rarr;
             </Link>
           </div>
         </div>

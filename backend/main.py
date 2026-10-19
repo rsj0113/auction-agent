@@ -48,9 +48,11 @@ def get_auctions(
     min_pyeong: Optional[float] = None,
     max_pyeong: Optional[float] = None,
     date_range: Optional[str] = None,
+    include_closed: bool = False,
 ):
     """
     Get a list of auction items with filtering and sorting.
+    By default, only active upcoming auctions are returned (expired/closed items excluded).
     """
     try:
         conn = get_db_connection()
@@ -71,6 +73,9 @@ def get_auctions(
             WHERE 1=1
         '''
         params = []
+
+        if not include_closed:
+            query += " AND COALESCE(status_flag, '') != 'CLOSED' AND (auction_date IS NULL OR auction_date = '' OR auction_date >= strftime('%Y%m%d', 'now', 'localtime'))"
         
         if grade:
             query += " AND ai_grade = ?"
@@ -349,6 +354,13 @@ def get_quick_filter_counts():
                 "today_new_total": 0,
                 "today_closed_total": 0,
             }
+
+        # 낙찰 결과 총 건수
+        try:
+            cursor.execute("SELECT COUNT(*) FROM auction_results")
+            counts["results_total"] = cursor.fetchone()[0]
+        except Exception:
+            counts["results_total"] = 0
         
         conn.close()
         return counts
@@ -544,6 +556,7 @@ def get_onbid_items(
     min_pyeong: Optional[float] = None,
     max_pyeong: Optional[float] = None,
     date_range: Optional[str] = None,
+    include_closed: bool = False,
     sort: Optional[str] = "default",
     limit: int = 100,
     offset: int = 0,
@@ -551,6 +564,7 @@ def get_onbid_items(
     """
     Get KAMCO OnBid (온비드 공매) commercial properties.
     Supports filtering by region, disposal method (매각/임대), floor (1F, B1, upper), pyeong range, favorites, and price.
+    By default, closed/ended items are excluded.
     """
     try:
         import re as _re
@@ -559,6 +573,9 @@ def get_onbid_items(
 
         where_clause = " WHERE 1=1"
         params = []
+
+        if not include_closed:
+            where_clause += " AND COALESCE(bid_status, '') != '마감'"
 
         if favorite_only:
             where_clause += " AND COALESCE(is_favorite, 0) = 1"
@@ -660,6 +677,142 @@ def get_onbid_items(
         rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
         return {"data": rows, "count": len(rows), "total_matching": total_matching}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/auction-results")
+def get_auction_results(
+    region: Optional[str] = None,
+    usage: Optional[str] = None,
+    floor_type: Optional[str] = None,
+    source: Optional[str] = None,
+    min_pyeong: Optional[float] = None,
+    max_pyeong: Optional[float] = None,
+    min_price: Optional[int] = None,
+    max_price: Optional[int] = None,
+    sort: Optional[str] = "recent",
+    limit: int = 50,
+    offset: int = 0,
+):
+    """
+    Get completed auction results (법원경매 매각결과 & 온비드 개찰결과).
+    Displays actual property information, winning bid price, winning rate (%), and number of bidders (경쟁률).
+    """
+    try:
+        import re as _re
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        where_clause = " WHERE 1=1"
+        params = []
+
+        if source and source in ("court", "onbid"):
+            where_clause += " AND source = ?"
+            params.append(source)
+
+        if usage:
+            if usage == 'commercial':
+                where_clause += " AND (usage LIKE '%상가%' OR usage LIKE '%근린%' OR usage LIKE '%점포%' OR usage LIKE '%판매%')"
+            elif usage == 'apartment':
+                where_clause += " AND usage LIKE '%아파트%'"
+            elif usage == 'villa':
+                where_clause += " AND (usage LIKE '%다세대%' OR usage LIKE '%빌라%')"
+            elif usage == 'officetel':
+                where_clause += " AND usage LIKE '%오피스텔%'"
+
+        if floor_type:
+            if floor_type == '1f':
+                where_clause += " AND floor = 1"
+            elif floor_type == 'b1':
+                where_clause += " AND floor < 0"
+            elif floor_type == 'upper':
+                where_clause += " AND floor >= 2"
+
+        if min_pyeong is not None and min_pyeong > 0:
+            where_clause += " AND area_pyeong >= ?"
+            params.append(min_pyeong)
+        if max_pyeong is not None and max_pyeong > 0:
+            where_clause += " AND area_pyeong <= ?"
+            params.append(max_pyeong)
+
+        if min_price is not None and min_price > 0:
+            where_clause += " AND winning_bid >= ?"
+            params.append(min_price)
+        if max_price is not None and max_price > 0:
+            where_clause += " AND winning_bid <= ?"
+            params.append(max_price)
+
+        if region and region.strip():
+            raw_reg = region.strip()
+            cleaned_reg = raw_reg.replace("전체", "").replace("남부", "").replace("북부", "").strip()
+            tokens = [t.strip() for t in _re.split(r"[·,/|()\s]+", cleaned_reg) if len(t.strip()) >= 2]
+            if not tokens:
+                tokens = [raw_reg]
+            token_ors = []
+            for t in tokens:
+                like = f"%{t}%"
+                token_ors.append("(location LIKE ? OR addr_sgg LIKE ? OR addr_emd LIKE ? OR item_name LIKE ?)")
+                params.extend([like, like, like, like])
+            where_clause += " AND (" + " OR ".join(token_ors) + ")"
+
+        # Aggregated stats
+        stats_query = f"""
+            SELECT COUNT(*), 
+                   COALESCE(ROUND(AVG(winning_rate), 1), 0.0),
+                   COALESCE(ROUND(AVG(bidder_count), 1), 0.0),
+                   COALESCE(MAX(bidder_count), 0),
+                   COALESCE(SUM(winning_bid), 0)
+            FROM auction_results {where_clause}
+        """
+        cursor.execute(stats_query, params)
+        st_row = cursor.fetchone()
+        total_matching = st_row[0]
+        avg_winning_rate = st_row[1]
+        avg_bidders = st_row[2]
+        max_bidders = st_row[3]
+        total_volume = st_row[4]
+
+        # Sorting
+        if sort == "bidders_desc":
+            order_clause = " ORDER BY bidder_count DESC, winning_bid DESC"
+        elif sort == "rate_asc":
+            order_clause = " ORDER BY winning_rate ASC"
+        elif sort == "rate_desc":
+            order_clause = " ORDER BY winning_rate DESC"
+        elif sort == "price_desc":
+            order_clause = " ORDER BY winning_bid DESC"
+        elif sort == "price_asc":
+            order_clause = " ORDER BY winning_bid ASC"
+        else: # default recent
+            order_clause = " ORDER BY result_date DESC, id DESC"
+
+        query = f"""
+            SELECT id, source, case_number, item_name, location, addr_sido, addr_sgg, addr_emd,
+                   usage, floor, area_pyeong, area_m2, appraisal, min_bid, winning_bid,
+                   winning_rate, bidder_count, runner_up_bid, result_date, result_status,
+                   court_name, special_notes, created_at
+            FROM auction_results
+            {where_clause}
+            {order_clause}
+            LIMIT ? OFFSET ?
+        """
+        cursor.execute(query, params + [limit, offset])
+        rows = [dict(r) for r in cursor.fetchall()]
+        conn.close()
+
+        return {
+            "data": rows,
+            "count": len(rows),
+            "total_matching": total_matching,
+            "stats": {
+                "avg_winning_rate": avg_winning_rate,
+                "avg_bidders": avg_bidders,
+                "max_bidders": max_bidders,
+                "total_volume": total_volume,
+                "total_count": total_matching,
+            }
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -806,6 +959,18 @@ def get_dashboard_summary():
                 "today_closed_total": 0,
             }
 
+        # 낙찰 결과 통계 집계
+        try:
+            cursor.execute("SELECT COUNT(*), COALESCE(ROUND(AVG(winning_rate), 1), 0.0), COALESCE(ROUND(AVG(bidder_count), 1), 0.0) FROM auction_results")
+            r_st = cursor.fetchone()
+            res_total = r_st[0]
+            res_avg_rate = r_st[1]
+            res_avg_bidders = r_st[2]
+        except Exception:
+            res_total = 0
+            res_avg_rate = 0.0
+            res_avg_bidders = 0.0
+
         conn.close()
         
         return {
@@ -838,6 +1003,11 @@ def get_dashboard_summary():
                 "total": onbid_total,
                 "first_floor": onbid_1f,
                 "discounted_30": onbid_discounted,
+            },
+            "results_coverage": {
+                "total": res_total,
+                "avg_winning_rate": res_avg_rate,
+                "avg_bidders": res_avg_bidders,
             }
         }
     except Exception as e:
