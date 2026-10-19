@@ -127,6 +127,12 @@ interface AuctionDetail extends AuctionItem {
   sample_listings?: SampleListing[];
   senior_deposit_assumed?: number;
   min_market_price?: number;
+  winning_bid?: number;
+  winning_rate?: number;
+  bidder_count?: number;
+  runner_up_bid?: number;
+  result_date?: string;
+  result_status?: string;
 }
 
 export interface AuctionResultItem {
@@ -153,6 +159,28 @@ export interface AuctionResultItem {
   court_name?: string;
   special_notes?: string;
   created_at?: string;
+  // Full DB attributes (근저당, 임차인, AI분석 등)
+  rights_list?: string;
+  tenant_registration_date?: string;
+  tenant_deposit?: number;
+  is_payout_requested?: number;
+  ai_grade?: string;
+  ai_score?: number;
+  ai_verdict?: string;
+  ai_suggested_bid?: string;
+  ai_report_json?: string;
+  special_rights?: string;
+  market_price?: number;
+  safety_margin?: number;
+  market_discount_pct?: number;
+  rental_yield?: number;
+  est_monthly_rent?: number;
+  failed_count?: number;
+  lat?: number;
+  lng?: number;
+  disposal_method?: string;
+  prpt_div?: string;
+  reg_org_nm?: string;
 }
 
 export interface AuctionResultStats {
@@ -809,8 +837,8 @@ export default function AuctionsPage() {
     fetchListings(nextPage);
   };
 
-  const handleSelectAuction = async (item: AuctionItem) => {
-    setSelectedDetail({ ...item, ai_report_json: "{}" } as AuctionDetail);
+  const handleSelectAuction = async (item: any) => {
+    setSelectedDetail({ ...item, ai_report_json: item.ai_report_json || "{}" } as AuctionDetail);
     setDetailLoading(true);
     try {
       const res = await fetch(`/api/auctions/${item.case_number}`, {
@@ -818,7 +846,15 @@ export default function AuctionsPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setSelectedDetail(data.data);
+        setSelectedDetail({
+          ...data.data,
+          winning_bid: item.winning_bid ?? data.data.winning_bid,
+          winning_rate: item.winning_rate ?? data.data.winning_rate,
+          bidder_count: item.bidder_count ?? data.data.bidder_count,
+          runner_up_bid: item.runner_up_bid ?? data.data.runner_up_bid,
+          result_date: item.result_date ?? data.data.result_date,
+          result_status: item.result_status ?? data.data.result_status,
+        });
       }
     } catch (error) {
       console.error("상세 데이터 로딩 실패:", error);
@@ -1884,16 +1920,37 @@ export default function AuctionsPage() {
             </article>
           ))}
 
-          {/* 4. 🏆 낙찰 결과 목록 (실제 낙찰가 & 응찰 인원수 & 2등 비교) */}
+          {/* 4. 🏆 낙찰 결과 목록 (실제 낙찰가 & 최저가 & 감정가 & 근저당 및 권리분석 & 응찰자수) */}
           {assetSource === "results" && auctionResults.map((item) => {
             const isHighCompetition = item.bidder_count >= 10;
             const isBargain = item.winning_rate <= 70;
             const gap = item.winning_bid - (item.runner_up_bid || 0);
+            const seniorAnalysis = analyzeSeniorDeposit(
+              item.rights_list,
+              item.tenant_registration_date,
+              item.tenant_deposit,
+              item.is_payout_requested
+            );
+            const malso = getMalsoStandard(item.rights_list);
+
+            // 근저당 및 등기부 권리 요약 추출
+            let rightsParsed: any[] = [];
+            if (item.rights_list) {
+              try {
+                rightsParsed = typeof item.rights_list === "string" ? JSON.parse(item.rights_list) : item.rights_list;
+              } catch (e) {
+                rightsParsed = [];
+              }
+            }
+            const primaryMortgage = Array.isArray(rightsParsed) 
+              ? rightsParsed.find((r: any) => (r.name || "").includes("근저당"))
+              : null;
 
             return (
               <article 
                 key={`${item.source}-${item.case_number}-${item.id}`}
-                className="bg-white border border-gray-200 hover:border-amber-400 rounded-2xl p-4 sm:p-5 shadow-sm transition-all group"
+                onClick={() => handleSelectAuction(item)}
+                className="bg-white border border-gray-200 hover:border-amber-400 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all group cursor-pointer"
               >
                 {/* 1. 상단 메타 배지 */}
                 <div className="flex justify-between items-start mb-2.5 gap-2">
@@ -1934,6 +1991,19 @@ export default function AuctionsPage() {
                     <span className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg shrink-0">
                       ✅ {item.result_status || "낙찰 완료"}
                     </span>
+                    {item.ai_grade && (
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border shrink-0 ${getGradeColor(item.ai_grade)}`}>
+                        {item.ai_grade} 등급
+                      </span>
+                    )}
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-md border shrink-0 ${seniorAnalysis.statusBadge.color}`}>
+                      {seniorAnalysis.statusBadge.text}
+                    </span>
+                    {malso && (
+                      <span className="text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-lg shrink-0">
+                        🏦 말소: {malso.name}
+                      </span>
+                    )}
                     {isHighCompetition && (
                       <span className="text-xs font-black text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-lg shrink-0">
                         🔥 입찰경쟁 {item.bidder_count}명
@@ -1941,7 +2011,7 @@ export default function AuctionsPage() {
                     )}
                     {isBargain && (
                       <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg shrink-0">
-                        💎 감정가 70% 이하 저가낙찰
+                        💎 70% 이하 저가낙찰
                       </span>
                     )}
                   </div>
@@ -1950,19 +2020,55 @@ export default function AuctionsPage() {
                   </div>
                 </div>
 
-                {/* 2. 주소 및 면적 기본 정보 */}
-                <h3 className="text-base font-extrabold text-gray-900 mb-1.5 leading-snug break-keep">
+                {/* 2. 주소 및 건물 규모 */}
+                <h3 className="text-base font-extrabold text-gray-900 mb-1 leading-snug break-keep group-hover:text-blue-600 transition-colors">
                   📍 {item.location}
                 </h3>
-                <p className="text-xs text-gray-500 mb-3 flex items-center gap-2 flex-wrap">
+                <p className="text-xs text-gray-500 mb-2.5 flex items-center gap-2 flex-wrap">
                   <span>건물 전용: <strong className="text-gray-900 font-bold">{item.area_pyeong}평</strong> ({item.area_m2}㎡)</span>
-                  <span>·</span>
-                  <span>감정가: <span className="font-semibold text-gray-700">{formatMoney(item.appraisal)}</span></span>
-                  <span>·</span>
-                  <span>입찰 최저가: <span className="font-semibold text-gray-700">{formatMoney(item.min_bid)}</span></span>
+                  {item.reg_org_nm && (
+                    <>
+                      <span>·</span>
+                      <span>기관: {item.reg_org_nm}</span>
+                    </>
+                  )}
                 </p>
 
-                {/* 3. 🔥 핵심 결과 하이라이트 박스 (최종 낙찰 금액 & 응찰 인원 & 낙찰가율) */}
+                {/* 3. 📊 법원 감정가 vs 입찰 최저가 vs 네이버 시세 3분할 비교 그리드 */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-2.5 sm:p-3 bg-gray-50/90 border border-gray-200/80 rounded-xl mb-3 text-xs">
+                  <div>
+                    <span className="text-[11px] text-gray-400 block font-medium">법원 감정가</span>
+                    <span className="text-sm font-bold text-gray-800">{formatMoney(item.appraisal)}</span>
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-blue-600 block font-medium">
+                      입찰 최저가 {item.failed_count && item.failed_count > 0 ? `(유찰 ${item.failed_count}회)` : "(신건)"}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-bold text-blue-700">{formatMoney(item.min_bid)}</span>
+                      {item.appraisal > item.min_bid && (
+                        <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-1 py-0.2 rounded border border-rose-200">
+                          -{Math.round((1 - item.min_bid / item.appraisal) * 100)}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1">
+                    <span className="text-[11px] text-emerald-700 block font-medium">네이버 시세 / 감정</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-bold text-emerald-900">
+                        {formatMoney(item.market_price || item.appraisal)}
+                      </span>
+                      {item.safety_margin && item.safety_margin > 0 ? (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1 py-0.2 rounded">
+                          마진 +{formatMoney(item.safety_margin)}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. 🔥 핵심 낙찰 결과 하이라이트 박스 (최종 낙찰 금액 & 응찰 인원 & 낙찰가율 & 2등 차순위 비교) */}
                 <div className="bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50 border border-amber-200/90 rounded-2xl p-3.5 sm:p-4 mb-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
@@ -2013,7 +2119,39 @@ export default function AuctionsPage() {
                   )}
                 </div>
 
-                {/* 4. 낙찰 분석 메모 */}
+                {/* 5. 📋 등기부 권리 및 근저당 분석 요약 박스 (사용자 요청: 근저당 정보 & 권리관계 노출) */}
+                <div className="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-800 flex items-center gap-1">
+                      <span>🏦</span> <span>등기부 권리 &amp; 근저당 현황</span>
+                    </span>
+                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                      후순위 권리 전액 소멸 (안전)
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1 border-t border-slate-200/70 text-slate-700">
+                    <div>
+                      <span className="text-slate-400">1순위 근저당(말소기준): </span>
+                      <strong className="text-slate-900">
+                        {primaryMortgage 
+                          ? `${primaryMortgage.name} ${primaryMortgage.amount ? `(${formatMoney(primaryMortgage.amount)})` : ''} · ${primaryMortgage.date || ''}` 
+                          : malso 
+                          ? `${malso.name} (${malso.date})` 
+                          : "등기 확인 완료"}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400">임차인 현황: </span>
+                      <strong className="text-slate-900">
+                        {item.tenant_registration_date 
+                          ? `전입 ${item.tenant_registration_date} (${seniorAnalysis.statusBadge.text})` 
+                          : "소유자 점유 (대항력 임차인 없음)"}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 6. 낙찰 분석 메모 */}
                 {item.special_notes && (
                   <div className="mb-3 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-700 flex items-start gap-1.5">
                     <span className="shrink-0 text-sm">💡</span>
@@ -2023,11 +2161,18 @@ export default function AuctionsPage() {
                   </div>
                 )}
 
-                {/* 5. 하단 액션 버튼 */}
+                {/* 7. 하단 액션 버튼 */}
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-100 text-xs">
-                  <span className="text-gray-400">
-                    사건종결: 매각결정 확정 완료
-                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelectAuction(item);
+                    }}
+                    className="font-bold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>🔍</span> <span>전체 권리분석 &amp; 시세 상세 보기 →</span>
+                  </button>
                   <div className="flex items-center gap-1.5 w-full sm:w-auto">
                     <button
                       type="button"
@@ -2043,6 +2188,7 @@ export default function AuctionsPage() {
                       href={`https://map.kakao.com/link/search/${encodeURIComponent(item.location)}`}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="flex-1 sm:flex-initial text-center px-2 py-1 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border border-yellow-200 font-bold transition-colors"
                     >
                       📍 로드뷰
@@ -2051,6 +2197,7 @@ export default function AuctionsPage() {
                       href={`https://m.map.naver.com/search2/search.naver?query=${encodeURIComponent(item.location)}`}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="flex-1 sm:flex-initial text-center px-2.5 py-1 rounded-lg bg-[#03c75a] hover:bg-emerald-600 text-white font-extrabold transition-colors shadow-2xs"
                     >
                       네이버 지도 ↗
@@ -2176,6 +2323,66 @@ export default function AuctionsPage() {
                     </div>
                   </div>
                   
+                  {/* 🏆 최종 낙찰 결과 요약 배너 (낙찰 매물인 경우 상단에 노출) */}
+                  {selectedDetail.winning_bid !== undefined && selectedDetail.winning_bid > 0 && (
+                    <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">🏆</span>
+                          <span className="text-xs font-black uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-lg backdrop-blur-xs">
+                            {selectedDetail.result_status || "낙찰 완료"}
+                          </span>
+                          {selectedDetail.result_date && (
+                            <span className="text-xs text-amber-100 font-medium">
+                              매각일자: {selectedDetail.result_date}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs bg-black/20 backdrop-blur-xs px-2.5 py-1 rounded-lg font-bold">
+                          경쟁률: {selectedDetail.bidder_count || 1} : 1
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pt-1">
+                        <div>
+                          <span className="text-xs text-amber-100 block mb-0.5 font-medium">최후 낙찰 금액 (매각가)</span>
+                          <div className="text-2xl sm:text-3xl font-black tracking-tight">
+                            {formatMoney(selectedDetail.winning_bid)}
+                            <span className="text-xs sm:text-sm font-normal text-amber-100 ml-2">
+                              ({selectedDetail.winning_bid.toLocaleString()}원)
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <div className="bg-white/10 backdrop-blur-xs border border-white/20 px-3 py-1.5 rounded-xl text-center">
+                            <span className="text-[10px] text-amber-200 block">감정가 대비</span>
+                            <span className="text-base font-black">{selectedDetail.winning_rate}%</span>
+                          </div>
+                          <div className="bg-white/10 backdrop-blur-xs border border-white/20 px-3 py-1.5 rounded-xl text-center">
+                            <span className="text-[10px] text-amber-200 block">입찰 참여자</span>
+                            <span className="text-base font-black text-amber-100">{selectedDetail.bidder_count}명</span>
+                          </div>
+                          {selectedDetail.runner_up_bid !== undefined && selectedDetail.runner_up_bid > 0 && (
+                            <div className="bg-white/10 backdrop-blur-xs border border-white/20 px-3 py-1.5 rounded-xl text-center">
+                              <span className="text-[10px] text-amber-200 block">2등 입찰가</span>
+                              <span className="text-base font-black">{formatMoney(selectedDetail.runner_up_bid)}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 1등과 2등 차순위 입찰자 격차 */}
+                      {selectedDetail.runner_up_bid !== undefined && selectedDetail.runner_up_bid > 0 && (
+                        <div className="pt-2 border-t border-white/20 text-xs text-amber-100 flex items-center justify-between">
+                          <span>🥈 2등 입찰가와의 차이:</span>
+                          <span className="font-extrabold text-white text-sm">
+                            +{formatMoney(selectedDetail.winning_bid - selectedDetail.runner_up_bid)} ({(((selectedDetail.winning_bid - selectedDetail.runner_up_bid) / selectedDetail.winning_bid) * 100).toFixed(1)}% 차이)
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-3">
                      <div className="bg-blue-50/50 p-3.5 rounded-xl border border-blue-100">
                         <p className="text-xs text-blue-600 font-medium mb-1">감정가</p>
