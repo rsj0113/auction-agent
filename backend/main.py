@@ -791,7 +791,11 @@ def get_auction_results(
             SELECT id, source, case_number, item_name, location, addr_sido, addr_sgg, addr_emd,
                    usage, floor, area_pyeong, area_m2, appraisal, min_bid, winning_bid,
                    winning_rate, bidder_count, runner_up_bid, result_date, result_status,
-                   court_name, special_notes, created_at
+                   court_name, special_notes, rights_list, tenant_registration_date, tenant_deposit,
+                   is_payout_requested, ai_grade, ai_score, ai_verdict, ai_suggested_bid,
+                   ai_report_json, special_rights, market_price, safety_margin, market_discount_pct,
+                   rental_yield, est_monthly_rent, failed_count, lat, lng, disposal_method, prpt_div,
+                   reg_org_nm, created_at
             FROM auction_results
             {where_clause}
             {order_clause}
@@ -821,6 +825,7 @@ def get_auction_results(
 def get_auction_detail(case_number: str):
     """
     Get full details for a specific auction item, including matching Naver listings.
+    Supports active auctions as well as auction_results items.
     """
     try:
         conn = get_db_connection()
@@ -831,6 +836,14 @@ def get_auction_detail(case_number: str):
         ''', (case_number,))
         
         row = cursor.fetchone()
+        
+        # Fallback to auction_results if not found in active auction_items
+        if row is None:
+            cursor.execute('''
+                SELECT * FROM auction_results WHERE case_number = ?
+            ''', (case_number,))
+            row = cursor.fetchone()
+            
         conn.close()
         
         if row is None:
