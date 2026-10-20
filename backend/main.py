@@ -1186,3 +1186,44 @@ def chat_auction_advisor(case_number: str, req: AuctionChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+from core.agent_advisor import recommend_and_compare, chat_with_agent
+
+class AgentRecommendRequest(BaseModel):
+    prompt: str
+
+@app.post("/api/agent/recommend-compare")
+def agent_recommend_compare_endpoint(req: AgentRecommendRequest):
+    """
+    On-demand real-time AI Investment Secretary:
+    Scans DB, selects top candidate properties, produces comparison table & secretary's pick.
+    """
+    try:
+        res = recommend_and_compare(req.prompt)
+        if "error" in res:
+            raise HTTPException(status_code=500, detail=res["error"])
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class AgentChatRequest(BaseModel):
+    message: str
+    chat_history: Optional[List[Dict[str, Any]]] = None
+    case_number: Optional[str] = None
+
+@app.post("/api/agent/chat")
+def agent_chat_endpoint(req: AgentChatRequest):
+    """
+    Conversational AI Secretary for answering questions on auction results,
+    bidding psychology, market trends, and rights analysis.
+    """
+    try:
+        res = chat_with_agent(req.message, req.chat_history, req.case_number)
+        if "error" in res:
+            raise HTTPException(status_code=500, detail=res["error"])
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
