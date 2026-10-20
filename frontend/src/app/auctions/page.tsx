@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import InvestmentCalculator from "@/components/InvestmentCalculator";
 import AuctionMap, { formatNaverPrice10k } from "@/components/AuctionMap";
+import AgentAdvisorModal from "@/components/AgentAdvisorModal";
 
 export interface OnbidItem {
   cltr_no: string;
@@ -656,6 +657,11 @@ export default function AuctionsPage() {
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
 
+  // AI 수석 실시간 투자 비서 모달 상태
+  const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
+  const [agentModalTab, setAgentModalTab] = useState<"recommend" | "chat">("recommend");
+  const [agentFocusedCase, setAgentFocusedCase] = useState<string>("");
+
   const handleSendChat = async (customMsg?: string) => {
     const textToSend = (customMsg || chatInput).trim();
     if (!textToSend || !selectedDetail || chatLoading) return;
@@ -749,6 +755,10 @@ export default function AuctionsPage() {
       }
       if (dateParam) {
         setDateRangeFilter(dateParam);
+      }
+      const agentParam = params.get("open_agent") || params.get("agent");
+      if (agentParam) {
+        setIsAgentModalOpen(true);
       }
     }
     fetch("/api/auctions/quick-counts", { headers: { "ngrok-skip-browser-warning": "1" } })
@@ -1086,8 +1096,22 @@ export default function AuctionsPage() {
               </p>
             </div>
           </div>
-          {/* 리스트 / 지도 보기 전환 탭 & 임장 플래너 */}
+          {/* 리스트 / 지도 보기 전환 탭 & 임장 플래너 & AI 실시간 비서 */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setAgentFocusedCase("");
+                setAgentModalTab("recommend");
+                setIsAgentModalOpen(true);
+              }}
+              className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 hover:from-indigo-500 hover:to-violet-600 text-white border border-indigo-500 text-xs font-black transition-all flex items-center gap-1 shadow-xs cursor-pointer hover:scale-[1.02]"
+              title="AI 실시간 투자 비서 (추천·비교·낙찰질문)"
+            >
+              <span className="text-sm">🤖</span>
+              <span className="hidden sm:inline">AI 실시간 비서</span>
+            </button>
+
             <Link
               href="/planner"
               className="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-extrabold transition-colors flex items-center gap-1 shadow-2xs"
@@ -3438,6 +3462,49 @@ export default function AuctionsPage() {
           </div>
         </div>
       )}
+
+      {/* Floating Action Button (FAB) for AI Real-time Secretary */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          type="button"
+          onClick={() => {
+            setAgentFocusedCase("");
+            setAgentModalTab("recommend");
+            setIsAgentModalOpen(true);
+          }}
+          className="group relative flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 hover:from-slate-800 hover:to-indigo-900 text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 border border-indigo-500/60 transition-all cursor-pointer"
+        >
+          <div className="relative">
+            <span className="text-xl">🤖</span>
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full"></span>
+          </div>
+          <div className="text-left">
+            <div className="text-xs font-black tracking-tight flex items-center gap-1.5 text-white">
+              <span>AI 실시간 투자 비서</span>
+              <span className="text-[9px] bg-violet-600 text-white px-1.5 py-0.2 rounded-full font-bold">LIVE</span>
+            </div>
+            <div className="text-[10px] text-indigo-300 font-medium hidden sm:block">
+              실시간 맞비교 · 낙찰 결과 심층 질의
+            </div>
+          </div>
+        </button>
+      </div>
+
+      {/* AI 실시간 수석 투자 비서 모달 */}
+      <AgentAdvisorModal
+        isOpen={isAgentModalOpen}
+        onClose={() => setIsAgentModalOpen(false)}
+        initialTab={agentModalTab}
+        initialCaseNumber={agentFocusedCase}
+        onSelectAuction={(item) => {
+          setIsAgentModalOpen(false);
+          handleSelectAuction(item);
+        }}
+        onAddToPlanner={(item, source) => {
+          handleAddToPlanner(item, source as any);
+        }}
+      />
     </div>
   );
 }
