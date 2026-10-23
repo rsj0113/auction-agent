@@ -1582,8 +1582,12 @@ export default function AuctionsPage() {
                 </span>
               </div>
               <span className="text-[11px] text-amber-800/80 font-medium">
-                실제 법원경매·온비드 낙찰 데이터 기반 지표
+                공공데이터포털 온비드(KAMCO) 실시간 개찰결과 API 연동 (법원경매 실낙찰가는 수집 준비중)
               </span>
+            </div>
+            <div className="mb-2 px-2.5 py-1.5 bg-amber-50/80 border border-amber-200/60 rounded-xl text-[11px] text-amber-900 flex items-center justify-between">
+              <span>🏛️ <strong>실제 데이터 현황</strong>: 온비드 공매 실낙찰가 및 유효입찰자 수 100% 반영 중</span>
+              <span className="text-gray-500 text-[10px]">⚖️ 법원경매 낙찰결과는 공식 API 미제공으로 자동수집 파이프라인 개발 준비 중입니다.</span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
