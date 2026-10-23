@@ -347,17 +347,17 @@ def chat_with_agent(user_message: str, chat_history: list = None, case_number: s
 - 물건 소재지: {item_dict.get('location')}
 - 용도 및 층수/면적: {item_dict.get('usage', '상가/주택')}, {item_dict.get('floor', 0)}층, 전용 {item_dict.get('area_pyeong', 0)}평
 - 법원 감정가: {item_dict.get('appraisal', 0):,}원
-- 입찰 최저가: {item_dict.get('min_bid', 0):,}원 (유찰 {item_dict.get('failed_count', 0)}회)
+- 입찰 최저가: {(format(item_dict.get('min_bid', 0), ',') + '원') if item_dict.get('min_bid') else '비공개/정보없음'}
 - 최종 낙찰 금액: {item_dict.get('winning_bid', 0):,}원 (낙찰가율 {item_dict.get('winning_rate', 0)}%)
-- 참여 응찰자수: {item_dict.get('bidder_count', 0)}명
-- 2등 차순위 입찰가: {item_dict.get('runner_up_bid', 0):,}원 (격차: {max(0, (item_dict.get('winning_bid', 0) - item_dict.get('runner_up_bid', 0))):,}원)
-- 등기부 권리내역: {item_dict.get('rights_list', '정보없음')}
-- 임차인 현황: {item_dict.get('tenant_registration_date') or '소유자 점유 (선순위 임차인 없음)'}
-- 네이버/감정 시세: {item_dict.get('market_price', item_dict.get('appraisal', 0)):,}원
+- 유효 입찰자수: {str(item_dict.get('bidder_count')) + '명' if item_dict.get('bidder_count') else '정보없음'}
+- 2등 차순위 입찰가: {(format(item_dict.get('runner_up_bid'), ',') + '원 (격차: ' + format(max(0, item_dict.get('winning_bid', 0) - item_dict.get('runner_up_bid')), ',') + '원)') if item_dict.get('runner_up_bid') else '정보없음(공개되지 않음)'}
+- 등기부 권리내역: {item_dict.get('rights_list') if item_dict.get('rights_list') not in (None, '', '[]') else '정보없음'}
+- 임차인 현황: {item_dict.get('tenant_registration_date') or '정보없음'}
+- 네이버/감정 시세: {(format(item_dict.get('market_price'), ',') + '원') if item_dict.get('market_price') else '정보없음'}
 """
     else:
         results_summary = "\n".join([
-            f"- {r['case_number']} ({r['location']}): 감정가 {r['appraisal']:,}원 -> 낙찰가 {r['winning_bid']:,}원 (낙찰가율 {r['winning_rate']}%, 응찰자 {r['bidder_count']}명, 2등 {r['runner_up_bid']:,}원)"
+            f"- {r['case_number']} ({r['location']}): 감정가 {r['appraisal']:,}원 -> 낙찰가 {r['winning_bid']:,}원 (낙찰가율 {r['winning_rate']}%, 유효입찰 {r['bidder_count'] or '정보없음'}명)"
             for r in recent_results
         ])
         context_str = f"""
@@ -373,7 +373,7 @@ def chat_with_agent(user_message: str, chat_history: list = None, case_number: s
 1. 상투적인 서론은 줄이고, 질문에 대한 날카롭고 깊이 있는 분석을 전문적이면서도 친절한 비서의 말투(~하셨습니다, ~로 판단됩니다)로 답변하십시오.
 2. 금액은 억/만원 단위(예: 3억 5,200만원)를 함께 적어 가독성을 높이십시오.
 3. 1등 낙찰자와 2등 차순위 입찰자의 심리, 유찰에 따른 가격 매력도, 임대수익률 및 갭투자 등 실무적 시각을 제시하십시오.
-4. 만약 특정 물건이 아닌 일반 질문이라면, 보유한 실거래 낙찰 통계와 시장 흐름을 토대로 명쾌하게 조언하십시오.
+4. '정보없음'으로 표기된 항목(2등 입찰가, 권리내역 등)은 절대 추측하거나 지어내지 말고, 공개되지 않은 정보라고 솔직히 밝히십시오. 확인된 수치(감정가, 낙찰가, 낙찰가율, 입찰자수)만 근거로 분석하십시오.\n5. 만약 특정 물건이 아닌 일반 질문이라면, 보유한 실거래 낙찰 통계와 시장 흐름을 토대로 명쾌하게 조언하십시오.
 
 데이터 컨텍스트:
 {context_str}

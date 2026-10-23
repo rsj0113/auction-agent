@@ -18,9 +18,9 @@ def run_migration():
     cursor = conn.cursor()
 
     # 1. Drop and recreate auction_results table with full rich attributes
-    cursor.execute("DROP TABLE IF EXISTS auction_results;")
+    # 누적 보존: 기존 낙찰결과를 DROP하지 않음 (매번 100건으로 초기화되던 문제 수정)
     cursor.execute("""
-    CREATE TABLE auction_results (
+    CREATE TABLE IF NOT EXISTS auction_results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         source TEXT NOT NULL,                  -- 'court' or 'onbid'
         case_number TEXT NOT NULL UNIQUE,      -- 사건번호 or 관리번호
@@ -102,7 +102,7 @@ def run_migration():
         WHERE appraisal > 0 AND min_bid > 0
           AND (auction_date <= ? OR status_flag = 'CLOSED' OR failed_count >= 1)
         ORDER BY auction_date DESC
-        LIMIT 60
+        LIMIT 2000
     """, (today_str,))
     court_candidates = cursor.fetchall()
     print(f"Found {len(court_candidates)} candidate court properties for result tracking.")
@@ -249,7 +249,7 @@ def run_migration():
 
         try:
             cursor.execute("""
-                INSERT OR REPLACE INTO auction_results (
+                INSERT OR IGNORE INTO auction_results (
                     source, case_number, item_name, location, addr_sido, addr_sgg, addr_emd,
                     usage, floor, area_pyeong, area_m2, appraisal, min_bid, winning_bid,
                     winning_rate, bidder_count, runner_up_bid, result_date, result_status,
@@ -292,7 +292,7 @@ def run_migration():
         FROM onbid_items
         WHERE appraisal > 0 AND min_bid > 0
           AND (remain_time LIKE '%마감%' OR bid_status = '마감' OR bid_end_date <= datetime('now', 'localtime'))
-        LIMIT 40
+        LIMIT 2000
     """)
     onbid_candidates = cursor.fetchall()
     print(f"Found {len(onbid_candidates)} candidate OnBid items for result tracking.")
@@ -323,7 +323,7 @@ def run_migration():
 
         try:
             cursor.execute("""
-                INSERT OR REPLACE INTO auction_results (
+                INSERT OR IGNORE INTO auction_results (
                     source, case_number, item_name, location, addr_sido, addr_sgg, addr_emd,
                     usage, floor, area_pyeong, area_m2, appraisal, min_bid, winning_bid,
                     winning_rate, bidder_count, runner_up_bid, result_date, result_status,
