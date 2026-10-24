@@ -171,13 +171,18 @@ async def scrape_court_results(target_courts=None, max_pages_per_court=3, headle
                 # 1. 법원 선택 & '매각' 선택
                 xhr_results.clear()
                 await page.evaluate(f"""() => {{
-                    const cortComp = window.WebSquare.util.getComponentById('mf_wfm_mainFrame_sbx_dspslRsltSrchCortOfc');
-                    if (cortComp && cortComp.setSelectedIndex) cortComp.setSelectedIndex({c_idx});
+                    if (window.WebSquare && window.WebSquare.util) {{
+                        const cortComp = window.WebSquare.util.getComponentById('mf_wfm_mainFrame_sbx_dspslRsltSrchCortOfc');
+                        if (cortComp && cortComp.setSelectedIndex) cortComp.setSelectedIndex({c_idx});
 
-                    const rsltComp = window.WebSquare.util.getComponentById('mf_wfm_mainFrame_sbx_dspslRsltLst');
-                    if (rsltComp && rsltComp.setSelectedIndex) rsltComp.setSelectedIndex(1); // '매각'만 선택
+                        const rsltComp = window.WebSquare.util.getComponentById('mf_wfm_mainFrame_sbx_dspslRsltLst');
+                        if (rsltComp && rsltComp.setSelectedIndex) rsltComp.setSelectedIndex(1); // '매각'만 선택
+                    }}
 
-                    document.getElementById('mf_wfm_mainFrame_btn_dspslRsltSrch').click();
+                    const btn = document.getElementById('mf_wfm_mainFrame_btn_dspslRsltSrch') || 
+                                document.querySelector('[id*="btn_dspslRsltSrch"]') ||
+                                document.querySelector('a:has-text("검색")');
+                    if (btn) btn.click();
                 }}""")
                 await asyncio.sleep(4)
 
