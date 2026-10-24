@@ -179,9 +179,13 @@ async def scrape_court_results(target_courts=None, max_pages_per_court=3, headle
                         if (rsltComp && rsltComp.setSelectedIndex) rsltComp.setSelectedIndex(1); // '매각'만 선택
                     }}
 
-                    const btn = document.getElementById('mf_wfm_mainFrame_btn_dspslRsltSrch') || 
-                                document.querySelector('[id*="btn_dspslRsltSrch"]') ||
-                                document.querySelector('a:has-text("검색")');
+                    let btn = document.getElementById('mf_wfm_mainFrame_btn_dspslRsltSrch') || 
+                              document.querySelector('[id*="btn_dspslRsltSrch"]');
+                    if (!btn) {
+                        for (let a of document.querySelectorAll('a, button')) {
+                            if ((a.textContent || '').trim() === '검색') { btn = a; break; }
+                        }
+                    }
                     if (btn) btn.click();
                 }}""")
                 await asyncio.sleep(4)
