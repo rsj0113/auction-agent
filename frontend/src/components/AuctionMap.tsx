@@ -66,6 +66,13 @@ interface AuctionMapProps {
   priceRange?: string; // "", "under1", "1to3", "3to5", "over5"
   assetSource?: "auction" | "onbid" | "naver" | "results";
   selectedSources?: { auction: boolean; onbid: boolean; naver: boolean; results: boolean };
+  onToggleSource?: (src: "auction" | "onbid" | "naver" | "results") => void;
+  sourceCounts?: {
+    auction: number;
+    onbid: number;
+    naver: number;
+    results: number;
+  };
   fullScreenMode?: boolean;
 }
 
@@ -120,12 +127,18 @@ export default function AuctionMap({
   priceRange = "",
   assetSource = "auction",
   selectedSources,
+  onToggleSource,
+  sourceCounts,
   fullScreenMode = false,
 }: AuctionMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersLayerRef = useRef<any>(null);
   const [mapReady, setMapReady] = useState(false);
+
+  // 하단 바텀시트(Drawer) 상태 & 탭 ('pinned' | 'list')
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<"pinned" | "list">("pinned");
 
   // 선택된 경매/공매/낙찰 매물 플로팅 상세 카드 상태
   const [selectedPinnedItem, setSelectedPinnedItem] = useState<MapItem | null>(null);
@@ -516,9 +529,9 @@ export default function AuctionMap({
   };
 
   return (
-    <div className="space-y-4">
-      {/* 🏆 낙찰 결과 전용 지도 안내 바 */}
-      {assetSource === "results" && (
+    <div className={fullScreenMode ? "w-full" : "space-y-4"}>
+      {/* 🏆 낙찰 결과 전용 지도 안내 바 (일반 모드 전용) */}
+      {!fullScreenMode && assetSource === "results" && (
         <div className="flex items-center justify-between p-3 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/5 rounded-2xl border border-amber-300 shadow-2xs">
           <div className="flex items-center gap-2">
             <span className="text-base">🏆</span>
@@ -540,228 +553,206 @@ export default function AuctionMap({
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-        {/* 1단: 지역 점프 & 네이버 상가 전용 위치·가격·거래유형 필터 바 */}
-        <div className="p-3.5 bg-gray-50 border-b border-gray-200 space-y-2.5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-bold text-gray-700 mr-1">📍 권역 점프:</span>
-              {PRESET_REGIONS.map((reg) => {
-                const isActive = naverRegion === reg.regionKey;
-                return (
-                  <button
-                    key={reg.label}
-                    onClick={() => {
-                      setNaverRegion(reg.regionKey);
-                      setNaverRegionInput(reg.regionKey);
-                      handleFlyTo(reg.lat, reg.lng, reg.zoom);
-                    }}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
-                      isActive
-                        ? "bg-blue-600 text-white border-blue-600 shadow-xs"
-                        : "bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-700 border-gray-200"
-                    }`}
-                  >
-                    {reg.label}
-                  </button>
-                );
-              })}
+      <div className={`bg-white border border-gray-200 overflow-hidden shadow-sm ${fullScreenMode ? "rounded-2xl" : "rounded-2xl"}`}>
+        {/* 1단: 지역 점프 & 네이버 상가 전용 위치·가격·거래유형 필터 바 (일반 모드 전용) */}
+        {!fullScreenMode && (
+          <div className="p-3.5 bg-gray-50 border-b border-gray-200 space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-bold text-gray-700 mr-1">📍 권역 점프:</span>
+                {PRESET_REGIONS.map((reg) => {
+                  const isActive = naverRegion === reg.regionKey;
+                  return (
+                    <button
+                      key={reg.label}
+                      onClick={() => {
+                        setNaverRegion(reg.regionKey);
+                        setNaverRegionInput(reg.regionKey);
+                        handleFlyTo(reg.lat, reg.lng, reg.zoom);
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
+                        isActive
+                          ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                          : "bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-700 border-gray-200"
+                      }`}
+                    >
+                      {reg.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => setShowNaver(!showNaver)}
+                className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
+                  showNaver
+                    ? "bg-[#03c75a] text-white border-[#03c75a] shadow-xs"
+                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-100"
+                }`}
+              >
+                <span>🟢 네이버 상가 표시</span>
+                <span className="px-1.5 py-0.2 rounded bg-black/15 text-[10px]">
+                  {showNaver ? `${naverTotalMatching.toLocaleString()}건` : "OFF"}
+                </span>
+              </button>
             </div>
 
-            <button
-              onClick={() => setShowNaver(!showNaver)}
-              className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
-                showNaver
-                  ? "bg-[#03c75a] text-white border-[#03c75a] shadow-xs"
-                  : "bg-white text-gray-600 border-gray-200 hover:bg-gray-100"
-              }`}
-            >
-              <span>🟢 네이버 상가 표시</span>
-              <span className="px-1.5 py-0.2 rounded bg-black/15 text-[10px]">
-                {showNaver ? `${naverTotalMatching.toLocaleString()}건` : "OFF"}
-              </span>
-            </button>
-          </div>
+            {/* 2단: 네이버 상가 세부 필터 */}
+            {showNaver && (
+              <div className="pt-2 border-t border-gray-200/80 flex flex-wrap items-center gap-2">
+                <span className="text-xs font-extrabold text-emerald-800 flex items-center gap-1">
+                  <span className="px-1.5 py-0.2 rounded bg-[#03c75a] text-white text-[10px] font-black">N</span>
+                  상가 상세필터:
+                </span>
 
-          {/* 2단: 네이버 상가 세부 필터 (동네 검색, 가격대, 1층 상가, 매매/월세, 정렬) */}
-          {showNaver && (
-            <div className="pt-2 border-t border-gray-200/80 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-extrabold text-emerald-800 flex items-center gap-1">
-                <span className="px-1.5 py-0.2 rounded bg-[#03c75a] text-white text-[10px] font-black">N</span>
-                상가 상세필터:
-              </span>
-
-              {/* 동네 직접 검색 */}
-              <div className="flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden shadow-2xs">
-                <input
-                  type="text"
-                  placeholder="동네/역 검색 (예: 서현, 야탑, 판교, 역삼)"
-                  value={naverRegionInput}
-                  onChange={(e) => setNaverRegionInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && setNaverRegion(naverRegionInput)}
-                  className="px-2.5 py-1 text-xs text-gray-800 outline-none w-44 sm:w-52"
-                />
-                {naverRegionInput && (
+                <div className="flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden shadow-2xs">
+                  <input
+                    type="text"
+                    placeholder="동네/역 검색 (예: 서현, 야탑, 판교, 역삼)"
+                    value={naverRegionInput}
+                    onChange={(e) => setNaverRegionInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && setNaverRegion(naverRegionInput)}
+                    className="px-2.5 py-1 text-xs text-gray-800 outline-none w-44 sm:w-52"
+                  />
+                  {naverRegionInput && (
+                    <button
+                      onClick={() => {
+                        setNaverRegionInput("");
+                        setNaverRegion("");
+                      }}
+                      className="px-1.5 text-gray-400 hover:text-gray-600 text-xs cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  )}
                   <button
-                    onClick={() => {
-                      setNaverRegionInput("");
-                      setNaverRegion("");
-                    }}
-                    className="px-1.5 text-gray-400 hover:text-gray-600 text-xs cursor-pointer"
+                    onClick={() => setNaverRegion(naverRegionInput)}
+                    className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer"
                   >
-                    ✕
+                    적용
                   </button>
-                )}
-                <button
-                  onClick={() => setNaverRegion(naverRegionInput)}
-                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer"
+                </div>
+
+                <select
+                  value={naverPriceRange}
+                  onChange={(e) => setNaverPriceRange(e.target.value)}
+                  className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white border border-gray-200 text-gray-700 outline-none focus:border-emerald-500 cursor-pointer"
                 >
-                  적용
-                </button>
-              </div>
+                  {PRICE_OPTIONS.map((p) => (
+                    <option key={p.id || "all"} value={p.id}>
+                      💰 {p.label}
+                    </option>
+                  ))}
+                </select>
 
-              {/* 가격대 필터 */}
-              <select
-                value={naverPriceRange}
-                onChange={(e) => setNaverPriceRange(e.target.value)}
-                className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white border border-gray-200 text-gray-700 outline-none focus:border-emerald-500 cursor-pointer"
-              >
-                {PRICE_OPTIONS.map((p) => (
-                  <option key={p.id || "all"} value={p.id}>
-                    💰 {p.label}
-                  </option>
-                ))}
-              </select>
-
-              {/* 1층 상가 토글 */}
-              <button
-                onClick={() => {
-                  setNaverFloorType(naverFloorType === "1f" ? "" : "1f");
-                  setNaverFirstFloorOnly(false);
-                }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                  naverFloorType === "1f" || (naverFirstFloorOnly && !naverFloorType)
-                    ? "bg-orange-500 text-white border-orange-500 shadow-xs"
-                    : "bg-white text-orange-700 border-orange-200 hover:bg-orange-50"
-                }`}
-              >
-                🏪 1층
-              </button>
-
-              {/* 지하 1층 (골프/체육용) 토글 */}
-              <button
-                onClick={() => {
-                  setNaverFloorType(naverFloorType === "b1" ? "" : "b1");
-                  setNaverFirstFloorOnly(false);
-                }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                  naverFloorType === "b1"
-                    ? "bg-purple-600 text-white border-purple-600 shadow-xs ring-2 ring-purple-600/30"
-                    : "bg-white text-purple-700 border-purple-200 hover:bg-purple-50"
-                }`}
-              >
-                ⛳ 지하1층 (B1 골프·체육)
-              </button>
-
-              {/* 평수 셀렉트 */}
-              <select
-                value={naverPyeongRange}
-                onChange={(e) => setNaverPyeongRange(e.target.value)}
-                className={`px-2 py-1 rounded-lg text-xs font-bold border outline-none cursor-pointer ${
-                  naverPyeongRange ? "border-blue-400 text-blue-700 bg-blue-50/50" : "bg-white border-gray-200 text-gray-700"
-                }`}
-              >
-                <option value="">평수 전체</option>
-                <option value="under10">소형 (~10평)</option>
-                <option value="10to30">중형 (10~30평)</option>
-                <option value="30to60">중대형 (30~60평)</option>
-                <option value="over60">대형 (60평+ 골프장용)</option>
-              </select>
-
-              {/* 관심 매물만 토글 */}
-              <button
-                onClick={() => setNaverFavoriteOnly(!naverFavoriteOnly)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                  naverFavoriteOnly
-                    ? "bg-amber-500 text-white border-amber-500 shadow-xs"
-                    : "bg-white text-amber-800 border-amber-300 hover:bg-amber-50"
-                }`}
-              >
-                ⭐ 관심
-              </button>
-
-              {/* 매매/월세 토글 */}
-              <div className="inline-flex bg-white border border-gray-200 rounded-lg p-0.5">
-                {(["", "매매", "월세"] as const).map((t) => (
-                  <button
-                    key={t || "all"}
-                    onClick={() => setNaverTradeType(t)}
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold cursor-pointer transition-colors ${
-                      naverTradeType === t
-                        ? "bg-emerald-600 text-white"
-                        : "text-gray-600 hover:text-gray-900"
-                    }`}
-                  >
-                    {t || "전체"}
-                  </button>
-                ))}
-              </div>
-
-              {/* 정렬 */}
-              <select
-                value={naverSort}
-                onChange={(e) => setNaverSort(e.target.value)}
-                className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-gray-200 text-gray-700 outline-none focus:border-emerald-500 cursor-pointer"
-              >
-                <option value="default">정렬: 1층·일반상가 우선</option>
-                <option value="price_asc">낮은 가격순</option>
-                <option value="price_desc">높은 가격순</option>
-                <option value="area_desc">넓은 면적순</option>
-              </select>
-
-              {(naverRegion || naverPriceRange || naverFirstFloorOnly || naverFloorType || naverPyeongRange || naverTradeType || naverFavoriteOnly) && (
                 <button
                   onClick={() => {
-                    setNaverRegion("");
-                    setNaverRegionInput("");
-                    setNaverPriceRange("");
+                    setNaverFloorType(naverFloorType === "1f" ? "" : "1f");
                     setNaverFirstFloorOnly(false);
-                    setNaverFloorType("");
-                    setNaverPyeongRange("");
-                    setNaverTradeType("");
-                    setNaverFavoriteOnly(false);
                   }}
-                  className="px-2 py-1 rounded-lg text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 cursor-pointer"
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                    naverFloorType === "1f" || (naverFirstFloorOnly && !naverFloorType)
+                      ? "bg-orange-500 text-white border-orange-500 shadow-xs"
+                      : "bg-white text-orange-700 border-orange-200 hover:bg-orange-50"
+                  }`}
                 >
-                  초기화
+                  🏪 1층
                 </button>
-              )}
-            </div>
-          )}
-        </div>
 
-        {/* 범례 바 */}
-        <div className="px-3.5 py-1.5 bg-white border-b border-gray-100 flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-gray-600">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-1 font-bold text-gray-800">
-              ⚖️ 법원경매 ({items.length}건):
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>S등급
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>A·B등급
-            </span>
-            <span className="text-gray-300">|</span>
-            <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
-              <span className="px-1 py-0.2 bg-[#03c75a] text-white rounded text-[9px] font-black">N</span>
-              네이버 상가 검색결과: {naverTotalMatching.toLocaleString()}건 (지도 표시 {naverItems.length}건)
-            </span>
+                <button
+                  onClick={() => {
+                    setNaverFloorType(naverFloorType === "b1" ? "" : "b1");
+                    setNaverFirstFloorOnly(false);
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                    naverFloorType === "b1"
+                      ? "bg-purple-600 text-white border-purple-600 shadow-xs ring-2 ring-purple-600/30"
+                      : "bg-white text-purple-700 border-purple-200 hover:bg-purple-50"
+                  }`}
+                >
+                  ⛳ 지하1층
+                </button>
+
+                <select
+                  value={naverPyeongRange}
+                  onChange={(e) => setNaverPyeongRange(e.target.value)}
+                  className={`px-2 py-1 rounded-lg text-xs font-bold border outline-none cursor-pointer ${
+                    naverPyeongRange ? "border-blue-400 text-blue-700 bg-blue-50/50" : "bg-white border-gray-200 text-gray-700"
+                  }`}
+                >
+                  <option value="">평수 전체</option>
+                  <option value="under10">소형 (~10평)</option>
+                  <option value="10to30">중형 (10~30평)</option>
+                  <option value="30to60">중대형 (30~60평)</option>
+                  <option value="over60">대형 (60평+)</option>
+                </select>
+
+                <button
+                  onClick={() => setNaverFavoriteOnly(!naverFavoriteOnly)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                    naverFavoriteOnly
+                      ? "bg-amber-500 text-white border-amber-500 shadow-xs"
+                      : "bg-white text-amber-800 border-amber-300 hover:bg-amber-50"
+                  }`}
+                >
+                  ⭐ 관심
+                </button>
+
+                <div className="inline-flex bg-white border border-gray-200 rounded-lg p-0.5">
+                  {(["", "매매", "월세"] as const).map((t) => (
+                    <button
+                      key={t || "all"}
+                      onClick={() => setNaverTradeType(t)}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-bold cursor-pointer transition-colors ${
+                        naverTradeType === t
+                          ? "bg-emerald-600 text-white"
+                          : "text-gray-600 hover:text-gray-900"
+                      }`}
+                    >
+                      {t || "전체"}
+                    </button>
+                  ))}
+                </div>
+
+                <select
+                  value={naverSort}
+                  onChange={(e) => setNaverSort(e.target.value)}
+                  className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-gray-200 text-gray-700 outline-none focus:border-emerald-500 cursor-pointer"
+                >
+                  <option value="default">정렬: 1층·일반상가 우선</option>
+                  <option value="price_asc">낮은 가격순</option>
+                  <option value="price_desc">높은 가격순</option>
+                  <option value="area_desc">넓은 면적순</option>
+                </select>
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
-        {/* 지도 캔버스 */}
-        <div className={`relative w-full ${fullScreenMode ? "h-[calc(100vh-230px)] min-h-[560px] sm:min-h-[660px]" : "h-[500px] sm:h-[580px]"} bg-gray-100 transition-all`}>
+        {/* 범례 바 (일반 모드 전용) */}
+        {!fullScreenMode && (
+          <div className="px-3.5 py-1.5 bg-white border-b border-gray-100 flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-gray-600">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-1 font-bold text-gray-800">
+                ⚖️ 법원경매 ({items.length}건):
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>S등급
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>A·B등급
+              </span>
+              <span className="text-gray-300">|</span>
+              <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
+                <span className="px-1 py-0.2 bg-[#03c75a] text-white rounded text-[9px] font-black">N</span>
+                네이버 상가 검색결과: {naverTotalMatching.toLocaleString()}건 (지도 표시 {naverItems.length}건)
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* 지도 캔버스 및 오버레이 */}
+        <div className={`relative w-full ${fullScreenMode ? "h-[calc(100vh-140px)] min-h-[580px] sm:min-h-[660px]" : "h-[500px] sm:h-[580px]"} bg-gray-100 transition-all`}>
           {!mapReady && (
             <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-500 z-10">
               지도를 불러오는 중입니다...
@@ -769,243 +760,500 @@ export default function AuctionMap({
           )}
           <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-          {/* 🌟 선택한 경매/공매/낙찰 매물 플로팅 상세 카드 */}
-          {selectedPinnedItem && (
-            <div className="absolute bottom-3 left-3 right-3 sm:left-auto sm:right-4 sm:w-96 bg-white rounded-2xl shadow-2xl border-2 border-indigo-500 p-4 z-[520] animate-in slide-in-from-bottom-2">
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className={`px-2 py-0.5 rounded-md text-[11px] font-black text-white ${
-                    selectedPinnedItem.source === "results" || selectedPinnedItem.winning_bid
-                      ? "bg-amber-600"
-                      : selectedPinnedItem.source === "onbid"
-                      ? "bg-purple-600"
-                      : "bg-blue-600"
-                  }`}>
-                    {selectedPinnedItem.source === "results" || selectedPinnedItem.winning_bid
-                      ? "🏆 낙찰결과"
-                      : selectedPinnedItem.source === "onbid"
-                      ? "🏛️ 온비드 공매"
-                      : `⚖️ 법원경매 ${selectedPinnedItem.ai_grade ? `(${selectedPinnedItem.ai_grade}등급)` : ""}`}
-                  </span>
-                  <span className="text-xs font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded-md">
-                    {selectedPinnedItem.case_number || selectedPinnedItem.cltr_no}
-                  </span>
-                  {selectedPinnedItem.usage && (
-                    <span className="text-[11px] font-semibold text-gray-600 bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded">
-                      {selectedPinnedItem.usage}
-                    </span>
-                  )}
-                </div>
-                <button
-                  onClick={() => setSelectedPinnedItem(null)}
-                  className="text-gray-400 hover:text-gray-700 text-sm font-bold px-1.5 cursor-pointer"
-                  title="닫기"
-                >
-                  ✕
-                </button>
-              </div>
+          {/* 🌟 [전체화면 모드] 좌상단 플로팅 퀵 권역 & 검색바 */}
+          {fullScreenMode && (
+            <div className="absolute top-3 left-3 z-[400] flex items-center gap-1.5 max-w-[calc(100%-120px)]">
+              <select
+                value={naverRegion}
+                onChange={(e) => {
+                  const reg = PRESET_REGIONS.find((r) => r.regionKey === e.target.value);
+                  setNaverRegion(e.target.value);
+                  setNaverRegionInput(e.target.value);
+                  if (reg) handleFlyTo(reg.lat, reg.lng, reg.zoom);
+                }}
+                className="px-2.5 py-1.5 bg-white/95 backdrop-blur-md rounded-xl text-xs font-black text-gray-800 shadow-md border border-gray-200 outline-none cursor-pointer"
+              >
+                {PRESET_REGIONS.map((r) => (
+                  <option key={r.label} value={r.regionKey}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
 
-              <h4 className="text-sm font-extrabold text-gray-900 mb-1 line-clamp-2">
-                📍 {selectedPinnedItem.location || selectedPinnedItem.cltr_nm}
-              </h4>
-              <p className="text-xs text-gray-500 mb-2">
-                {selectedPinnedItem.area_pyeong || selectedPinnedItem.bld_area_pyeong ? (
-                  <span>전용 <strong className="text-gray-800">{selectedPinnedItem.area_pyeong || selectedPinnedItem.bld_area_pyeong}평</strong> · </span>
-                ) : null}
-                <span>{selectedPinnedItem.floor ? (selectedPinnedItem.floor < 0 ? `지하${Math.abs(selectedPinnedItem.floor)}층` : `${selectedPinnedItem.floor}층`) : "층수미상"}</span>
-                {selectedPinnedItem.reg_org_nm ? ` · ${selectedPinnedItem.reg_org_nm}` : ""}
-              </p>
-
-              {/* 가격 브리핑 */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 mb-3">
-                {selectedPinnedItem.winning_bid && selectedPinnedItem.winning_bid > 0 ? (
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-[11px] font-bold text-amber-900 block">최종 낙찰가</span>
-                      <span className="text-sm font-black text-amber-700">
-                        {selectedPinnedItem.winning_bid.toLocaleString()}원
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs font-extrabold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
-                        낙찰가율 {selectedPinnedItem.winning_rate || 0}%
-                      </span>
-                      {selectedPinnedItem.bidder_count ? (
-                        <span className="block text-[10px] text-gray-500 mt-0.5">
-                          경쟁률 {selectedPinnedItem.bidder_count}명 응찰
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-[11px] font-bold text-blue-900 block">최저 입찰가</span>
-                      <span className="text-sm font-black text-blue-700">
-                        {(selectedPinnedItem.min_bid || 0).toLocaleString()}원
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[11px] text-gray-500 line-through block">
-                        감정 {(selectedPinnedItem.appraisal || 0).toLocaleString()}원
-                      </span>
-                      {selectedPinnedItem.failed_count !== undefined && (
-                        <span className="text-xs font-bold text-rose-600">
-                          유찰 {selectedPinnedItem.failed_count}회
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* 하단 액션 버튼 */}
-              <div className="flex items-center gap-2">
-                {onAddToPlanner && (
+              <div className="hidden sm:flex items-center bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl px-2 py-1 shadow-md">
+                <input
+                  type="text"
+                  placeholder="동네/역 검색"
+                  value={naverRegionInput}
+                  onChange={(e) => setNaverRegionInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      setNaverRegion(naverRegionInput);
+                    }
+                  }}
+                  className="text-xs text-gray-800 outline-none w-28 placeholder:text-gray-400"
+                />
+                {naverRegionInput && (
                   <button
-                    type="button"
                     onClick={() => {
-                      const src = selectedPinnedItem.source === "results" ? "results" : selectedPinnedItem.source === "onbid" ? "onbid" : "auction";
-                      onAddToPlanner(selectedPinnedItem, src);
+                      setNaverRegionInput("");
+                      setNaverRegion("");
                     }}
-                    className="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 shrink-0"
+                    className="text-gray-400 hover:text-gray-600 text-xs px-1 cursor-pointer"
                   >
-                    <span>📍</span> <span>임장담기</span>
+                    ✕
                   </button>
                 )}
-                <button
-                  type="button"
-                  onClick={() => onSelectItem(selectedPinnedItem)}
-                  className="flex-1 py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-xs transition-colors cursor-pointer text-center"
-                >
-                  🔍 AI 상세분석 & 권리분석 열기
-                </button>
               </div>
             </div>
           )}
 
-          {/* 선택한 네이버 상가 매물 플로팅 상세 카드 */}
-          {selectedNaver && (
-            <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 bg-white rounded-2xl shadow-xl border-2 border-emerald-500 p-4 z-[500]">
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="px-2 py-0.5 rounded-md bg-[#03c75a] text-white text-[11px] font-extrabold">
-                    N 네이버 상가 ({selectedNaver.trade_type})
+          {/* 🌟 [전체화면 모드] 우상단 수도권 퀵 복귀 버튼 */}
+          {fullScreenMode && (
+            <div className="absolute top-3 right-3 z-[400] flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => handleFlyTo(37.43, 127.08, 11)}
+                className="px-2.5 py-1.5 bg-white/95 backdrop-blur-md rounded-xl text-xs font-extrabold text-gray-700 shadow-md border border-gray-200 hover:bg-gray-50 cursor-pointer"
+                title="수도권 중심 좌표로 이동"
+              >
+                🌐 수도권
+              </button>
+            </div>
+          )}
+
+          {/* 🌟 [전체화면 모드] 하단 플로팅 필터 독 & 매물 목록 보기 버튼 */}
+          {fullScreenMode && !isDrawerOpen && !selectedPinnedItem && !selectedNaver && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[420] w-[95%] max-w-md flex flex-col items-center gap-2 pointer-events-auto animate-in fade-in slide-in-from-bottom-2 duration-200">
+              {/* 4대 소스 토글 필 버튼들 */}
+              <div className="flex items-center justify-center gap-1 p-1 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 w-full overflow-x-auto">
+                {/* 1. ⚖️ 경매 */}
+                <button
+                  type="button"
+                  onClick={() => onToggleSource && onToggleSource("auction")}
+                  className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                    selectedSources?.auction
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "bg-gray-100 text-gray-500 hover:text-gray-800"
+                  }`}
+                >
+                  <span className="whitespace-nowrap break-keep">⚖️ 경매</span>
+                  <span className={`text-[10px] px-1 py-0.2 rounded font-bold ${selectedSources?.auction ? "bg-white/20 text-white" : "text-gray-400"}`}>
+                    {sourceCounts?.auction ?? items.filter((i) => i.source === "auction" || !i.source).length}
                   </span>
-                  {selectedNaver.floor === 1 ? (
-                    <span className="px-2 py-0.5 rounded-md bg-orange-500 text-white text-[11px] font-extrabold">
-                      ✨ 1층 상가
-                    </span>
-                  ) : selectedNaver.floor ? (
-                    <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 text-[11px] font-bold">
-                      {selectedNaver.floor < 0 ? `지하${Math.abs(selectedNaver.floor)}층` : `${selectedNaver.floor}층`} / {selectedNaver.total_floor || "-"}층
-                    </span>
-                  ) : null}
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
+                </button>
+
+                {/* 2. 🏛️ 공매 */}
+                <button
+                  type="button"
+                  onClick={() => onToggleSource && onToggleSource("onbid")}
+                  className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                    selectedSources?.onbid
+                      ? "bg-purple-600 text-white shadow-xs"
+                      : "bg-gray-100 text-gray-500 hover:text-gray-800"
+                  }`}
+                >
+                  <span className="whitespace-nowrap break-keep">🏛️ 공매</span>
+                  <span className={`text-[10px] px-1 py-0.2 rounded font-bold ${selectedSources?.onbid ? "bg-white/20 text-white" : "text-gray-400"}`}>
+                    {sourceCounts?.onbid ?? items.filter((i) => i.source === "onbid").length}
+                  </span>
+                </button>
+
+                {/* 3. 🟢 네이버 */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onToggleSource) onToggleSource("naver");
+                    setShowNaver(!showNaver);
+                  }}
+                  className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                    (selectedSources?.naver ?? showNaver)
+                      ? "bg-[#03c75a] text-white shadow-xs"
+                      : "bg-gray-100 text-gray-500 hover:text-gray-800"
+                  }`}
+                >
+                  <span className="whitespace-nowrap break-keep">🟢 시세</span>
+                  <span className={`text-[10px] px-1 py-0.2 rounded font-bold ${(selectedSources?.naver ?? showNaver) ? "bg-white/20 text-white" : "text-gray-400"}`}>
+                    {naverTotalMatching || naverItems.length}
+                  </span>
+                </button>
+
+                {/* 4. 🏆 낙찰 */}
+                <button
+                  type="button"
+                  onClick={() => onToggleSource && onToggleSource("results")}
+                  className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                    selectedSources?.results
+                      ? "bg-amber-600 text-white shadow-xs"
+                      : "bg-gray-100 text-gray-500 hover:text-gray-800"
+                  }`}
+                >
+                  <span className="whitespace-nowrap break-keep">🏆 낙찰</span>
+                  <span className={`text-[10px] px-1 py-0.2 rounded font-bold ${selectedSources?.results ? "bg-white/20 text-white" : "text-gray-400"}`}>
+                    {sourceCounts?.results ?? items.filter((i) => i.source === "results" || i.winning_bid).length}
+                  </span>
+                </button>
+              </div>
+
+              {/* 매물 목록 열기 버튼 */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDrawerOpen(true);
+                  setDrawerTab("list");
+                }}
+                className="w-full py-2.5 px-4 bg-gray-900/95 hover:bg-black text-white text-xs sm:text-sm font-black rounded-2xl shadow-2xl backdrop-blur-md flex items-center justify-between border border-gray-700 cursor-pointer active:scale-98 transition-all"
+              >
+                <span className="flex items-center gap-1.5">
+                  <span>📋</span>
+                  <span>매물 목록 보기</span>
+                </span>
+                <span className="flex items-center gap-1 text-[11px] text-gray-300 bg-white/20 px-2.5 py-0.5 rounded-full font-bold">
+                  <span>총 {(items.length + (showNaver ? naverItems.length : 0)).toLocaleString()}건</span>
+                  <span>▲</span>
+                </span>
+              </button>
+            </div>
+          )}
+
+          {/* 🌟 [바텀시트 (Bottom Sheet / Drawer)] 매물 목록 및 상세 정보 */}
+          {(isDrawerOpen || selectedPinnedItem || selectedNaver) && (
+            <div className="absolute inset-x-0 bottom-0 max-h-[70vh] sm:max-h-[60vh] bg-white rounded-t-3xl shadow-2xl border-t border-gray-200 z-[530] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200">
+              {/* 바텀시트 상단 헤더 & 탭 */}
+              <div className="px-4 pt-2.5 pb-2 bg-gray-50 border-b border-gray-200 shrink-0">
+                <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-2" />
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    {(selectedPinnedItem || selectedNaver) && (
+                      <button
+                        type="button"
+                        onClick={() => setDrawerTab("pinned")}
+                        className={`px-3 py-1 rounded-xl text-xs font-black transition-colors cursor-pointer ${
+                          drawerTab === "pinned"
+                            ? "bg-indigo-600 text-white shadow-xs"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
+                      >
+                        📌 선택 매물 상세
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setDrawerTab("list")}
+                      className={`px-3 py-1 rounded-xl text-xs font-black transition-colors cursor-pointer ${
+                        drawerTab === "list" || (!selectedPinnedItem && !selectedNaver)
+                          ? "bg-blue-600 text-white shadow-xs"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      📋 지도 매물 목록 ({(items.length + (showNaver ? naverItems.length : 0)).toLocaleString()}건)
+                    </button>
+                  </div>
+
                   <button
                     type="button"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      const nextFav = selectedNaver.is_favorite ? 0 : 1;
-                      setSelectedNaver({ ...selectedNaver, is_favorite: nextFav });
-                      setNaverItems((prev) =>
-                        prev.map((n) =>
-                          n.article_id === selectedNaver.article_id ? { ...n, is_favorite: nextFav } : n
-                        )
-                      );
-                      try {
-                        await fetch("/api/favorites/toggle", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "1" },
-                          body: JSON.stringify({ item_type: "naver", item_id: selectedNaver.article_id }),
-                        });
-                      } catch (err) {
-                        console.error("관심등록 실패:", err);
-                      }
+                    onClick={() => {
+                      setIsDrawerOpen(false);
+                      setSelectedPinnedItem(null);
+                      setSelectedNaver(null);
                     }}
-                    className={`p-1 text-base transition-transform hover:scale-125 cursor-pointer ${
-                      selectedNaver.is_favorite ? "text-amber-500 font-bold" : "text-gray-300 hover:text-amber-400"
-                    }`}
-                    title={selectedNaver.is_favorite ? "관심매물 해제" : "관심매물 등록"}
+                    className="px-2.5 py-1 text-xs font-bold text-gray-500 hover:text-gray-900 bg-white hover:bg-gray-100 rounded-lg border border-gray-200 cursor-pointer flex items-center gap-1"
                   >
-                    {selectedNaver.is_favorite ? "⭐" : "☆"}
-                  </button>
-                  <button
-                    onClick={() => setSelectedNaver(null)}
-                    className="text-gray-400 hover:text-gray-700 text-sm font-bold px-1.5 cursor-pointer"
-                  >
-                    ✕
+                    <span>✕ 지도 전체보기</span>
                   </button>
                 </div>
               </div>
 
-              {selectedNaver.recommend_tag && (
-                <div className="mb-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-900 font-extrabold text-xs shadow-xs">
-                  <span>{selectedNaver.recommend_tag}</span>
-                </div>
-              )}
+              {/* 바텀시트 본문 스크롤 영역 */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {/* 1. 선택 매물 상세 탭 (또는 핀이 선택되었을 때) */}
+                {(drawerTab === "pinned" || (!isDrawerOpen && (selectedPinnedItem || selectedNaver))) && (
+                  <div>
+                    {selectedPinnedItem && (
+                      <div className="max-w-xl mx-auto space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className={`px-2.5 py-0.5 rounded-md text-xs font-black text-white ${
+                              selectedPinnedItem.source === "results" || selectedPinnedItem.winning_bid
+                                ? "bg-amber-600"
+                                : selectedPinnedItem.source === "onbid"
+                                ? "bg-purple-600"
+                                : "bg-blue-600"
+                            }`}>
+                              {selectedPinnedItem.source === "results" || selectedPinnedItem.winning_bid
+                                ? "🏆 낙찰결과"
+                                : selectedPinnedItem.source === "onbid"
+                                ? "🏛️ 온비드 공매"
+                                : `⚖️ 법원경매 ${selectedPinnedItem.ai_grade ? `(${selectedPinnedItem.ai_grade}등급)` : ""}`}
+                            </span>
+                            <span className="text-xs font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded-md">
+                              {selectedPinnedItem.case_number || selectedPinnedItem.cltr_no}
+                            </span>
+                            {selectedPinnedItem.usage && (
+                              <span className="text-[11px] font-semibold text-gray-600 bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded">
+                                {selectedPinnedItem.usage}
+                              </span>
+                            )}
+                          </div>
+                        </div>
 
-              <h4 className="text-sm font-extrabold text-gray-900 mb-1 line-clamp-2">
-                {selectedNaver.article_name || "일반상가"}
-              </h4>
-              <p className="text-xs text-gray-500 mb-3">
-                📍 {selectedNaver.addr_sgg} {selectedNaver.addr_emd} · 전용{" "}
-                <strong className="text-gray-800">{selectedNaver.area_pyeong}평</strong> ({selectedNaver.area_m2}㎡)
-              </p>
+                        <h4 className="text-base font-extrabold text-gray-900">
+                          📍 {selectedPinnedItem.location || selectedPinnedItem.cltr_nm}
+                        </h4>
+                        <p className="text-xs text-gray-500">
+                          {selectedPinnedItem.area_pyeong || selectedPinnedItem.bld_area_pyeong ? (
+                            <span>전용 <strong className="text-gray-800">{selectedPinnedItem.area_pyeong || selectedPinnedItem.bld_area_pyeong}평</strong> · </span>
+                          ) : null}
+                          <span>{selectedPinnedItem.floor ? (selectedPinnedItem.floor < 0 ? `지하${Math.abs(selectedPinnedItem.floor)}층` : `${selectedPinnedItem.floor}층`) : "층수미상"}</span>
+                          {selectedPinnedItem.reg_org_nm ? ` · ${selectedPinnedItem.reg_org_nm}` : ""}
+                        </p>
 
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 mb-3">
-                {selectedNaver.trade_type === "매매" ? (
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-800">네이버 매매 호가</span>
-                    <div className="text-right">
-                      <span className="text-base font-black text-emerald-700">
-                        {formatNaverPrice10k(selectedNaver.price_sale_10k)}원
-                      </span>
-                      {selectedNaver.area_pyeong > 0 && (
-                        <span className="block text-[10px] text-emerald-600 font-semibold">
-                          평당 {Math.round(selectedNaver.price_sale_10k / selectedNaver.area_pyeong).toLocaleString()}만원
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-800">네이버 보증금 / 월세</span>
-                    <div className="text-right">
-                      <span className="text-base font-black text-emerald-700">
-                        {formatNaverPrice10k(selectedNaver.deposit_10k)} / 월 {formatNaverPrice10k(selectedNaver.monthly_rent_10k)}
-                      </span>
-                      {selectedNaver.area_pyeong > 0 && (
-                        <span className="block text-[10px] text-emerald-600 font-semibold">
-                          평당 월세 {(selectedNaver.monthly_rent_10k / selectedNaver.area_pyeong).toFixed(1)}만원
-                        </span>
-                      )}
-                    </div>
+                        {/* 가격 브리핑 */}
+                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3">
+                          {selectedPinnedItem.winning_bid && selectedPinnedItem.winning_bid > 0 ? (
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className="text-xs font-bold text-amber-900 block">최종 낙찰가</span>
+                                <span className="text-lg font-black text-amber-700">
+                                  {selectedPinnedItem.winning_bid.toLocaleString()}원
+                                </span>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-full">
+                                  낙찰가율 {selectedPinnedItem.winning_rate || 0}%
+                                </span>
+                                {selectedPinnedItem.bidder_count ? (
+                                  <span className="block text-[11px] text-gray-500 mt-1">
+                                    경쟁률 {selectedPinnedItem.bidder_count}명 응찰
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className="text-xs font-bold text-blue-900 block">최저 입찰가</span>
+                                <span className="text-lg font-black text-blue-700">
+                                  {(selectedPinnedItem.min_bid || 0).toLocaleString()}원
+                                </span>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-xs text-gray-500 line-through block">
+                                  감정 {(selectedPinnedItem.appraisal || 0).toLocaleString()}원
+                                </span>
+                                {selectedPinnedItem.failed_count !== undefined && (
+                                  <span className="text-xs font-bold text-rose-600">
+                                    유찰 {selectedPinnedItem.failed_count}회
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 하단 액션 버튼 */}
+                        <div className="flex items-center gap-2 pt-1">
+                          {onAddToPlanner && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const src = selectedPinnedItem.source === "results" ? "results" : selectedPinnedItem.source === "onbid" ? "onbid" : "auction";
+                                onAddToPlanner(selectedPinnedItem, src);
+                              }}
+                              className="px-3 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 shrink-0"
+                            >
+                              <span>📍</span> <span>임장담기</span>
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => onSelectItem(selectedPinnedItem)}
+                            className="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-xs transition-colors cursor-pointer text-center"
+                          >
+                            🔍 AI 상세분석 & 권리분석 열기
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedNaver && (
+                      <div className="max-w-xl mx-auto space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="px-2 py-0.5 rounded-md bg-[#03c75a] text-white text-xs font-extrabold">
+                              N 네이버 상가 ({selectedNaver.trade_type})
+                            </span>
+                            {selectedNaver.floor === 1 ? (
+                              <span className="px-2 py-0.5 rounded-md bg-orange-500 text-white text-xs font-extrabold">
+                                ✨ 1층 상가
+                              </span>
+                            ) : selectedNaver.floor ? (
+                              <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 text-xs font-bold">
+                                {selectedNaver.floor < 0 ? `지하${Math.abs(selectedNaver.floor)}층` : `${selectedNaver.floor}층`} / {selectedNaver.total_floor || "-"}층
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+
+                        <h4 className="text-base font-extrabold text-gray-900">
+                          {selectedNaver.article_name || "일반상가"}
+                        </h4>
+                        <p className="text-xs text-gray-500">
+                          📍 {selectedNaver.addr_sgg} {selectedNaver.addr_emd} · 전용{" "}
+                          <strong className="text-gray-800">{selectedNaver.area_pyeong}평</strong> ({selectedNaver.area_m2}㎡)
+                        </p>
+
+                        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3">
+                          {selectedNaver.trade_type === "매매" ? (
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-emerald-800">네이버 매매 호가</span>
+                              <div className="text-right">
+                                <span className="text-lg font-black text-emerald-700">
+                                  {formatNaverPrice10k(selectedNaver.price_sale_10k)}원
+                                </span>
+                                {selectedNaver.area_pyeong > 0 && (
+                                  <span className="block text-[11px] text-emerald-600 font-semibold">
+                                    평당 {Math.round(selectedNaver.price_sale_10k / selectedNaver.area_pyeong).toLocaleString()}만원
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-emerald-800">네이버 보증금 / 월세</span>
+                              <div className="text-right">
+                                <span className="text-lg font-black text-emerald-700">
+                                  {formatNaverPrice10k(selectedNaver.deposit_10k)} / 월 {formatNaverPrice10k(selectedNaver.monthly_rent_10k)}
+                                </span>
+                                {selectedNaver.area_pyeong > 0 && (
+                                  <span className="block text-[11px] text-emerald-600 font-semibold">
+                                    평당 월세 {(selectedNaver.monthly_rent_10k / selectedNaver.area_pyeong).toFixed(1)}만원
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-1">
+                          <span className="text-xs text-gray-400 truncate">
+                            {selectedNaver.realtor || "공인중개사"} {selectedNaver.confirm_date ? `· 확인 ${selectedNaver.confirm_date}` : ""}
+                          </span>
+                          <a
+                            href={selectedNaver.detail_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-2 rounded-xl bg-[#03c75a] hover:bg-emerald-600 text-white text-xs font-extrabold transition-colors shrink-0"
+                          >
+                            네이버 부동산 원문 ↗
+                          </a>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
 
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] text-gray-400 truncate">
-                  {selectedNaver.realtor || "공인중개사"} {selectedNaver.confirm_date ? `· 확인 ${selectedNaver.confirm_date}` : ""}
-                </span>
-                <a
-                  href={selectedNaver.detail_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-[#03c75a] hover:bg-emerald-600 text-white text-xs font-extrabold transition-colors shrink-0"
-                >
-                  네이버 부동산 원문 ↗
-                </a>
+                {/* 2. 지도 내 매물 스크롤 리스트 탭 */}
+                {(drawerTab === "list" || (!selectedPinnedItem && !selectedNaver)) && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                    {/* 경매/공매/낙찰 아이템들 */}
+                    {items.slice(0, 50).map((it, idx) => {
+                      const isResults = it.source === "results" || !!it.winning_bid;
+                      const isOnbid = it.source === "onbid";
+                      return (
+                        <div
+                          key={it.case_number || it.cltr_no || idx}
+                          onClick={() => {
+                            setSelectedPinnedItem(it);
+                            setSelectedNaver(null);
+                            setDrawerTab("pinned");
+                            if (it.lat && it.lng) handleFlyTo(it.lat, it.lng, 16);
+                          }}
+                          className="p-3 rounded-2xl border border-gray-200 hover:border-blue-500 bg-gray-50/50 hover:bg-blue-50/30 transition-all cursor-pointer flex flex-col justify-between gap-1.5"
+                        >
+                          <div className="flex items-center justify-between gap-1">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-black text-white ${
+                              isResults ? "bg-amber-600" : isOnbid ? "bg-purple-600" : "bg-blue-600"
+                            }`}>
+                              {isResults ? "🏆 낙찰" : isOnbid ? "🏛️ 공매" : "⚖️ 경매"}
+                            </span>
+                            <span className="text-xs font-bold text-gray-700 truncate max-w-[200px]">
+                              {it.case_number || it.cltr_no}
+                            </span>
+                            <span className="text-[11px] font-bold text-gray-500">
+                              {it.area_pyeong || it.bld_area_pyeong ? `${it.area_pyeong || it.bld_area_pyeong}평` : ""}
+                            </span>
+                          </div>
+
+                          <h5 className="text-xs font-extrabold text-gray-900 line-clamp-1">
+                            {it.location || it.cltr_nm}
+                          </h5>
+
+                          <div className="flex items-center justify-between pt-1 border-t border-gray-200/60 text-xs">
+                            <span className="font-extrabold text-blue-700">
+                              {isResults
+                                ? `낙찰 ${(it.winning_bid || 0).toLocaleString()}원 (${it.winning_rate || 0}%)`
+                                : `최저 ${(it.min_bid || 0).toLocaleString()}원`}
+                            </span>
+                            <span className="text-[11px] text-gray-400">
+                              {it.reg_org_nm || it.usage || "상세보기 ↗"}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* 네이버 상가 아이템들 */}
+                    {showNaver &&
+                      naverItems.slice(0, 30).map((n) => (
+                        <div
+                          key={n.article_id}
+                          onClick={() => {
+                            setSelectedNaver(n);
+                            setSelectedPinnedItem(null);
+                            setDrawerTab("pinned");
+                            if (n.lat && n.lng) handleFlyTo(n.lat, n.lng, 16);
+                          }}
+                          className="p-3 rounded-2xl border border-gray-200 hover:border-emerald-500 bg-gray-50/50 hover:bg-emerald-50/30 transition-all cursor-pointer flex flex-col justify-between gap-1.5"
+                        >
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-black bg-[#03c75a] text-white">
+                              🟢 네이버
+                            </span>
+                            <span className="text-xs font-bold text-gray-700 truncate max-w-[200px]">
+                              {n.article_name || "일반상가"}
+                            </span>
+                            <span className="text-[11px] font-bold text-gray-500">
+                              {n.area_pyeong}평
+                            </span>
+                          </div>
+
+                          <h5 className="text-xs font-extrabold text-gray-900 line-clamp-1">
+                            📍 {n.addr_sgg} {n.addr_emd}
+                          </h5>
+
+                          <div className="flex items-center justify-between pt-1 border-t border-gray-200/60 text-xs">
+                            <span className="font-extrabold text-emerald-700">
+                              {n.trade_type === "매매"
+                                ? `매매 ${formatNaverPrice10k(n.price_sale_10k)}원`
+                                : `월세 ${formatNaverPrice10k(n.deposit_10k)}/${formatNaverPrice10k(n.monthly_rent_10k)}`}
+                            </span>
+                            <span className="text-[11px] text-emerald-600 font-bold">
+                              네이버 매물 ↗
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* 하단 네이버 상가 실매물 카드 리스트 */}
-      {showNaver && (
+      {/* 하단 네이버 상가 실매물 카드 리스트 (일반 모드 전용) */}
+      {!fullScreenMode && showNaver && (
         <div className="bg-white border border-emerald-200 rounded-2xl p-4 sm:p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5">
             <div className="flex flex-wrap items-center gap-2">

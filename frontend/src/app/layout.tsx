@@ -26,22 +26,16 @@ export default function RootLayout({
               <span>올인원 부동산 AI</span>
               <span className="hidden md:inline text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">경매·공매·낙찰</span>
             </Link>
-            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-              <Link href="/auctions?source=results" className="text-[11px] sm:text-xs font-black px-2 sm:px-2.5 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 shadow-2xs flex items-center gap-1 transition-all whitespace-nowrap">
-                <span>🏆</span> <span className="hidden sm:inline">낙찰결과</span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Link href="/auctions" className="text-xs font-extrabold px-3 py-1.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-xs flex items-center gap-1 transition-all whitespace-nowrap">
+                <span>🔍</span> <span>매물탐색</span>
               </Link>
-              <Link href="/auctions?view=map" className="text-[11px] sm:text-xs font-black px-2 sm:px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 shadow-2xs flex items-center gap-1 transition-all whitespace-nowrap">
-                <span>🗺️</span> <span>지도</span>
-              </Link>
-              <Link href="/planner" className="text-[11px] sm:text-xs font-bold px-2 sm:px-2.5 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 shadow-2xs flex items-center gap-1 transition-all whitespace-nowrap">
-                <span>📍</span> <span className="hidden xs:inline">임장</span>
-              </Link>
-              <Link href="/auctions" className="text-[11px] sm:text-xs font-bold px-2 sm:px-3 py-1.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-xs flex items-center gap-1 transition-colors whitespace-nowrap">
-                <span>🔍</span> <span>목록</span>
+              <Link href="/planner" className="text-xs font-bold px-2.5 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 shadow-2xs flex items-center gap-1 transition-all whitespace-nowrap">
+                <span>📍</span> <span className="hidden xs:inline">임장플래너</span>
               </Link>
             </div>
           </nav>
-          <main className="p-4 py-6">
+          <main className="p-2 sm:p-4">
             {children}
           </main>
         </div>

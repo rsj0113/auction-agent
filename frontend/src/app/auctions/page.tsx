@@ -1140,280 +1140,66 @@ export default function AuctionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="text-gray-400 hover:text-gray-700 transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </Link>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 tracking-tight">전체 매물 검색</h1>
-              <p className="text-[11px] text-gray-500 font-medium">
-                {selectedSources.auction ? "⚖️경매 " : ""}{selectedSources.onbid ? "🏛️공매 " : ""}{selectedSources.naver ? "🟢시세 " : ""}{selectedSources.results ? "🏆낙찰 " : ""}· 총 {totalMatching.toLocaleString()}건
-              </p>
-            </div>
-          </div>
-          {/* 리스트 / 지도 보기 전환 탭 & 임장 플래너 & 실거래 낙찰 결과 바로가기 */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <button
-              type="button"
-              onClick={() => handleToggleSource("results")}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1 shadow-2xs cursor-pointer ${
-                selectedSources.results
-                  ? "bg-amber-600 text-white ring-2 ring-amber-500/30"
-                  : "bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200"
-              }`}
-              title="실거래 낙찰결과 토글"
-            >
-              <span className="text-sm">🏆</span>
-              <span className="hidden xs:inline">낙찰결과</span>
-              <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
-                selectedSources.results ? "bg-white/20 text-white" : "bg-white text-amber-800 border border-amber-200"
-              }`}>
-                {quickCounts.results_total ? quickCounts.results_total.toLocaleString() : "3,396"}
-              </span>
-            </button>
-
-            <Link
-              href="/planner"
-              className="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-extrabold transition-colors flex items-center gap-1 shadow-2xs"
-              title="임장 플래너 열기"
-            >
-              <span>📍</span>
-              <span className="hidden sm:inline">임장 플래너</span>
-            </Link>
-
-            <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200">
-              <button
-                onClick={() => setViewMode("map")}
-                className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === "map"
-                    ? "bg-emerald-600 text-white shadow-2xs"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                🗺️ 지도
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === "list"
-                    ? "bg-blue-600 text-white shadow-2xs"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                📋 리스트
-              </button>
-            </div>
-          </div>
+      {/* 임장 플래너 담기 토스트 알림 */}
+      {plannerToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-gray-900/90 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <span>{plannerToast}</span>
+          <Link href="/planner" className="underline text-blue-300 hover:text-white ml-1">
+            플래너 보기 &rarr;
+          </Link>
         </div>
+      )}
 
-        {/* 임장 플래너 담기 토스트 알림 */}
-        {plannerToast && (
-          <div className="fixed bottom-6 right-6 z-50 bg-gray-900/90 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-200">
-            <span>{plannerToast}</span>
-            <Link href="/planner" className="underline text-blue-300 hover:text-white ml-1">
-              플래너 보기 &rarr;
-            </Link>
-          </div>
-        )}
-      </header>
-
-      <main className="w-full mx-auto px-4 sm:px-5 pt-5 max-w-5xl">
-        {/* 🌟 1. 최상위 뷰 모드 탭 (지도 버전 vs 리스트 버전) */}
-        <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-200/90 rounded-2xl border border-slate-300 shadow-inner mb-3.5">
+      <main className="w-full mx-auto px-2 sm:px-4 pt-2 sm:pt-3 max-w-6xl">
+        {/* 🌟 1. 최상단 뷰 모드 탭 (🗺️ 지도 버전 vs 📋 리스트 버전) */}
+        <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-200/90 rounded-2xl border border-slate-300 shadow-inner mb-3">
           <button
             type="button"
             onClick={() => setViewMode("map")}
-            className={`h-12 flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+            className={`h-11 flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
               viewMode === "map"
                 ? "bg-emerald-600 text-white shadow-md ring-2 ring-emerald-500/30 scale-[1.01]"
                 : "bg-white text-gray-700 hover:text-gray-900 hover:bg-gray-50 border border-gray-200"
             }`}
           >
             <span className="text-base sm:text-lg">🗺️</span>
-            <span className="whitespace-nowrap break-keep">지도 버전 (전체 화면 지도)</span>
+            <span className="whitespace-nowrap break-keep">지도 버전</span>
             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${viewMode === "map" ? "bg-white/25 text-white" : "bg-emerald-50 text-emerald-700"}`}>
-              실시간 핀
+              전체화면
             </span>
           </button>
 
           <button
             type="button"
             onClick={() => setViewMode("list")}
-            className={`h-12 flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+            className={`h-11 flex items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
               viewMode === "list"
                 ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-500/30 scale-[1.01]"
                 : "bg-white text-gray-700 hover:text-gray-900 hover:bg-gray-50 border border-gray-200"
             }`}
           >
             <span className="text-base sm:text-lg">📋</span>
-            <span className="whitespace-nowrap break-keep">리스트 버전 (상세 목록)</span>
+            <span className="whitespace-nowrap break-keep">리스트 버전</span>
             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${viewMode === "list" ? "bg-white/25 text-white" : "bg-blue-50 text-blue-700"}`}>
-              상세 카드
+              {totalMatching.toLocaleString()}건
             </span>
           </button>
         </div>
 
-        {/* 🌟 2. 4대 매물 소스 다중 선택 버튼 바 (경매·공매·네이버·낙찰결과 - 중복 선택 가능) */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-2 px-1">
-            <span className="text-xs font-black text-gray-800 flex items-center gap-1.5">
-              <span>🏢</span>
-              <span>매물 종류 선택</span>
-              <span className="text-[11px] font-normal text-gray-500 hidden sm:inline">(버튼 클릭으로 복수 선택 및 동시 비교 가능)</span>
-            </span>
-            <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-200">
-              선택 매물 총 {totalMatching.toLocaleString()}건
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
-            {/* 1. ⚖️ 법원경매 */}
-            <button
-              type="button"
-              onClick={() => handleToggleSource("auction")}
-              className={`h-13 sm:h-14 px-3 rounded-2xl font-extrabold transition-all cursor-pointer flex items-center justify-between border ${
-                selectedSources.auction
-                  ? "bg-blue-600 text-white border-blue-600 shadow-md ring-2 ring-blue-500/30 -translate-y-0.5"
-                  : "bg-white text-gray-500 hover:text-gray-800 border-gray-200 hover:bg-gray-50 opacity-70"
-              }`}
-            >
-              <div className="flex items-center gap-1.5 truncate">
-                <span className="text-base sm:text-lg">⚖️</span>
-                <div className="text-left">
-                  <div className="text-xs sm:text-sm font-black whitespace-nowrap break-keep">법원경매</div>
-                  <div className={`text-[10px] font-medium leading-none ${selectedSources.auction ? "text-blue-100" : "text-gray-400"}`}>
-                    {selectedSources.auction ? "선택됨 ✓" : "선택해제"}
-                  </div>
-                </div>
-              </div>
-              <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-black whitespace-nowrap shrink-0 ${
-                selectedSources.auction ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-              }`}>
-                {quickCounts.total ? quickCounts.total.toLocaleString() : "1,281"}
-              </span>
-            </button>
-
-            {/* 2. 🏛️ 온비드 공매 */}
-            <button
-              type="button"
-              onClick={() => handleToggleSource("onbid")}
-              className={`h-13 sm:h-14 px-3 rounded-2xl font-extrabold transition-all cursor-pointer flex items-center justify-between border ${
-                selectedSources.onbid
-                  ? "bg-purple-600 text-white border-purple-600 shadow-md ring-2 ring-purple-500/30 -translate-y-0.5"
-                  : "bg-white text-gray-500 hover:text-gray-800 border-gray-200 hover:bg-gray-50 opacity-70"
-              }`}
-            >
-              <div className="flex items-center gap-1.5 truncate">
-                <span className="text-base sm:text-lg">🏛️</span>
-                <div className="text-left">
-                  <div className="text-xs sm:text-sm font-black whitespace-nowrap break-keep">온비드공매</div>
-                  <div className={`text-[10px] font-medium leading-none ${selectedSources.onbid ? "text-purple-100" : "text-gray-400"}`}>
-                    {selectedSources.onbid ? "선택됨 ✓" : "선택해제"}
-                  </div>
-                </div>
-              </div>
-              <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-black whitespace-nowrap shrink-0 ${
-                selectedSources.onbid ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-              }`}>
-                {quickCounts.onbid_total ? quickCounts.onbid_total.toLocaleString() : "1,967"}
-              </span>
-            </button>
-
-            {/* 3. 🟢 네이버 시세 */}
-            <button
-              type="button"
-              onClick={() => handleToggleSource("naver")}
-              className={`h-13 sm:h-14 px-3 rounded-2xl font-extrabold transition-all cursor-pointer flex items-center justify-between border ${
-                selectedSources.naver
-                  ? "bg-[#03c75a] text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/30 -translate-y-0.5"
-                  : "bg-white text-gray-500 hover:text-gray-800 border-gray-200 hover:bg-gray-50 opacity-70"
-              }`}
-            >
-              <div className="flex items-center gap-1.5 truncate">
-                <span className="text-base sm:text-lg">🟢</span>
-                <div className="text-left">
-                  <div className="text-xs sm:text-sm font-black whitespace-nowrap break-keep">네이버시세</div>
-                  <div className={`text-[10px] font-medium leading-none ${selectedSources.naver ? "text-emerald-100" : "text-gray-400"}`}>
-                    {selectedSources.naver ? "선택됨 ✓" : "선택해제"}
-                  </div>
-                </div>
-              </div>
-              <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-black whitespace-nowrap shrink-0 ${
-                selectedSources.naver ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-              }`}>
-                {quickCounts.naver_total ? quickCounts.naver_total.toLocaleString() : (quickCounts.naver_shops ? quickCounts.naver_shops.toLocaleString() : "5,544")}
-              </span>
-            </button>
-
-            {/* 4. 🏆 낙찰결과 */}
-            <button
-              type="button"
-              onClick={() => handleToggleSource("results")}
-              className={`h-13 sm:h-14 px-3 rounded-2xl font-extrabold transition-all cursor-pointer flex items-center justify-between border ${
-                selectedSources.results
-                  ? "bg-amber-600 text-white border-amber-600 shadow-md ring-2 ring-amber-500/30 -translate-y-0.5"
-                  : "bg-white text-gray-500 hover:text-gray-800 border-gray-200 hover:bg-gray-50 opacity-70"
-              }`}
-            >
-              <div className="flex items-center gap-1.5 truncate">
-                <span className="text-base sm:text-lg">🏆</span>
-                <div className="text-left">
-                  <div className="text-xs sm:text-sm font-black whitespace-nowrap break-keep">낙찰결과</div>
-                  <div className={`text-[10px] font-medium leading-none ${selectedSources.results ? "text-amber-100" : "text-gray-400"}`}>
-                    {selectedSources.results ? "선택됨 ✓" : "선택해제"}
-                  </div>
-                </div>
-              </div>
-              <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-black whitespace-nowrap shrink-0 ${
-                selectedSources.results ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-              }`}>
-                {quickCounts.results_total ? quickCounts.results_total.toLocaleString() : "3,396"}
-              </span>
-            </button>
-          </div>
-        </div>
-
         {/* 🗺️ 지도 버전 (전체 화면 지도 모드) */}
         {viewMode === "map" && (
-          <div className="space-y-3 mb-8">
-            <div className="bg-white border border-gray-200/90 rounded-2xl p-2.5 sm:p-3 shadow-xs flex items-center gap-2">
-              <span className="text-gray-400 text-sm pl-1">🔍</span>
-              <input 
-                type="text"
-                placeholder="지도 내 지역 또는 키워드 검색 (예: 성남, 분당, 강남, 역삼, 아파트, 상가)"
-                value={regionInput}
-                onChange={(e) => setRegionInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && setRegionFilter(regionInput)}
-                className="flex-1 text-xs sm:text-sm bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
-              />
-              {regionInput && (
-                <button
-                  onClick={() => {
-                    setRegionInput("");
-                    setRegionFilter("");
-                  }}
-                  className="text-gray-400 hover:text-gray-600 text-xs p-1"
-                >
-                  ✕
-                </button>
-              )}
-              <button 
-                onClick={() => setRegionFilter(regionInput)}
-                className="bg-emerald-600 text-white text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-xl hover:bg-emerald-700 transition-colors shadow-2xs cursor-pointer shrink-0"
-              >
-                검색
-              </button>
-            </div>
-
+          <div className="w-full mb-8">
             <AuctionMap
               items={combinedMapItems}
               assetSource={assetSource}
               selectedSources={selectedSources}
+              onToggleSource={handleToggleSource}
+              sourceCounts={{
+                auction: quickCounts.total || 0,
+                onbid: quickCounts.onbid_total || 0,
+                naver: quickCounts.naver_total || quickCounts.naver_shops || 0,
+                results: quickCounts.results_total || 0,
+              }}
               onSelectItem={(item) => handleSelectAuction(item)}
               onAddToPlanner={(item, src) => handleAddToPlanner(item, src as any)}
               focusRegion={regionFilter || regionInput}
@@ -1426,6 +1212,125 @@ export default function AuctionsPage() {
         {/* 📋 리스트 버전 (상세 목록 모드) */}
         {viewMode === "list" && (
           <>
+            {/* 🌟 2. 4대 매물 소스 다중 선택 버튼 바 (경매·공매·네이버·낙찰결과 - 중복 선택 가능) */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-xs font-black text-gray-800 flex items-center gap-1.5">
+                  <span>🏢</span>
+                  <span>매물 종류 선택</span>
+                  <span className="text-[11px] font-normal text-gray-500 hidden sm:inline">(버튼 클릭으로 복수 선택 및 동시 비교 가능)</span>
+                </span>
+                <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-200">
+                  선택 매물 총 {totalMatching.toLocaleString()}건
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+                {/* 1. ⚖️ 법원경매 */}
+                <button
+                  type="button"
+                  onClick={() => handleToggleSource("auction")}
+                  className={`h-12 sm:h-13 px-3 rounded-2xl font-extrabold transition-all cursor-pointer flex items-center justify-between border ${
+                    selectedSources.auction
+                      ? "bg-blue-600 text-white border-blue-600 shadow-md ring-2 ring-blue-500/30 -translate-y-0.5"
+                      : "bg-white text-gray-500 hover:text-gray-800 border-gray-200 hover:bg-gray-50 opacity-70"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 truncate">
+                    <span className="text-base sm:text-lg">⚖️</span>
+                    <div className="text-left">
+                      <div className="text-xs sm:text-sm font-black whitespace-nowrap break-keep">법원경매</div>
+                      <div className={`text-[10px] font-medium leading-none ${selectedSources.auction ? "text-blue-100" : "text-gray-400"}`}>
+                        {selectedSources.auction ? "선택됨 ✓" : "선택해제"}
+                      </div>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-black whitespace-nowrap shrink-0 ${
+                    selectedSources.auction ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
+                  }`}>
+                    {quickCounts.total ? quickCounts.total.toLocaleString() : "1,281"}
+                  </span>
+                </button>
+
+                {/* 2. 🏛️ 온비드 공매 */}
+                <button
+                  type="button"
+                  onClick={() => handleToggleSource("onbid")}
+                  className={`h-12 sm:h-13 px-3 rounded-2xl font-extrabold transition-all cursor-pointer flex items-center justify-between border ${
+                    selectedSources.onbid
+                      ? "bg-purple-600 text-white border-purple-600 shadow-md ring-2 ring-purple-500/30 -translate-y-0.5"
+                      : "bg-white text-gray-500 hover:text-gray-800 border-gray-200 hover:bg-gray-50 opacity-70"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 truncate">
+                    <span className="text-base sm:text-lg">🏛️</span>
+                    <div className="text-left">
+                      <div className="text-xs sm:text-sm font-black whitespace-nowrap break-keep">온비드공매</div>
+                      <div className={`text-[10px] font-medium leading-none ${selectedSources.onbid ? "text-purple-100" : "text-gray-400"}`}>
+                        {selectedSources.onbid ? "선택됨 ✓" : "선택해제"}
+                      </div>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-black whitespace-nowrap shrink-0 ${
+                    selectedSources.onbid ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
+                  }`}>
+                    {quickCounts.onbid_total ? quickCounts.onbid_total.toLocaleString() : "1,967"}
+                  </span>
+                </button>
+
+                {/* 3. 🟢 네이버 시세 */}
+                <button
+                  type="button"
+                  onClick={() => handleToggleSource("naver")}
+                  className={`h-12 sm:h-13 px-3 rounded-2xl font-extrabold transition-all cursor-pointer flex items-center justify-between border ${
+                    selectedSources.naver
+                      ? "bg-[#03c75a] text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/30 -translate-y-0.5"
+                      : "bg-white text-gray-500 hover:text-gray-800 border-gray-200 hover:bg-gray-50 opacity-70"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 truncate">
+                    <span className="text-base sm:text-lg">🟢</span>
+                    <div className="text-left">
+                      <div className="text-xs sm:text-sm font-black whitespace-nowrap break-keep">네이버시세</div>
+                      <div className={`text-[10px] font-medium leading-none ${selectedSources.naver ? "text-emerald-100" : "text-gray-400"}`}>
+                        {selectedSources.naver ? "선택됨 ✓" : "선택해제"}
+                      </div>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-black whitespace-nowrap shrink-0 ${
+                    selectedSources.naver ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
+                  }`}>
+                    {quickCounts.naver_total ? quickCounts.naver_total.toLocaleString() : (quickCounts.naver_shops ? quickCounts.naver_shops.toLocaleString() : "5,544")}
+                  </span>
+                </button>
+
+                {/* 4. 🏆 낙찰결과 */}
+                <button
+                  type="button"
+                  onClick={() => handleToggleSource("results")}
+                  className={`h-12 sm:h-13 px-3 rounded-2xl font-extrabold transition-all cursor-pointer flex items-center justify-between border ${
+                    selectedSources.results
+                      ? "bg-amber-600 text-white border-amber-600 shadow-md ring-2 ring-amber-500/30 -translate-y-0.5"
+                      : "bg-white text-gray-500 hover:text-gray-800 border-gray-200 hover:bg-gray-50 opacity-70"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 truncate">
+                    <span className="text-base sm:text-lg">🏆</span>
+                    <div className="text-left">
+                      <div className="text-xs sm:text-sm font-black whitespace-nowrap break-keep">낙찰결과</div>
+                      <div className={`text-[10px] font-medium leading-none ${selectedSources.results ? "text-amber-100" : "text-gray-400"}`}>
+                        {selectedSources.results ? "선택됨 ✓" : "선택해제"}
+                      </div>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-black whitespace-nowrap shrink-0 ${
+                    selectedSources.results ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
+                  }`}>
+                    {quickCounts.results_total ? quickCounts.results_total.toLocaleString() : "3,396"}
+                  </span>
+                </button>
+              </div>
+            </div>
             {/* 📊 일일 신규 유입 및 마감/삭제 건수 라이브 인포 바 */}
             {quickCounts?.inflow_outflow && (
           <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 sm:p-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-emerald-50/90 rounded-2xl border border-blue-200/80 shadow-2xs mb-4 text-xs">
