@@ -696,7 +696,7 @@ def get_onbid_items(
                    reg_org_nm, detail_url,
                    COALESCE(is_favorite, 0) as is_favorite,
                    COALESCE(recommend_tag, '') as recommend_tag,
-                   scraped_at
+                   scraped_at, lat, lng
             FROM onbid_items
         """ + where_clause + order_clause + " LIMIT ? OFFSET ?"
 

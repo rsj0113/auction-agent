@@ -4,13 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { formatMoneyShort } from "@/app/auctions/page";
 
 interface MapItem {
+  id?: number | string;
   case_number: string;
+  cltr_no?: string;
   location: string;
+  cltr_nm?: string;
   usage?: string;
   appraisal: number;
   min_bid: number;
-  failed_count: number;
-  ai_grade: string;
+  failed_count?: number;
+  ai_grade?: string;
   safety_margin?: number;
   market_discount_pct?: number;
   floor?: number | null;
@@ -22,6 +25,12 @@ interface MapItem {
   winning_rate?: number;
   bidder_count?: number;
   source?: string;
+  disposal_method?: string;
+  reg_org_nm?: string;
+  remain_time?: string;
+  area_pyeong?: number;
+  bld_area_pyeong?: number;
+  [key: string]: any;
 }
 
 export interface NaverShopItem {
@@ -52,9 +61,12 @@ export interface NaverShopItem {
 interface AuctionMapProps {
   items: MapItem[];
   onSelectItem: (item: any) => void;
+  onAddToPlanner?: (item: any, source: string) => void;
   focusRegion?: string;
   priceRange?: string; // "", "under1", "1to3", "3to5", "over5"
   assetSource?: "auction" | "onbid" | "naver" | "results";
+  selectedSources?: { auction: boolean; onbid: boolean; naver: boolean; results: boolean };
+  fullScreenMode?: boolean;
 }
 
 const PRESET_REGIONS = [
@@ -103,17 +115,25 @@ export function formatNaverPinPrice(n: NaverShopItem): string {
 export default function AuctionMap({
   items,
   onSelectItem,
+  onAddToPlanner,
   focusRegion = "",
   priceRange = "",
   assetSource = "auction",
+  selectedSources,
+  fullScreenMode = false,
 }: AuctionMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersLayerRef = useRef<any>(null);
   const [mapReady, setMapReady] = useState(false);
 
-  // 네이버 상가 실매물 오버레이 & 필터 상태 (낙찰결과 모드에서는 낙찰 핀 가독성을 위해 기본 OFF)
-  const [showNaver, setShowNaver] = useState(assetSource !== "results");
+  // 선택된 경매/공매/낙찰 매물 플로팅 상세 카드 상태
+  const [selectedPinnedItem, setSelectedPinnedItem] = useState<MapItem | null>(null);
+
+  // 네이버 상가 실매물 오버레이 & 필터 상태
+  const [showNaver, setShowNaver] = useState(
+    selectedSources ? selectedSources.naver : assetSource !== "results"
+  );
   const [naverFirstFloorOnly, setNaverFirstFloorOnly] = useState(false);
   const [naverFloorType, setNaverFloorType] = useState<string>("");
   const [naverPyeongRange, setNaverPyeongRange] = useState<string>("");
@@ -126,6 +146,13 @@ export default function AuctionMap({
   const [naverItems, setNaverItems] = useState<NaverShopItem[]>([]);
   const [naverTotalMatching, setNaverTotalMatching] = useState<number>(0);
   const [selectedNaver, setSelectedNaver] = useState<NaverShopItem | null>(null);
+
+  // selectedSources.naver 동기화
+  useEffect(() => {
+    if (selectedSources) {
+      setShowNaver(selectedSources.naver);
+    }
+  }, [selectedSources?.naver]);
 
   // 상위 페이지의 지역/가격 필터가 바뀌면 네이버 상가 필터도 자동 동기화
   useEffect(() => {
@@ -344,66 +371,90 @@ export default function AuctionMap({
     );
 
     validItems.forEach((item) => {
-      const isResult = item.winning_bid && item.winning_bid > 0;
+      const isResult = item.source === "results" || (item.winning_bid && item.winning_bid > 0);
+      const isOnbid = item.source === "onbid" || !!item.disposal_method;
       const grade = (item.ai_grade || "B").toUpperCase();
-      const bg = isResult
-        ? "#d97706" // 낙찰 결과는 눈에 띄는 호박/황금색
-        : grade === "S"
-        ? "#7c3aed"
-        : grade === "A"
-        ? "#2563eb"
-        : grade === "B"
-        ? "#1d4ed8"
-        : grade === "C"
-        ? "#d97706"
-        : "#dc2626";
-
+      
       const priceLabel = isResult ? formatMoneyShort(item.winning_bid!) : formatMoneyShort(item.min_bid);
-      const is1FShop = item.usage === "상가/근린시설" && item.floor === 1;
+      const is1FShop = (item.usage === "상가/근린시설" || (item.usage || "").includes("근린")) && item.floor === 1;
 
-      const iconHtml = isResult ? `
-        <div style="
-          display:inline-flex;
-          align-items:center;
-          gap:4px;
-          background:linear-gradient(135deg, #b45309, #d97706);
-          color:#fff;
-          padding:3px 9px;
-          border-radius:9999px;
-          font-size:11px;
-          font-weight:900;
-          white-space:nowrap;
-          box-shadow:0 3px 10px rgba(180,83,9,0.45);
-          border:2px solid #fef3c7;
-          transform:translate(-50%, -50%);
-          cursor:pointer;
-        ">
-          <span>🏆낙찰</span>
-          <span>${priceLabel}</span>
-          ${item.winning_rate ? `<span style="color:#fef08a;font-size:9.5px;">(${item.winning_rate}%)</span>` : ""}
-        </div>
-      ` : `
-        <div style="
-          display:inline-flex;
-          align-items:center;
-          gap:4px;
-          background:${bg};
-          color:#fff;
-          padding:3px 8px;
-          border-radius:9999px;
-          font-size:11px;
-          font-weight:800;
-          white-space:nowrap;
-          box-shadow:0 3px 8px rgba(0,0,0,0.32);
-          border:2px solid ${is1FShop ? "#fde047" : "#ffffff"};
-          transform:translate(-50%, -50%);
-          cursor:pointer;
-        ">
-          <span>⚖️${grade}</span>
-          ${is1FShop ? `<span style="color:#fde047;">1층</span>` : ""}
-          <span>${priceLabel}</span>
-        </div>
-      `;
+      let iconHtml = "";
+      let zBoost = 500;
+
+      if (isResult) {
+        zBoost = 1600;
+        iconHtml = `
+          <div style="
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            background:linear-gradient(135deg, #b45309, #d97706);
+            color:#fff;
+            padding:3px 9px;
+            border-radius:9999px;
+            font-size:11px;
+            font-weight:900;
+            white-space:nowrap;
+            box-shadow:0 3px 10px rgba(180,83,9,0.45);
+            border:2px solid #fef3c7;
+            transform:translate(-50%, -50%);
+            cursor:pointer;
+          ">
+            <span>🏆낙찰</span>
+            <span>${priceLabel}</span>
+            ${item.winning_rate ? `<span style="color:#fef08a;font-size:9.5px;">(${item.winning_rate}%)</span>` : ""}
+          </div>
+        `;
+      } else if (isOnbid) {
+        zBoost = 1200;
+        iconHtml = `
+          <div style="
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            background:linear-gradient(135deg, #6b21a8, #9333ea);
+            color:#fff;
+            padding:3px 8px;
+            border-radius:9999px;
+            font-size:11px;
+            font-weight:900;
+            white-space:nowrap;
+            box-shadow:0 3px 8px rgba(107,33,168,0.4);
+            border:2px solid #f3e8ff;
+            transform:translate(-50%, -50%);
+            cursor:pointer;
+          ">
+            <span>🏛️공매</span>
+            ${is1FShop ? `<span style="color:#fde047;">1층</span>` : ""}
+            <span>${priceLabel}</span>
+          </div>
+        `;
+      } else {
+        const bg = grade === "S" ? "#7c3aed" : grade === "A" ? "#2563eb" : grade === "B" ? "#1d4ed8" : grade === "C" ? "#d97706" : "#dc2626";
+        zBoost = grade === "S" ? 1400 : grade === "A" ? 1000 : grade === "B" ? 700 : grade === "C" ? 300 : 100;
+        iconHtml = `
+          <div style="
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            background:${bg};
+            color:#fff;
+            padding:3px 8px;
+            border-radius:9999px;
+            font-size:11px;
+            font-weight:800;
+            white-space:nowrap;
+            box-shadow:0 3px 8px rgba(0,0,0,0.32);
+            border:2px solid ${is1FShop ? "#fde047" : "#ffffff"};
+            transform:translate(-50%, -50%);
+            cursor:pointer;
+          ">
+            <span>⚖️${grade}</span>
+            ${is1FShop ? `<span style="color:#fde047;">1층</span>` : ""}
+            <span>${priceLabel}</span>
+          </div>
+        `;
+      }
 
       const customIcon = L.divIcon({
         html: iconHtml,
@@ -411,23 +462,26 @@ export default function AuctionMap({
         iconSize: [0, 0],
       });
 
-      const zBoost = isResult ? 1500 : (grade === "S" ? 1200 : grade === "A" ? 1000 : grade === "B" ? 700 : grade === "C" ? 300 : 100);
-
       const marker = L.marker([item.lat, item.lng], { icon: customIcon, zIndexOffset: zBoost });
       
       const tooltipContent = isResult ? `
         <div style="font-size:12px;font-weight:800;color:#92400e;">🏆 [실거래 낙찰] ${item.case_number} (${item.usage || "부동산"})</div>
         <div style="font-size:11px;color:#374151;max-width:240px;white-space:normal;">${item.location}</div>
         <div style="font-size:11.5px;color:#b45309;font-weight:800;margin-top:2px;">최종 낙찰: ${priceLabel} (낙찰가율 ${item.winning_rate || 0}%)</div>
+      ` : isOnbid ? `
+        <div style="font-size:12px;font-weight:800;color:#6b21a8;">🏛️ [온비드 공매] ${item.case_number || item.cltr_no}</div>
+        <div style="font-size:11px;color:#374151;max-width:240px;white-space:normal;">${item.location || item.cltr_nm}</div>
+        <div style="font-size:11px;color:#7e22ce;font-weight:800;margin-top:2px;">최저가: ${priceLabel} · ${item.reg_org_nm || "공매"}</div>
       ` : `
         <div style="font-size:12px;font-weight:700;">⚖️ [법원경매] ${item.case_number} (${item.usage || "매물"})</div>
         <div style="font-size:11px;color:#374151;max-width:220px;white-space:normal;">${item.location}</div>
-        <div style="font-size:11px;color:#2563eb;font-weight:700;margin-top:2px;">최저가: ${priceLabel} (유찰 ${item.failed_count}회)</div>
+        <div style="font-size:11px;color:#2563eb;font-weight:700;margin-top:2px;">최저가: ${priceLabel} (유찰 ${item.failed_count || 0}회)</div>
       `;
 
       marker.bindTooltip(tooltipContent, { direction: "top", offset: [0, -12] });
       marker.on("click", () => {
         setSelectedNaver(null);
+        setSelectedPinnedItem(item);
         onSelectItem(item);
       });
       marker.addTo(layerGroup);
@@ -707,13 +761,128 @@ export default function AuctionMap({
         </div>
 
         {/* 지도 캔버스 */}
-        <div className="relative w-full h-[500px] sm:h-[580px] bg-gray-100">
+        <div className={`relative w-full ${fullScreenMode ? "h-[calc(100vh-230px)] min-h-[560px] sm:min-h-[660px]" : "h-[500px] sm:h-[580px]"} bg-gray-100 transition-all`}>
           {!mapReady && (
             <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-500 z-10">
               지도를 불러오는 중입니다...
             </div>
           )}
           <div ref={mapContainerRef} className="w-full h-full z-0" />
+
+          {/* 🌟 선택한 경매/공매/낙찰 매물 플로팅 상세 카드 */}
+          {selectedPinnedItem && (
+            <div className="absolute bottom-3 left-3 right-3 sm:left-auto sm:right-4 sm:w-96 bg-white rounded-2xl shadow-2xl border-2 border-indigo-500 p-4 z-[520] animate-in slide-in-from-bottom-2">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className={`px-2 py-0.5 rounded-md text-[11px] font-black text-white ${
+                    selectedPinnedItem.source === "results" || selectedPinnedItem.winning_bid
+                      ? "bg-amber-600"
+                      : selectedPinnedItem.source === "onbid"
+                      ? "bg-purple-600"
+                      : "bg-blue-600"
+                  }`}>
+                    {selectedPinnedItem.source === "results" || selectedPinnedItem.winning_bid
+                      ? "🏆 낙찰결과"
+                      : selectedPinnedItem.source === "onbid"
+                      ? "🏛️ 온비드 공매"
+                      : `⚖️ 법원경매 ${selectedPinnedItem.ai_grade ? `(${selectedPinnedItem.ai_grade}등급)` : ""}`}
+                  </span>
+                  <span className="text-xs font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded-md">
+                    {selectedPinnedItem.case_number || selectedPinnedItem.cltr_no}
+                  </span>
+                  {selectedPinnedItem.usage && (
+                    <span className="text-[11px] font-semibold text-gray-600 bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded">
+                      {selectedPinnedItem.usage}
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSelectedPinnedItem(null)}
+                  className="text-gray-400 hover:text-gray-700 text-sm font-bold px-1.5 cursor-pointer"
+                  title="닫기"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <h4 className="text-sm font-extrabold text-gray-900 mb-1 line-clamp-2">
+                📍 {selectedPinnedItem.location || selectedPinnedItem.cltr_nm}
+              </h4>
+              <p className="text-xs text-gray-500 mb-2">
+                {selectedPinnedItem.area_pyeong || selectedPinnedItem.bld_area_pyeong ? (
+                  <span>전용 <strong className="text-gray-800">{selectedPinnedItem.area_pyeong || selectedPinnedItem.bld_area_pyeong}평</strong> · </span>
+                ) : null}
+                <span>{selectedPinnedItem.floor ? (selectedPinnedItem.floor < 0 ? `지하${Math.abs(selectedPinnedItem.floor)}층` : `${selectedPinnedItem.floor}층`) : "층수미상"}</span>
+                {selectedPinnedItem.reg_org_nm ? ` · ${selectedPinnedItem.reg_org_nm}` : ""}
+              </p>
+
+              {/* 가격 브리핑 */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 mb-3">
+                {selectedPinnedItem.winning_bid && selectedPinnedItem.winning_bid > 0 ? (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold text-amber-900 block">최종 낙찰가</span>
+                      <span className="text-sm font-black text-amber-700">
+                        {selectedPinnedItem.winning_bid.toLocaleString()}원
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-extrabold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
+                        낙찰가율 {selectedPinnedItem.winning_rate || 0}%
+                      </span>
+                      {selectedPinnedItem.bidder_count ? (
+                        <span className="block text-[10px] text-gray-500 mt-0.5">
+                          경쟁률 {selectedPinnedItem.bidder_count}명 응찰
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold text-blue-900 block">최저 입찰가</span>
+                      <span className="text-sm font-black text-blue-700">
+                        {(selectedPinnedItem.min_bid || 0).toLocaleString()}원
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[11px] text-gray-500 line-through block">
+                        감정 {(selectedPinnedItem.appraisal || 0).toLocaleString()}원
+                      </span>
+                      {selectedPinnedItem.failed_count !== undefined && (
+                        <span className="text-xs font-bold text-rose-600">
+                          유찰 {selectedPinnedItem.failed_count}회
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 하단 액션 버튼 */}
+              <div className="flex items-center gap-2">
+                {onAddToPlanner && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const src = selectedPinnedItem.source === "results" ? "results" : selectedPinnedItem.source === "onbid" ? "onbid" : "auction";
+                      onAddToPlanner(selectedPinnedItem, src);
+                    }}
+                    className="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 shrink-0"
+                  >
+                    <span>📍</span> <span>임장담기</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onSelectItem(selectedPinnedItem)}
+                  className="flex-1 py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-xs transition-colors cursor-pointer text-center"
+                >
+                  🔍 AI 상세분석 & 권리분석 열기
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 선택한 네이버 상가 매물 플로팅 상세 카드 */}
           {selectedNaver && (
