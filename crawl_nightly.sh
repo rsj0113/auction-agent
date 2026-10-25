@@ -52,8 +52,11 @@ $PYTHON core/onbid_api_scraper.py --pages 2 >> "$LOG" 2>&1
 echo "[시세 매칭] $(date '+%H:%M:%S') 경매 물건 ↔ 네이버 상가/빌라 시세 및 안전마진 재계산" >> "$LOG"
 $PYTHON core/market_matcher.py >> "$LOG" 2>&1
 
-echo "[낙찰 결과 최신화] $(date '+%H:%M:%S') 매각기일 경과 매물 마감 및 낙찰 결과 DB 최신화 (온비드 실제 개찰결과 API)" >> "$LOG"
+echo "[낙찰 결과 최신화 - 온비드] $(date '+%H:%M:%S') 온비드 공매 실제 개찰결과 API 최신화" >> "$LOG"
 $PYTHON core/onbid_results.py --days 7 >> "$LOG" 2>&1
+
+echo "[낙찰 결과 최신화 - 대법원] $(date '+%H:%M:%S') 수도권 주요 법원 실제 매각결과(낙찰) 크롤링 수집" >> "$LOG"
+$PYTHON core/court_results_scraper.py --courts "서울중앙지방법원,성남지원,수원지방법원,인천지방법원,고양지원,안양지원,부천지원" --max-pages 2 >> "$LOG" 2>&1
 
 echo "[정리] $(date '+%H:%M:%S') 7일 이상 지난 오래된 매물 삭제" >> "$LOG"
 $PYTHON cleanup_db.py --days 7 >> "$LOG" 2>&1
