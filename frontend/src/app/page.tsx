@@ -5,6 +5,7 @@ import Link from "next/link";
 import { analyzeSeniorDeposit, formatMoney, formatMoneyShort, formatDateShort, QUICK_CHIPS } from "./auctions/page";
 import InvestmentCalculator from "@/components/InvestmentCalculator";
 import AuctionMap, { formatNaverPrice10k } from "@/components/AuctionMap";
+import AgentAdvisorModal from "@/components/AgentAdvisorModal";
 
 interface SummaryData {
   total_active_auctions: number;
@@ -204,6 +205,45 @@ export default function Home() {
   const [selectedDetail, setSelectedDetail] = useState<AuctionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
+  // AI 수석 투자 비서 모달 상태
+  const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
+  const [agentModalTab, setAgentModalTab] = useState<"recommend" | "chat">("recommend");
+
+  // 추천 매물 계속 업데이트 (로테이션/새로고침) 상태
+  const [recommendPage, setRecommendPage] = useState<number>(0);
+  const [recommendRefreshing, setRecommendRefreshing] = useState(false);
+
+  const handleRefreshRecommendations = async () => {
+    setRecommendRefreshing(true);
+    const nextPage = recommendPage + 1;
+    setRecommendPage(nextPage);
+    try {
+      const limit = 12;
+      const offset = (nextPage % 5) * limit; // 5개 페이지 순환
+      const [aucRes, naverRes, onbidRes] = await Promise.all([
+        fetch(`/api/auctions?limit=${limit}&offset=${offset}&sort=recommend`, { headers: { "ngrok-skip-browser-warning": "1" } }),
+        fetch(`/api/naver-listings?limit=18&offset=${(nextPage % 4) * 18}`, { headers: { "ngrok-skip-browser-warning": "1" } }),
+        fetch(`/api/onbid-items?limit=18&offset=${(nextPage % 4) * 18}`, { headers: { "ngrok-skip-browser-warning": "1" } }),
+      ]);
+      if (aucRes.ok) {
+        const aData = await aucRes.json();
+        if (aData.data?.length > 0) setAuctions(aData.data);
+      }
+      if (naverRes.ok) {
+        const nData = await naverRes.json();
+        if (nData.data?.length > 0) setRecommendedNaver(nData.data);
+      }
+      if (onbidRes.ok) {
+        const oData = await onbidRes.json();
+        if (oData.data?.length > 0) setOnbidItems(oData.data);
+      }
+    } catch (e) {
+      console.error("추천 매물 새로고침 실패:", e);
+    } finally {
+      setRecommendRefreshing(false);
+    }
+  };
+
   let aiReport = null;
   if (selectedDetail?.ai_report_json) {
     try {
@@ -372,7 +412,7 @@ export default function Home() {
     <div className="space-y-8 animate-fade-in relative">
       {/* 1. 데이터 커버리지 & 최신 업데이트 브리핑 섹션 */}
       <section>
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-extrabold text-gray-900">📊 실시간 데이터 커버리지 & 업데이트 현황</h2>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -380,27 +420,28 @@ export default function Home() {
               매일 03:00 자동 갱신
             </span>
           </div>
-          <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200">
+
+          {/* 🌟 우측 핵심 바로가기 액션 버튼들 (어색했던 [리스트 vs 지도+N상가] 버튼 대체) */}
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setViewMode("list")}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === "list"
-                  ? "bg-white text-blue-600 shadow-2xs"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+              type="button"
+              onClick={() => {
+                setAgentModalTab("recommend");
+                setIsAgentModalOpen(true);
+              }}
+              className="px-3 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
             >
-              📋 리스트
+              <span>🤖</span>
+              <span>AI 맞춤 추천 비서</span>
             </button>
-            <button
-              onClick={() => setViewMode("map")}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === "map"
-                  ? "bg-blue-600 text-white shadow-2xs"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+
+            <Link
+              href="/auctions?view=map"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
             >
-              🗺️ 지도 + N상가
-            </button>
+              <span>🗺️</span>
+              <span>전체화면 지도 탐색 ↗</span>
+            </Link>
           </div>
         </div>
 
@@ -676,43 +717,13 @@ export default function Home() {
             );
           })}
 
-          {/* 네이버 부동산 상가 실매물 같이보기 퀵 버튼 */}
-          <button
-            onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              viewMode === "map"
-                ? "bg-[#03c75a] text-white shadow-sm ring-2 ring-emerald-500/30 scale-[1.02]"
-                : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300"
-            }`}
-          >
-            <span className="px-1 py-0.2 rounded bg-[#03c75a] text-white text-[9px] font-black">N</span>
-            <span>네이버 상가 실매물 같이보기</span>
-            {typeof quickCounts["naver_shops"] === "number" && quickCounts["naver_shops"] > 0 && (
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                viewMode === "map" ? "bg-white/25 text-white" : "bg-emerald-200/70 text-emerald-900"
-              }`}>
-                {quickCounts["naver_shops"].toLocaleString()}
-              </span>
-            )}
-          </button>
         </div>
       </section>
-
-      {/* 지도 보기 활성화 시 인터랙티브 지도 표시 */}
-      {viewMode === "map" && (
-        <section>
-          <AuctionMap
-            items={auctions}
-            onSelectItem={(item) => handleSelectAuction(item)}
-            focusRegion=""
-          />
-        </section>
-      )}
 
       {/* 2. 임장 추천 매물 & 전체 물건 리스트 */}
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <h2 className="text-lg font-extrabold text-gray-900 flex items-center gap-2">
               <span>
                 {quickFilter
@@ -723,9 +734,34 @@ export default function Home() {
                   ? "🎯 1층 상가 임장 추천 매물"
                   : pyeongFilter === "over60"
                   ? "🏢 60평 이상 대형 상가 매물"
-                  : "🎯 상가 임장 추천 매물"}
+                  : "🎯 AI 실시간 엄선 추천 매물"}
               </span>
             </h2>
+
+            {/* 🌟 추천 매물 실시간 새로고침 (로테이션 갱신) 버튼 */}
+            <button
+              type="button"
+              onClick={handleRefreshRecommendations}
+              disabled={recommendRefreshing}
+              className="px-2.5 py-1 rounded-lg text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
+              title="클릭 시 새로운 S·A등급 알짜 추천 매물을 순환 업데이트합니다"
+            >
+              <span className={recommendRefreshing ? "animate-spin" : ""}>🔄</span>
+              <span>{recommendRefreshing ? "업데이트 중..." : "다른 추천 매물 보기"}</span>
+            </button>
+
+            {/* AI 비서 추천 바로열기 버튼 */}
+            <button
+              type="button"
+              onClick={() => {
+                setAgentModalTab("recommend");
+                setIsAgentModalOpen(true);
+              }}
+              className="px-2.5 py-1 rounded-lg text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            >
+              <span>🤖 AI 심층 추천</span>
+            </button>
+
             {(quickFilter || floorFilter || pyeongFilter) && (
               <button
                 onClick={() => {
@@ -1873,6 +1909,17 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* AI 실시간 수석 투자 비서 모달 */}
+      <AgentAdvisorModal
+        isOpen={isAgentModalOpen}
+        onClose={() => setIsAgentModalOpen(false)}
+        initialTab={agentModalTab}
+        onSelectAuction={(item) => {
+          setIsAgentModalOpen(false);
+          handleSelectAuction(item as any);
+        }}
+      />
     </div>
   );
 }
