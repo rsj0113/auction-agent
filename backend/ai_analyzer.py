@@ -1,34 +1,19 @@
 import os
 import json
-import urllib.request
-from openai import OpenAI
-from typing import Dict
+from typing import Dict, Optional, List
 from dotenv import load_dotenv
+
+# Gemini 1순위 헬퍼
+from core.gemini_helper import call_gemini_json, call_gemini_chat
 
 load_dotenv()
 
-def _call_gemini_json(prompt: str, api_key: str, model_name: str = "gemini-3.8-flash") -> dict:
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "responseMimeType": "application/json",
-            "temperature": 0.2
-        }
-    }
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"}
-    )
-    with urllib.request.urlopen(req, timeout=25) as resp:
-        body = json.loads(resp.read().decode("utf-8"))
-        text = body["candidates"][0]["content"]["parts"][0]["text"]
-        res = json.loads(text)
-        res["ai_model"] = model_name
-        return res
-
 def analyze_auction_data(item_data: dict) -> dict:
+    """
+    경매 물건 종합 AI 가치 및 권리 분석:
+    - 1순위: Google Gemini (무료 티어 / 고속 3.5 Flash Lite 등 우선)
+    - 2순위: OpenAI GPT-4o-mini (폴백)
+    """
     gemini_key = os.getenv("GEMINI_API_KEY")
     openai_key = os.getenv("OPENAI_API_KEY")
     if not gemini_key and not openai_key:
@@ -73,36 +58,38 @@ def analyze_auction_data(item_data: dict) -> dict:
     }}
     """
     
-    # 1순위: Gemini 무료 티어 / Pro API 키 우선 호출
-    if gemini_key:
-        for g_model in ("gemini-3.8-flash", "gemini-flash-latest"):
-            try:
-                return _call_gemini_json(prompt, gemini_key, g_model)
-            except Exception:
-                continue
+    # 1순위: Google Gemini 무료 티어 우선 호출
+    gemini_res = call_gemini_json(prompt, temperature=0.2)
+    if gemini_res:
+        return gemini_res
 
-    # 2순위: OpenAI 폴백
-    client = OpenAI(api_key=openai_key)
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "system", "content": "You are a helpful JSON-only assistant."},
-                  {"role": "user", "content": prompt}],
-        response_format={"type": "json_object"},
-        temperature=0.2
-    )
-    result = json.loads(response.choices[0].message.content)
-    result["ai_model"] = "gpt-4o-mini"
-    return result
+    # 2순위: OpenAI GPT-4o-mini 폴백
+    if openai_key:
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=openai_key)
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "system", "content": "You are a helpful JSON-only assistant."},
+                          {"role": "user", "content": prompt}],
+                response_format={"type": "json_object"},
+                temperature=0.2
+            )
+            result = json.loads(response.choices[0].message.content)
+            result["ai_model"] = "gpt-4o-mini"
+            return result
+        except Exception as e:
+            return {"error": f"OpenAI 폴백 호출 실패: {str(e)}"}
+
+    return {"error": "AI 분석 호출에 실패했습니다."}
 
 
 def chat_with_auction_ai(item_data: dict, user_message: str, chat_history: list = None) -> dict:
     """
-    Conversational AI advisor for answering auction, valuation, winning bid, and rights questions.
+    경매 매물 및 낙찰 결과 대화형 AI 어드바이저:
+    - 1순위: Google Gemini (무료 티어 / 고속 3.5 Flash Lite 등 우선)
+    - 2순위: OpenAI GPT-4o-mini (폴백)
     """
-    openai_key = os.getenv("OPENAI_API_KEY")
-    if not openai_key:
-        return {"error": "OPENAI_API_KEY가 설정되어 있지 않습니다."}
-
     appraisal = item_data.get('appraisal', 0) or 0
     min_bid = item_data.get('min_bid', 0) or 0
     winning_bid = item_data.get('winning_bid', 0) or 0
@@ -154,27 +141,41 @@ def chat_with_auction_ai(item_data: dict, user_message: str, chat_history: list 
 {context}
 """
 
-    messages = [{"role": "system", "content": system_prompt}]
-
-    if chat_history and isinstance(chat_history, list):
-        for msg in chat_history[-6:]:
-            if isinstance(msg, dict) and msg.get("role") in ("user", "assistant") and msg.get("content"):
-                messages.append({"role": msg["role"], "content": msg["content"]})
-
-    messages.append({"role": "user", "content": user_message})
-
-    client = OpenAI(api_key=openai_key)
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=messages,
-        temperature=0.3,
-        max_tokens=800
+    # 1순위: Google Gemini 무료 티어 우선 대화 생성
+    gemini_chat = call_gemini_chat(
+        user_message=user_message,
+        system_prompt=system_prompt,
+        chat_history=chat_history,
+        temperature=0.3
     )
+    if gemini_chat:
+        return gemini_chat
 
-    reply = response.choices[0].message.content
-    return {
-        "reply": reply,
-        "ai_model": "gpt-4o-mini"
-    }
+    # 2순위: OpenAI GPT-4o-mini 폴백
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if openai_key:
+        try:
+            from openai import OpenAI
+            messages = [{"role": "system", "content": system_prompt}]
+            if chat_history and isinstance(chat_history, list):
+                for msg in chat_history[-6:]:
+                    if isinstance(msg, dict) and msg.get("role") in ("user", "assistant") and msg.get("content"):
+                        messages.append({"role": msg["role"], "content": msg["content"]})
+            messages.append({"role": "user", "content": user_message})
 
+            client = OpenAI(api_key=openai_key)
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages,
+                temperature=0.3,
+                max_tokens=800
+            )
+            reply = response.choices[0].message.content
+            return {
+                "reply": reply,
+                "ai_model": "gpt-4o-mini"
+            }
+        except Exception as e:
+            return {"error": f"OpenAI 응답 생성 실패: {str(e)}"}
 
+    return {"error": "AI 응답을 생성할 수 없습니다. (GEMINI 또는 OPENAI 키 설정 필요)"}

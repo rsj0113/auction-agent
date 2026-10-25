@@ -1511,9 +1511,9 @@ class AuctionAnalyzer:
         }}
         """
         try:
-            # 1순위: Gemini API (무료 티어 / Gemini Pro 키)
+            # 1순위: Gemini API (무료 티어 / 고속 3.5 Flash Lite 우선)
             if self.gemini_key:
-                for g_model in ("gemini-3.8-flash", "gemini-flash-latest"):
+                for g_model in ("gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash"):
                     try:
                         return self._call_gemini(prompt, g_model)
                     except Exception:

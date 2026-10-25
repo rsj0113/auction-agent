@@ -3,9 +3,9 @@ import json
 import sqlite3
 import re
 from typing import List, Dict, Any, Optional
-from openai import OpenAI
 from dotenv import load_dotenv
 
+from core.gemini_helper import call_gemini_json, call_gemini_chat
 from core.villa_transactions import get_villa_trade_info
 from core.post_auction_analyzer import analyze_post_auction
 
@@ -21,11 +21,9 @@ def get_db():
 def parse_user_intent(user_prompt: str) -> dict:
     """
     Extract user search intent from natural language prompt.
+    1순위: Google Gemini 무료 티어 우선
+    2순위: OpenAI GPT-4o-mini 폴백
     """
-    openai_key = os.getenv("OPENAI_API_KEY")
-    if not openai_key:
-        return {"property_type": "", "region": "", "max_price": None, "focus": "general"}
-
     prompt = f"""
 다음은 부동산 경매 투자자의 자연어 요청입니다.
 요청 내용을 분석하여 아래 JSON 형식으로 추출하십시오.
@@ -55,21 +53,31 @@ def parse_user_intent(user_prompt: str) -> dict:
   "keywords": "..."
 }}
 """
-    try:
-        client = OpenAI(api_key=openai_key)
-        resp = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a specialized intent extraction engine. Respond in JSON only."},
-                {"role": "user", "content": prompt}
-            ],
-            response_format={"type": "json_object"},
-            temperature=0.0
-        )
-        return json.loads(resp.choices[0].message.content)
-    except Exception as e:
-        print(f"Error parsing intent: {e}")
-        return {"property_type": "", "region": "", "max_price": None, "focus": "general", "is_result_query": False}
+    # 1순위: Gemini
+    gemini_res = call_gemini_json(prompt, system_prompt="You are a specialized intent extraction engine. Respond in JSON only.", temperature=0.0)
+    if gemini_res and isinstance(gemini_res, dict):
+        return gemini_res
+
+    # 2순위: OpenAI 폴백
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if openai_key:
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=openai_key)
+            resp = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are a specialized intent extraction engine. Respond in JSON only."},
+                    {"role": "user", "content": prompt}
+                ],
+                response_format={"type": "json_object"},
+                temperature=0.0
+            )
+            return json.loads(resp.choices[0].message.content)
+        except Exception as e:
+            print(f"Error parsing intent with OpenAI: {e}")
+
+    return {"property_type": "", "region": "", "max_price": None, "focus": "general", "is_result_query": False}
 
 def search_candidate_items(intent: dict, limit: int = 4) -> List[Dict[str, Any]]:
     conn = get_db()
@@ -179,11 +187,9 @@ def recommend_and_compare(user_prompt: str, chat_history: list = None) -> dict:
     1. Parse intent
     2. Retrieve top candidates
     3. Generate side-by-side comparison and secretary pick
+    - 1순위: Google Gemini 무료 티어 우선
+    - 2순위: OpenAI GPT-4o-mini 폴백
     """
-    openai_key = os.getenv("OPENAI_API_KEY")
-    if not openai_key:
-        return {"error": "OPENAI_API_KEY가 설정되어 있지 않습니다."}
-
     intent = parse_user_intent(user_prompt)
     candidates = search_candidate_items(intent, limit=3)
 
@@ -257,37 +263,53 @@ def recommend_and_compare(user_prompt: str, chat_history: list = None) -> dict:
 }}
 """
 
-    try:
-        client = OpenAI(api_key=openai_key)
-        resp = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a top-tier real estate investment secretary agent. Respond in JSON only."},
-                {"role": "user", "content": comparison_prompt}
-            ],
-            response_format={"type": "json_object"},
-            temperature=0.2
-        )
-        result = json.loads(resp.choices[0].message.content)
-        result["candidates"] = candidates
-        return result
-    except Exception as e:
-        print(f"Error in recommend_and_compare: {e}")
-        return {
-            "intent_summary": user_prompt,
-            "secretary_pick": {"case_number": candidates[0].get("case_number", ""), "title": candidates[0].get("location", ""), "reason": "안전마진 및 가격 경쟁력이 가장 우수합니다."},
-            "candidates": candidates,
-            "comparison_table": [],
-            "briefing_markdown": f"AI 분석 생성 중 일시적 오류가 발생했습니다. ({str(e)})"
-        }
+    # 1순위: Google Gemini 무료 티어 우선
+    gemini_res = call_gemini_json(
+        comparison_prompt,
+        system_prompt="You are a top-tier real estate investment secretary agent. Respond in JSON only.",
+        temperature=0.2
+    )
+    if gemini_res and isinstance(gemini_res, dict):
+        gemini_res["candidates"] = candidates
+        return gemini_res
+
+    # 2순위: OpenAI GPT-4o-mini 폴백
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if openai_key:
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=openai_key)
+            resp = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are a top-tier real estate investment secretary agent. Respond in JSON only."},
+                    {"role": "user", "content": comparison_prompt}
+                ],
+                response_format={"type": "json_object"},
+                temperature=0.2
+            )
+            result = json.loads(resp.choices[0].message.content)
+            result["candidates"] = candidates
+            return result
+        except Exception as e:
+            print(f"Error in recommend_and_compare with OpenAI: {e}")
+
+    return {
+        "intent_summary": user_prompt,
+        "secretary_pick": {"case_number": candidates[0].get("case_number", ""), "title": candidates[0].get("location", ""), "reason": "안전마진 및 가격 경쟁력이 가장 우수합니다."},
+        "candidates": candidates,
+        "comparison_table": [],
+        "briefing_markdown": "비교 추천 보고서를 생성하지 못했습니다. 잠시 후 다시 시도해 주세요."
+    }
 
 def chat_with_agent(user_message: str, chat_history: list = None, case_number: str = None) -> dict:
     """
     Interactive conversation with AI Investment Secretary about auction results or active auctions.
     """
+    gemini_key = os.getenv("GEMINI_API_KEY")
     openai_key = os.getenv("OPENAI_API_KEY")
-    if not openai_key:
-        return {"error": "OPENAI_API_KEY가 설정되어 있지 않습니다."}
+    if not gemini_key and not openai_key:
+        return {"error": "GEMINI_API_KEY 또는 OPENAI_API_KEY가 설정되어 있지 않습니다."}
 
     conn = get_db()
     cursor = conn.cursor()
@@ -379,27 +401,45 @@ def chat_with_agent(user_message: str, chat_history: list = None, case_number: s
 {context_str}
 """
 
-    messages = [{"role": "system", "content": system_prompt}]
-
-    if chat_history and isinstance(chat_history, list):
-        for msg in chat_history[-6:]:
-            if isinstance(msg, dict) and msg.get("role") in ("user", "assistant") and msg.get("content"):
-                messages.append({"role": msg["role"], "content": msg["content"]})
-
-    messages.append({"role": "user", "content": user_message})
-
-    try:
-        client = OpenAI(api_key=openai_key)
-        resp = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages,
-            temperature=0.3,
-            max_tokens=850
-        )
+    # 1순위: Google Gemini 무료 티어 우선
+    gemini_res = call_gemini_chat(
+        user_message=user_message,
+        system_prompt=system_prompt,
+        chat_history=chat_history,
+        temperature=0.3
+    )
+    if gemini_res:
         return {
-            "reply": resp.choices[0].message.content,
+            "reply": gemini_res["reply"],
             "referenced_item": item_dict,
-            "ai_model": "gpt-4o-mini"
+            "ai_model": gemini_res["ai_model"]
         }
-    except Exception as e:
-        return {"error": f"AI 응답 생성 실패: {str(e)}"}
+
+    # 2순위: OpenAI GPT-4o-mini 폴백
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if openai_key:
+        try:
+            from openai import OpenAI
+            messages = [{"role": "system", "content": system_prompt}]
+            if chat_history and isinstance(chat_history, list):
+                for msg in chat_history[-6:]:
+                    if isinstance(msg, dict) and msg.get("role") in ("user", "assistant") and msg.get("content"):
+                        messages.append({"role": msg["role"], "content": msg["content"]})
+            messages.append({"role": "user", "content": user_message})
+
+            client = OpenAI(api_key=openai_key)
+            resp = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages,
+                temperature=0.3,
+                max_tokens=850
+            )
+            return {
+                "reply": resp.choices[0].message.content,
+                "referenced_item": item_dict,
+                "ai_model": "gpt-4o-mini"
+            }
+        except Exception as e:
+            return {"error": f"AI 응답 생성 실패: {str(e)}"}
+
+    return {"error": "AI 응답을 생성할 수 없습니다. (GEMINI 또는 OPENAI 키 설정 필요)"}
