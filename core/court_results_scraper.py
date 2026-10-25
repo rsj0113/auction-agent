@@ -161,35 +161,24 @@ async def scrape_court_results(target_courts=None, max_pages_per_court=3, headle
             court_index_map = {c.get('text', '').strip(): c.get('index', idx) for idx, c in enumerate(court_options)}
 
             for court_name in target_courts:
-                c_idx = court_index_map.get(court_name)
-                if c_idx is None:
-                    print(f"[{court_name}] 법원 옵션 인덱스를 찾을 수 없어 건너뜁니다.")
+                print(f"\n🏛️ [{court_name}] 매각결과 검색 시작...")
+                try:
+                    await page.goto("https://www.courtauction.go.kr", wait_until="networkidle", timeout=60000)
+                    await page.evaluate("() => document.getElementById('mf_wfm_header_anc_dspslRsltSrch').click()")
+                    await asyncio.sleep(4)
+
+                    # 법원 선택 (Playwright native select_option)
+                    xhr_results.clear()
+                    await page.select_option("#mf_wfm_mainFrame_sbx_dspslRsltSrchCortOfc", label=court_name)
+                    await asyncio.sleep(1.5)
+                except Exception as e_nav:
+                    print(f"  [!] 법원 선택 및 페이지 준비 실패 ({court_name}): {e_nav}")
                     continue
 
-                print(f"\n🏛️ [{court_name}] 매각결과 검색 시작 (옵션 인덱스: {c_idx})...")
-
-                # 1. 법원 선택 & '매각' 선택
+                # 2. 검색 클릭 (Playwright native click)
                 xhr_results.clear()
-                await page.evaluate(f"""() => {{
-                    if (window.WebSquare && window.WebSquare.util) {{
-                        const cortComp = window.WebSquare.util.getComponentById('mf_wfm_mainFrame_sbx_dspslRsltSrchCortOfc');
-                        if (cortComp && cortComp.setSelectedIndex) cortComp.setSelectedIndex({c_idx});
-
-                        const rsltComp = window.WebSquare.util.getComponentById('mf_wfm_mainFrame_sbx_dspslRsltLst');
-                        if (rsltComp && rsltComp.setSelectedIndex) rsltComp.setSelectedIndex(1); // '매각'만 선택
-                    }}
-
-                    let btn = document.getElementById('mf_wfm_mainFrame_btn_dspslRsltSrch') || 
-                              document.querySelector('[id*="btn_dspslRsltSrch"]');
-                    if (!btn) {
-                        for (let a of document.querySelectorAll('a, button')) {
-                            if ((a.textContent || '').trim() === '검색') { btn = a; break; }
-                        }
-                    }
-                    if (btn) btn.click();
-                }}""")
+                await page.click("#mf_wfm_mainFrame_btn_dspslRsltSrch")
                 await asyncio.sleep(4)
-
                 if not xhr_results:
                     await asyncio.sleep(3)
 
