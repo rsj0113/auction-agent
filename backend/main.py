@@ -75,7 +75,7 @@ def get_auctions(
         params = []
 
         if not include_closed:
-            query += " AND COALESCE(status_flag, '') != 'CLOSED' AND (auction_date IS NULL OR auction_date = '' OR auction_date >= strftime('%Y%m%d', 'now', 'localtime'))"
+            query += " AND COALESCE(status_flag, '') != 'CLOSED' AND (auction_date IS NULL OR auction_date = '' OR REPLACE(auction_date, '-', '') >= strftime('%Y%m%d', 'now', 'localtime'))"
         
         if grade:
             query += " AND ai_grade = ?"
@@ -199,10 +199,15 @@ def get_auctions(
         else: # default recent
             query += " ORDER BY last_updated DESC"
             
+        # 필터링 조건에 부합하는 총 매물 수
+        count_query = "SELECT COUNT(*) " + query[query.find("FROM auction_items"):]
+        cursor.execute(count_query, params)
+        total_matching = cursor.fetchone()[0]
+
         query += " LIMIT ? OFFSET ?"
-        params.extend([limit, offset])
+        exec_params = list(params) + [limit, offset]
         
-        cursor.execute(query, params)
+        cursor.execute(query, exec_params)
         
         items = [dict(row) for row in cursor.fetchall()]
         conn.close()
@@ -216,7 +221,7 @@ def get_auctions(
         except Exception:
             pass
 
-        return {"data": items}
+        return {"data": items, "total_matching": total_matching}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
