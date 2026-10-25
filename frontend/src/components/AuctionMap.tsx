@@ -18,6 +18,10 @@ interface MapItem {
   lng?: number;
   is_favorite?: number;
   recommend_tag?: string;
+  winning_bid?: number;
+  winning_rate?: number;
+  bidder_count?: number;
+  source?: string;
 }
 
 export interface NaverShopItem {
@@ -50,13 +54,18 @@ interface AuctionMapProps {
   onSelectItem: (item: any) => void;
   focusRegion?: string;
   priceRange?: string; // "", "under1", "1to3", "3to5", "over5"
+  assetSource?: "auction" | "onbid" | "naver" | "results";
 }
 
 const PRESET_REGIONS = [
+  { label: "🇰🇷 전국 전체", regionKey: "", lat: 36.3, lng: 127.8, zoom: 7 },
   { label: "🌐 수도권 전체", regionKey: "", lat: 37.43, lng: 127.08, zoom: 11 },
   { label: "🎯 성남·분당·판교", regionKey: "성남·분당", lat: 37.395, lng: 127.125, zoom: 13 },
-  { label: "💎 강남·서초·송파·마포", regionKey: "강남·서초·송파·마포", lat: 37.505, lng: 127.045, zoom: 12 },
+  { label: "💎 강남·서초·송파", regionKey: "강남·서초·송파·마포", lat: 37.505, lng: 127.045, zoom: 12 },
   { label: "🌳 수원·안양", regionKey: "수원·안양", lat: 37.315, lng: 127.005, zoom: 12 },
+  { label: "⛵ 부산·울산", regionKey: "부산", lat: 35.18, lng: 129.07, zoom: 11 },
+  { label: "🚄 대구·경북", regionKey: "대구", lat: 35.87, lng: 128.60, zoom: 11 },
+  { label: "🏛️ 대전·세종", regionKey: "대전", lat: 36.35, lng: 127.38, zoom: 11 },
 ];
 
 const PRICE_OPTIONS = [
@@ -96,14 +105,15 @@ export default function AuctionMap({
   onSelectItem,
   focusRegion = "",
   priceRange = "",
+  assetSource = "auction",
 }: AuctionMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersLayerRef = useRef<any>(null);
   const [mapReady, setMapReady] = useState(false);
 
-  // 네이버 상가 실매물 오버레이 & 필터 상태
-  const [showNaver, setShowNaver] = useState(true);
+  // 네이버 상가 실매물 오버레이 & 필터 상태 (낙찰결과 모드에서는 낙찰 핀 가독성을 위해 기본 OFF)
+  const [showNaver, setShowNaver] = useState(assetSource !== "results");
   const [naverFirstFloorOnly, setNaverFirstFloorOnly] = useState(false);
   const [naverFloorType, setNaverFloorType] = useState<string>("");
   const [naverPyeongRange, setNaverPyeongRange] = useState<string>("");
@@ -334,22 +344,45 @@ export default function AuctionMap({
     );
 
     validItems.forEach((item) => {
+      const isResult = item.winning_bid && item.winning_bid > 0;
       const grade = (item.ai_grade || "B").toUpperCase();
-      const bg =
-        grade === "S"
-          ? "#7c3aed"
-          : grade === "A"
-          ? "#2563eb"
-          : grade === "B"
-          ? "#1d4ed8"
-          : grade === "C"
-          ? "#d97706"
-          : "#dc2626";
+      const bg = isResult
+        ? "#d97706" // 낙찰 결과는 눈에 띄는 호박/황금색
+        : grade === "S"
+        ? "#7c3aed"
+        : grade === "A"
+        ? "#2563eb"
+        : grade === "B"
+        ? "#1d4ed8"
+        : grade === "C"
+        ? "#d97706"
+        : "#dc2626";
 
-      const priceLabel = formatMoneyShort(item.min_bid);
+      const priceLabel = isResult ? formatMoneyShort(item.winning_bid!) : formatMoneyShort(item.min_bid);
       const is1FShop = item.usage === "상가/근린시설" && item.floor === 1;
 
-      const iconHtml = `
+      const iconHtml = isResult ? `
+        <div style="
+          display:inline-flex;
+          align-items:center;
+          gap:4px;
+          background:linear-gradient(135deg, #b45309, #d97706);
+          color:#fff;
+          padding:3px 9px;
+          border-radius:9999px;
+          font-size:11px;
+          font-weight:900;
+          white-space:nowrap;
+          box-shadow:0 3px 10px rgba(180,83,9,0.45);
+          border:2px solid #fef3c7;
+          transform:translate(-50%, -50%);
+          cursor:pointer;
+        ">
+          <span>🏆낙찰</span>
+          <span>${priceLabel}</span>
+          ${item.winning_rate ? `<span style="color:#fef08a;font-size:9.5px;">(${item.winning_rate}%)</span>` : ""}
+        </div>
+      ` : `
         <div style="
           display:inline-flex;
           align-items:center;
@@ -378,16 +411,21 @@ export default function AuctionMap({
         iconSize: [0, 0],
       });
 
-      const zBoost =
-        grade === "S" ? 1200 : grade === "A" ? 1000 : grade === "B" ? 700 : grade === "C" ? 300 : 100;
+      const zBoost = isResult ? 1500 : (grade === "S" ? 1200 : grade === "A" ? 1000 : grade === "B" ? 700 : grade === "C" ? 300 : 100);
 
       const marker = L.marker([item.lat, item.lng], { icon: customIcon, zIndexOffset: zBoost });
-      marker.bindTooltip(
-        `<div style="font-size:12px;font-weight:700;">⚖️ [법원경매] ${item.case_number} (${item.usage || "매물"})</div>
-         <div style="font-size:11px;color:#374151;max-width:220px;white-space:normal;">${item.location}</div>
-         <div style="font-size:11px;color:#2563eb;font-weight:700;margin-top:2px;">최저가: ${priceLabel} (유찰 ${item.failed_count}회)</div>`,
-        { direction: "top", offset: [0, -12] }
-      );
+      
+      const tooltipContent = isResult ? `
+        <div style="font-size:12px;font-weight:800;color:#92400e;">🏆 [실거래 낙찰] ${item.case_number} (${item.usage || "부동산"})</div>
+        <div style="font-size:11px;color:#374151;max-width:240px;white-space:normal;">${item.location}</div>
+        <div style="font-size:11.5px;color:#b45309;font-weight:800;margin-top:2px;">최종 낙찰: ${priceLabel} (낙찰가율 ${item.winning_rate || 0}%)</div>
+      ` : `
+        <div style="font-size:12px;font-weight:700;">⚖️ [법원경매] ${item.case_number} (${item.usage || "매물"})</div>
+        <div style="font-size:11px;color:#374151;max-width:220px;white-space:normal;">${item.location}</div>
+        <div style="font-size:11px;color:#2563eb;font-weight:700;margin-top:2px;">최저가: ${priceLabel} (유찰 ${item.failed_count}회)</div>
+      `;
+
+      marker.bindTooltip(tooltipContent, { direction: "top", offset: [0, -12] });
       marker.on("click", () => {
         setSelectedNaver(null);
         onSelectItem(item);
@@ -425,12 +463,35 @@ export default function AuctionMap({
 
   return (
     <div className="space-y-4">
+      {/* 🏆 낙찰 결과 전용 지도 안내 바 */}
+      {assetSource === "results" && (
+        <div className="flex items-center justify-between p-3 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/5 rounded-2xl border border-amber-300 shadow-2xs">
+          <div className="flex items-center gap-2">
+            <span className="text-base">🏆</span>
+            <div>
+              <div className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                <span>실거래 낙찰 지도 모드</span>
+                <span className="px-2 py-0.2 bg-amber-600 text-white rounded-full text-[10px] font-bold">실낙찰 핀 활성화</span>
+              </div>
+              <p className="text-[11px] text-amber-800">
+                지도 위에 황금색 핀으로 실제 낙찰가 및 낙찰가율(%)이 표시됩니다. 핀을 클릭하면 상세 낙찰 정보를 확인하실 수 있습니다.
+              </p>
+            </div>
+          </div>
+          <div className="text-right shrink-0 hidden sm:block">
+            <span className="text-xs font-bold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-lg border border-amber-200">
+              총 {items.filter(it => it.lat && it.lng).length.toLocaleString()}건 위치 확인
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
         {/* 1단: 지역 점프 & 네이버 상가 전용 위치·가격·거래유형 필터 바 */}
         <div className="p-3.5 bg-gray-50 border-b border-gray-200 space-y-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-bold text-gray-700 mr-1">📍 권역 선택 (지도 이동 + 상가 필터):</span>
+              <span className="text-xs font-bold text-gray-700 mr-1">📍 권역 점프:</span>
               {PRESET_REGIONS.map((reg) => {
                 const isActive = naverRegion === reg.regionKey;
                 return (

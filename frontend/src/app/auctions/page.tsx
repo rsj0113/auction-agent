@@ -1158,71 +1158,128 @@ export default function AuctionsPage() {
       </header>
 
       <main className="w-full mx-auto px-4 sm:px-5 pt-5 max-w-5xl">
-        {/* 🌟 핵심 4대 자산 구분 탭 (법원경매 / 온비드 / 네이버 / 낙찰결과) */}
-        <div className="flex items-center gap-1 sm:gap-2 p-1 sm:p-1.5 bg-white rounded-2xl border border-gray-200/90 shadow-2xs mb-4">
-          <button
-            onClick={() => setAssetSource("auction")}
-            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 py-2 sm:py-2.5 px-1 sm:px-2 rounded-xl text-[11px] sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap break-keep ${
-              assetSource === "auction"
-                ? "bg-blue-600 text-white shadow-sm ring-2 ring-blue-600/30 scale-[1.01]"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-            }`}
-          >
-            <span>⚖️ 법원경매</span>
-            <span className={`text-[9px] sm:text-[11px] px-1.5 py-0.2 rounded-full font-bold ${
-              assetSource === "auction" ? "bg-white/20 text-white" : "bg-blue-50 text-blue-700"
-            }`}>
-              {quickCounts.total ? quickCounts.total.toLocaleString() : "1,281"}
-            </span>
-          </button>
+        {/* 🌟 1. 핵심 4대 자산 구분 탭 네비게이션 */}
+        <div className="mb-3.5 bg-slate-200/80 p-1.5 rounded-2xl border border-slate-300/80 shadow-inner">
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+            <button
+              onClick={() => setAssetSource("auction")}
+              className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-3 px-1 sm:px-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer whitespace-nowrap break-keep ${
+                assetSource === "auction"
+                  ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-500/40 -translate-y-0.5"
+                  : "bg-white/80 text-gray-700 hover:text-gray-900 hover:bg-white border border-gray-200/60 shadow-2xs"
+              }`}
+            >
+              <span className="flex items-center gap-1"><span>⚖️</span> <span>법원경매</span></span>
+              <span className={`text-[10px] sm:text-xs px-1.5 py-0.2 rounded-full font-black ${
+                assetSource === "auction" ? "bg-white/25 text-white" : "bg-blue-50 text-blue-700 border border-blue-200/60"
+              }`}>
+                {quickCounts.total ? quickCounts.total.toLocaleString() : "1,281"}
+              </span>
+            </button>
 
-          <button
-            onClick={() => setAssetSource("onbid")}
-            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 py-2 sm:py-2.5 px-1 sm:px-2 rounded-xl text-[11px] sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap break-keep ${
-              assetSource === "onbid"
-                ? "bg-purple-600 text-white shadow-sm ring-2 ring-purple-600/30 scale-[1.01]"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-            }`}
-          >
-            <span>🏛️ 온비드</span>
-            <span className={`text-[9px] sm:text-[11px] px-1.5 py-0.2 rounded-full font-bold ${
-              assetSource === "onbid" ? "bg-white/20 text-white" : "bg-purple-50 text-purple-700"
-            }`}>
-              {quickCounts.onbid_total ? quickCounts.onbid_total.toLocaleString() : "626"}
-            </span>
-          </button>
+            <button
+              onClick={() => setAssetSource("onbid")}
+              className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-3 px-1 sm:px-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer whitespace-nowrap break-keep ${
+                assetSource === "onbid"
+                  ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-500/40 -translate-y-0.5"
+                  : "bg-white/80 text-gray-700 hover:text-gray-900 hover:bg-white border border-gray-200/60 shadow-2xs"
+              }`}
+            >
+              <span className="flex items-center gap-1"><span>🏛️</span> <span>온비드</span></span>
+              <span className={`text-[10px] sm:text-xs px-1.5 py-0.2 rounded-full font-black ${
+                assetSource === "onbid" ? "bg-white/25 text-white" : "bg-purple-50 text-purple-700 border border-purple-200/60"
+              }`}>
+                {quickCounts.onbid_total ? quickCounts.onbid_total.toLocaleString() : "3,355"}
+              </span>
+            </button>
 
-          <button
-            onClick={() => setAssetSource("naver")}
-            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 py-2 sm:py-2.5 px-1 sm:px-2 rounded-xl text-[11px] sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap break-keep ${
-              assetSource === "naver"
-                ? "bg-[#03c75a] text-white shadow-sm ring-2 ring-emerald-500/30 scale-[1.01]"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-            }`}
-          >
-            <span>🟢 네이버 (상가·빌라)</span>
-            <span className={`text-[9px] sm:text-[11px] px-1.5 py-0.2 rounded-full font-bold ${
-              assetSource === "naver" ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-700"
-            }`}>
-              {quickCounts.naver_total ? quickCounts.naver_total.toLocaleString() : (quickCounts.naver_shops ? quickCounts.naver_shops.toLocaleString() : "5,544")}
-            </span>
-          </button>
+            <button
+              onClick={() => setAssetSource("naver")}
+              className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-3 px-1 sm:px-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer whitespace-nowrap break-keep ${
+                assetSource === "naver"
+                  ? "bg-[#03c75a] text-white shadow-md ring-2 ring-emerald-500/40 -translate-y-0.5"
+                  : "bg-white/80 text-gray-700 hover:text-gray-900 hover:bg-white border border-gray-200/60 shadow-2xs"
+              }`}
+            >
+              <span className="flex items-center gap-1"><span>🟢</span> <span>네이버</span></span>
+              <span className={`text-[10px] sm:text-xs px-1.5 py-0.2 rounded-full font-black ${
+                assetSource === "naver" ? "bg-white/25 text-white" : "bg-emerald-50 text-emerald-800 border border-emerald-200/60"
+              }`}>
+                {quickCounts.naver_total ? quickCounts.naver_total.toLocaleString() : (quickCounts.naver_shops ? quickCounts.naver_shops.toLocaleString() : "5,544")}
+              </span>
+            </button>
 
-          <button
-            onClick={() => setAssetSource("results")}
-            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 py-2 sm:py-2.5 px-1 sm:px-2 rounded-xl text-[11px] sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap break-keep ${
-              assetSource === "results"
-                ? "bg-amber-600 text-white shadow-sm ring-2 ring-amber-500/30 scale-[1.01]"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-            }`}
-          >
-            <span>🏆 낙찰결과</span>
-            <span className={`text-[9px] sm:text-[11px] px-1.5 py-0.2 rounded-full font-bold ${
-              assetSource === "results" ? "bg-white/20 text-white" : "bg-amber-50 text-amber-700"
-            }`}>
-              {quickCounts.results_total ? quickCounts.results_total.toLocaleString() : "100"}
-            </span>
-          </button>
+            <button
+              onClick={() => setAssetSource("results")}
+              className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-3 px-1 sm:px-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer whitespace-nowrap break-keep ${
+                assetSource === "results"
+                  ? "bg-amber-600 text-white shadow-md ring-2 ring-amber-500/40 -translate-y-0.5"
+                  : "bg-white/80 text-gray-700 hover:text-gray-900 hover:bg-white border border-gray-200/60 shadow-2xs"
+              }`}
+            >
+              <span className="flex items-center gap-1"><span>🏆</span> <span>낙찰결과</span></span>
+              <span className={`text-[10px] sm:text-xs px-1.5 py-0.2 rounded-full font-black ${
+                assetSource === "results" ? "bg-white/25 text-white" : "bg-amber-50 text-amber-800 border border-amber-200/60"
+              }`}>
+                {quickCounts.results_total ? quickCounts.results_total.toLocaleString() : "3,396"}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* 🌟 2. 탭별 맞춤 헤더 배너 (기능별 이동 느낌 극대화) */}
+        <div className={`mb-3.5 p-3.5 sm:p-4 rounded-2xl border shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+          assetSource === "results"
+            ? "bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-amber-500/15 border-amber-300/80"
+            : assetSource === "onbid"
+            ? "bg-gradient-to-r from-purple-500/10 via-indigo-500/5 to-purple-500/15 border-purple-300/80"
+            : assetSource === "naver"
+            ? "bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-emerald-500/15 border-emerald-300/80"
+            : "bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-blue-500/15 border-blue-300/80"
+        }`}>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xl">
+                {assetSource === "results" ? "🏆" : assetSource === "onbid" ? "🏛️" : assetSource === "naver" ? "🟢" : "⚖️"}
+              </span>
+              <h2 className="text-sm sm:text-base font-black text-gray-900">
+                {assetSource === "results" && "전국 실거래 낙찰 결과 분석실"}
+                {assetSource === "onbid" && "온비드 공공·신탁 자산 공매관"}
+                {assetSource === "naver" && "네이버 부동산 수도권 현장 시세관"}
+                {assetSource === "auction" && "대법원 법원경매 실시간 매각 물건"}
+              </h2>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold text-white ${
+                assetSource === "results" ? "bg-amber-600" : assetSource === "onbid" ? "bg-purple-600" : assetSource === "naver" ? "bg-[#03c75a]" : "bg-blue-600"
+              }`}>
+                {assetSource === "results" ? "3,396건 실데이터" : assetSource === "onbid" ? "3,355건 OpenAPI" : assetSource === "naver" ? "5,544건 실매물" : "실시간 법원 데이터"}
+              </span>
+            </div>
+            <p className="text-xs text-gray-600">
+              {assetSource === "results" && "온비드 공매 및 법원경매의 실제 낙찰가, 낙찰가율(%), 응찰자 수 경쟁률을 지도와 목록에서 비교 분석합니다."}
+              {assetSource === "onbid" && "한국자산관리공사(캠코) 압류재산, 국유재산, 공공기관 및 신탁부동산의 매각·임대(대부) 공매를 검색합니다."}
+              {assetSource === "naver" && "수도권 상가 및 빌라의 네이버 부동산 실매물 시세와 급매 매물을 법원경매와 1:1로 비교합니다."}
+              {assetSource === "auction" && "대법원 경매물건의 AI 권리분석, 대항력·인수보증금 진단, 안전마진 및 예상 낙찰가를 분석합니다."}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+            {/* 🗺️ 지도 모드 바로가기 원클릭 버튼 */}
+            <button
+              onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                viewMode === "map"
+                  ? "bg-gray-900 text-white ring-2 ring-gray-900/20 scale-[1.02]"
+                  : "bg-white text-gray-800 hover:bg-gray-50 border border-gray-300"
+              }`}
+            >
+              <span>{viewMode === "map" ? "📋 목록으로 보기" : "🗺️ 지도에서 위치 확인"}</span>
+              <span className={`px-1.5 py-0.2 rounded text-[10px] font-black ${
+                viewMode === "map" ? "bg-emerald-500 text-white" : "bg-gray-100 text-gray-600"
+              }`}>
+                {viewMode === "map" ? "지도 ON" : "지도 OFF"}
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* 📊 일일 신규 유입 및 마감/삭제 건수 라이브 인포 바 */}
@@ -1263,92 +1320,128 @@ export default function AuctionsPage() {
           </div>
         )}
 
-        {/* Filters */}
-        <div className="flex flex-col gap-2 sm:gap-2.5 mb-5 bg-gray-50/80 p-2.5 sm:p-3.5 rounded-2xl border border-gray-200/80">
-          <div className="flex gap-1.5 sm:gap-2">
-            <input 
-              type="text"
-              placeholder={`${assetSource === "auction" ? "법원경매" : assetSource === "onbid" ? "온비드 공매" : assetSource === "naver" ? "네이버 상가" : "낙찰 결과 (실거래 매물)"} 지역 검색 (예: 성남, 분당, 강남)`}
-              value={regionInput}
-              onChange={(e) => setRegionInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && setRegionFilter(regionInput)}
-              className="flex-1 text-xs sm:text-sm bg-white border border-gray-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-gray-800 outline-none focus:border-blue-500 shadow-2xs"
-            />
-            <button 
-              onClick={() => setRegionFilter(regionInput)}
-              className="bg-blue-600 text-white text-xs sm:text-sm font-bold px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl hover:bg-blue-700 transition-colors shadow-2xs shrink-0 cursor-pointer"
-            >
-              검색
-            </button>
-          </div>
-
-          {/* Quick Filter Chips (투자자용 원클릭 퀵 필터) */}
-          <div className="pt-0.5 sm:pt-1">
-            <div className="flex items-center justify-between mb-1 px-0.5">
-              <span className="text-[11px] font-bold text-gray-500 flex items-center gap-1">
-                <span>⚡</span> <span>투자자 퀵 필터</span>
-              </span>
-              {(quickFilter || regionFilter || propertyTypeFilter || tenantFilter || floorFilter || pyeongFilter || priceFilter || gradeFilter || dateRangeFilter) && (
+        {/* 🌟 3. 카드 A: 통합 검색 바 & 뷰 모드 스위치 */}
+        <div className="bg-white border border-gray-200/90 rounded-2xl p-3 sm:p-3.5 shadow-xs mb-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="flex-1 flex items-center gap-2 bg-gray-50/90 border border-gray-200 rounded-xl px-3 py-1.5 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+              <span className="text-gray-400 text-sm">🔍</span>
+              <input 
+                type="text"
+                placeholder={`${assetSource === "auction" ? "법원경매 물건" : assetSource === "onbid" ? "온비드 공매 물건" : assetSource === "naver" ? "네이버 상가 매물" : "낙찰 결과 (실거래)"} 지역 또는 키워드 검색 (예: 성남, 분당, 강남, 아파트, 상가)`}
+                value={regionInput}
+                onChange={(e) => setRegionInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && setRegionFilter(regionInput)}
+                className="flex-1 text-xs sm:text-sm bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
+              />
+              {regionInput && (
                 <button
-                  onClick={handleResetFilters}
-                  className="text-[10px] sm:text-[11px] text-gray-500 hover:text-red-600 font-semibold flex items-center gap-1 transition-colors bg-white px-1.5 sm:px-2 py-0.5 rounded-lg border border-gray-200 cursor-pointer"
+                  onClick={() => {
+                    setRegionInput("");
+                    setRegionFilter("");
+                  }}
+                  className="text-gray-400 hover:text-gray-600 text-xs p-1"
                 >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  초기화
+                  ✕
                 </button>
               )}
             </div>
-
-            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 pt-0.5">
-              {QUICK_CHIPS.map((chip) => {
-                const isActive = quickFilter === chip.id;
-                let count = quickCounts[chip.countKey];
-                if (chip.id === "golf_b1") {
-                  count = assetSource === "onbid" ? quickCounts["onbid_b1"] : assetSource === "naver" ? quickCounts["naver_b1"] : quickCounts["golf_b1"];
-                } else if (chip.id === "first_floor_shop") {
-                  count = assetSource === "onbid" ? quickCounts["onbid_first_floor"] : assetSource === "naver" ? quickCounts["naver_first_floor"] : quickCounts["first_floor_shop"];
-                }
-                return (
-                  <button
-                    key={chip.id}
-                    onClick={() => setQuickFilter(isActive ? "" : chip.id)}
-                    className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap break-keep ${
-                      isActive
-                        ? "bg-blue-600 text-white shadow-sm ring-2 ring-blue-600/30 scale-[1.02]"
-                        : "bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900 border border-gray-200 shadow-2xs"
-                    }`}
-                  >
-                    <span>{chip.icon}</span>
-                    <span>{chip.label}</span>
-                    {typeof count === "number" && (
-                      <span className={`text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                        isActive ? "bg-white/25 text-white" : "bg-gray-100 text-gray-500"
-                      }`}>
-                        {count.toLocaleString()}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-
-              {/* 네이버 지도 바로보기 버튼 */}
-              <button
-                onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
-                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap break-keep ${
-                  viewMode === "map"
-                    ? "bg-[#03c75a] text-white shadow-sm ring-2 ring-emerald-500/30 scale-[1.02]"
-                    : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300 shadow-2xs"
-                }`}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button 
+                onClick={() => setRegionFilter(regionInput)}
+                className="flex-1 sm:flex-none bg-blue-600 text-white text-xs sm:text-sm font-bold px-4 py-2 sm:py-2.5 rounded-xl hover:bg-blue-700 transition-colors shadow-2xs cursor-pointer"
               >
-                <span className="px-1 py-0.2 rounded bg-[#03c75a] text-white text-[9px] font-black">N</span>
-                <span>지도 오버레이</span>
+                검색
               </button>
+              {/* 뷰 모드 토글 (목록 / 지도) */}
+              <div className="flex bg-gray-100 rounded-xl p-0.5 border border-gray-200">
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    viewMode === "list"
+                      ? "bg-white text-gray-900 shadow-xs"
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  📋 목록
+                </button>
+                <button
+                  onClick={() => setViewMode("map")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    viewMode === "map"
+                      ? "bg-[#03c75a] text-white shadow-xs"
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  🗺️ 지도
+                </button>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-sm pt-1">
+        {/* 🌟 4. 카드 B: 투자자 퀵 필터 바 (독립된 카드) */}
+        <div className="bg-white border border-gray-200/90 rounded-2xl p-3 shadow-2xs mb-3">
+          <div className="flex items-center justify-between mb-2 px-0.5">
+            <span className="text-[11px] font-bold text-gray-600 flex items-center gap-1.5">
+              <span>⚡</span> <span className="font-extrabold text-gray-800">투자자 원클릭 퀵 필터</span>
+              <span className="text-[10px] text-gray-400 font-normal hidden sm:inline">(조건 클릭 시 즉시 필터링)</span>
+            </span>
+            {(quickFilter || regionFilter || propertyTypeFilter || tenantFilter || floorFilter || pyeongFilter || priceFilter || gradeFilter || dateRangeFilter) && (
+              <button
+                onClick={handleResetFilters}
+                className="text-[10px] sm:text-[11px] text-red-600 hover:text-red-700 hover:bg-red-50 font-bold flex items-center gap-1 transition-colors px-2 py-0.5 rounded-lg border border-red-200 cursor-pointer"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                필터 전체 초기화
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
+            {QUICK_CHIPS.map((chip) => {
+              const isActive = quickFilter === chip.id;
+              let count = quickCounts[chip.countKey];
+              if (chip.id === "golf_b1") {
+                count = assetSource === "onbid" ? quickCounts["onbid_b1"] : assetSource === "naver" ? quickCounts["naver_b1"] : quickCounts["golf_b1"];
+              } else if (chip.id === "first_floor_shop") {
+                count = assetSource === "onbid" ? quickCounts["onbid_first_floor"] : assetSource === "naver" ? quickCounts["naver_first_floor"] : quickCounts["first_floor_shop"];
+              }
+              return (
+                <button
+                  key={chip.id}
+                  onClick={() => setQuickFilter(isActive ? "" : chip.id)}
+                  className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap break-keep ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-sm ring-2 ring-blue-600/30 scale-[1.02]"
+                      : "bg-gray-50 text-gray-700 hover:bg-gray-100 hover:text-gray-900 border border-gray-200/80 shadow-2xs"
+                  }`}
+                >
+                  <span>{chip.icon}</span>
+                  <span>{chip.label}</span>
+                  {typeof count === "number" && (
+                    <span className={`text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      isActive ? "bg-white/25 text-white" : "bg-white text-gray-500 border border-gray-200"
+                    }`}>
+                      {count.toLocaleString()}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 🌟 5. 카드 C: 상세 조건 및 정렬 패널 (독립된 카드) */}
+        <div className="bg-slate-50/90 border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-2xs mb-4 space-y-2.5">
+          <div className="flex items-center justify-between px-0.5">
+            <span className="text-[11px] font-bold text-gray-600 flex items-center gap-1.5">
+              <span>🔍</span> <span className="font-extrabold text-gray-800">상세 조건 필터</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-sm">
             {/* 1. 자산별 맞춤 유형/방식 */}
             {assetSource === "auction" || assetSource === "results" ? (
               <select 
@@ -1418,13 +1511,15 @@ export default function AuctionsPage() {
               <option value="over60">대형 (60평+ 골프장용)</option>
             </select>
 
-            {/* 4. 가격 */}
+            {/* 4. 가격대 필터 */}
             <select 
               value={priceFilter} 
               onChange={(e) => setPriceFilter(e.target.value)}
-              className="w-full text-xs sm:text-sm bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-700 outline-none focus:border-blue-500 shadow-2xs"
+              className={`w-full text-xs sm:text-sm bg-white border rounded-xl px-3 py-2 outline-none shadow-2xs font-bold ${
+                priceFilter ? "border-emerald-500 text-emerald-800 bg-emerald-50/50" : "border-gray-200 text-gray-700 focus:border-blue-500"
+              }`}
             >
-              <option value="">가격 전체</option>
+              <option value="">가격대 전체</option>
               <option value="under1">1억 미만</option>
               <option value="1to3">1억 ~ 3억</option>
               <option value="3to5">3억 ~ 5억</option>
@@ -1475,7 +1570,8 @@ export default function AuctionsPage() {
             </div>
           )}
 
-          <div className="flex items-center gap-2 pt-1 border-t border-gray-200/50">
+          {/* 정렬 드롭다운 */}
+          <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
             <span className="text-xs text-gray-500 shrink-0 font-medium">정렬:</span>
             {assetSource === "auction" ? (
               <select 
@@ -1536,7 +1632,8 @@ export default function AuctionsPage() {
         {viewMode === "map" && (
           <div className="mb-6">
             <AuctionMap
-              items={auctions}
+              items={(assetSource === "results" ? auctionResults : assetSource === "onbid" ? onbidItems : auctions) as any}
+              assetSource={assetSource}
               onSelectItem={(item) => handleSelectAuction(item)}
               focusRegion={regionFilter || regionInput}
               priceRange={priceFilter}

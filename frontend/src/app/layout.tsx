@@ -31,11 +31,11 @@ export default function RootLayout({
               <Link href="/planner" className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 shadow-2xs flex items-center gap-1 transition-all">
                 <span>📍</span> <span>임장 플래너</span>
               </Link>
-              <Link href="/auctions?open_agent=1" className="text-xs font-black px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-xs flex items-center gap-1 transition-all">
-                <span>🤖</span> <span>AI 비서</span>
+              <Link href="/auctions?src=results" className="text-xs font-black px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 shadow-2xs flex items-center gap-1 transition-all">
+                <span>🏆</span> <span>낙찰결과</span>
               </Link>
               <Link href="/auctions" className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-sm flex items-center gap-1 transition-colors">
-                🔍 검색
+                🔍 매물검색
               </Link>
             </div>
           </nav>
