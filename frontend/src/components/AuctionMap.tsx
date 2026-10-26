@@ -73,6 +73,8 @@ export interface MapFilterProps {
   setPyeongFilter?: (val: string) => void;
   quickFilter?: string;
   setQuickFilter?: (val: string) => void;
+  tradeTypeFilter?: string;
+  setTradeTypeFilter?: (val: string) => void;
   onResetFilters?: () => void;
 }
 
@@ -175,16 +177,6 @@ export default function AuctionMap({
     }
   }, [isDetailModalOpen]);
 
-  // 활성 필터 개수 계산
-  const activeFilterCount = [
-    filterProps?.regionFilter,
-    filterProps?.priceFilter,
-    filterProps?.propertyTypeFilter,
-    filterProps?.floorFilter,
-    filterProps?.pyeongFilter,
-    filterProps?.quickFilter,
-  ].filter(Boolean).length;
-
   // 선택된 경매/공매/낙찰 매물 플로팅 상세 카드 상태
   const [selectedPinnedItem, setSelectedPinnedItem] = useState<MapItem | null>(null);
 
@@ -195,7 +187,7 @@ export default function AuctionMap({
   const [naverFirstFloorOnly, setNaverFirstFloorOnly] = useState(false);
   const [naverFloorType, setNaverFloorType] = useState<string>("");
   const [naverPyeongRange, setNaverPyeongRange] = useState<string>("");
-  const [naverTradeType, setNaverTradeType] = useState<"" | "매매" | "월세">("");
+  const [naverTradeType, setNaverTradeType] = useState<string>(filterProps?.tradeTypeFilter || "");
   const [naverRegion, setNaverRegion] = useState<string>(focusRegion || "");
   const [naverRegionInput, setNaverRegionInput] = useState<string>(focusRegion || "");
   const [naverPriceRange, setNaverPriceRange] = useState<string>(priceRange || "");
@@ -205,12 +197,30 @@ export default function AuctionMap({
   const [naverTotalMatching, setNaverTotalMatching] = useState<number>(0);
   const [selectedNaver, setSelectedNaver] = useState<NaverShopItem | null>(null);
 
+  // 활성 필터 개수 계산
+  const activeFilterCount = [
+    filterProps?.regionFilter,
+    filterProps?.priceFilter,
+    filterProps?.propertyTypeFilter,
+    filterProps?.floorFilter,
+    filterProps?.pyeongFilter,
+    filterProps?.quickFilter,
+    filterProps?.tradeTypeFilter || naverTradeType,
+  ].filter(Boolean).length;
+
   // selectedSources.naver 동기화
   useEffect(() => {
     if (selectedSources) {
       setShowNaver(selectedSources.naver);
     }
   }, [selectedSources?.naver]);
+
+  // 상위 페이지의 tradeTypeFilter 동기화
+  useEffect(() => {
+    if (filterProps?.tradeTypeFilter !== undefined) {
+      setNaverTradeType(filterProps.tradeTypeFilter);
+    }
+  }, [filterProps?.tradeTypeFilter]);
 
   // 상위 페이지의 지역/가격 필터가 바뀌면 네이버 상가 필터도 자동 동기화
   useEffect(() => {
@@ -890,232 +900,282 @@ export default function AuctionMap({
             </div>
           )}
 
-          {/* 🌟 [지도 필터링 플로팅 모달] */}
+          {/* 🌟 [지도 필터링 모달 오버레이 (화면 밖 벗어남 완전 방지)] */}
           {isFilterOpen && !isDetailModalOpen && (
-            <div className="absolute top-12 right-2 sm:right-3 z-[450] w-[95vw] max-w-sm sm:max-w-md max-h-[82vh] bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-200/90 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-              {/* 모달 헤더 */}
-              <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border-b border-gray-200 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">🎛️</span>
-                  <span className="text-sm font-black text-gray-900">지도 매물 정밀 필터</span>
-                  {activeFilterCount > 0 && (
-                    <span className="px-2 py-0.5 text-[10px] font-extrabold bg-blue-600 text-white rounded-full">
-                      {activeFilterCount}개 활성
-                    </span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsFilterOpen(false)}
-                  className="p-1.5 rounded-xl hover:bg-gray-200 text-gray-500 hover:text-gray-900 transition-colors cursor-pointer text-xs font-bold"
-                >
-                  ✕ 닫기
-                </button>
-              </div>
+            <div className="fixed inset-0 z-[600] flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
+              {/* 모달 밖 클릭 시 닫기 */}
+              <div className="absolute inset-0" onClick={() => setIsFilterOpen(false)} />
 
-              {/* 모달 본문 스크롤 영역 */}
-              <div className="flex-1 overflow-y-auto p-3.5 space-y-4 text-xs">
-                {/* 1. 지역 바로가기 (지도 이동 + 필터) */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-extrabold text-gray-900 flex items-center gap-1">
-                      <span>📍</span> <span>지역 선택 (클릭 시 지도 이동)</span>
-                    </span>
-                    {filterProps?.regionFilter && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (filterProps?.setRegionFilter) filterProps.setRegionFilter("");
-                          if (filterProps?.setRegionInput) filterProps.setRegionInput("");
-                          setNaverRegion("");
-                          setNaverRegionInput("");
-                        }}
-                        className="text-[10px] text-blue-600 hover:underline font-bold cursor-pointer"
-                      >
-                        지역 초기화
-                      </button>
+              {/* 모달 본체: 화면 너비를 벗어나지 않도록 w-full max-w-md 및 안전 마진 적용 */}
+              <div className="relative w-full max-w-md max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden z-10 animate-in zoom-in-95 duration-150">
+                {/* 모달 헤더 */}
+                <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border-b border-gray-200 flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🎛️</span>
+                    <span className="text-sm font-black text-gray-900">지도 매물 정밀 필터</span>
+                    {activeFilterCount > 0 && (
+                      <span className="px-2 py-0.5 text-[10px] font-extrabold bg-blue-600 text-white rounded-full">
+                        {activeFilterCount}개 활성
+                      </span>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                    {PRESET_REGIONS.map((reg) => {
-                      const isSelected = (filterProps?.regionFilter || focusRegion) === reg.regionKey;
-                      return (
+                  <button
+                    type="button"
+                    onClick={() => setIsFilterOpen(false)}
+                    className="p-1.5 rounded-xl hover:bg-gray-200 text-gray-500 hover:text-gray-900 transition-colors cursor-pointer text-xs font-bold"
+                  >
+                    ✕ 닫기
+                  </button>
+                </div>
+
+                {/* 모달 본문 스크롤 영역 */}
+                <div className="flex-1 overflow-y-auto p-3.5 space-y-4 text-xs">
+                  {/* 1. 지역 바로가기 (지도 이동 + 필터) */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="font-extrabold text-gray-900 flex items-center gap-1">
+                        <span>📍</span> <span>지역 선택 (클릭 시 지도 이동)</span>
+                      </span>
+                      {filterProps?.regionFilter && (
                         <button
-                          key={reg.label}
                           type="button"
                           onClick={() => {
-                            handleFlyTo(reg.lat, reg.lng, reg.zoom);
-                            if (filterProps?.setRegionFilter) filterProps.setRegionFilter(reg.regionKey);
-                            if (filterProps?.setRegionInput) filterProps.setRegionInput(reg.regionKey);
-                            setNaverRegion(reg.regionKey);
-                            setNaverRegionInput(reg.regionKey);
+                            if (filterProps?.setRegionFilter) filterProps.setRegionFilter("");
+                            if (filterProps?.setRegionInput) filterProps.setRegionInput("");
+                            setNaverRegion("");
+                            setNaverRegionInput("");
                           }}
-                          className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer truncate ${
-                            isSelected
-                              ? "bg-blue-600 text-white border-blue-600 shadow-xs"
-                              : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
-                          }`}
+                          className="text-[10px] text-blue-600 hover:underline font-bold cursor-pointer"
                         >
-                          {reg.label}
+                          지역 초기화
                         </button>
-                      );
-                    })}
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                      {PRESET_REGIONS.map((reg) => {
+                        const isSelected = (filterProps?.regionFilter || focusRegion) === reg.regionKey;
+                        return (
+                          <button
+                            key={reg.label}
+                            type="button"
+                            onClick={() => {
+                              handleFlyTo(reg.lat, reg.lng, reg.zoom);
+                              if (filterProps?.setRegionFilter) filterProps.setRegionFilter(reg.regionKey);
+                              if (filterProps?.setRegionInput) filterProps.setRegionInput(reg.regionKey);
+                              setNaverRegion(reg.regionKey);
+                              setNaverRegionInput(reg.regionKey);
+                            }}
+                            className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer truncate ${
+                              isSelected
+                                ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                                : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
+                            }`}
+                          >
+                            {reg.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 2. 🏷️ 네이버 상가 거래 방식 (매매 / 전월세) */}
+                  <div className="bg-emerald-50/50 p-2.5 rounded-2xl border border-emerald-200/80">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="font-extrabold text-emerald-950 flex items-center gap-1">
+                        <span>🏷️</span> <span>네이버 거래 방식 (매매 / 전월세)</span>
+                      </span>
+                      {naverTradeType && (
+                        <span className="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-300">
+                          {naverTradeType}만 보기
+                        </span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {[
+                        { id: "", label: "전체 방식" },
+                        { id: "매매", label: "💰 매매만" },
+                        { id: "월세", label: "🔑 월세만" },
+                        { id: "전세", label: "🏠 전세만" },
+                      ].map((t) => {
+                        const isSelected = naverTradeType === t.id;
+                        return (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => {
+                              setNaverTradeType(t.id as any);
+                              if (filterProps?.setTradeTypeFilter) {
+                                filterProps.setTradeTypeFilter(t.id);
+                              }
+                            }}
+                            className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer truncate ${
+                              isSelected
+                                ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
+                                : "bg-white text-gray-700 hover:bg-emerald-50 border-gray-200"
+                            }`}
+                          >
+                            {t.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 3. 가격대 필터 */}
+                  <div>
+                    <span className="font-extrabold text-gray-900 block mb-1.5 flex items-center gap-1">
+                      <span>💰</span> <span>가격대</span>
+                    </span>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+                      {PRICE_OPTIONS.map((opt) => {
+                        const isSelected = (filterProps?.priceFilter ?? priceRange) === opt.id;
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => {
+                              if (filterProps?.setPriceFilter) filterProps.setPriceFilter(opt.id);
+                              setNaverPriceRange(opt.id);
+                            }}
+                            className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer ${
+                              isSelected
+                                ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                                : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 4. 매물 용도/종류 */}
+                  <div>
+                    <span className="font-extrabold text-gray-900 block mb-1.5 flex items-center gap-1">
+                      <span>🏢</span> <span>매물 용도</span>
+                    </span>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {[
+                        { id: "", label: "전체 용도" },
+                        { id: "commercial", label: "🏪 상가/근린" },
+                        { id: "apartment", label: "🏢 아파트" },
+                        { id: "officetel", label: "🏬 오피스텔" },
+                        { id: "villa", label: "🏘️ 빌라/다세대" },
+                        { id: "land", label: "🌲 임야/토지" },
+                      ].map((t) => {
+                        const isSelected = (filterProps?.propertyTypeFilter ?? "") === t.id;
+                        return (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => filterProps?.setPropertyTypeFilter && filterProps.setPropertyTypeFilter(t.id)}
+                            className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer truncate ${
+                              isSelected
+                                ? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
+                                : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
+                            }`}
+                          >
+                            {t.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 5. 층수 필터 */}
+                  <div>
+                    <span className="font-extrabold text-gray-900 block mb-1.5 flex items-center gap-1">
+                      <span>📐</span> <span>층수</span>
+                    </span>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {[
+                        { id: "", label: "층수 전체" },
+                        { id: "1f", label: "🏪 1층만" },
+                        { id: "b1", label: "⛳ 지하1층" },
+                        { id: "upper", label: "🏢 2층 이상" },
+                      ].map((f) => {
+                        const isSelected = (filterProps?.floorFilter ?? "") === f.id;
+                        return (
+                          <button
+                            key={f.id}
+                            type="button"
+                            onClick={() => {
+                              if (filterProps?.setFloorFilter) filterProps.setFloorFilter(f.id);
+                              setNaverFloorType(f.id);
+                            }}
+                            className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer truncate ${
+                              isSelected
+                                ? "bg-purple-600 text-white border-purple-600 shadow-xs"
+                                : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
+                            }`}
+                          >
+                            {f.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 6. ⚡ 투자자 퀵 테마 필터 */}
+                  <div>
+                    <span className="font-extrabold text-gray-900 block mb-1.5 flex items-center gap-1">
+                      <span>⚡</span> <span>투자 퀵 테마</span>
+                    </span>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { id: "half_price", label: "🔥 반값 경매 (50%↓)" },
+                        { id: "small_budget", label: "💰 소액 투자 (1억↓)" },
+                        { id: "top_grade", label: "🏆 AI S·A등급 엄선" },
+                        { id: "safe", label: "🛡️ 안전 매물 (선순위無)" },
+                      ].map((q) => {
+                        const isSelected = (filterProps?.quickFilter ?? "") === q.id;
+                        return (
+                          <button
+                            key={q.id}
+                            type="button"
+                            onClick={() => {
+                              if (filterProps?.setQuickFilter) {
+                                filterProps.setQuickFilter(isSelected ? "" : q.id);
+                              }
+                            }}
+                            className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer truncate ${
+                              isSelected
+                                ? "bg-rose-600 text-white border-rose-600 shadow-xs"
+                                : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
+                            }`}
+                          >
+                            {q.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
-                {/* 2. 가격대 필터 */}
-                <div>
-                  <span className="font-extrabold text-gray-900 block mb-1.5 flex items-center gap-1">
-                    <span>💰</span> <span>가격대</span>
-                  </span>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
-                    {PRICE_OPTIONS.map((opt) => {
-                      const isSelected = (filterProps?.priceFilter ?? priceRange) === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => {
-                            if (filterProps?.setPriceFilter) filterProps.setPriceFilter(opt.id);
-                            setNaverPriceRange(opt.id);
-                          }}
-                          className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer ${
-                            isSelected
-                              ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
-                              : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      );
-                    })}
-                  </div>
+                {/* 모달 하단 액션 버튼 바 */}
+                <div className="p-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (filterProps?.onResetFilters) filterProps.onResetFilters();
+                      setNaverRegion("");
+                      setNaverPriceRange("");
+                      setNaverFloorType("");
+                      setNaverTradeType("");
+                    }}
+                    className="py-2 px-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-bold text-xs transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    <span>🔄</span> <span>필터 초기화</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsFilterOpen(false)}
+                    className="flex-1 py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-colors cursor-pointer text-center"
+                  >
+                    ✓ 필터 적용 ({items.length + (showNaver ? naverItems.length : 0)}건 보기)
+                  </button>
                 </div>
-
-                {/* 3. 매물 용도/종류 */}
-                <div>
-                  <span className="font-extrabold text-gray-900 block mb-1.5 flex items-center gap-1">
-                    <span>🏢</span> <span>매물 용도</span>
-                  </span>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {[
-                      { id: "", label: "전체 용도" },
-                      { id: "commercial", label: "🏪 상가/근린" },
-                      { id: "apartment", label: "🏢 아파트" },
-                      { id: "officetel", label: "🏬 오피스텔" },
-                      { id: "villa", label: "🏘️ 빌라/다세대" },
-                      { id: "land", label: "🌲 임야/토지" },
-                    ].map((t) => {
-                      const isSelected = (filterProps?.propertyTypeFilter ?? "") === t.id;
-                      return (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => filterProps?.setPropertyTypeFilter && filterProps.setPropertyTypeFilter(t.id)}
-                          className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer truncate ${
-                            isSelected
-                              ? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
-                              : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
-                          }`}
-                        >
-                          {t.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 4. 층수 필터 */}
-                <div>
-                  <span className="font-extrabold text-gray-900 block mb-1.5 flex items-center gap-1">
-                    <span>📐</span> <span>층수</span>
-                  </span>
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {[
-                      { id: "", label: "층수 전체" },
-                      { id: "1f", label: "🏪 1층만" },
-                      { id: "b1", label: "⛳ 지하1층" },
-                      { id: "upper", label: "🏢 2층 이상" },
-                    ].map((f) => {
-                      const isSelected = (filterProps?.floorFilter ?? "") === f.id;
-                      return (
-                        <button
-                          key={f.id}
-                          type="button"
-                          onClick={() => {
-                            if (filterProps?.setFloorFilter) filterProps.setFloorFilter(f.id);
-                            setNaverFloorType(f.id);
-                          }}
-                          className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer truncate ${
-                            isSelected
-                              ? "bg-purple-600 text-white border-purple-600 shadow-xs"
-                              : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
-                          }`}
-                        >
-                          {f.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 5. ⚡ 투자자 퀵 테마 필터 */}
-                <div>
-                  <span className="font-extrabold text-gray-900 block mb-1.5 flex items-center gap-1">
-                    <span>⚡</span> <span>투자 퀵 테마</span>
-                  </span>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {[
-                      { id: "half_price", label: "🔥 반값 경매 (50%↓)" },
-                      { id: "small_budget", label: "💰 소액 투자 (1억↓)" },
-                      { id: "top_grade", label: "🏆 AI S·A등급 엄선" },
-                      { id: "safe", label: "🛡️ 안전 매물 (선순위無)" },
-                    ].map((q) => {
-                      const isSelected = (filterProps?.quickFilter ?? "") === q.id;
-                      return (
-                        <button
-                          key={q.id}
-                          type="button"
-                          onClick={() => {
-                            if (filterProps?.setQuickFilter) {
-                              filterProps.setQuickFilter(isSelected ? "" : q.id);
-                            }
-                          }}
-                          className={`py-1.5 px-2 rounded-xl text-[11px] font-bold text-center border transition-all cursor-pointer truncate ${
-                            isSelected
-                              ? "bg-rose-600 text-white border-rose-600 shadow-xs"
-                              : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
-                          }`}
-                        >
-                          {q.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* 모달 하단 액션 버튼 바 */}
-              <div className="p-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (filterProps?.onResetFilters) filterProps.onResetFilters();
-                    setNaverRegion("");
-                    setNaverPriceRange("");
-                    setNaverFloorType("");
-                  }}
-                  className="py-2 px-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-bold text-xs transition-colors cursor-pointer flex items-center gap-1"
-                >
-                  <span>🔄</span> <span>필터 초기화</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsFilterOpen(false)}
-                  className="flex-1 py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-colors cursor-pointer text-center"
-                >
-                  ✓ 지도 적용 ({items.length + (showNaver ? naverItems.length : 0)}건 보기)
-                </button>
               </div>
             </div>
           )}

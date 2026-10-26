@@ -662,6 +662,7 @@ export default function AuctionsPage() {
   const [priceFilter, setPriceFilter] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<string>("recent");
   const [propertyTypeFilter, setPropertyTypeFilter] = useState<string>("");
+  const [tradeTypeFilter, setTradeTypeFilter] = useState<string>("");
   const [tenantFilter, setTenantFilter] = useState<string>("");
   const [floorFilter, setFloorFilter] = useState<string>("");
   const [pyeongFilter, setPyeongFilter] = useState<string>("");
@@ -929,7 +930,8 @@ export default function AuctionsPage() {
         if (maxPy) url += `&max_pyeong=${maxPy}`;
         if (dateRange) url += `&date_range=${dateRange}`;
         if (sort && sort !== "recent") url += `&sort=${sort}`;
-        if (propertyType === "rent") url += `&trade_type=월세`;
+        if (tradeTypeFilter) url += `&trade_type=${encodeURIComponent(tradeTypeFilter)}`;
+        else if (propertyType === "rent") url += `&trade_type=월세`;
         else if (propertyType === "sale") url += `&trade_type=매매`;
         else if (propertyType === "villa") url += `&property_type=villa`;
         else if (propertyType === "commercial") url += `&property_type=commercial`;
@@ -994,7 +996,7 @@ export default function AuctionsPage() {
       fetchListings(0);
     }, 250);
     return () => clearTimeout(timer);
-  }, [selectedSources, gradeFilter, priceFilter, sortOrder, propertyTypeFilter, tenantFilter, floorFilter, pyeongFilter, regionFilter, quickFilter, viewMode, dateRangeFilter]);
+  }, [selectedSources, gradeFilter, priceFilter, sortOrder, propertyTypeFilter, tradeTypeFilter, tenantFilter, floorFilter, pyeongFilter, regionFilter, quickFilter, viewMode, dateRangeFilter]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -1082,6 +1084,7 @@ export default function AuctionsPage() {
     setRegionFilter("");
     setRegionInput("");
     setPropertyTypeFilter("");
+    setTradeTypeFilter("");
     setTenantFilter("");
     setFloorFilter("");
     setPyeongFilter("");
@@ -1221,6 +1224,8 @@ export default function AuctionsPage() {
                 setPyeongFilter,
                 quickFilter,
                 setQuickFilter,
+                tradeTypeFilter,
+                setTradeTypeFilter,
                 onResetFilters: handleResetFilters,
               }}
             />
@@ -1524,8 +1529,6 @@ export default function AuctionsPage() {
                 <option value="">유형 전체 (상가·빌라)</option>
                 <option value="commercial">🏪 상가/근린 매물</option>
                 <option value="villa">🏡 빌라/다세대 매물</option>
-                <option value="sale">🏷️ 매매만</option>
-                <option value="rent">🔑 월세만</option>
               </select>
             )}
 
@@ -1614,6 +1617,36 @@ export default function AuctionsPage() {
                 <option value="C">C 등급</option>
                 <option value="D">D 등급</option>
               </select>
+            </div>
+          )}
+
+          {/* 네이버 상가/빌라 전용 거래방식 필터 (매매 / 전월세) */}
+          {(assetSource === "naver" || selectedSources.naver) && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="text-[11px] sm:text-xs text-emerald-800 shrink-0 font-extrabold flex items-center gap-1">
+                <span>🏷️</span> <span>네이버 거래방식:</span>
+              </span>
+              <div className="flex items-center gap-1 flex-wrap">
+                {[
+                  { value: "", label: "전체 방식" },
+                  { value: "매매", label: "💰 매매만" },
+                  { value: "월세", label: "🔑 월세만" },
+                  { value: "전세", label: "🏠 전세만" },
+                ].map((t) => (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => setTradeTypeFilter(t.value)}
+                    className={`py-1 px-2.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                      tradeTypeFilter === t.value
+                        ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs"
+                        : "bg-white text-gray-600 border-gray-200 hover:bg-emerald-50 hover:text-emerald-700"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

@@ -492,9 +492,12 @@ def get_naver_listings(
                 params.extend([like, like, like, like])
             where_clause += " AND (" + " OR ".join(token_ors) + ")"
 
-        if trade_type and trade_type in ("매매", "월세", "전세"):
-            where_clause += " AND trade_type = ?"
-            params.append(trade_type)
+        if trade_type:
+            if trade_type in ("매매", "월세", "전세"):
+                where_clause += " AND trade_type = ?"
+                params.append(trade_type)
+            elif trade_type in ("전월세", "임대"):
+                where_clause += " AND trade_type IN ('월세', '전세')"
 
         # 층수 필터 (하위 호환 first_floor_only 포함)
         if floor_type:
