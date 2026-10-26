@@ -1205,6 +1205,24 @@ export default function AuctionsPage() {
               focusRegion={regionFilter || regionInput}
               priceRange={priceFilter}
               fullScreenMode={true}
+              isDetailModalOpen={Boolean(selectedDetail)}
+              filterProps={{
+                regionFilter,
+                setRegionFilter,
+                regionInput,
+                setRegionInput,
+                priceFilter,
+                setPriceFilter,
+                propertyTypeFilter,
+                setPropertyTypeFilter,
+                floorFilter,
+                setFloorFilter,
+                pyeongFilter,
+                setPyeongFilter,
+                quickFilter,
+                setQuickFilter,
+                onResetFilters: handleResetFilters,
+              }}
             />
           </div>
         )}
@@ -1350,13 +1368,16 @@ export default function AuctionsPage() {
                     ? "bg-blue-600 text-white shadow-sm ring-2 ring-blue-500/30"
                     : "bg-white text-blue-700 hover:bg-blue-50 border border-blue-200 shadow-2xs"
                 }`}
-                title="오늘 신규 등록된 매물만 필터링"
+                title={`오늘 신규 유입 상세: 법원경매 ${(quickCounts.inflow_outflow.today_new_court || 0).toLocaleString()}건, 온비드공매 ${(quickCounts.inflow_outflow.today_new_onbid || 0).toLocaleString()}건, 네이버상가시세 ${(quickCounts.inflow_outflow.today_new_naver || 0).toLocaleString()}건`}
               >
                 <span>✨ 오늘 신규 유입</span>
                 <span className={`px-1.5 py-0.2 rounded-md font-bold ${
                   dateRangeFilter === "today" ? "bg-white/20 text-white" : "bg-blue-50 text-blue-700"
                 }`}>
                   +{(quickCounts.inflow_outflow.today_new_total || 0).toLocaleString()}건
+                </span>
+                <span className="text-[10px] opacity-80 font-normal hidden md:inline">
+                  (경매 {quickCounts.inflow_outflow.today_new_court || 0} · 공매 {(quickCounts.inflow_outflow.today_new_onbid || 0).toLocaleString()} · 시세 {(quickCounts.inflow_outflow.today_new_naver || 0).toLocaleString()})
                 </span>
               </button>
               <div className="px-2.5 py-1 rounded-xl text-xs font-black bg-white text-rose-700 border border-rose-200 shadow-2xs flex items-center gap-1.5">
@@ -2590,7 +2611,7 @@ export default function AuctionsPage() {
 
       {/* 모달 (page.tsx와 동일 로직) */}
       {selectedDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4">
           <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setSelectedDetail(null)}></div>
           <div className="bg-white rounded-3xl w-full max-w-lg md:max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
             {detailLoading ? (

@@ -491,11 +491,14 @@ export default function Home() {
                 <Link
                   href="/auctions?date_range=today"
                   className="px-2.5 py-1 rounded-lg text-xs font-black bg-blue-600 text-white hover:bg-blue-700 shadow-2xs flex items-center gap-1.5 transition-all"
-                  title="오늘 신규 등록된 매물 검색하기"
+                  title={`오늘 신규 유입 상세: 법원경매 ${(summary.inflow_outflow.today_new_court || 0).toLocaleString()}건, 온비드공매 ${(summary.inflow_outflow.today_new_onbid || 0).toLocaleString()}건, 네이버상가시세 ${(summary.inflow_outflow.today_new_naver || 0).toLocaleString()}건`}
                 >
                   <span>✨ 오늘 신규 유입</span>
                   <span className="bg-white/20 px-1.5 py-0.2 rounded font-extrabold">
                     +{(summary.inflow_outflow.today_new_total || 0).toLocaleString()}건
+                  </span>
+                  <span className="text-[10px] text-blue-100 font-medium hidden md:inline">
+                    (경매 {summary.inflow_outflow.today_new_court || 0} · 공매 {(summary.inflow_outflow.today_new_onbid || 0).toLocaleString()} · 시세 {(summary.inflow_outflow.today_new_naver || 0).toLocaleString()})
                   </span>
                 </Link>
                 <div className="px-2.5 py-1 rounded-lg text-xs font-black bg-white text-rose-700 border border-rose-200 shadow-2xs flex items-center gap-1.5">
@@ -1330,7 +1333,7 @@ export default function Home() {
 
       {/* 모달 (page.tsx와 동일 로직) */}
       {selectedDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4">
           <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setSelectedDetail(null)}></div>
           <div className="bg-white rounded-3xl w-full max-w-lg md:max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200">
             {detailLoading ? (
