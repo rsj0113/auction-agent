@@ -74,7 +74,8 @@ def get_auctions(
         '''
         params = []
 
-        if not include_closed:
+        is_case_search = bool(region and ("타경" in region or "202" in region))
+        if not include_closed and not is_case_search:
             query += " AND COALESCE(status_flag, '') != 'CLOSED' AND (auction_date IS NULL OR auction_date = '' OR REPLACE(auction_date, '-', '') >= strftime('%Y%m%d', 'now', 'localtime'))"
         
         if grade:
