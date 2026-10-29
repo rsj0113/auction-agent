@@ -107,9 +107,10 @@ def get_auctions(
             tokens = [t.strip() for t in _re.split(r"[·,/|\s]+", region) if t.strip() and t.strip() not in ("전체", "서울", "경기")]
             if not tokens:
                 tokens = [region.strip()]
-            sub_clauses = ["location LIKE ?" for _ in tokens]
+            sub_clauses = ["(location LIKE ? OR case_number LIKE ?)" for _ in tokens]
             query += " AND (" + " OR ".join(sub_clauses) + ")"
-            params.extend([f"%{t}%" for t in tokens])
+            for t in tokens:
+                params.extend([f"%{t}%", f"%{t}%"])
 
         if has_tenant:
             if has_tenant.lower() in ('yes', 'true', '1', 'y'):
