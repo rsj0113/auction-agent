@@ -76,7 +76,15 @@ def get_auctions(
 
         is_case_search = bool(region and ("타경" in region or "202" in region))
         if not include_closed and not is_case_search:
-            query += " AND COALESCE(status_flag, '') != 'CLOSED' AND (auction_date IS NULL OR auction_date = '' OR REPLACE(auction_date, '-', '') >= strftime('%Y%m%d', 'now', 'localtime'))"
+            query += """ AND COALESCE(status_flag, '') != 'CLOSED' 
+                         AND (
+                             (auction_date IS NOT NULL AND auction_date != '' AND REPLACE(auction_date, '-', '') >= strftime('%Y%m%d', 'now', 'localtime'))
+                             OR (
+                                 (auction_date IS NULL OR auction_date = '')
+                                 AND (last_updated >= datetime('now', '-7 days', 'localtime') OR COALESCE(is_favorite, 0) = 1)
+                             )
+                         )"""
+
         
         if grade:
             query += " AND ai_grade = ?"

@@ -14,6 +14,33 @@ def cleanup_old_data(db_path: str, days: int):
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         
+        # 0. 낙찰 완료(auction_results 매칭) 및 7일 이상 미갱신 공백 물건 마감(CLOSED) 처리
+        try:
+            cursor.execute("""
+                UPDATE auction_items 
+                SET status_flag = 'CLOSED' 
+                WHERE case_number IN (SELECT case_number FROM auction_results) 
+                  AND (status_flag != 'CLOSED' OR status_flag IS NULL)
+            """)
+            closed_result_count = cursor.rowcount
+            if closed_result_count > 0:
+                print(f"  - [동기화] 낙찰 완료 물건 {closed_result_count}건 마감(CLOSED) 상태로 전환.")
+
+            seven_days_ago = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')
+            cursor.execute("""
+                UPDATE auction_items 
+                SET status_flag = 'CLOSED' 
+                WHERE COALESCE(status_flag, '') != 'CLOSED' 
+                  AND (auction_date IS NULL OR auction_date = '') 
+                  AND last_updated < ? 
+                  AND COALESCE(is_favorite, 0) != 1
+            """, (seven_days_ago,))
+            stale_closed_count = cursor.rowcount
+            if stale_closed_count > 0:
+                print(f"  - [공백정리] 7일 이상 기일 미지정/취하 추정 물건 {stale_closed_count}건 마감(CLOSED) 처리.")
+        except Exception as e_close:
+            print(f"  - [마감처리] 오류: {e_close}")
+
         # 1. 경매 물건 (auction_items) 안전 정리
         # 절대 보존: 관심 매물(is_favorite = 1), 매각기일이 오늘 이후(auction_date >= today_str)
         # 삭제 대상: (매각기일이 30일 이상 지난 과거 OR auction_date 없음) AND last_updated < cutoff AND is_favorite != 1

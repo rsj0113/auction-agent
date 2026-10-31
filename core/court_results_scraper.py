@@ -303,7 +303,18 @@ async def scrape_court_results(target_courts=None, max_pages_per_court=3, headle
         finally:
             await browser.close()
 
-    conn.commit()
+    # 낙찰 결과 수집 후 경매물건 테이블(auction_items) 상태를 CLOSED로 일괄 동기화
+    try:
+        cur.execute("""
+            UPDATE auction_items 
+            SET status_flag = 'CLOSED' 
+            WHERE case_number IN (SELECT case_number FROM auction_results) 
+              AND (status_flag != 'CLOSED' OR status_flag IS NULL)
+        """)
+        conn.commit()
+    except Exception as e_sync:
+        print(f"[!] 경매물건 상태 CLOSED 동기화 오류: {e_sync}")
+
     total_in_db = cur.execute("SELECT COUNT(*) FROM auction_results WHERE source='court'").fetchone()[0]
     conn.close()
 
