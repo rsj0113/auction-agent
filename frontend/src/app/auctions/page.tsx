@@ -1902,8 +1902,12 @@ export default function AuctionsPage() {
                 <div>
                   <p className="text-[11px] text-gray-400 font-medium mb-0.5">최저가 <span className="text-red-500 ml-1">유찰 {item.failed_count}회</span></p>
                   <p className="text-sm font-bold text-blue-600">{formatMoney(item.min_bid)}</p>
-                  {item.auction_date && (
+                  {item.auction_date ? (
                     <p className="text-xs text-gray-500 mt-0.5">기일: {item.auction_date.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3')}</p>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-1.5 py-0.5 rounded mt-1 shadow-2xs">
+                      <span>📅</span> 법원 기일변경 / 추후지정
+                    </span>
                   )}
                 </div>
               </div>
@@ -2462,6 +2466,25 @@ export default function AuctionsPage() {
                       </div>
                       <div className="text-amber-900 font-bold">
                         1-2등 격차: <span className="text-rose-600 font-black">{formatMoney(gap)}</span> ({((gap / item.winning_bid) * 100).toFixed(1)}% 차이)
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 🎯 AI 예측 추천가 vs 실제 낙찰가 비교 분석 (피드백 루프) */}
+                  {item.ai_suggested_bid && item.ai_suggested_bid.trim() && item.ai_suggested_bid !== "0원" && item.ai_suggested_bid !== "0원 ~ 0원" && (
+                    <div className="mt-2.5 pt-2.5 border-t border-amber-200/70 bg-white/70 p-2.5 rounded-lg border border-amber-200/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-blue-600 text-white">
+                          🤖 사전 AI 예측 추천가
+                        </span>
+                        <strong className="text-blue-900 font-bold">{item.ai_suggested_bid}</strong>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px]">
+                        <span className="text-slate-500">실제 낙찰가:</span>
+                        <strong className="text-slate-900 font-extrabold">{formatMoney(item.winning_bid)}</strong>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          검증 완료 ✨
+                        </span>
                       </div>
                     </div>
                   )}
