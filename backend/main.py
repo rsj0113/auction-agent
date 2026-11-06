@@ -223,8 +223,16 @@ def get_auctions(
         conn.close()
         
         try:
+            from core.market_matcher import extract_assumed_deposit_info
             from core.villa_transactions import get_villa_trade_info
             for it in items:
+                dep, is_risk, reason = extract_assumed_deposit_info(it)
+                it["senior_deposit_assumed"] = dep
+                it["is_senior_risk"] = is_risk or (dep > 0)
+                it["is_unknown_senior_risk"] = is_risk
+                it["senior_risk_reason"] = reason
+                it["net_cost"] = (it.get("min_bid") or 0) + dep
+
                 v_info = get_villa_trade_info(it)
                 if v_info:
                     it["villa_trade_info"] = v_info
@@ -917,10 +925,20 @@ def get_auction_detail(case_number: str):
             matched_res = matcher.match_item(item_data)
             item_data["sample_listings"] = matched_res.get("sample_listings", [])
             item_data["senior_deposit_assumed"] = matched_res.get("senior_deposit_assumed", 0)
+            item_data["is_senior_risk"] = matched_res.get("is_senior_risk", False)
+            item_data["is_unknown_senior_risk"] = matched_res.get("is_unknown_senior_risk", False)
+            item_data["senior_risk_reason"] = matched_res.get("senior_risk_reason", "")
+            item_data["net_cost"] = matched_res.get("net_cost", (item_data.get("min_bid") or 0))
             item_data["min_market_price"] = matched_res.get("min_market_price", 0)
+            item_data["safety_margin"] = matched_res.get("safety_margin", item_data.get("safety_margin", 0))
+            item_data["market_discount_pct"] = matched_res.get("market_discount_pct", item_data.get("market_discount_pct", 0.0))
         except Exception:
             item_data["sample_listings"] = []
             item_data["senior_deposit_assumed"] = 0
+            item_data["is_senior_risk"] = False
+            item_data["is_unknown_senior_risk"] = False
+            item_data["senior_risk_reason"] = ""
+            item_data["net_cost"] = item_data.get("min_bid") or 0
             item_data["min_market_price"] = 0
 
         # Attach villa recent transaction info

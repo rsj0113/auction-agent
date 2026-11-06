@@ -157,19 +157,28 @@ def get_villa_trade_info(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "is_subject": False
         })
 
-    # 4. 가격 비교 및 안전마진 계산
-    # 최저가 대비 실거래가 차이
-    target_comp_price = min_bid if min_bid > 0 else (winning_bid if winning_bid > 0 else appraisal)
-    price_gap_vs_min = recent_price - target_comp_price
-    discount_pct_vs_min = round((price_gap_vs_min / recent_price) * 100, 1) if recent_price > 0 else 0.0
+    # 4. 가격 비교 및 안전마진 계산 (인수금액 = 최저가 + 선순위 보증금 반영)
+    from core.market_matcher import extract_assumed_deposit_info
+    senior_deposit, is_unknown_risk, senior_risk_reason = extract_assumed_deposit_info(item)
+
+    base_bid = min_bid if min_bid > 0 else (winning_bid if winning_bid > 0 else appraisal)
+    total_cost = base_bid + senior_deposit
+
+    if is_unknown_risk:
+        # 보증금 미상의 대항력 있는 선순위 임차인이 있는 경우, 가짜 마진 생성 차단
+        price_gap_vs_min = 0
+        discount_pct_vs_min = None
+    else:
+        price_gap_vs_min = recent_price - total_cost
+        discount_pct_vs_min = round((price_gap_vs_min / recent_price) * 100, 1) if recent_price > 0 else 0.0
 
     # 낙찰가 대비 차이
-    price_gap_vs_win = (recent_price - winning_bid) if winning_bid > 0 else 0
+    price_gap_vs_win = (recent_price - (winning_bid + senior_deposit)) if winning_bid > 0 else 0
     discount_pct_vs_win = round((price_gap_vs_win / recent_price) * 100, 1) if recent_price > 0 and winning_bid > 0 else 0.0
 
     # 예상 전세가 및 갭투자 필요 현금 (빌라 전세가율 평균 72%)
     est_jeonse_price = int(recent_price * 0.72)
-    gap_investment_cash = max(0, target_comp_price - est_jeonse_price)
+    gap_investment_cash = max(0, total_cost - est_jeonse_price)
 
     return {
         "is_villa": True,
@@ -183,6 +192,11 @@ def get_villa_trade_info(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         "price_gap_vs_min": price_gap_vs_min,
         "discount_pct_vs_min": discount_pct_vs_min,
         "price_gap_vs_win": price_gap_vs_win,
+        "senior_deposit_assumed": senior_deposit,
+        "total_cost": total_cost,
+        "is_senior_risk": is_unknown_risk or (senior_deposit > 0),
+        "is_unknown_senior_risk": is_unknown_risk,
+        "senior_risk_reason": senior_risk_reason,
         "discount_pct_vs_win": discount_pct_vs_win,
         "est_jeonse_price": est_jeonse_price,
         "gap_investment_cash": gap_investment_cash,

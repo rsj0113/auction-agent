@@ -88,6 +88,11 @@ export interface VillaTradeInfo {
   gap_investment_cash: number;
   nearby_trades: NearbyTrade[];
   rtms_url?: string;
+  senior_deposit_assumed?: number;
+  total_cost?: number;
+  is_senior_risk?: boolean;
+  is_unknown_senior_risk?: boolean;
+  senior_risk_reason?: string;
 }
 
 export interface PostAuctionAnalysis {
@@ -164,6 +169,11 @@ interface AuctionItem {
   area_pyeong?: number;
   is_favorite?: number;
   recommend_tag?: string;
+  senior_deposit_assumed?: number;
+  is_senior_risk?: boolean;
+  is_unknown_senior_risk?: boolean;
+  senior_risk_reason?: string;
+  net_cost?: number;
   villa_trade_info?: VillaTradeInfo;
   post_auction_analysis?: PostAuctionAnalysis;
 }
@@ -1900,8 +1910,20 @@ export default function AuctionsPage() {
                   <p className="text-sm font-semibold text-gray-900">{formatMoney(item.appraisal)}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] text-gray-400 font-medium mb-0.5">최저가 <span className="text-red-500 ml-1">유찰 {item.failed_count}회</span></p>
-                  <p className="text-sm font-bold text-blue-600">{formatMoney(item.min_bid)}</p>
+                  <p className="text-[11px] text-gray-400 font-medium mb-0.5">
+                    최저가 <span className="text-red-500 ml-1">유찰 {item.failed_count}회</span>
+                    {item.senior_deposit_assumed && item.senior_deposit_assumed > 0 ? (
+                      <span className="text-amber-700 ml-1 font-bold">+인수 {formatMoney(item.senior_deposit_assumed)}</span>
+                    ) : null}
+                  </p>
+                  <div className="flex items-baseline gap-1.5 flex-wrap">
+                    <span className="text-sm font-bold text-blue-600">{formatMoney(item.min_bid)}</span>
+                    {item.senior_deposit_assumed && item.senior_deposit_assumed > 0 ? (
+                      <span className="text-[10px] text-amber-800 font-extrabold bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                        총원가 {formatMoney(item.net_cost || ((item.min_bid || 0) + item.senior_deposit_assumed))}
+                      </span>
+                    ) : null}
+                  </div>
                   {item.auction_date ? (
                     <p className="text-xs text-gray-500 mt-0.5">기일: {item.auction_date.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3')}</p>
                   ) : (
@@ -1912,16 +1934,39 @@ export default function AuctionsPage() {
                 </div>
               </div>
 
-              {/* 진짜 안전마진 배너 */}
-              {item.market_match_count && item.market_match_count > 0 && item.market_price && item.market_price > 0 ? (
+              {/* 진짜 안전마진 배너 (인수보증금 차감 반영 및 미상 위험 방어) */}
+              {item.is_unknown_senior_risk ? (
+                <div className="mt-3 p-2.5 rounded-xl bg-gradient-to-r from-rose-50 to-red-50 border border-red-200 flex items-center justify-between text-xs shadow-2xs">
+                  <div className="min-w-0 pr-2">
+                    <span className="font-extrabold text-red-900 flex items-center gap-1">
+                      <span>🚨 선순위 보증금 인수 주의</span>
+                      <span className="text-[10px] text-red-700 font-semibold">(실마진 없음/미상)</span>
+                    </span>
+                    <span className="text-[11px] text-red-600 block mt-0.5 truncate">
+                      대항력 있는 선순위 임차인 보증금 전액 인수 위험 (단순 최저가 차익 맹신 금지)
+                    </span>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="inline-block px-2 py-0.5 rounded-md font-bold text-[10px] bg-red-600 text-white">
+                      인수위험
+                    </span>
+                  </div>
+                </div>
+              ) : item.market_match_count && item.market_match_count > 0 && item.market_price && item.market_price > 0 ? (
                 <div className="mt-3 p-2.5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/90 flex items-center justify-between text-xs">
                   <div className="min-w-0 pr-2">
-                    <span className="font-extrabold text-emerald-900 flex items-center gap-1">
+                    <span className="font-extrabold text-emerald-900 flex items-center gap-1.5 flex-wrap">
                       <span>🎯 진짜 안전마진</span>
                       <span className="text-sm text-emerald-700">+{formatMoney(item.safety_margin)}</span>
+                      {item.senior_deposit_assumed && item.senior_deposit_assumed > 0 ? (
+                        <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded border border-amber-300">
+                          인수금 {formatMoney(item.senior_deposit_assumed)} 차감반영
+                        </span>
+                      ) : null}
                     </span>
                     <span className="text-[11px] text-emerald-700 font-medium block mt-0.5 truncate">
                       네이버 시세 {formatMoney(item.market_price)} ({item.market_match_level} {item.market_match_count}건 비교)
+                      {item.senior_deposit_assumed && item.senior_deposit_assumed > 0 ? ` · 실매수원가 ${formatMoney(item.net_cost || ((item.min_bid || 0) + item.senior_deposit_assumed))}` : ''}
                     </span>
                   </div>
                   <div className="text-right shrink-0">
@@ -1937,10 +1982,17 @@ export default function AuctionsPage() {
                 </div>
               ) : item.safety_margin && item.safety_margin > 0 ? (
                 <div className="mt-3 p-2 rounded-xl bg-gray-50/80 border border-gray-200/60 flex items-center justify-between text-xs">
-                  <span className="text-gray-600 font-medium">
-                    🏛️ 감정가 기준 마진: <strong className="text-gray-900">+{formatMoney(item.safety_margin)}</strong>
-                  </span>
-                  <span className="text-[11px] text-gray-600 font-semibold bg-gray-200/60 px-1.5 py-0.5 rounded">
+                  <div className="min-w-0 pr-2">
+                    <span className="text-gray-600 font-medium flex items-center gap-1.5 flex-wrap">
+                      <span>🏛️ 감정가 기준 마진: <strong className="text-gray-900">+{formatMoney(item.safety_margin)}</strong></span>
+                      {item.senior_deposit_assumed && item.senior_deposit_assumed > 0 ? (
+                        <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded border border-amber-300">
+                          인수금 {formatMoney(item.senior_deposit_assumed)} 차감반영
+                        </span>
+                      ) : null}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-gray-600 font-semibold bg-gray-200/60 px-1.5 py-0.5 rounded shrink-0">
                     할인 {item.market_discount_pct}%
                   </span>
                 </div>
@@ -1958,7 +2010,11 @@ export default function AuctionsPage() {
                       <span className="text-gray-400 text-[10px] ml-1">({item.villa_trade_info.recent_date})</span>
                     </span>
                   </div>
-                  {item.villa_trade_info.discount_pct_vs_min !== null && (
+                  {item.villa_trade_info.is_unknown_senior_risk ? (
+                    <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-700 border border-red-200">
+                      선순위인수 위험
+                    </span>
+                  ) : item.villa_trade_info.discount_pct_vs_min !== null && (
                     <span className={`shrink-0 text-[11px] font-bold px-2 py-0.5 rounded ${
                       item.villa_trade_info.discount_pct_vs_min > 0 
                         ? 'bg-rose-100 text-rose-700' 
@@ -1967,6 +2023,7 @@ export default function AuctionsPage() {
                       {item.villa_trade_info.discount_pct_vs_min > 0 
                         ? `실거래 대비 -${item.villa_trade_info.discount_pct_vs_min}%`
                         : `실거래 대비 +${Math.abs(item.villa_trade_info.discount_pct_vs_min)}%`}
+                      {item.villa_trade_info.senior_deposit_assumed && item.villa_trade_info.senior_deposit_assumed > 0 ? " (인수반영)" : ""}
                     </span>
                   )}
                 </div>

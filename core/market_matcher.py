@@ -24,15 +24,22 @@ from typing import Any, Dict, List, Optional, Tuple
 PYEONG = 3.3058
 
 
-def extract_assumed_deposit(item: Dict[str, Any]) -> int:
+def extract_assumed_deposit_info(item: Dict[str, Any]) -> Tuple[int, bool, str]:
     """
-    선순위 임차인 인수 보증금 총액 계산 (원 단위)
+    선순위 임차인 인수 보증금 총액 계산 및 미상 인수 리스크 판정
+    Returns:
+        (senior_deposit: int, is_unknown_senior_risk: bool, reason: str)
     """
     assumed = 0
+    is_unknown_senior_risk = False
+    reasons = []
+
     tenant_deposit = item.get("tenant_deposit") or 0
     is_payout_requested = bool(item.get("is_payout_requested"))
     ai_verdict = str(item.get("ai_verdict") or "")
-    
+    remarks = str(item.get("remarks") or "")
+    rights_list = str(item.get("rights_list") or "")
+
     # 1. ai_report_json 내 tenants 상세 분석
     report_raw = item.get("ai_report_json")
     if report_raw:
@@ -41,6 +48,7 @@ def extract_assumed_deposit(item: Dict[str, Any]) -> int:
             tenants = report.get("tenants", [])
             if isinstance(tenants, list) and tenants:
                 tenant_sum = 0
+                has_unknown_tenant = False
                 for t in tenants:
                     dep = t.get("deposit")
                     payout_req = t.get("is_payout_requested", False)
@@ -52,7 +60,6 @@ def extract_assumed_deposit(item: Dict[str, Any]) -> int:
                             clean_dep = re.sub(r"[^0-9]", "", dep)
                             if clean_dep:
                                 val = int(clean_dep)
-                                # 만원 단위 표기인 경우 보정
                                 if "억" in dep or "만" in dep:
                                     if "억" in dep and "만" in dep:
                                         m = re.search(r"(\d+)억\s*(\d+)만", dep)
@@ -67,17 +74,66 @@ def extract_assumed_deposit(item: Dict[str, Any]) -> int:
                                         if m:
                                             val = int(m.group(1)) * 10000
                                 tenant_sum += val
+                            elif "미상" in dep or not clean_dep:
+                                has_unknown_tenant = True
+                        else:
+                            has_unknown_tenant = True
+
                 if tenant_sum > 0:
                     assumed = max(assumed, tenant_sum)
+                    reasons.append(f"선순위 임차인 미배당 보증금 {assumed:,}원 인수")
+                elif has_unknown_tenant:
+                    is_unknown_senior_risk = True
+                    reasons.append("선순위 임차인 배당요구 미신청(보증금 미상)으로 전액 인수 위험")
         except Exception:
             pass
 
     # 2. ai_report_json에 없거나 계산 안 된 경우 기본 tenant_deposit 검토
     if assumed == 0 and tenant_deposit > 0:
-        # 배당요구를 안 했거나 위험(인수) 판정인 경우
         if not is_payout_requested or "인수" in ai_verdict or "대항력" in ai_verdict:
             assumed = int(tenant_deposit)
+            reasons.append(f"대항력 임차보증금 {assumed:,}원 인수")
 
+    # 3. ai_verdict 및 비고란에서 명시적 인수 리스크 키워드 탐색
+    senior_risk_keywords = ["대항력 있는 선순위 임차인", "보증금 전액 인수 위험", "선순위 임차인 미배당", "보증금 인수 위험", "선순위 임차보증금 인수"]
+    has_verdict_risk = any(k in ai_verdict for k in senior_risk_keywords) or any(k in remarks for k in ["보증금 전액 인수", "대항력 있는 임차인"])
+    
+    if has_verdict_risk:
+        if assumed == 0:
+            # 보증금 텍스트 추출 시도 (예: 2억 5,000만원)
+            m_amt = re.search(r"(?:보증금|임차보증금)[^\d]{0,10}(\d+억(?:\s*\d+만)?|\d+만)원?", ai_verdict + " " + remarks)
+            if m_amt:
+                amt_str = m_amt.group(1)
+                val = 0
+                if "억" in amt_str and "만" in amt_str:
+                    m = re.search(r"(\d+)억\s*(\d+)만", amt_str)
+                    if m:
+                        val = (int(m.group(1)) * 10000 + int(m.group(2))) * 10000
+                elif "억" in amt_str:
+                    m = re.search(r"(\d+)억", amt_str)
+                    if m:
+                        val = int(m.group(1)) * 100000000
+                elif "만" in amt_str:
+                    m = re.search(r"(\d+)만", amt_str)
+                    if m:
+                        val = int(m.group(1)) * 10000
+                if val > 0:
+                    assumed = val
+                    reasons.append(f"분석 보고서 기반 선순위 보증금 {assumed:,}원 인수")
+                else:
+                    is_unknown_senior_risk = True
+                    reasons.append("대항력 선순위 임차인 보증금 미상(인수 위험)")
+            else:
+                is_unknown_senior_risk = True
+                reasons.append("대항력 있는 선순위 임차인 보증금 전액 인수 위험")
+
+    final_reason = " / ".join(reasons) if reasons else ("인수 보증금 없음" if assumed == 0 and not is_unknown_senior_risk else "권리 인수 주의")
+    return assumed, is_unknown_senior_risk, final_reason
+
+
+def extract_assumed_deposit(item: Dict[str, Any]) -> int:
+    """기존 호환성 유지용"""
+    assumed, _, _ = extract_assumed_deposit_info(item)
     return assumed
 
 
@@ -302,18 +358,22 @@ class MarketMatcher:
             if denom > 0 and est_monthly_rent > 0:
                 rental_yield = round((est_monthly_rent * 12 / denom) * 100, 2)
 
-        # 선순위 인수 보증금 (여러 임차인 전액 합산 반영)
-        senior_deposit = extract_assumed_deposit(item)
+        # 선순위 인수 보증금 (여러 임차인 전액 합산 반영 및 미상 위험 방어)
+        senior_deposit, is_unknown_senior_risk, senior_risk_reason = extract_assumed_deposit_info(item)
         net_cost = min_bid + senior_deposit
 
-        # 안전마진 계산
-        if market_price > 0:
-            safety_margin = market_price - net_cost
-            market_discount_pct = round((market_price - net_cost) / market_price * 100, 1)
+        # 안전마진 계산 (실질 매수원가 = 최저가 + 인수금액 반영)
+        if is_unknown_senior_risk:
+            # 🚨 보증금 미상의 대항력 있는 선순위 임차인이 있는 경우, 가짜 안전마진 생성 원천 차단
+            safety_margin = 0
+            market_discount_pct = 0.0
+        elif market_price > 0:
+            safety_margin = max(0, market_price - net_cost)
+            market_discount_pct = round((market_price - net_cost) / market_price * 100, 1) if market_price > 0 and net_cost < market_price else 0.0
         else:
             # 네이버 매칭이 없는 경우 감정가 기준 보조 계산
-            safety_margin = appraisal - net_cost if appraisal > 0 else 0
-            market_discount_pct = round((appraisal - net_cost) / appraisal * 100, 1) if appraisal > 0 else 0.0
+            safety_margin = max(0, appraisal - net_cost) if appraisal > 0 and net_cost < appraisal else 0
+            market_discount_pct = round((appraisal - net_cost) / appraisal * 100, 1) if appraisal > 0 and net_cost < appraisal else 0.0
 
         # 대표 비교 매물 (최대 5건)
         sample_listings = []
@@ -338,6 +398,10 @@ class MarketMatcher:
             "market_match_count": len(display_sales),
             "market_match_level": match_level if len(display_sales) > 0 else "미매칭",
             "senior_deposit_assumed": senior_deposit,
+            "is_senior_risk": is_unknown_senior_risk or (senior_deposit > 0),
+            "is_unknown_senior_risk": is_unknown_senior_risk,
+            "senior_risk_reason": senior_risk_reason,
+            "net_cost": net_cost,
             "est_monthly_rent": est_monthly_rent,
             "rental_yield": rental_yield,
             "sample_listings": sample_listings,
@@ -354,7 +418,7 @@ class MarketMatcher:
             items = cursor.execute("""
                 SELECT case_number, location, appraisal, min_bid, area_m2, floor,
                        legal_div_no, addr_sgg, addr_emd, tenant_deposit,
-                       is_payout_requested, ai_verdict, ai_report_json
+                       is_payout_requested, ai_verdict, ai_report_json, remarks, rights_list
                 FROM auction_items
             """).fetchall()
             
