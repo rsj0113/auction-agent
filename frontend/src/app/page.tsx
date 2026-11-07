@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { analyzeSeniorDeposit, formatMoney, formatMoneyShort, formatDateShort, QUICK_CHIPS } from "./auctions/page";
 import InvestmentCalculator from "@/components/InvestmentCalculator";
+import RegistryRightsTable from "@/components/RegistryRightsTable";
 import AuctionMap, { formatNaverPrice10k } from "@/components/AuctionMap";
 import AgentAdvisorModal from "@/components/AgentAdvisorModal";
 
@@ -1758,6 +1759,13 @@ export default function Home() {
                         )}
                       </div>
 
+                      {/* 📜 등기부 권리 전체 내역 & 소멸(말소) 투명 분석 카드 */}
+                      <RegistryRightsTable
+                        rightsListJson={selectedDetail.rights_list}
+                        tenantRegistrationDate={selectedDetail.tenant_registration_date}
+                        aiReport={aiReport}
+                      />
+
                       {/* 실전 투자금 & 경락잔금대출 계산기 */}
                       <InvestmentCalculator
                         appraisal={selectedDetail.appraisal}
@@ -1901,6 +1909,22 @@ export default function Home() {
                                 <li key={idx}>{risk}</li>
                               ))}
                             </ul>
+                          </div>
+                        )}
+
+                        {aiReport.extinguished_rights && aiReport.extinguished_rights.length > 0 && aiReport.extinguished_rights[0] !== '없음' && (
+                          <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-200">
+                            <span className="block text-emerald-800 mb-2 font-semibold text-sm flex items-center gap-1.5">
+                              <span>🛡️</span>
+                              <span>낙찰 시 소멸(말소)되는 권리 (낙찰자 인수 없음)</span>
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {aiReport.extinguished_rights.map((right: string, idx: number) => (
+                                <span key={idx} className="bg-white px-2.5 py-1 rounded-lg border border-emerald-300 text-xs font-semibold text-emerald-800 shadow-2xs">
+                                  ✓ {right} <span className="font-normal text-[11px] text-emerald-600">(말소)</span>
+                                </span>
+                              ))}
+                            </div>
                           </div>
                         )}
 
