@@ -1301,7 +1301,20 @@ export default function Home() {
                       >
                         {item.is_favorite ? "⭐" : "☆"}
                       </button>
-                      <span className="text-xs text-gray-400 font-medium">#{item.cltr_no}</span>
+                      <button 
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (navigator.clipboard && item.cltr_no) {
+                            navigator.clipboard.writeText(item.cltr_no);
+                            alert(`온비드 관리번호 [${item.cltr_no}]가 클립보드에 복사되었습니다!`);
+                          }
+                        }}
+                        className="text-xs text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-1.5 py-0.5 rounded cursor-pointer font-bold"
+                        title="클릭하여 온비드 관리번호 복사"
+                      >
+                        📋 #{item.cltr_no}
+                      </button>
                     </div>
                   </div>
 
@@ -1364,14 +1377,23 @@ export default function Home() {
                       >
                         📍 카카오 로드뷰
                       </a>
-                      <a
-                        href={item.detail_url || `https://www.onbid.co.kr/op/cltrpbancinf/cltr/cltrcdtnsrch/CltrCdtnSrchController/mvmnCltrCdtnSrchClg.do`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-extrabold transition-colors shadow-2xs"
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (navigator.clipboard && item.cltr_no) {
+                            navigator.clipboard.writeText(item.cltr_no).catch(() => {});
+                          }
+                          const url = item.detail_url && !item.detail_url.includes("mvmnCltrDtl.do")
+                            ? item.detail_url
+                            : `https://www.onbid.co.kr/op/cltrpbancinf/cltr/cltrcdtnsrch/CltrCdtnSrchController/mvmnCltrCdtnSrchClg.do?srchCltrMnmtNo=${encodeURIComponent(item.cltr_no || '')}&searchCltrMnmtNoYn=Y`;
+                          window.open(url, "_blank", "noopener,noreferrer");
+                        }}
+                        className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-extrabold transition-colors shadow-2xs flex items-center gap-1 cursor-pointer"
+                        title={`관리번호(${item.cltr_no})가 자동 복사되며 온비드 검색 페이지로 안전하게 연결됩니다.`}
                       >
-                        온비드 공매 원문 ↗
-                      </a>
+                        <span>온비드 공매 원문 ↗</span>
+                      </button>
                     </div>
                   </div>
                 </article>

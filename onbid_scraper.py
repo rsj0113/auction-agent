@@ -267,9 +267,8 @@ def save_to_db(items):
         onbid_pbanc_no = str(it.get('onbidPbancNo') or '')
         
         detail_url = (
-            f"https://www.onbid.co.kr/op/cltrpbancinf/cltrdtl/CltrDtlController/mvmnCltrDtl.do?"
-            f"cltrHstrNo={cltr_his_no}&onbidCltrno={onbid_cltr_no}&onbidPbancNo={onbid_pbanc_no}&"
-            f"pbctno={pbct_no}&cltrScrnGrpCd={cltr_scrn_grp_cd}&pbctCdtnNo={pbct_cdtn_no}"
+            f"https://www.onbid.co.kr/op/cltrpbancinf/cltr/cltrcdtnsrch/CltrCdtnSrchController/mvmnCltrCdtnSrchClg.do?"
+            f"srchCltrMnmtNo={urllib.parse.quote(cltr_no)}&searchCltrMnmtNoYn=Y"
         )
         
         # 즐겨찾기 보존을 위해 기존 값 확인

@@ -120,11 +120,10 @@ def run(max_pages_per_type=3):
 
                     pbct_no = str(it.get("pbctNo") or "")
                     pbct_cdtn_no = str(it.get("pbctCdtnNo") or "")
-                    onbid_pbanc_no = str(it.get("onbidPbancNo") or "")
+                    import urllib.parse
                     detail_url = (
-                        f"https://www.onbid.co.kr/op/cltrpbancinf/cltrdtl/CltrDtlController/mvmnCltrDtl.do?"
-                        f"onbidCltrno={onbid_cltr_no}&onbidPbancNo={onbid_pbanc_no}&"
-                        f"pbctno={pbct_no}&pbctCdtnNo={pbct_cdtn_no}"
+                        f"https://www.onbid.co.kr/op/cltrpbancinf/cltr/cltrcdtnsrch/CltrCdtnSrchController/mvmnCltrCdtnSrchClg.do?"
+                        f"srchCltrMnmtNo={urllib.parse.quote(cltr_no)}&searchCltrMnmtNoYn=Y"
                     )
 
                     cur.execute("SELECT is_favorite FROM onbid_items WHERE cltr_no = ?", (cltr_no,))
