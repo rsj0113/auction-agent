@@ -60,7 +60,7 @@ export default function InvestmentCalculator({
   isHouse = true,
   location = "",
 }: InvestmentCalculatorProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   // 입력 상태 (만원 단위)
   const defaultBidMan = Math.max(100, Math.round(minBid / 10000));
@@ -423,7 +423,7 @@ export default function InvestmentCalculator({
                       {rentalDepositMan > 0 ? formatMoney(rentalDepositWon) : "0원"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <input
                       type="number"
                       step="100"
@@ -433,6 +433,15 @@ export default function InvestmentCalculator({
                       className="w-full bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs text-gray-800 font-bold outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-400"
                     />
                     <span className="text-gray-500 text-[11px] shrink-0 font-medium">만원</span>
+                    <button
+                      type="button"
+                      onClick={handleExecuteCalculate}
+                      className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-lg text-xs shrink-0 shadow-xs cursor-pointer flex items-center gap-1"
+                      title="입력한 전세금으로 계산 실행"
+                    >
+                      <span>🧮</span>
+                      <span>계산</span>
+                    </button>
                   </div>
                   {/* 전세 퀵 칩 */}
                   <div className="flex gap-1 mt-1.5 flex-wrap">
@@ -440,7 +449,10 @@ export default function InvestmentCalculator({
                       <button
                         key={amt}
                         type="button"
-                        onClick={() => setRentalDepositMan((prev) => prev + amt)}
+                        onClick={() => {
+                          setRentalDepositMan((prev) => prev + amt);
+                          handleExecuteCalculate();
+                        }}
                         className="px-1.5 py-0.5 bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded text-[10px] text-gray-600 font-medium transition-colors"
                       >
                         +{amt >= 10000 ? `${amt / 10000}억` : `${amt}만`}
@@ -449,7 +461,10 @@ export default function InvestmentCalculator({
                     {rentalDepositMan > 0 && (
                       <button
                         type="button"
-                        onClick={() => setRentalDepositMan(0)}
+                        onClick={() => {
+                          setRentalDepositMan(0);
+                          handleExecuteCalculate();
+                        }}
                         className="px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-[10px] text-gray-500"
                       >
                         초기화
@@ -468,7 +483,7 @@ export default function InvestmentCalculator({
                       {monthlyRentMan > 0 ? formatMoney(monthlyRentWon) : "0원"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <input
                       type="number"
                       step="5"
@@ -478,6 +493,15 @@ export default function InvestmentCalculator({
                       className="w-full bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs text-gray-800 font-bold outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-400"
                     />
                     <span className="text-gray-500 text-[11px] shrink-0 font-medium">만원</span>
+                    <button
+                      type="button"
+                      onClick={handleExecuteCalculate}
+                      className="px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold rounded-lg text-xs shrink-0 shadow-xs cursor-pointer flex items-center gap-1"
+                      title="입력한 월세로 계산 실행"
+                    >
+                      <span>🧮</span>
+                      <span>계산</span>
+                    </button>
                   </div>
                   {/* 월세 퀵 칩 */}
                   <div className="flex gap-1 mt-1.5 flex-wrap">
@@ -485,7 +509,10 @@ export default function InvestmentCalculator({
                       <button
                         key={amt}
                         type="button"
-                        onClick={() => setMonthlyRentMan((prev) => prev + amt)}
+                        onClick={() => {
+                          setMonthlyRentMan((prev) => prev + amt);
+                          handleExecuteCalculate();
+                        }}
                         className="px-1.5 py-0.5 bg-white hover:bg-amber-50 border border-gray-200 hover:border-amber-300 rounded text-[10px] text-gray-600 font-medium transition-colors"
                       >
                         +{amt}만
@@ -494,7 +521,10 @@ export default function InvestmentCalculator({
                     {monthlyRentMan > 0 && (
                       <button
                         type="button"
-                        onClick={() => setMonthlyRentMan(0)}
+                        onClick={() => {
+                          setMonthlyRentMan(0);
+                          handleExecuteCalculate();
+                        }}
                         className="px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-[10px] text-gray-500"
                       >
                         초기화
