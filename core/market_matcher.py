@@ -40,20 +40,62 @@ def extract_assumed_deposit_info(item: Dict[str, Any]) -> Tuple[int, bool, str]:
     remarks = str(item.get("remarks") or "")
     rights_list = str(item.get("rights_list") or "")
 
+    # 말소기준일자 추출
+    clean_malso = ""
+    if rights_list:
+        try:
+            rl = json.loads(rights_list) if isinstance(rights_list, str) else rights_list
+            if isinstance(rl, list):
+                malso_kw = ["담보가등기", "근저당", "가압류", "경매개시결정", "경매개시", "압류", "저당"]
+                m_candidates = []
+                for r in rl:
+                    if any(k in r.get("name", "") for k in malso_kw) and r.get("date"):
+                        cd = re.sub(r"[^0-9]", "", r["date"])
+                        if len(cd) >= 8:
+                            m_candidates.append(cd[:8])
+                if m_candidates:
+                    clean_malso = min(m_candidates)
+        except Exception:
+            pass
+
+    is_explicit_safe = (
+        "SAFE" in ai_verdict or
+        "대항력 있는 임차인이 확인되지 않습니다" in ai_verdict or
+        "소유자/채무자 점유" in ai_verdict or
+        "후순위 임차인" in ai_verdict or
+        "권리 소멸" in ai_verdict
+    )
+
     # 1. ai_report_json 내 tenants 상세 분석
     report_raw = item.get("ai_report_json")
     if report_raw:
         try:
             report = json.loads(report_raw) if isinstance(report_raw, str) else report_raw
+            retained = report.get("retained_rights", [])
+            has_no_retained = (isinstance(retained, list) and len(retained) == 1 and retained[0] == "없음")
+
             tenants = report.get("tenants", [])
             if isinstance(tenants, list) and tenants:
                 tenant_sum = 0
-                has_unknown_tenant = False
+                has_unknown_senior = False
                 for t in tenants:
                     dep = t.get("deposit")
                     payout_req = t.get("is_payout_requested", False)
-                    # 배당요구를 하지 않았거나 미배당인 경우
-                    if not payout_req:
+                    t_date = re.sub(r"[^0-9]", "", t.get("move_in_date") or "")
+
+                    # 말소기준권리와 비교하여 선순위 여부 검증
+                    is_senior = False
+                    if clean_malso and len(t_date) >= 8:
+                        is_senior = (t_date < clean_malso)
+                    else:
+                        # 날짜가 없거나 불명인 경우
+                        if is_explicit_safe or has_no_retained:
+                            is_senior = False
+                        else:
+                            is_senior = True
+
+                    # 배당요구를 하지 않은 선순위 임차인인 경우만 인수 대상
+                    if is_senior and not payout_req:
                         if isinstance(dep, (int, float)) and dep > 0:
                             tenant_sum += int(dep)
                         elif isinstance(dep, str):
@@ -75,21 +117,21 @@ def extract_assumed_deposit_info(item: Dict[str, Any]) -> Tuple[int, bool, str]:
                                             val = int(m.group(1)) * 10000
                                 tenant_sum += val
                             elif "미상" in dep or not clean_dep:
-                                has_unknown_tenant = True
+                                has_unknown_senior = True
                         else:
-                            has_unknown_tenant = True
+                            has_unknown_senior = True
 
                 if tenant_sum > 0:
                     assumed = max(assumed, tenant_sum)
                     reasons.append(f"선순위 임차인 미배당 보증금 {assumed:,}원 인수")
-                elif has_unknown_tenant:
+                elif has_unknown_senior and not is_explicit_safe:
                     is_unknown_senior_risk = True
                     reasons.append("선순위 임차인 배당요구 미신청(보증금 미상)으로 전액 인수 위험")
         except Exception:
             pass
 
     # 2. ai_report_json에 없거나 계산 안 된 경우 기본 tenant_deposit 검토
-    if assumed == 0 and tenant_deposit > 0:
+    if assumed == 0 and tenant_deposit > 0 and not is_explicit_safe:
         if not is_payout_requested or "인수" in ai_verdict or "대항력" in ai_verdict:
             assumed = int(tenant_deposit)
             reasons.append(f"대항력 임차보증금 {assumed:,}원 인수")

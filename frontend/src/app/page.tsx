@@ -1520,13 +1520,47 @@ export default function Home() {
                         </span>
                       </div>
 
-                      <div className="bg-gradient-to-br from-emerald-100 to-teal-100 p-2.5 rounded-xl border border-emerald-300">
-                        <span className="text-emerald-800 block text-[11px] mb-0.5 font-extrabold">🎯 진짜 안전마진</span>
-                        <span className="font-extrabold text-emerald-900 text-sm">
-                          +{formatMoney(selectedDetail.safety_margin)}
+                      <div className={`p-2.5 rounded-xl border ${
+                        selectedDetail.is_unknown_senior_risk 
+                          ? 'bg-rose-50 border-rose-200' 
+                          : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
+                          ? 'bg-gradient-to-br from-emerald-100 to-teal-100 border-emerald-300'
+                          : 'bg-gray-100 border-gray-200'
+                      }`}>
+                        <span className={`block text-[11px] mb-0.5 font-extrabold ${
+                          selectedDetail.is_unknown_senior_risk 
+                            ? 'text-rose-800' 
+                            : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
+                            ? 'text-emerald-800'
+                            : 'text-gray-600'
+                        }`}>
+                          {selectedDetail.is_unknown_senior_risk ? '🚨 실질 마진' : '🎯 진짜 안전마진'}
                         </span>
-                        <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">
-                          {selectedDetail.market_discount_pct}% 저렴
+                        <span className={`font-extrabold text-sm ${
+                          selectedDetail.is_unknown_senior_risk 
+                            ? 'text-rose-700' 
+                            : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
+                            ? 'text-emerald-900'
+                            : 'text-gray-700'
+                        }`}>
+                          {selectedDetail.is_unknown_senior_risk
+                            ? '인수위험 (0원)'
+                            : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
+                            ? `+${formatMoney(selectedDetail.safety_margin)}`
+                            : '0원 (신건 1회차)'}
+                        </span>
+                        <span className={`text-[10px] font-bold block mt-0.5 ${
+                          selectedDetail.is_unknown_senior_risk 
+                            ? 'text-rose-600' 
+                            : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
+                            ? 'text-emerald-700'
+                            : 'text-gray-500'
+                        }`}>
+                          {selectedDetail.is_unknown_senior_risk
+                            ? '보증금 인수 리스크'
+                            : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
+                            ? `${selectedDetail.market_discount_pct}% 저렴`
+                            : '유찰 시 마진 발생'}
                         </span>
                       </div>
                     </div>
