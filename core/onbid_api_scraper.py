@@ -108,6 +108,10 @@ def run(max_pages_per_type=3):
                     bid_start_date = f"{bgng_raw[:4]}-{bgng_raw[4:6]}-{bgng_raw[6:8]} {bgng_raw[8:10]}:{bgng_raw[10:12]}" if len(bgng_raw) >= 12 else bgng_raw
                     bid_end_date = f"{end_raw[:4]}-{end_raw[4:6]}-{end_raw[6:8]} {end_raw[8:10]}:{end_raw[10:12]}" if len(end_raw) >= 12 else end_raw
                     remain_time = "진행중"
+                    curr_dt_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                    if bid_end_date and bid_end_date < curr_dt_str:
+                        bid_status = "마감"
+                        remain_time = "마감"
 
                     land_area_m2 = float(it.get("landSqms") or 0.0)
                     bld_area_m2 = float(it.get("bldSqms") or 0.0)
@@ -115,7 +119,7 @@ def run(max_pages_per_type=3):
                     reg_org_nm = it.get("rqstOrgNm") or it.get("orgNm") or "온비드"
 
                     floor, is_first_floor, recommend_tag = parse_floor_and_tags(
-                        cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method, bld_area_pyeong
+                        cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method, bld_area_pyeong, usage=usage
                     )
 
                     pbct_no = str(it.get("pbctNo") or "")

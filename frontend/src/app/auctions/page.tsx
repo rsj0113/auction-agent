@@ -592,18 +592,68 @@ export function analyzeSeniorDeposit(
 }
 
 function getPropertyType(location: string, usage?: string): string {
-  if (!location && !usage) return "기타";
-  const target = (usage || "") + " " + (location || "");
-  
-  // 상가/근린을 가장 먼저 체크 (예: "아파트 단지내 상가", "신촌럭키아파트 이룸타워" 등은 상가로 분류되어야 함)
-  if (target.includes("상가") || target.includes("근린") || target.includes("타워") || target.includes("지식산업") || target.includes("프라자") || target.includes("플라자") || target.includes("센터") || target.includes("에이스")) return "상가/근린시설";
-  
-  if (target.includes("아파트")) return "🏢 아파트";
-  if (target.includes("오피스텔")) return "🏬 오피스텔";
-  if (target.includes("다세대") || target.includes("빌라")) return "🏘️ 빌라/다세대";
-  if (target.includes("산") && target.match(/산\s*[0-9]+/)) return "🌲 임야(산)";
-  if (target.includes("임야")) return "🌲 임야(산)";
-  if (target.match(/[0-9]+번지/)) return "🗺️ 토지/대지";
+  const u = (usage || "").trim();
+  const loc = (location || "").trim();
+  if (!loc && !u) return "기타";
+
+  // 0. 차량 체크
+  if (loc.includes("Mercedes-Benz") || loc.includes("BMW") || loc.includes("차대번호") || loc.includes("차종 :")) {
+    return "🚗 차량/기타";
+  }
+
+  // 1. 공적 용도(usage) 최우선 신뢰 (등기부/공매 공식 용도)
+  if (u && !/^\d+$/.test(u) && u !== "기타") {
+    if (u.includes("아파트")) return "🏢 아파트";
+    if (u.includes("오피스텔")) return "🏬 오피스텔";
+    if (u.includes("다세대") || u.includes("빌라") || u.includes("연립")) return "🏘️ 빌라/다세대";
+    if (u.includes("상가주택") || u.includes("근린주택")) return "🏪🏠 상가주택";
+    if (u.includes("주거용") || u.includes("주택") || u.includes("단독") || u.includes("다가구") || u.includes("도시형")) return "🏠 주택";
+    if (u.includes("상가") || u.includes("근린") || u.includes("판매") || u.includes("점포") || u.includes("업무용")) return "🏪 상가/근린시설";
+    if (u.includes("토지") || u.includes("대지") || u.includes("전") || u.includes("답") || u.includes("임야")) return "🌲 임야/토지";
+  }
+
+  // 2. 단지 내 상가 (아파트/주택 단지 내 상가동 또는 점포)
+  if (
+    (loc.includes("단지내상가") || loc.includes("단지상가") || loc.includes("상가동") || loc.includes("제상가동") || loc.includes("근린상가") || loc.includes("지하도상가") || loc.includes("지하상가") || loc.includes("시장")) &&
+    !loc.includes("상가주택")
+  ) {
+    return "🏪 상가/근린시설";
+  }
+
+  // 3. 소재지(location) 기반 주거용 판별
+  if (loc.includes("상가주택")) return "🏪🏠 상가주택";
+  if (loc.includes("아파트") && !loc.includes("상가") && !loc.includes("점포")) return "🏢 아파트";
+  if (loc.includes("오피스텔") && !loc.includes("상가") && !loc.includes("점포")) return "🏬 오피스텔";
+  if (
+    (loc.includes("빌라") || loc.includes("다세대") || loc.includes("연립") || loc.includes("맨션") || loc.includes("하이츠") || loc.includes("토브하우스") || loc.includes("아트빌") || loc.includes("드림빌") || loc.includes("빌리지")) &&
+    !loc.includes("상가") && !loc.includes("점포")
+  ) {
+    return "🏘️ 빌라/다세대";
+  }
+  if (loc.includes("단독주택") || loc.includes("다가구주택") || loc.includes("단독 주택") || loc.includes("다가구 주택")) {
+    return "🏠 주택";
+  }
+
+  // 4. 소재지 기반 상업용 판별 (지식산업센터, 프라자 등 명확한 상업시설)
+  if (
+    loc.includes("상가") || loc.includes("근린생활") || loc.includes("근린시설") || loc.includes("점포") ||
+    loc.includes("지식산업") || loc.includes("프라자") || loc.includes("플라자") || loc.includes("비즈타워") ||
+    loc.includes("테크노") || loc.includes("에스케이브이") || loc.includes("sk v1") || loc.includes("skv1") ||
+    loc.includes("스퀘어") || loc.includes("아케이드")
+  ) {
+    return "🏪 상가/근린시설";
+  }
+
+  // 5. 토지 및 임야
+  if (loc.includes("임야") || /산\s*[0-9]+/.test(loc)) return "🌲 임야(산)";
+  if (/[0-9]+(-[0-9]+)?번지/.test(loc) && !loc.includes("층") && !loc.includes("호")) return "🗺️ 토지/대지";
+  if (/\d+(-\d+)?$/.test(loc.trim()) && !loc.includes("층") && !loc.includes("호")) return "🗺️ 토지/대지";
+
+  // 6. 호수/층수만 있는 경우 주거용 다세대
+  if (loc.includes("층") && loc.includes("호") && !loc.includes("상가")) {
+    return "🏘️ 빌라/다세대";
+  }
+
   return "🏠 주택/기타";
 }
 
@@ -915,6 +965,7 @@ export default function AuctionsPage() {
         if (sort && sort !== "recent") url += `&sort=${sort}`;
         if (propertyType === "rent") url += `&disposal_method=임대`;
         else if (propertyType === "sale") url += `&disposal_method=매각`;
+        else if (propertyType) url += `&property_type=${propertyType}`;
 
         promises.push(
           fetch(url, { headers: { "ngrok-skip-browser-warning": "1" } })
@@ -1528,7 +1579,12 @@ export default function AuctionsPage() {
                 onChange={(e) => setPropertyTypeFilter(e.target.value)}
                 className="w-full text-xs sm:text-sm bg-white border border-purple-200 rounded-xl px-3 py-2 text-purple-900 font-semibold outline-none focus:border-purple-500 shadow-2xs"
               >
-                <option value="">처분방식 전체</option>
+                <option value="">용도/처분방식 전체</option>
+                <option value="commercial">🏪 상가/근린 공매</option>
+                <option value="residential">🏠 주거용(아파트·주택) 공매</option>
+                <option value="apartment">🏢 아파트 공매</option>
+                <option value="villa">🏘️ 빌라/다세대 공매</option>
+                <option value="land">🌲 토지/임야 공매</option>
                 <option value="sale">🏷️ 매각만</option>
                 <option value="rent">🔑 임대(대부)만</option>
               </select>
@@ -2085,6 +2141,9 @@ export default function AuctionsPage() {
                   <span className="px-2 py-0.5 rounded-lg bg-purple-600 text-white text-xs font-black shrink-0">
                     🏛️ 온비드 공매
                   </span>
+                  <span className="px-2 py-0.5 rounded-lg bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold shrink-0">
+                    {getPropertyType(item.addr_full || item.cltr_nm, item.usage)}
+                  </span>
                   <span className={`px-2 py-0.5 rounded-lg text-xs font-bold border shrink-0 ${
                     item.disposal_method === "임대"
                       ? "bg-indigo-50 text-indigo-700 border-indigo-200"
@@ -2097,8 +2156,12 @@ export default function AuctionsPage() {
                       ⛳ 지하1층·{item.bld_area_pyeong}평(골프/체육)
                     </span>
                   ) : item.is_first_floor === 1 ? (
-                    <span className="px-2 py-0.5 rounded-lg bg-orange-100 text-orange-800 border border-orange-300 text-xs font-bold shrink-0">
-                      ✨ 1층 상가
+                    <span className={`px-2 py-0.5 rounded-lg border text-xs font-bold shrink-0 ${
+                      getPropertyType(item.addr_full || item.cltr_nm, item.usage).includes("상가")
+                        ? "bg-orange-100 text-orange-800 border-orange-300"
+                        : "bg-emerald-100 text-emerald-800 border-emerald-300"
+                    }`}>
+                      {getPropertyType(item.addr_full || item.cltr_nm, item.usage).includes("상가") ? "✨ 1층 상가" : "🏠 1층 주거"}
                     </span>
                   ) : item.floor > 0 ? (
                     <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold shrink-0">
@@ -2174,11 +2237,15 @@ export default function AuctionsPage() {
                 </div>
                 <div className="text-right">
                   <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-extrabold ${
-                    (item.remain_time || "").includes("마감") || (item.remain_time || "").includes("시간")
-                      ? "bg-red-100 text-red-700 border border-red-200 animate-pulse"
+                    item.bid_status === "마감" || (item.remain_time || "").includes("마감")
+                      ? "bg-red-100 text-red-700 border border-red-300"
+                      : (item.remain_time || "").includes("시간") || (item.remain_time || "").includes("분")
+                      ? "bg-amber-100 text-amber-800 border border-amber-300 animate-pulse"
                       : "bg-purple-100 text-purple-800 border border-purple-200"
                   }`}>
-                    ⏰ {item.remain_time || "입찰진행"}
+                    {item.bid_status === "마감" || (item.remain_time || "").includes("마감")
+                      ? "⛔ 입찰마감"
+                      : `⏰ ${item.remain_time || "입찰진행"}`}
                   </span>
                   {item.bid_end_date && (
                     <p className="text-[11px] text-gray-500 mt-1">
@@ -2190,7 +2257,7 @@ export default function AuctionsPage() {
 
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-100 text-xs">
                 <span className="text-gray-500 truncate max-w-xs">
-                  🏛️ {item.reg_org_nm || "한국자산관리공사"} · {item.usage || "근린생활시설"}
+                  🏛️ {item.reg_org_nm || "한국자산관리공사"} · {item.usage || getPropertyType(item.addr_full || item.cltr_nm)}
                 </span>
                 <div className="flex items-center gap-1.5 w-full sm:w-auto">
                   <button

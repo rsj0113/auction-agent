@@ -101,15 +101,28 @@ def get_auctions(
 
         if property_type:
             if property_type == 'apartment':
-                query += " AND (usage LIKE '%아파트%' OR location LIKE '%아파트%')"
+                query += " AND ((usage LIKE '%아파트%' OR location LIKE '%아파트%') AND usage NOT LIKE '%상가%' AND location NOT LIKE '%단지내상가%' AND location NOT LIKE '%상가동%')"
             elif property_type == 'officetel':
-                query += " AND (usage LIKE '%오피스텔%' OR location LIKE '%오피스텔%')"
+                query += " AND ((usage LIKE '%오피스텔%' OR location LIKE '%오피스텔%') AND usage NOT LIKE '%상가%' AND location NOT LIKE '%단지내상가%' AND location NOT LIKE '%상가동%')"
             elif property_type == 'villa':
-                query += " AND (usage LIKE '%다세대%' OR usage LIKE '%빌라%' OR location LIKE '%다세대%' OR location LIKE '%빌라%')"
+                query += " AND ((usage LIKE '%다세대%' OR usage LIKE '%빌라%' OR usage LIKE '%연립%' OR location LIKE '%다세대%' OR location LIKE '%빌라%' OR location LIKE '%연립%') AND usage NOT LIKE '%상가%')"
             elif property_type == 'commercial':
-                query += " AND (usage LIKE '%상가%' OR usage LIKE '%근린%' OR location LIKE '%상가%' OR location LIKE '%근린%' OR location LIKE '%타워%' OR location LIKE '%지식산업%' OR location LIKE '%프라자%' OR location LIKE '%플라자%' OR location LIKE '%센터%' OR location LIKE '%에이스%')"
+                query += """ AND (
+                    usage IN ('상가/근린시설', '근린생활시설', '상가용및업무용건물', '판매시설', '근린시설')
+                    OR (
+                        (usage IS NULL OR usage IN ('', '기타'))
+                        AND (
+                            location LIKE '%단지내상가%' OR location LIKE '%단지상가%' OR location LIKE '%상가동%' OR location LIKE '%제상가동%'
+                            OR location LIKE '%근린상가%' OR location LIKE '%지하도상가%' OR location LIKE '%지하상가%' OR location LIKE '%시장%'
+                            OR location LIKE '%지식산업%' OR location LIKE '%프라자%' OR location LIKE '%플라자%' OR location LIKE '%스퀘어%'
+                            OR location LIKE '%비즈타워%' OR location LIKE '%테크노%'
+                        )
+                        AND location NOT LIKE '%아파트%' AND location NOT LIKE '%오피스텔%'
+                        AND location NOT LIKE '%빌라%' AND location NOT LIKE '%다세대%' AND location NOT LIKE '%주택%'
+                    )
+                )"""
             elif property_type == 'land':
-                query += " AND (usage LIKE '%임야%' OR usage LIKE '%대지%' OR location LIKE '%임야%' OR location LIKE '%산 %' OR location LIKE '%번지%')"
+                query += " AND (usage LIKE '%임야%' OR usage LIKE '%대지%' OR usage LIKE '%토지%' OR location LIKE '%임야%' OR location LIKE '%산 %' OR location LIKE '%번지%') AND usage NOT LIKE '%상가%'"
                 
         if region:
             import re as _re
@@ -343,15 +356,34 @@ def get_quick_filter_counts():
             counts["naver_b1"] = 0
             counts["naver_golf_b1"] = 0
 
-        # onbid_items (온비드 공매 상가 건수)
+        # onbid_items (온비드 공매 활성 건수)
         try:
-            cursor.execute("SELECT COUNT(*) FROM onbid_items")
+            cursor.execute("""
+                SELECT COUNT(*) FROM onbid_items 
+                WHERE COALESCE(bid_status, '') != '마감' 
+                  AND (bid_end_date IS NULL OR bid_end_date = '' OR bid_end_date >= strftime('%Y-%m-%d %H:%M', 'now', 'localtime'))
+            """)
             counts["onbid_total"] = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE is_first_floor = 1")
+            cursor.execute("""
+                SELECT COUNT(*) FROM onbid_items 
+                WHERE is_first_floor = 1 
+                  AND COALESCE(bid_status, '') != '마감'
+                  AND (bid_end_date IS NULL OR bid_end_date = '' OR bid_end_date >= strftime('%Y-%m-%d %H:%M', 'now', 'localtime'))
+            """)
             counts["onbid_first_floor"] = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE floor < 0")
+            cursor.execute("""
+                SELECT COUNT(*) FROM onbid_items 
+                WHERE floor < 0 
+                  AND COALESCE(bid_status, '') != '마감'
+                  AND (bid_end_date IS NULL OR bid_end_date = '' OR bid_end_date >= strftime('%Y-%m-%d %H:%M', 'now', 'localtime'))
+            """)
             counts["onbid_b1"] = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE discount_pct >= 30")
+            cursor.execute("""
+                SELECT COUNT(*) FROM onbid_items 
+                WHERE discount_pct >= 30 
+                  AND COALESCE(bid_status, '') != '마감'
+                  AND (bid_end_date IS NULL OR bid_end_date = '' OR bid_end_date >= strftime('%Y-%m-%d %H:%M', 'now', 'localtime'))
+            """)
             counts["onbid_discounted"] = cursor.fetchone()[0]
         except Exception:
             counts["onbid_total"] = 0
@@ -369,7 +401,11 @@ def get_quick_filter_counts():
             today_closed_court = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE date(scraped_at) >= date('now', 'localtime')")
             today_new_onbid = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE remain_time LIKE '%마감%' OR bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%'")
+            cursor.execute("""
+                SELECT COUNT(*) FROM onbid_items 
+                WHERE bid_status = '마감' 
+                  AND (bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%' OR remain_time LIKE '%마감%')
+            """)
             today_closed_onbid = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE date(scraped_at) >= date('now', 'localtime')")
             today_new_naver = cursor.fetchone()[0]
@@ -601,6 +637,7 @@ def get_onbid_items(
     region: Optional[str] = None,
     disposal_method: Optional[str] = None,
     prpt_div: Optional[str] = None,
+    property_type: Optional[str] = None,
     first_floor_only: bool = False,
     floor_type: Optional[str] = None,
     favorite_only: bool = False,
@@ -615,12 +652,13 @@ def get_onbid_items(
     offset: int = 0,
 ):
     """
-    Get KAMCO OnBid (온비드 공매) commercial properties.
-    Supports filtering by region, disposal method (매각/임대), floor (1F, B1, upper), pyeong range, favorites, and price.
-    By default, closed/ended items are excluded.
+    Get KAMCO OnBid (온비드 공매) properties.
+    Supports filtering by region, property type (상가, 주택, 아파트, 빌라, 토지), disposal method (매각/임대), floor, pyeong, favorites, and price.
+    By default, expired/closed items are strictly excluded.
     """
     try:
         import re as _re
+        import datetime as _dt
         conn = get_db_connection()
         cursor = conn.cursor()
 
@@ -628,10 +666,40 @@ def get_onbid_items(
         params = []
 
         if not include_closed:
-            where_clause += " AND COALESCE(bid_status, '') != '마감'"
+            where_clause += """ AND COALESCE(bid_status, '') != '마감'
+                                AND (
+                                    bid_end_date IS NULL OR bid_end_date = ''
+                                    OR bid_end_date >= strftime('%Y-%m-%d %H:%M', 'now', 'localtime')
+                                )"""
 
         if favorite_only:
             where_clause += " AND COALESCE(is_favorite, 0) = 1"
+
+        # 용도/부동산 유형 필터 (상가, 아파트, 빌라, 주택, 토지)
+        if property_type:
+            if property_type == 'commercial':
+                where_clause += """ AND (
+                    usage LIKE '%상가%' OR usage LIKE '%근린%' OR usage LIKE '%판매%' OR usage LIKE '%점포%' OR usage LIKE '%업무%'
+                    OR (
+                        (usage IS NULL OR usage = '' OR usage = '기타')
+                        AND (cltr_nm LIKE '%상가%' OR cltr_nm LIKE '%근린%' OR cltr_nm LIKE '%판매%' OR cltr_nm LIKE '%점포%')
+                        AND cltr_nm NOT LIKE '%주택%' AND cltr_nm NOT LIKE '%아파트%' AND cltr_nm NOT LIKE '%빌라%'
+                    )
+                )"""
+            elif property_type in ('apartment', 'apt'):
+                where_clause += " AND (usage LIKE '%아파트%' OR cltr_nm LIKE '%아파트%')"
+            elif property_type in ('villa', 'multihouse'):
+                where_clause += " AND (usage LIKE '%다세대%' OR usage LIKE '%빌라%' OR usage LIKE '%연립%' OR cltr_nm LIKE '%다세대%' OR cltr_nm LIKE '%빌라%')"
+            elif property_type in ('residential', 'house'):
+                where_clause += """ AND (
+                    usage LIKE '%주거%' OR usage LIKE '%주택%' OR usage LIKE '%아파트%' OR usage LIKE '%다세대%' OR usage LIKE '%도시형%'
+                    OR cltr_nm LIKE '%주택%' OR cltr_nm LIKE '%아파트%' OR cltr_nm LIKE '%빌라%' OR cltr_nm LIKE '%다세대%'
+                )"""
+            elif property_type == 'land':
+                where_clause += """ AND (
+                    usage LIKE '%토지%' OR usage LIKE '%대지%' OR usage LIKE '%임야%' OR usage LIKE '%전%' OR usage LIKE '%답%'
+                    OR cltr_nm LIKE '%토지%' OR cltr_nm LIKE '%대지%' OR cltr_nm LIKE '%임야%'
+                )"""
 
         # 층수 필터 (하위 호환 first_floor_only 포함)
         if floor_type:
@@ -729,6 +797,34 @@ def get_onbid_items(
         cursor.execute(query, params + [limit, offset])
         rows = [dict(r) for r in cursor.fetchall()]
         conn.close()
+
+        # 실시간 마감 시간 및 상태 동적 계산
+        now_dt = _dt.datetime.now()
+        for row in rows:
+            end_str = row.get("bid_end_date")
+            if end_str:
+                try:
+                    end_dt = _dt.datetime.strptime(end_str[:16], "%Y-%m-%d %H:%M")
+                    if end_dt < now_dt:
+                        row["bid_status"] = "마감"
+                        row["remain_time"] = "마감"
+                    else:
+                        diff = end_dt - now_dt
+                        if diff.days > 0:
+                            row["remain_time"] = f"D-{diff.days}"
+                        elif diff.seconds >= 3600:
+                            row["remain_time"] = f"마감 {diff.seconds // 3600}시간 전"
+                        else:
+                            row["remain_time"] = f"마감 {max(1, diff.seconds // 60)}분 전"
+                except Exception:
+                    pass
+            # 주거용인데 1층상가 태그가 붙어있는 경우 교정
+            usg = row.get("usage") or ""
+            nm = row.get("cltr_nm") or ""
+            if any(k in usg for k in ["주거", "주택", "아파트", "다세대"]) or any(k in nm for k in ["주택", "아파트", "빌라", "다세대"]):
+                if row.get("recommend_tag"):
+                    row["recommend_tag"] = row["recommend_tag"].replace("🏪 1층상가", "🏠 1층 주거")
+
         return {"data": rows, "count": len(rows), "total_matching": total_matching}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -1017,15 +1113,29 @@ def get_dashboard_summary():
         naver_gyeonggi_etc = max(0, naver_total - naver_seongnam - naver_seoul)
         auc_gyeonggi_etc = max(0, total_items - auc_seoul - auc_seongnam - auc_seongnam_court_etc)
 
-        # 온비드 공매 통계
+        # 온비드 공매 통계 (활성 매물 기준)
         try:
-            cursor.execute("SELECT COUNT(*) FROM onbid_items")
+            cursor.execute("""
+                SELECT COUNT(*) FROM onbid_items 
+                WHERE COALESCE(bid_status, '') != '마감' 
+                  AND (bid_end_date IS NULL OR bid_end_date = '' OR bid_end_date >= strftime('%Y-%m-%d %H:%M', 'now', 'localtime'))
+            """)
             onbid_total = cursor.fetchone()[0]
             cursor.execute("SELECT MAX(scraped_at) FROM onbid_items")
             onbid_last_updated = cursor.fetchone()[0] or "-"
-            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE is_first_floor = 1")
+            cursor.execute("""
+                SELECT COUNT(*) FROM onbid_items 
+                WHERE is_first_floor = 1 
+                  AND COALESCE(bid_status, '') != '마감'
+                  AND (bid_end_date IS NULL OR bid_end_date = '' OR bid_end_date >= strftime('%Y-%m-%d %H:%M', 'now', 'localtime'))
+            """)
             onbid_1f = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE discount_pct >= 30")
+            cursor.execute("""
+                SELECT COUNT(*) FROM onbid_items 
+                WHERE discount_pct >= 30 
+                  AND COALESCE(bid_status, '') != '마감'
+                  AND (bid_end_date IS NULL OR bid_end_date = '' OR bid_end_date >= strftime('%Y-%m-%d %H:%M', 'now', 'localtime'))
+            """)
             onbid_discounted = cursor.fetchone()[0]
         except Exception:
             onbid_total = 0
@@ -1041,7 +1151,11 @@ def get_dashboard_summary():
             today_closed_court = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE date(scraped_at) >= date('now', 'localtime')")
             today_new_onbid = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM onbid_items WHERE remain_time LIKE '%마감%' OR bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%'")
+            cursor.execute("""
+                SELECT COUNT(*) FROM onbid_items 
+                WHERE bid_status = '마감' 
+                  AND (bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%' OR remain_time LIKE '%마감%')
+            """)
             today_closed_onbid = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE date(scraped_at) >= date('now', 'localtime')")
             today_new_naver = cursor.fetchone()[0]

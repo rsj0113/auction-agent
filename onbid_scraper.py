@@ -104,12 +104,13 @@ def get_base_payload():
     ]
     return payload
 
-def parse_floor_and_tags(cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method, bld_area_pyeong=0.0):
-    """물건명 및 금액에서 층수 및 추천 태그 판별 (지하1층/B1 골프·체육시설 감지 포함)"""
+def parse_floor_and_tags(cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method, bld_area_pyeong=0.0, usage=""):
+    """물건명 및 금액에서 층수 및 추천 태그 판별 (주거용과 상가 구분)"""
     floor = 0
     is_first_floor = 0
     
     nm = cltr_nm or ""
+    usg = usage or ""
     # 1. 지하층/B1 탐지 (명확한 지하 표기)
     m_under = re.search(r'(?:제?지하|제지|(?<![가-힣A-Za-z])지|(?<![A-Za-z])[bB])\s*([1-9])\s*(?:층|,|~)', nm)
     if m_under:
@@ -132,10 +133,16 @@ def parse_floor_and_tags(cltr_nm, min_bid, appraisal, discount_pct, prpt_div, di
         is_first_floor = 1
 
     tags = []
+    # 주거용 여부 체크 (주택, 아파트, 다세대, 빌라 등)
+    is_residential = any(k in usg for k in ["주거", "주택", "아파트", "다세대", "도시형"]) or any(k in nm for k in ["주택", "아파트", "빌라", "다세대"])
+    
     if is_first_floor:
-        tags.append("🏪 1층상가")
+        if is_residential:
+            tags.append("🏠 1층 주거")
+        else:
+            tags.append("🏪 1층상가")
     elif floor < 0:
-        if bld_area_pyeong >= 30:
+        if bld_area_pyeong >= 30 and not is_residential:
             tags.append(f"⛳ 지하{abs(floor)}층·{int(bld_area_pyeong)}평(골프/체육)")
         else:
             tags.append(f"🏢 지하{abs(floor)}층")
@@ -248,15 +255,25 @@ def save_to_db(items):
         bid_start_date = it.get('pbctBegnDtm') or ''
         bid_end_date = it.get('pbctDdlnDt') or ''
         
+        # 마감 일시가 지났으면 마감 처리
+        if bid_end_date:
+            try:
+                curr_dt_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                if bid_end_date < curr_dt_str:
+                    bid_status = '마감'
+                    remain_time = '마감'
+            except Exception:
+                pass
+        
         land_area_m2 = float(it.get('landSqms') or 0.0)
         bld_area_m2 = float(it.get('bldSqms') or 0.0)
         bld_area_pyeong = round(bld_area_m2 * 0.3025, 2)
         
         reg_org_nm = it.get('regOrgNm') or ''
         
-        # 층수 및 태그 추출
+        # 층수 및 태그 추출 (주거용 구분)
         floor, is_first_floor, recommend_tag = parse_floor_and_tags(
-            cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method, bld_area_pyeong
+            cltr_nm, min_bid, appraisal, discount_pct, prpt_div, disposal_method, bld_area_pyeong, usage=usage
         )
         
         # 상세 URL 조립
