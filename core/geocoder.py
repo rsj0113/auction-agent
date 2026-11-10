@@ -427,8 +427,37 @@ def geocode_address(
     base_lat, base_lng = 36.3504, 127.3845  # 대한민국 중심부(대전 인근) 기본값
 
     # 1단계: 동/읍/면 매칭
+    # 1단계: 시/군/구 및 시/도 지역 앵커(Anchor) 먼저 검출
+    anchor_lat, anchor_lng = None, None
+    anchor_type = None
+
+    # 긴 SGG 이름 우선 매칭
+    for sgg_key in sorted(SGG_COORDS.keys(), key=len, reverse=True):
+        if sgg_key in combined_text:
+            anchor_lat, anchor_lng = SGG_COORDS[sgg_key]
+            anchor_type = "sgg"
+            break
+
+    # SGG 매칭 안 된 경우 SIDO 매칭
+    if not anchor_lat:
+        for sido_key in sorted(SIDO_COORDS.keys(), key=len, reverse=True):
+            if sido_key in combined_text:
+                anchor_lat, anchor_lng = SIDO_COORDS[sido_key]
+                anchor_type = "sido"
+                break
+
+    # 주소 앞단 시도 추론
+    if not anchor_lat:
+        loc_clean = re.sub(r"^[0-9\-\s\(\)]+", "", loc)
+        for sido_key in ("서울", "경기", "인천", "강원", "부산", "대구", "대전", "광주", "울산", "세종", "충북", "충남", "전북", "전남", "경북", "경남", "제주"):
+            if loc_clean.startswith(sido_key):
+                anchor_lat, anchor_lng = SIDO_COORDS[sido_key]
+                anchor_type = "sido"
+                break
+
+    # 2단계: 동/읍/면 후보 추출 및 앵커와의 거리 유효성 검증 (동명이인 동 충돌 방지)
+    # 예: 인천 남동구 논현동 주소에서 서울 강남구 논현동 좌표가 매칭되는 현상 원천 차단
     emd_candidates = []
-    # 괄호 안 법정동 (예: 창곡동, 위례센트럴푸르지오)
     paren_m = re.search(r"\(([가-힣0-9]+[동읍면])", loc)
     if paren_m:
         emd_candidates.append(paren_m.group(1))
@@ -440,35 +469,27 @@ def geocode_address(
 
     for cand in emd_candidates:
         if cand in EMD_COORDS:
-            base_lat, base_lng = EMD_COORDS[cand]
-            matched_level = "emd"
-            break
-
-    # 2단계: 시/군/구 매칭 (동 매칭 실패 시)
-    if matched_level == "fallback":
-        # 긴 이름 우선 매칭 (예: "창원시 성산구", "성남시 분당구" -> "성남시")
-        for sgg_key in sorted(SGG_COORDS.keys(), key=len, reverse=True):
-            if sgg_key in combined_text:
-                base_lat, base_lng = SGG_COORDS[sgg_key]
-                matched_level = "sgg"
+            cand_lat, cand_lng = EMD_COORDS[cand]
+            # 앵커가 있을 경우 거리 검증 (SGG는 20km, SIDO는 45km 이내여야 해당 동으로 인정)
+            if anchor_lat is not None:
+                dlat = (cand_lat - anchor_lat) * 111.0
+                dlng = (cand_lng - anchor_lng) * 88.0
+                dist_km = (dlat ** 2 + dlng ** 2) ** 0.5
+                max_allowed_dist = 20.0 if anchor_type == "sgg" else 45.0
+                if dist_km <= max_allowed_dist:
+                    base_lat, base_lng = cand_lat, cand_lng
+                    matched_level = "emd"
+                    break
+            else:
+                base_lat, base_lng = cand_lat, cand_lng
+                matched_level = "emd"
                 break
 
-    # 3단계: 시/도 매칭 (시/군/구 매칭 실패 시)
-    if matched_level == "fallback":
-        for sido_key in sorted(SIDO_COORDS.keys(), key=len, reverse=True):
-            if sido_key in combined_text:
-                base_lat, base_lng = SIDO_COORDS[sido_key]
-                matched_level = "sido"
-                break
+    # 3단계: 동 매칭 실패 또는 동명이인 기각 시 시/군/구 또는 시/도 앵커 채택
+    if matched_level == "fallback" and anchor_lat is not None:
+        base_lat, base_lng = anchor_lat, anchor_lng
+        matched_level = anchor_type
 
-    # 4단계: 특별 케이스 (주소 앞 2글자로 시도 추론)
-    if matched_level == "fallback":
-        loc_clean = re.sub(r"^[0-9\-\s\(\)]+", "", loc)
-        for sido_key in ("서울", "경기", "인천", "강원", "부산", "대구", "대전", "광주", "울산", "세종", "충북", "충남", "전북", "전남", "경북", "경남", "제주"):
-            if loc_clean.startswith(sido_key):
-                base_lat, base_lng = SIDO_COORDS[sido_key]
-                matched_level = "sido"
-                break
 
     # 4단계: 마이크로 오프셋 (동일 구/동 내 매물 마커 분산)
     # EMD 수준: ±0.0035도(약 350m 반경)

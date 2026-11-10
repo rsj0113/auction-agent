@@ -582,7 +582,8 @@ def get_naver_listings(
             where_clause += " AND ((trade_type = '매매' AND price_sale_10k > 0 AND price_sale_10k <= ?) OR (trade_type != '매매' AND (deposit_10k + monthly_rent_10k * 100) <= ?))"
             params.extend([max_10k, max_10k])
 
-        # 등록/수집일자 필터 (date_range: today, 3days, 7days, 30days)
+        # 등록/수집일자 필터 (date_range: today, 3days, 7days, 14days, 30days, all)
+        # 종료된 매물 노출 방지: 기본값은 최근 14일 이내 활성 매물 또는 관심 매물만 노출
         if date_range:
             if date_range == 'today':
                 where_clause += " AND date(scraped_at) >= date('now', 'localtime')"
@@ -590,8 +591,15 @@ def get_naver_listings(
                 where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-3 days')"
             elif date_range == '7days':
                 where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-7 days')"
+            elif date_range == '14days':
+                where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-14 days')"
             elif date_range == '30days':
                 where_clause += " AND date(scraped_at) >= date('now', 'localtime', '-30 days')"
+            elif date_range == 'all':
+                pass  # 전체 허용
+        elif not favorite_only:
+            # 기본 모드: 종료된 매물이 섞이지 않도록 최근 14일 이내 수집되었거나 관심 매물인 경우만 반환
+            where_clause += " AND (date(scraped_at) >= date('now', 'localtime', '-14 days') OR COALESCE(is_favorite, 0) = 1)"
 
         count_query = "SELECT COUNT(*) FROM naver_listings" + where_clause
         cursor.execute(count_query, params)

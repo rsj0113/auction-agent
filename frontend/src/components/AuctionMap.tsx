@@ -104,9 +104,13 @@ const PRESET_REGIONS = [
   { label: "🎯 성남·분당·판교", regionKey: "성남·분당", lat: 37.395, lng: 127.125, zoom: 13 },
   { label: "💎 강남·서초·송파", regionKey: "강남·서초·송파·마포", lat: 37.505, lng: 127.045, zoom: 12 },
   { label: "🌳 수원·안양", regionKey: "수원·안양", lat: 37.315, lng: 127.005, zoom: 12 },
-  { label: "⛵ 부산·울산", regionKey: "부산", lat: 35.18, lng: 129.07, zoom: 11 },
+  { label: "✈️ 인천·송도·부평", regionKey: "인천", lat: 37.46, lng: 126.70, zoom: 11 },
+  { label: "🏔️ 강원·춘천·원주", regionKey: "강원", lat: 37.75, lng: 128.20, zoom: 9 },
+  { label: "⛵ 부산·울산·경남", regionKey: "부산", lat: 35.18, lng: 129.07, zoom: 11 },
   { label: "🚄 대구·경북", regionKey: "대구", lat: 35.87, lng: 128.60, zoom: 11 },
-  { label: "🏛️ 대전·세종", regionKey: "대전", lat: 36.35, lng: 127.38, zoom: 11 },
+  { label: "🏛️ 대전·세종·충청", regionKey: "대전", lat: 36.35, lng: 127.38, zoom: 11 },
+  { label: "🌾 광주·전남·전북", regionKey: "광주", lat: 35.16, lng: 126.85, zoom: 10 },
+  { label: "🍊 제주특별자치도", regionKey: "제주", lat: 33.40, lng: 126.55, zoom: 10 },
 ];
 
 const PRICE_OPTIONS = [
