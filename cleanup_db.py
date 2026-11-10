@@ -69,20 +69,22 @@ def cleanup_old_data(db_path: str, days: int):
 
         # 2. 네이버 부동산 매물 (naver_listings) 정리
         # 관심 매물(is_favorite = 1)은 영구 보존
+        # 수집일자(scraped_at) 기준 cutoff 또는 확인일자(confirm_date)가 3주 이상 지난 종료 매물 정리
         try:
+            three_weeks_ago_str = (datetime.now() - timedelta(days=max(days, 21))).strftime('%Y-%m-%d')
             cursor.execute("""
                 SELECT COUNT(*) FROM naver_listings 
                 WHERE COALESCE(is_favorite, 0) != 1 
-                  AND scraped_at < ?
-            """, (cutoff_date,))
+                  AND (scraped_at < ? OR (confirm_date IS NOT NULL AND confirm_date != '' AND confirm_date < ?))
+            """, (cutoff_date, three_weeks_ago_str))
             naver_count = cursor.fetchone()[0]
             if naver_count > 0:
                 cursor.execute("""
                     DELETE FROM naver_listings 
                     WHERE COALESCE(is_favorite, 0) != 1 
-                      AND scraped_at < ?
-                """, (cutoff_date,))
-                print(f"  - [네이버부동산] 오래된 매물 {naver_count}건 정리 완료.")
+                      AND (scraped_at < ? OR (confirm_date IS NOT NULL AND confirm_date != '' AND confirm_date < ?))
+                """, (cutoff_date, three_weeks_ago_str))
+                print(f"  - [네이버부동산] 오래된/종료 매물 {naver_count}건 정리 완료 (관심 매물 보호됨).")
             else:
                 print("  - [네이버부동산] 삭제할 오래된 매물이 없습니다.")
         except sqlite3.OperationalError as e:
@@ -94,7 +96,7 @@ def cleanup_old_data(db_path: str, days: int):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="오래된 매물 데이터 안전 정리 스크립트")
     parser.add_argument("--db", type=str, default=DB_FILE_PATH, help="SQLite DB 파일 경로")
-    parser.add_argument("--days", type=int, default=30, help="며칠 전까지 업데이트가 안 된 매물을 정리할지 (기본: 30일)")
+    parser.add_argument("--days", type=int, default=14, help="며칠 전까지 업데이트가 안 된 매물을 정리할지 (기본: 14일)")
     args = parser.parse_args()
     
     cleanup_old_data(args.db, args.days)
