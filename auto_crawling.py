@@ -1845,7 +1845,7 @@ async def main():
     console.print(f"[bold yellow]🔍 {args.region} 전체 법원 수집 시작 (법원 {len(court_list)}개, 법원당 최대 {args.max_items}개)[/bold yellow]")
 
     try:
-        from core.market_matcher import MarketMatcher
+        from core.market_matcher import MarketMatcher, detect_share_sale
         market_matcher = MarketMatcher()
     except Exception:
         market_matcher = None
@@ -1866,17 +1866,37 @@ async def main():
                 score, grade = 78, "B"
             else:
                 score, grade = 68, "B"
+
+        # 특수권리(지분매각 등) 태그가 있는데 SAFE 등급이 나오면 과대평가된 것이다.
+        # 지분매각은 전체 시세 대비 지분만 취득하고 배타적 점유도 불가하므로 등급·매수신호를 보수적으로 낮춘다.
+        try:
+            is_share_sale, share_ratio = detect_share_sale(item_d)
+        except Exception:
+            is_share_sale, share_ratio = False, None
+        share_note = ""
+        if is_share_sale:
+            _downgrade = {"S": (70, "A"), "A": (60, "B"), "B": (45, "C"), "C": (35, "D")}
+            if grade in _downgrade:
+                score, grade = _downgrade[grade]
+            score = max(20, score)
+            ratio_txt = f" {share_ratio:.0%}" if share_ratio else ""
+            share_note = f" | 지분매각({ratio_txt.strip() or '지분'}) 물건: 배타적 점유 불가·공유자 우선매수권 주의"
+
+        risks = [rights_r.get('reason', '현장 임장 및 관리비 확인 필수')]
+        if is_share_sale:
+            risks.append("지분매각 물건입니다. 전체 물건이 아닌 지분만 취득하므로 단독 점유·처분이 어렵고 공유자 우선매수권 행사 시 낙찰이 무효가 될 수 있습니다. 시세 비교도 지분 비율 기준으로 해석해야 합니다.")
+
         return {
             "score": score,
             "grade": grade,
-            "verdict": f"시스템 정밀 권리분석 ({rl}): {rights_r.get('reason', '권리 상태 양호')} (할인율 {disc_v}%)",
-            "buy_signal": rl == "SAFE" and disc_v >= 15,
+            "verdict": f"시스템 정밀 권리분석 ({rl}): {rights_r.get('reason', '권리 상태 양호')} (할인율 {disc_v}%){share_note}",
+            "buy_signal": rl == "SAFE" and disc_v >= 15 and not is_share_sale,
             "expected_yield": "6~9%" if rl == "SAFE" else "보수적 접근 필요",
             "suggested_bid": f"{int(min_v * 1.03):,}원 부근" if min_v > 0 else "입찰가 산정 대기",
             "extinguished_rights": ["말소기준권리 이후 후순위 제한물권 일체"],
             "retained_rights": ["선순위 임차보증금 인수 주의" if rl == "CRITICAL" else "없음"],
             "key_points": [f"감정가 대비 {disc_v}% 할인 매물", f"유찰 {item_d.get('failed_count', 0)}회 진행"],
-            "risks": [rights_r.get('reason', '현장 임장 및 관리비 확인 필수')],
+            "risks": risks,
             "analysis_detail": f"법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [{rl}]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
             "ai_model": "Rule-Engine"
         }
