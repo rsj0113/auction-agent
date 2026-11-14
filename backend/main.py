@@ -403,8 +403,7 @@ def get_quick_filter_counts():
             today_new_onbid = cursor.fetchone()[0]
             cursor.execute("""
                 SELECT COUNT(*) FROM onbid_items 
-                WHERE bid_status = '마감' 
-                  AND (bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%' OR remain_time LIKE '%마감%')
+                WHERE bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%'
             """)
             today_closed_onbid = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE date(scraped_at) >= date('now', 'localtime')")
@@ -1168,8 +1167,7 @@ def get_dashboard_summary():
             today_new_onbid = cursor.fetchone()[0]
             cursor.execute("""
                 SELECT COUNT(*) FROM onbid_items 
-                WHERE bid_status = '마감' 
-                  AND (bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%' OR remain_time LIKE '%마감%')
+                WHERE bid_end_date LIKE strftime('%Y-%m-%d', 'now', 'localtime') || '%'
             """)
             today_closed_onbid = cursor.fetchone()[0]
             cursor.execute("SELECT COUNT(*) FROM naver_listings WHERE date(scraped_at) >= date('now', 'localtime')")

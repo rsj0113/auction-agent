@@ -1507,7 +1507,7 @@ export default function AuctionsPage() {
                 <span className={`px-1.5 py-0.2 rounded-md font-bold ${
                   dateRangeFilter === "today" ? "bg-white/20 text-white" : "bg-blue-50 text-blue-700"
                 }`}>
-                  +{(quickCounts.inflow_outflow.today_new_total || 0).toLocaleString()}건
+                  {(quickCounts.inflow_outflow.today_new_total || 0).toLocaleString()}건
                 </span>
                 <span className="text-[10px] opacity-80 font-normal hidden md:inline">
                   (경매 {quickCounts.inflow_outflow.today_new_court || 0} · 공매 {(quickCounts.inflow_outflow.today_new_onbid || 0).toLocaleString()} · 시세 {(quickCounts.inflow_outflow.today_new_naver || 0).toLocaleString()})
@@ -1516,7 +1516,7 @@ export default function AuctionsPage() {
               <div className="px-2.5 py-1 rounded-xl text-xs font-black bg-white text-rose-700 border border-rose-200 shadow-2xs flex items-center gap-1.5">
                 <span>⏳ 오늘 마감/진행</span>
                 <span className="px-1.5 py-0.2 rounded-md font-bold bg-rose-50 text-rose-700">
-                  -{(quickCounts.inflow_outflow.today_closed_total || 0).toLocaleString()}건
+                  {(quickCounts.inflow_outflow.today_closed_total || 0).toLocaleString()}건
                 </span>
               </div>
             </div>

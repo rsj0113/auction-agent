@@ -557,7 +557,7 @@ export default function Home() {
                 >
                   <span>✨ 오늘 신규 유입</span>
                   <span className="bg-white/20 px-1.5 py-0.2 rounded font-extrabold">
-                    +{(summary.inflow_outflow.today_new_total || 0).toLocaleString()}건
+                    {(summary.inflow_outflow.today_new_total || 0).toLocaleString()}건
                   </span>
                   <span className="text-[10px] text-blue-100 font-medium hidden md:inline">
                     (경매 {summary.inflow_outflow.today_new_court || 0} · 공매 {(summary.inflow_outflow.today_new_onbid || 0).toLocaleString()} · 시세 {(summary.inflow_outflow.today_new_naver || 0).toLocaleString()})
@@ -566,7 +566,7 @@ export default function Home() {
                 <div className="px-2.5 py-1 rounded-lg text-xs font-black bg-white text-rose-700 border border-rose-200 shadow-2xs flex items-center gap-1.5">
                   <span>⏳ 오늘 마감/진행</span>
                   <span className="bg-rose-50 px-1.5 py-0.2 rounded font-extrabold text-rose-600">
-                    -{(summary.inflow_outflow.today_closed_total || 0).toLocaleString()}건
+                    {(summary.inflow_outflow.today_closed_total || 0).toLocaleString()}건
                   </span>
                 </div>
               </div>
