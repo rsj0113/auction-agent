@@ -1030,7 +1030,20 @@ export default function Home() {
                   {/* 특수권리 태그 배지 */}
                   {(() => {
                     try {
-                      const tags = item.special_rights ? JSON.parse(item.special_rights) : [];
+                      let tags = item.special_rights ? JSON.parse(item.special_rights) : [];
+                      const isShareImplicit = (item.remarks && (item.remarks.includes("지분") || item.remarks.includes("1/2"))) ||
+                                              (item.location && item.location.includes("지분"));
+                      if (isShareImplicit && !tags.some((t: any) => t.id === 'share')) {
+                        tags.push({
+                          id: "share",
+                          name: "지분 매각",
+                          short: "지분매각",
+                          badge_color: "bg-purple-100 text-purple-700 border-purple-200",
+                          risk_level: "MEDIUM",
+                          icon: "ℹ️",
+                          desc: "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다."
+                        });
+                      }
                       return tags.map((t: any) => (
                         <span key={t.id} className={`px-2 py-0.5 text-xs font-bold rounded-lg border shrink-0 ${t.badge_color || 'bg-amber-100 text-amber-800 border-amber-200'}`} title={t.desc}>
                           {t.icon || '🏷️'} {t.short || t.name}
@@ -1904,6 +1917,20 @@ export default function Home() {
                       }
                     } catch {}
 
+                    const isShareImplicit = (selectedDetail.remarks && (selectedDetail.remarks.includes("지분") || selectedDetail.remarks.includes("1/2"))) ||
+                                            (selectedDetail.location && selectedDetail.location.includes("지분"));
+                    if (isShareImplicit && !specialTags.some((t: any) => t.id === 'share')) {
+                      specialTags.push({
+                        id: "share",
+                        name: "지분 매각",
+                        short: "지분매각",
+                        badge_color: "bg-purple-100 text-purple-700 border-purple-200",
+                        risk_level: "MEDIUM",
+                        icon: "ℹ️",
+                        desc: "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다. 전체 배타적 점유가 불가하며 공유자 우선매수권 또는 공유물분할 청구 소송이 필요합니다."
+                      });
+                    }
+
                     const hasRemarks = Boolean(selectedDetail.remarks && selectedDetail.remarks.trim());
 
                     return (
@@ -1923,6 +1950,19 @@ export default function Home() {
                             </span>
                           )}
                         </div>
+
+                        {/* 지분매각 특별 경고 배너 */}
+                        {specialTags.some((t: any) => t.id === 'share') && (
+                          <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-900 flex items-start gap-2.5">
+                            <span className="text-base shrink-0">⚠️</span>
+                            <div>
+                              <strong className="font-extrabold text-purple-950 block">지분 매각 주의 물건</strong>
+                              <p className="mt-0.5 leading-relaxed text-[11px] text-purple-800">
+                                본 매물은 전체 부동산이 아닌 일부 공유 지분 매각 물건입니다. 낙찰자 단독 배타적 사용·수익이 제한될 수 있으며, 공유자의 우선매수권 행사 여부 및 공유물분할 청구소송 비용을 사전에 검토해야 합니다.
+                              </p>
+                            </div>
+                          </div>
+                        )}
 
                         {specialTags.length > 0 ? (
                           <div className="space-y-2">

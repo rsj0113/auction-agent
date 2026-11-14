@@ -46,7 +46,11 @@ TAG_DEFINITIONS: List[Dict[str, Any]] = [
         "risk_level": "MEDIUM",
         "icon": "ℹ️",
         "desc": "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다. 전체 배타적 점유가 불가하며 공유자 우선매수권 또는 공유물분할 청구 소송이 필요합니다.",
-        "patterns": [r"지분\s*매각", r"지분매각", r"공유지분", r"지분경매", r"지분\s*경매", r"지분임"]
+        "patterns": [
+            r"지분\s*매각", r"지분매각", r"공유지분", r"지분경매", r"지분\s*경매", r"지분임",
+            r"지분", r"\d+분의\s*\d+", r"(?:1/2|1/3|1/4|2/3|2/4|3/4|\d+/\d+)\s*지분",
+            r"지분\s*(?:1/2|1/3|1/4|2/3|2/4|3/4|\d+/\d+)"
+        ]
     },
     {
         "id": "superficies",
@@ -106,13 +110,34 @@ def extract_special_rights(
     location: str = "",
     usage: str = "",
     rights_list: Optional[Any] = None,
-    ai_report: Optional[Dict[str, Any]] = None
+    ai_report: Optional[Dict[str, Any]] = None,
+    dspsl_objects: Optional[List[Dict[str, Any]]] = None,
+    is_share: bool = False
 ) -> List[Dict[str, Any]]:
     """
-    매각물건명세서 비고란, 위치, 용도, 등기부 권리내역, AI 리포트를 종합 스캔하여
+    매각물건명세서 비고란, 위치, 용도, 등기부 권리내역, AI 리포트, 물건목록(지분)을 종합 스캔하여
     특수권리 태그 목록을 반환합니다.
     """
     found: List[Dict[str, Any]] = []
+    
+    # 지분매각 여부 선제 점검 (gdsDspslObjctLst 내 지분 분자/분모 또는 지분내용)
+    has_share_obj = is_share
+    if dspsl_objects and isinstance(dspsl_objects, list):
+        for obj in dspsl_objects:
+            if not isinstance(obj, dict):
+                continue
+            stk_ctt = str(obj.get("dspslStkCtt") or "")
+            nmrt = obj.get("dspslStkNmrtVal")
+            dnmn = obj.get("dspslStkDnmnVal")
+            if "지분" in stk_ctt or (nmrt and dnmn and int(nmrt) > 0 and int(dnmn) > 0):
+                has_share_obj = True
+                break
+
+    if has_share_obj:
+        for t in TAG_DEFINITIONS:
+            if t["id"] == "share":
+                found.append({k: t[k] for k in ("id", "name", "short", "badge_color", "risk_level", "icon", "desc")})
+                break
     
     # 텍스트 코퍼스 구성 (비고란 최우선)
     corpus_parts = [remarks or "", location or "", usage or ""]
@@ -142,7 +167,8 @@ def extract_special_rights(
     if is_farmland:
         for t in TAG_DEFINITIONS:
             if t["id"] == "farmland":
-                found.append({k: t[k] for k in ("id", "name", "short", "badge_color", "risk_level", "icon", "desc")})
+                if not any(item["id"] == "farmland" for item in found):
+                    found.append({k: t[k] for k in ("id", "name", "short", "badge_color", "risk_level", "icon", "desc")})
                 break
 
     # 2. 패턴 매칭

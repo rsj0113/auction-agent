@@ -274,9 +274,14 @@ class RightsAnalysisEngine:
                     _warnings.append(f"감정가 대비 {_dr}% 할인 — 지분경매·특수권리·다중유찰 여부 반드시 확인 필요")
             if failed_count >= 5:
                 _warnings.append(f"{failed_count}회 유찰 — 시장에서 반복적으로 외면된 물건, 근본 원인 파악 필수")
+            if deposit > 0 and not is_payout_requested:
+                return {"has_daehang": True, "risk_level": "CRITICAL",
+                        "reason": f"말소기준권리 미상이나 선순위 임차보증금 {deposit:,}원 인수 대상입니다.",
+                        "estimated_loss": deposit, "malso_standard": "정보없음",
+                        "discount_rate": _dr, "failed_count": failed_count, "warnings": _warnings}
             return {"has_daehang": False, "risk_level": "UNKNOWN",
                     "reason": "말소기준권리를 찾을 수 없습니다. 등기정보를 직접 확인하십시오.",
-                    "estimated_loss": 0, "malso_standard": "정보없음",
+                    "estimated_loss": deposit if deposit > 0 else 0, "malso_standard": "정보없음",
                     "discount_rate": _dr, "failed_count": failed_count, "warnings": _warnings}
 
         has_daehang = tenant_date < malso_date if tenant_date else False
@@ -421,7 +426,65 @@ class AuctionCrawler:
                 remarks_parts.append(f"[지상권 관련 내역]\n{gds['sprfcExstcDts'].strip()}")
             if gds.get('ndstrcRghCtt'):
                 remarks_parts.append(f"[소멸되지 않는 권리]\n{gds['ndstrcRghCtt'].strip()}")
-            remarks = "\n\n".join(remarks_parts)
+            if gds.get('tprtyRnkHypthcStngDts'):
+                remarks_parts.append(f"[매각물건명세서 을구/최선순위설정]\n{gds['tprtyRnkHypthcStngDts'].strip()}")
+
+            cs_nm = (dma.get('csBaseInfo') or {}).get('csNm', '')
+            if '지분' in cs_nm:
+                remarks_parts.append(f"[사건구분]\n{cs_nm.strip()}")
+
+            # 물건목록 지분내역 수집
+            obj_list_early = dma.get('gdsDspslObjctLst') or []
+            share_lines = []
+            for obj_e in obj_list_early:
+                if isinstance(obj_e, dict):
+                    stk = (obj_e.get('dspslStkCtt') or '').strip()
+                    if stk:
+                        share_lines.append(stk)
+                    elif obj_e.get('dspslStkNmrtVal') and obj_e.get('dspslStkDnmnVal') and int(obj_e['dspslStkDnmnVal']) > 0:
+                        share_lines.append(f"지분 {obj_e['dspslStkNmrtVal']}/{obj_e['dspslStkDnmnVal']}")
+            if share_lines:
+                remarks_parts.append("[지분매각 내역]\n" + "\n".join(share_lines))
+
+            # ── 기일내역 파싱 (유찰 횟수 및 최신 예정 기일 최저가 산출) ──
+            dxdy_lst = dma.get('gdsDspslDxdyLst') or []
+            failed_count_parsed = None
+            min_bid_parsed = None
+            prev_min_bid_parsed = None
+
+            if dxdy_lst and isinstance(dxdy_lst, list):
+                bidding_days = [
+                    d for d in dxdy_lst
+                    if isinstance(d, dict) and (d.get('auctnDxdyKndCd') == '01' or (d.get('tsLwsDspslPrc') or 0) > 0)
+                ]
+                if bidding_days:
+                    # 1. 유찰 횟수: auctnDxdyRsltCd == '002' 또는 결과 텍스트 '유찰'
+                    failed_items = [
+                        d for d in bidding_days
+                        if d.get('auctnDxdyRsltCd') in ('002', '유찰') or '유찰' in str(d.get('auctnDxdyRsltCd') or '')
+                    ]
+                    failed_count_parsed = len(failed_items)
+
+                    # 2. 예정 기일 및 최저가: auctnDxdyGdsStatCd == '00' 또는 결과 미정
+                    upcoming_items = [
+                        d for d in bidding_days
+                        if (d.get('auctnDxdyGdsStatCd') == '00' or not d.get('auctnDxdyRsltCd')) and (d.get('tsLwsDspslPrc') or 0) > 0
+                    ]
+                    if upcoming_items:
+                        target_day = upcoming_items[0]
+                        min_bid_parsed = int(target_day['tsLwsDspslPrc'])
+                        if target_day.get('dxdyYmd'):
+                            auction_date = str(target_day['dxdyYmd'])
+                        target_idx = bidding_days.index(target_day)
+                        if target_idx > 0 and (bidding_days[target_idx - 1].get('tsLwsDspslPrc') or 0) > 0:
+                            prev_min_bid_parsed = int(bidding_days[target_idx - 1]['tsLwsDspslPrc'])
+                    else:
+                        last_day = bidding_days[-1]
+                        min_bid_parsed = int(last_day.get('tsLwsDspslPrc') or 0)
+                        if last_day.get('dxdyYmd'):
+                            auction_date = str(last_day['dxdyYmd'])
+                        if len(bidding_days) > 1 and (bidding_days[-2].get('tsLwsDspslPrc') or 0) > 0:
+                            prev_min_bid_parsed = int(bidding_days[-2]['tsLwsDspslPrc'])
 
             # 디버그 덤프: --debug-dump 플래그 시 dma_result 전체를 파일로 저장
             if debug_dump_path and dma:
@@ -436,13 +499,19 @@ class AuctionCrawler:
             # ── 권리관계: tprtyRnkHypthcStngDts 전체 텍스트 스캔 ──────────
             hyp_text = gds.get('tprtyRnkHypthcStngDts') or ''
             if hyp_text:
-                RIGHTS_KW = ['담보가등기', '근저당', '가압류', '경매개시결정', '경매개시', '압류', '저당']
+                RIGHTS_KW = [
+                    '소유권이전청구권가등기', '담보가등기', '가등기',
+                    '주택임차권등기', '주택임차권', '상가임차권등기', '상가임차권', '임차권등기', '임차권',
+                    '처분금지가처분', '가처분',
+                    '근저당권', '근저당', '저당권', '저당',
+                    '가압류', '압류',
+                    '강제경매개시결정', '임의경매개시결정', '경매개시결정', '경매개시',
+                    '전세권', '지상권'
+                ]
                 DATE_RE = re.compile(r'(\d{4})[./](\d{1,2})[./](\d{1,2})|(\d{4})(\d{2})(\d{2})')
 
                 # 개행 기준 분리 후 각 세그먼트에서 날짜+키워드 추출
                 segments = [s.strip() for s in re.split(r'[\r\n]+', hyp_text) if s.strip()]
-                # 개행이 없는 연속 텍스트는 finditer로 (키워드→날짜) / (날짜→키워드) 패턴 직접 스캔
-                # lookahead split 대신 finditer를 써야 '근저당'→'저당' 오분류를 방지할 수 있다
                 if len(segments) <= 1:
                     kw_alt = '|'.join(re.escape(k) for k in RIGHTS_KW)
                     date_p = r'\d{4}[./]\d{1,2}[./]\d{1,2}|\d{8}'
@@ -451,7 +520,6 @@ class AuctionCrawler:
                                 f'({date_p})(?:[^가-힣]{{0,20}})({kw_alt})']:
                         for m2 in re.finditer(pat, hyp_text):
                             g = m2.groups()
-                            # 어느 순서인지 구분
                             if re.match(kw_alt, g[0]):
                                 kw_found, date_raw = g[0], g[1]
                             else:
@@ -478,6 +546,10 @@ class AuctionCrawler:
                         for kw in RIGHTS_KW:
                             if kw in seg:
                                 key = f"{kw}_{date_str}"
+                                if key not in seen:
+                                    seen.add(key)
+                                    rights_list.append({"name": kw, "date": date_str})
+                                break
                                 if key not in seen:
                                     seen.add(key)
                                     rights_list.append({"name": kw, "date": date_str})
@@ -663,9 +735,46 @@ class AuctionCrawler:
         except Exception:
             pass
 
-        area_pyeong = round(area_m2 / 3.30579, 1) if area_m2 else 0.0
+        # 임차인 목록 상세 비고란 통합
+        if tenants_list:
+            t_lines = []
+            for t in tenants_list:
+                dep_str = f"{t.get('deposit'):,}원" if isinstance(t.get('deposit'), int) and t.get('deposit') > 0 else str(t.get('deposit') or '미상')
+                payout_str = "배당요구 신청" if t.get('is_payout_requested') else "배당요구 없음"
+                t_lines.append(f"- {t.get('name', '미상')}: 전입 {t.get('move_in_date') or '미상'}, 보증금 {dep_str}, 확정 {t.get('fixed_date') or '미상'}, {payout_str} ({t.get('room') or ''})")
+            remarks_parts.append("[임차인 현황]\n" + "\n".join(t_lines))
 
-        special_rights = extract_special_rights(remarks=remarks, rights_list=rights_list)
+        remarks = "\n\n".join(remarks_parts)
+
+        # 비고란/을구 텍스트 기반 임차보증금 폴백 (임차권등기 보증금 누락 방어)
+        if tenant_deposit == 0:
+            all_text_search = f"{hyp_text} {remarks}"
+            m_dep = re.search(r'(?:보증금|임차보증금)[^\d]{0,10}(\d+(?:\.\d+)?억(?:\s*\d+만)?|\d+만|\d{1,3}(?:,\d{3})+)', all_text_search)
+            if m_dep:
+                amt_str = m_dep.group(1)
+                val = 0
+                if "억" in amt_str and "만" in amt_str:
+                    m_v = re.search(r"(\d+(?:\.\d+)?)억\s*(\d+)만", amt_str)
+                    if m_v: val = int(float(m_v.group(1)) * 100000000 + int(m_v.group(2)) * 10000)
+                elif "억" in amt_str:
+                    m_v = re.search(r"(\d+(?:\.\d+)?)억", amt_str)
+                    if m_v: val = int(float(m_v.group(1)) * 100000000)
+                elif "만" in amt_str:
+                    m_v = re.search(r"(\d+)만", amt_str)
+                    if m_v: val = int(m_v.group(1)) * 10000
+                elif "," in amt_str:
+                    clean_s = amt_str.replace(",", "")
+                    if clean_s.isdigit(): val = int(clean_s)
+                if val > 0:
+                    tenant_deposit = val
+
+        is_share_case = ('지분' in cs_nm or any(k in remarks for k in ['지분', '공유지분']))
+        special_rights = extract_special_rights(
+            remarks=remarks,
+            rights_list=rights_list,
+            dspsl_objects=obj_list,
+            is_share=is_share_case
+        )
 
         return {
             "rights_list": rights_list,
@@ -682,6 +791,9 @@ class AuctionCrawler:
             "auction_date": auction_date,
             "remarks": remarks,
             "special_rights": json.dumps(special_rights, ensure_ascii=False),
+            "failed_count": failed_count_parsed,
+            "min_bid": min_bid_parsed,
+            "prev_min_bid": prev_min_bid_parsed,
         }
 
     async def search(self, region: str = "서울", max_items: int = 5, court_code: str = "", debug_dump_path: str = "") -> list:
@@ -1017,6 +1129,10 @@ class AuctionCrawler:
                     if any(k in loc_s for k in ["Mercedes-Benz", "BMW", "차대번호", "차종 :", "연식 :"]):
                         return "차량/기타"
 
+                    # 0. 특수 복지/노유자 시설
+                    if any(k in loc_s or k in cur_usage for k in ["노유자", "복지시설", "요양시설", "사회복지", "어린이집", "유치원", "노인복지"]):
+                        return "노유자복지시설"
+
                     # 1. 단지내 상가 / 상가동
                     if any(k in loc_s for k in ["단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장"]):
                         return "상가/근린시설"
@@ -1031,7 +1147,7 @@ class AuctionCrawler:
                         return "오피스텔"
 
                     villa_kw = ["빌라", "다세대", "연립", "맨션", "하이츠", "빌리지", "타운", "주택", "하우스", "캐슬빌", "아트빌", "그린빌", "스카이빌", "드림빌", "청구빌", "현대빌", "삼성빌", "토브하우스"]
-                    if any(k in loc_s for k in villa_kw) and not any(k in loc_s for k in ["상가", "점포"]):
+                    if any(k in loc_s for k in villa_kw) and not any(k in loc_s for k in ["상가", "점포", "피더하우스", "노유자", "복지"]):
                         return "다세대/빌라"
 
                     # 3. 명확한 상업용 시설 검사
@@ -1384,8 +1500,18 @@ class AuctionCrawler:
                         row_detail_cache[row_id] = raw_detail
                     if api_gds.get('aeeEvlAmt') and appraisal == 0:
                         appraisal = int(api_gds['aeeEvlAmt'])
-                    if api_gds.get('fstPbancLwsDspslPrc') and min_bid == 0:
+
+                    # 차기 기일 최저가 및 유찰횟수 반영 (gdsDspslDxdyLst 기반 우선)
+                    if detail_info.get("min_bid") and detail_info["min_bid"] > 0:
+                        min_bid = detail_info["min_bid"]
+                    elif api_gds.get('fstPbancLwsDspslPrc') and min_bid == 0:
                         min_bid = int(api_gds['fstPbancLwsDspslPrc'])
+
+                    failed_count = detail_info.get("failed_count")
+                    if failed_count is None:
+                        failed_count = int(api_gds.get('flbdNcnt') or (1 if appraisal > min_bid else 0))
+
+                    prev_min_bid = detail_info.get("prev_min_bid") or 0
 
                     # 층수: API 미제공 시 location 문자열에서 fallback 파싱
                     floor = detail_info.get("floor") or 0
@@ -1407,7 +1533,8 @@ class AuctionCrawler:
                         "usage": usage,
                         "appraisal": appraisal,
                         "min_bid": min_bid,
-                        "failed_count": int(api_gds.get('flbdNcnt') or (1 if appraisal > min_bid else 0)),
+                        "prev_min_bid": prev_min_bid,
+                        "failed_count": failed_count,
                         "rights_list": detail_info["rights_list"],
                         "tenant_registration_date": detail_info["tenant_registration_date"],
                         "tenant_deposit": detail_info["tenant_deposit"],
@@ -1482,6 +1609,10 @@ class AuctionAnalyzer:
         warnings = rights.get('warnings', [])
         warnings_str = "\n        ".join([f"⚠️ {w}" for w in warnings]) if warnings else "없음"
 
+        remarks_content = item.get('remarks') or '특이사항 없음 (비고란 공란)'
+        rights_list_content = item.get('rights_list') or '정보없음'
+        special_rights_content = item.get('special_rights') or '없음'
+
         prompt = f"""
         당신은 대한민국 최고의 부동산 경매 전문가 및 감정평가사입니다.
         다음 실시간 수집된 실제 법원경매 물건을 정밀 가치 평가하여 세부적인 투자 의견을 주십시오.
@@ -1489,10 +1620,25 @@ class AuctionAnalyzer:
         [물건 정보]
         - 사건번호: {item['case_number']}
         - 소재지: {item['location']}
+        - 용도: {item.get('usage', '기타')}
         - 감정가: {item['appraisal']:,}원
         - 최저매각가격: {item['min_bid']:,}원
         - 감정가 대비 할인율: {discount_rate}%
         - 유찰횟수: {failed_count}회
+
+        [매각물건명세서 비고란 및 특수조건]
+        {remarks_content}
+
+        [등기부 및 을구 권리내역]
+        {rights_list_content}
+
+        [임차인 현황]
+        - 전입일자: {item.get('tenant_registration_date') or '소유자/미상'}
+        - 임차보증금: {item.get('tenant_deposit', 0):,}원
+        - 배당요구 여부: {'신청' if item.get('is_payout_requested') else '미신청 또는 해당없음'}
+
+        [특수권리 감지 태그]
+        {special_rights_content}
 
         [시스템 권리분석 엔진 결과]
         - 위험 등급: {rights['risk_level']} (SAFE, WARNING, CRITICAL 중 하나)
@@ -1506,9 +1652,11 @@ class AuctionAnalyzer:
         당신의 임무는 대한민국 경매 실무에 입각하여 다음 지표들을 도출하는 것입니다:
         1. 감정가 및 권리관계를 기반으로 한 '합리적 예상 낙찰가 범위(원화)' 제안 (단, 감정가 및 최저가가 모두 0원일 경우, 감정가 부재 상태임을 명시하고 인근 실거래가 기반 보수적 평가 후 입찰을 권고하십시오.)
         2. 낙찰 후 등기부 상에서 '말소되는 권리'와 '인수해야 할 권리' 목록 작성
-        3. 권리 등급이 UNKNOWN(등기정보 파싱 불가)인 경우 score를 40점 이하로 제한하고 직접 등기부 확인을 강력 권고하십시오.
-        4. 임차인 정보가 '정보없음'인 경우 임차인 리스크를 보수적으로 평가(최소 WARNING 수준)하십시오.
-        5. 할인율이 70% 이상이거나 유찰이 5회 이상인 경우, 지분경매·특수물건·법적 하자 가능성을 반드시 분석하고 score와 buy_signal에 적극 반영하십시오.
+        3. 매각물건명세서 을구(주택임차권등기 등) 또는 비고란에 '매수인 인수', '임차보증금 인수'가 명시되어 있거나 선순위 임차인이 배당요구를 하지 않은 경우, 해당 보증금(예: 3.8억 원 등)을 전액 retained_rights에 명시하고 '인수 0원/권리하자 없음'으로 오판독하지 마십시오.
+        4. 권리 등급이 UNKNOWN(등기정보 파싱 불가)인 경우 score를 40점 이하로 제한하고 직접 등기부 확인을 강력 권고하십시오.
+        5. 임차인 정보가 '정보없음'인 경우 임차인 리스크를 보수적으로 평가(최소 WARNING 수준)하십시오.
+        6. 할인율이 70% 이상이거나 유찰이 5회 이상인 경우, 지분경매·특수물건·법적 하자 가능성을 반드시 분석하고 score와 buy_signal에 적극 반영하십시오.
+        7. 지분매각인 경우 배타적 점유 불가 및 공유자 우선매수권 위험을 명시하십시오.
 
         반드시 JSON 형식으로만 응답하십시오:
         {{

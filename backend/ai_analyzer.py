@@ -26,35 +26,56 @@ def analyze_auction_data(item_data: dict) -> dict:
     if appraisal > 0:
         discount_rate = round((1 - min_bid / appraisal) * 100, 1)
 
-    prompt = f"""
-    당신은 대한민국 최고의 부동산 경매 전문가입니다.
-    다음 법원경매 물건을 분석하여 JSON 형식으로 결과를 응답하십시오.
+    remarks = item_data.get('remarks') or '특이사항 없음 (비고란 공란)'
+    rights_list = item_data.get('rights_list') or '정보없음'
+    special_rights = item_data.get('special_rights') or '없음'
+    usage = item_data.get('usage') or '부동산'
 
-    [물건 정보]
+    prompt = f"""
+    당신은 대한민국 최고의 부동산 경매 전문가 및 감정평가사입니다.
+    다음 법원경매 물건의 매각물건명세서, 등기부 을구, 비고란 및 권리관계를 정밀 분석하여 JSON 형식으로 결과를 응답하십시오.
+
+    [물건 기본 정보]
     - 사건번호: {item_data.get('case_number')}
     - 소재지: {item_data.get('location')}
+    - 용도: {usage}
     - 감정가: {appraisal:,}원
     - 최저매각가격: {min_bid:,}원
     - 할인율: {discount_rate}%
-    - 유찰횟수: {item_data.get('failed_count')}회
-    - 전입신고일: {item_data.get('tenant_registration_date') or '없음 (또는 미상)'}
-    - 보증금: {item_data.get('tenant_deposit', 0):,}원
-    - 등기부/권리내역: {item_data.get('rights_list') or '정보없음'}
+    - 유찰횟수: {item_data.get('failed_count', 0)}회
 
-    만약 전입신고일이 '없음 (또는 미상)'이고 등기부내역에 임차권이 없다면 임차인이 없는 물건으로 간주하여 무리한 리스크 경고(임차인 불확실성 등)를 생성하지 마십시오.
+    [매각물건명세서 비고란 및 특수조건]
+    {remarks}
 
-반드시 JSON 형식으로만 응답하십시오:
+    [등기부 및 을구 권리내역 (말소/인수 검토 대상)]
+    {rights_list}
+
+    [임차인 현황 및 보증금]
+    - 전입신고일: {item_data.get('tenant_registration_date') or '소유자/미상'}
+    - 임차보증금: {item_data.get('tenant_deposit', 0):,}원
+    - 배당요구 여부: {'배당요구 신청 완료' if item_data.get('is_payout_requested') == 1 else '미신청 또는 해당없음'}
+
+    [특수권리 감지 태그]
+    {special_rights}
+
+    [중요 권리분석 및 인수금액 산정 지침]
+    1. 매각물건명세서 을구에 '주택임차권등기'(또는 상가임차권등기)가 있거나, 비고란에 '매수인 인수', '임차권등기자 배당미요구 시 매수인 인수', '보증금 인수' 등이 명시된 경우 낙찰자가 인수해야 할 권리와 금액을 절대 누락하지 마십시오.
+    2. 선순위 주택임차권등기(보증금 3.8억 원 등)가 존재하고 배당요구를 하지 않은 경우, 해당 보증금은 전액 '매수인(낙찰자) 인수'로 판정하여 retained_rights에 명시하고 최종 권리 위험도(score, grade, verdict)에 반드시 반영하십시오. 절대 '인수 0원' 또는 '권리하자 없음'으로 오판독해서는 안 됩니다.
+    3. 전입신고일이 '없음(또는 미상)'이더라도 매각물건명세서 을구나 비고란에 임차권등기 또는 보증금이 명시되어 있다면 임차권 인수를 철저히 분석하십시오.
+    4. 지분매각인 경우 배타적 점유 불가 및 공유자 우선매수권 위험을 명시하십시오.
+
+    반드시 JSON 형식으로만 응답하십시오:
     {{
         "score": 0-100,
         "grade": "A-D",
-        "verdict": "권리분석 및 가치 종합 한줄 판정",
+        "verdict": "권리분석 및 가치 종합 한줄 판정 (인수 보증금이 있는 경우 반드시 금액 명시)",
         "buy_signal": true/false,
         "expected_yield": "예상 수익률 %",
-        "suggested_bid": "추천 입찰가",
-        "extinguished_rights": ["말소권리1"],
-        "retained_rights": ["인수권리1 (없다면 '없음')"],
-        "risks": ["현장 리스크1"],
-        "analysis_detail": "상세 분석 리포트"
+        "suggested_bid": "추천 입찰가 (인수 보증금을 감안한 실수수료 반영)",
+        "extinguished_rights": ["말소권리1", "말소권리2"],
+        "retained_rights": ["인수권리1 (없다면 '없음', 인수보증금이 있으면 '주택임차권등기 (보증금 X원 인수)' 등 구체적 명시)"],
+        "risks": ["현장 리스크1", "권리 리스크2"],
+        "analysis_detail": "경매 전문가 관점의 상세 분석 리포트"
     }}
     """
     
@@ -122,6 +143,10 @@ def chat_with_auction_ai(item_data: dict, user_message: str, chat_history: list 
 - 임차인 전입일자: {item_data.get('tenant_registration_date') or '소유자 점유 추정 (선순위 임차인 없음)'}
 - 임차보증금: {item_data.get('tenant_deposit', 0):,}원
 - 배당요구 여부: {'배당요구 신청 완료' if item_data.get('is_payout_requested') == 1 else '미신청 또는 해당없음'}
+
+[매각물건명세서 비고란 및 특수조건]
+- 비고란/을구 권리: {item_data.get('remarks') or '특이사항 없음'}
+- 특수권리 감지: {item_data.get('special_rights') or '없음'}
 
 [시세 및 마진]
 - 네이버 추정 호가/시세: {market_price:,}원

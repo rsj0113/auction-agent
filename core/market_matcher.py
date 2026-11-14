@@ -58,12 +58,17 @@ def extract_assumed_deposit_info(item: Dict[str, Any]) -> Tuple[int, bool, str]:
         except Exception:
             pass
 
+    has_explicit_assumption = any(k in remarks or k in rights_list for k in [
+        "주택임차권", "임차권등기", "매수인 인수", "매수인이 인수", "보증금 인수", "선순위 임차권"
+    ])
+
     is_explicit_safe = (
-        "SAFE" in ai_verdict or
-        "대항력 있는 임차인이 확인되지 않습니다" in ai_verdict or
-        "소유자/채무자 점유" in ai_verdict or
-        "후순위 임차인" in ai_verdict or
-        "권리 소멸" in ai_verdict
+        ("SAFE" in ai_verdict or
+         "대항력 있는 임차인이 확인되지 않습니다" in ai_verdict or
+         "소유자/채무자 점유" in ai_verdict or
+         "후순위 임차인" in ai_verdict or
+         "권리 소멸" in ai_verdict)
+        and not has_explicit_assumption
     )
 
     # 1. ai_report_json 내 tenants 상세 분석
@@ -137,37 +142,51 @@ def extract_assumed_deposit_info(item: Dict[str, Any]) -> Tuple[int, bool, str]:
             reasons.append(f"대항력 임차보증금 {assumed:,}원 인수")
 
     # 3. ai_verdict 및 비고란에서 명시적 인수 리스크 키워드 탐색
-    senior_risk_keywords = ["대항력 있는 선순위 임차인", "보증금 전액 인수 위험", "선순위 임차인 미배당", "보증금 인수 위험", "선순위 임차보증금 인수"]
-    has_verdict_risk = any(k in ai_verdict for k in senior_risk_keywords) or any(k in remarks for k in ["보증금 전액 인수", "대항력 있는 임차인"])
+    senior_risk_keywords = ["대항력 있는 선순위 임차인", "보증금 전액 인수 위험", "선순위 임차인 미배당", "보증금 인수 위험", "선순위 임차보증금 인수", "주택임차권", "매수인 인수", "임차권등기"]
+    has_verdict_risk = (
+        any(k in ai_verdict for k in senior_risk_keywords) or
+        any(k in remarks for k in ["보증금 전액 인수", "대항력 있는 임차인", "매수인 인수", "매수인이 인수", "주택임차권", "임차권등기"]) or
+        has_explicit_assumption
+    )
     
     if has_verdict_risk:
         if assumed == 0:
-            # 보증금 텍스트 추출 시도 (예: 2억 5,000만원)
-            m_amt = re.search(r"(?:보증금|임차보증금)[^\d]{0,10}(\d+억(?:\s*\d+만)?|\d+만)원?", ai_verdict + " " + remarks)
+            # 보증금 텍스트 추출 시도 (예: 3.8억, 3억 8,000만원, 380,000,000원)
+            all_text = f"{ai_verdict} {remarks} {rights_list}"
+            m_amt = re.search(r"(?:보증금|임차보증금)[^\d]{0,10}(\d+(?:\.\d+)?억(?:\s*\d+만)?|\d+만|\d{1,3}(?:,\d{3})+)", all_text)
             if m_amt:
                 amt_str = m_amt.group(1)
                 val = 0
                 if "억" in amt_str and "만" in amt_str:
-                    m = re.search(r"(\d+)억\s*(\d+)만", amt_str)
+                    m = re.search(r"(\d+(?:\.\d+)?)억\s*(\d+)만", amt_str)
                     if m:
-                        val = (int(m.group(1)) * 10000 + int(m.group(2))) * 10000
+                        val = int(float(m.group(1)) * 100000000 + int(m.group(2)) * 10000)
                 elif "억" in amt_str:
-                    m = re.search(r"(\d+)억", amt_str)
+                    m = re.search(r"(\d+(?:\.\d+)?)억", amt_str)
                     if m:
-                        val = int(m.group(1)) * 100000000
+                        val = int(float(m.group(1)) * 100000000)
                 elif "만" in amt_str:
                     m = re.search(r"(\d+)만", amt_str)
                     if m:
                         val = int(m.group(1)) * 10000
+                elif "," in amt_str:
+                    clean_n = amt_str.replace(",", "")
+                    if clean_n.isdigit():
+                        val = int(clean_n)
+
                 if val > 0:
                     assumed = val
-                    reasons.append(f"분석 보고서 기반 선순위 보증금 {assumed:,}원 인수")
+                    reasons.append(f"비고란/권리내역 기반 선순위 보증금 {assumed:,}원 인수")
                 else:
                     is_unknown_senior_risk = True
                     reasons.append("대항력 선순위 임차인 보증금 미상(인수 위험)")
             else:
-                is_unknown_senior_risk = True
-                reasons.append("대항력 있는 선순위 임차인 보증금 전액 인수 위험")
+                if tenant_deposit > 0:
+                    assumed = int(tenant_deposit)
+                    reasons.append(f"선순위 보증금 {assumed:,}원 인수")
+                else:
+                    is_unknown_senior_risk = True
+                    reasons.append("대항력 있는 선순위 임차인 보증금 전액 인수 위험")
 
     final_reason = " / ".join(reasons) if reasons else ("인수 보증금 없음" if assumed == 0 and not is_unknown_senior_risk else "권리 인수 주의")
     return assumed, is_unknown_senior_risk, final_reason
@@ -240,7 +259,28 @@ class MarketMatcher:
         matched_sgg_rent = []
         matched_sido_rent = []
 
-        is_villa_item = any(k in str(item.get("usage") or "") or k in loc for k in ["다세대", "빌라", "연립"])
+        usage_str = str(item.get("usage") or "").strip()
+        is_villa_item = any(k in usage_str or k in loc for k in ["다세대", "빌라", "연립"])
+        # 노유자복지시설, 복지시설, 종교시설, 공장, 창고 등 특수용도 시설 엄격 판별
+        FACILITY_CATEGORY_MAP = {
+            "노유자": ["노유자", "복지시설", "피더하우스", "실버타운", "요양원", "요양시설"],
+            "복지": ["노유자", "복지시설", "피더하우스", "실버타운", "요양원", "요양시설"],
+            "종교": ["종교시설", "교회", "사찰", "성당"],
+            "교회": ["종교시설", "교회", "사찰", "성당"],
+            "공장": ["공장", "제조장", "아파트형공장", "지식산업센터"],
+            "창고": ["물류창고", "전용창고", "창고용지"],
+            "위락": ["위락시설", "유흥"],
+            "숙박": ["숙박시설", "호텔", "모텔", "펜션", "게스트하우스"],
+            "주유소": ["주유소", "충전소"],
+            "목욕탕": ["목욕탕", "사우나", "스파"]
+        }
+        target_facility_kws = []
+        for cat, kws in FACILITY_CATEGORY_MAP.items():
+            if cat in usage_str or cat in loc:
+                target_facility_kws.extend(kws)
+        # 중복 제거
+        target_facility_kws = list(dict.fromkeys(target_facility_kws))
+        is_special_facility = bool(target_facility_kws)
 
         for n in self.naver_listings:
             n_area = float(n.get("area_m2") or 0.0)
@@ -248,6 +288,12 @@ class MarketMatcher:
                 continue
 
             n_realty = n.get("realty_type_cd") or ""
+            n_name = str(n.get("article_name") or "")
+            # 특수용도(노유자복지시설 등)인 경우 동종 비교군이 없으면 일반 상가(D02)/빌라 호가 매칭 원천 차단
+            if is_special_facility:
+                if not any(k in n_name for k in target_facility_kws):
+                    continue
+
             # 빌라인 경우 네이버 빌라(C02, C03, VL) 우선 매칭
             if is_villa_item:
                 if n_realty not in ("C02", "C03", "VL"):
@@ -310,7 +356,7 @@ class MarketMatcher:
             match_level = "동일시"
         else:
             chosen_sales = []
-            match_level = "매칭없음"
+            match_level = "동종 비교군 없음 (매칭차단)" if is_special_facility else "매칭없음"
 
         # 동일 층수(특히 1층 상가 vs 비1층 상가) 및 면적 유사도 순 정렬
         def _similarity_key(s: Dict[str, Any]):
@@ -321,9 +367,9 @@ class MarketMatcher:
 
         chosen_sales.sort(key=_similarity_key)
 
-        # 만약 ±40% 면적 필터 때문에 동일동/동일구 매칭이 비었다면, 면적 제한을 완화해 가장 비슷한 동일동/동일구 상가를 후보로 확보
+        # 만약 ±40% 면적 필터 때문에 동일동/동일구 매칭이 비었다면, 면적 제한을 완화해 가장 비슷한 동일동/동일구 상가를 후보로 확보 (특수시설/토지는 제외)
         fallback_Candidates = []
-        if not chosen_sales and not is_land:
+        if not chosen_sales and not is_land and not is_special_facility:
             for n in self.naver_listings:
                 if (n.get("trade_type_cd") == "A1" or n.get("trade_type") == "매매") and (n.get("price_sale_10k") or 0) > 0:
                     n_emd = str(n.get("addr_emd") or "")
@@ -334,7 +380,7 @@ class MarketMatcher:
 
         # 시세 단가 계산 (원/㎡)
         valid_sales = [s for s in chosen_sales if (s.get("price_sale_10k") or 0) > 0 and (s.get("area_m2") or 0) > 0]
-        display_sales = valid_sales if valid_sales else fallback_Candidates
+        display_sales = [] if is_special_facility else (valid_sales if valid_sales else fallback_Candidates)
         market_price = 0
         min_market_price = 0
         if valid_sales:
@@ -389,7 +435,7 @@ class MarketMatcher:
         rental_yield = 0.0
         area_pyeong = area_m2 / PYEONG if has_area else 0.0
         
-        if valid_rents and (market_price > 0 or appraisal > 0):
+        if valid_rents and (market_price > 0 or appraisal > 0) and not (is_special_facility and not valid_sales):
             avg_rpp = sum(r["monthly_rent_10k"] / r["area_pyeong"] for r in valid_rents) / len(valid_rents)
             avg_dep_10k = sum(r.get("deposit_10k") or 0 for r in valid_rents) / len(valid_rents)
             
@@ -405,7 +451,11 @@ class MarketMatcher:
         net_cost = min_bid + senior_deposit
 
         # 안전마진 계산 (실질 매수원가 = 최저가 + 인수금액 반영)
-        if is_unknown_senior_risk:
+        if is_special_facility and not valid_sales:
+            # 특수용도(노유자복지시설 등)는 동종 비교군이 없으면 임의 상가 호가 매칭 및 안전마진 산출 차단
+            safety_margin = 0
+            market_discount_pct = 0.0
+        elif is_unknown_senior_risk:
             # 🚨 보증금 미상의 대항력 있는 선순위 임차인이 있는 경우, 가짜 안전마진 생성 원천 차단
             safety_margin = 0
             market_discount_pct = 0.0
@@ -438,7 +488,7 @@ class MarketMatcher:
             "safety_margin": safety_margin,
             "market_discount_pct": market_discount_pct,
             "market_match_count": len(display_sales),
-            "market_match_level": match_level if len(display_sales) > 0 else "미매칭",
+            "market_match_level": match_level if (len(display_sales) > 0 or is_special_facility) else "미매칭",
             "senior_deposit_assumed": senior_deposit,
             "is_senior_risk": is_unknown_senior_risk or (senior_deposit > 0),
             "is_unknown_senior_risk": is_unknown_senior_risk,

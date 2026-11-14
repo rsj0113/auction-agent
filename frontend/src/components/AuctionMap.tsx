@@ -1376,6 +1376,33 @@ export default function AuctionMap({
                                 {selectedPinnedItem.usage}
                               </span>
                             )}
+                            {/* 특수권리 태그 배지 */}
+                            {(() => {
+                              try {
+                                let tags = selectedPinnedItem.special_rights ? JSON.parse(selectedPinnedItem.special_rights) : [];
+                                const isShareImplicit = (selectedPinnedItem.remarks && (selectedPinnedItem.remarks.includes("지분") || selectedPinnedItem.remarks.includes("1/2"))) ||
+                                                        (selectedPinnedItem.location && selectedPinnedItem.location.includes("지분")) ||
+                                                        (selectedPinnedItem.cltr_nm && selectedPinnedItem.cltr_nm.includes("지분"));
+                                if (isShareImplicit && !tags.some((t: any) => t.id === 'share')) {
+                                  tags.push({
+                                    id: "share",
+                                    name: "지분 매각",
+                                    short: "지분매각",
+                                    badge_color: "bg-purple-100 text-purple-700 border-purple-200",
+                                    risk_level: "MEDIUM",
+                                    icon: "ℹ️",
+                                    desc: "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다."
+                                  });
+                                }
+                                return tags.map((t: any) => (
+                                  <span key={t.id} className={`text-xs font-bold px-2 py-0.5 rounded-md border shrink-0 ${t.badge_color || 'bg-amber-100 text-amber-800 border-amber-200'}`} title={t.desc}>
+                                    {t.icon || '🏷️'} {t.short || t.name}
+                                  </span>
+                                ));
+                              } catch {
+                                return null;
+                              }
+                            })()}
                           </div>
                         </div>
 
