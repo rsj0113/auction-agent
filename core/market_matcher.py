@@ -23,6 +23,143 @@ from typing import Any, Dict, List, Optional, Tuple
 
 PYEONG = 3.3058
 
+# 물건 종류(주거용/상업용) 구분 키워드
+RESIDENTIAL_KEYWORDS = [
+    "아파트", "오피스텔", "다세대", "빌라", "연립", "맨션", "하이츠",
+    "단독주택", "다가구", "주거용", "도시형생활주택",
+]
+COMMERCIAL_KEYWORDS = [
+    "상가", "근린", "점포", "판매시설", "업무용", "사무실", "사무용",
+    "지식산업", "프라자", "플라자", "비즈타워", "오피스", "창고", "공장",
+]
+# 네이버 부동산 상가(상업용) realEstateType 코드
+COMMERCIAL_REALTY_CODES = ("D02", "D03", "D04", "E01", "Z00")
+
+
+def classify_property_type(usage: str = "", location: str = "") -> str:
+    """물건을 시세 비교군이 같은 유형끼리 묶기 위한 분류 (residential/commercial/mixed/unknown)
+
+    아파트·오피스텔·다세대 등 주거용 물건의 시세를 일반상가(D02) 호가와 비교하면
+    전혀 다른 상품을 비교하게 되어 안전마진이 수억 원 단위로 부풀려진다.
+    """
+    u = str(usage or "").strip()
+    loc = str(location or "").strip()
+
+    # 차량·선박 등 부동산이 아닌 물건은 시세 비교 대상이 아니다
+    if any(k in loc for k in ("차대번호", "차종", "자동차", "Mercedes", "BMW")) \
+            or any(k in u for k in ("차량", "자동차", "선박", "중기")):
+        return "car"
+
+    # 상가주택/근린주택은 1층 상가 + 주거 복합이므로 상업용 비교군을 허용
+    if any(k in u or k in loc for k in ("상가주택", "근린주택", "겸용주택")):
+        return "mixed"
+
+    # 단지내상가/상가동 등은 아파트 단지 안이어도 상업용
+    if any(k in loc for k in ("단지내상가", "단지상가", "상가동", "근린상가", "지하도상가", "지하상가")):
+        return "commercial"
+
+    # 1) 공적 용도(usage) 최우선
+    if u and not re.fullmatch(r"\d+", u):
+        if any(k in u for k in RESIDENTIAL_KEYWORDS) and "상가" not in u:
+            return "residential"
+        if any(k in u for k in COMMERCIAL_KEYWORDS):
+            return "commercial"
+        if any(k in u for k in ("토지", "대지", "임야", "전", "답")):
+            return "unknown"
+
+    # 2) 소재지 기반
+    if any(k in loc for k in ("상가", "근린생활", "근린시설", "점포")):
+        return "commercial"
+    if any(k in loc for k in RESIDENTIAL_KEYWORDS):
+        return "residential"
+    if any(k in loc for k in COMMERCIAL_KEYWORDS):
+        return "commercial"
+    return "unknown"
+
+
+def _is_commercial_listing(listing: Dict[str, Any]) -> bool:
+    """네이버 실매물이 상업용(상가 등)인지 여부"""
+    realty_cd = str(listing.get("realty_type_cd") or "")
+    if realty_cd in COMMERCIAL_REALTY_CODES:
+        return True
+    name = str(listing.get("article_name") or "")
+    return any(k in name for k in ("상가", "근린", "점포", "사무실", "오피스", "빌딩"))
+
+
+def _parse_share_ratio(text: str) -> Optional[float]:
+    """'2분의 1', '1/2 지분' 등의 표기에서 지분 비율(0~1)을 계산"""
+    if not text:
+        return None
+    # '2분의 1' → 1/2
+    for m in re.finditer(r"(\d+)\s*분의\s*(\d+)", text):
+        den, num = int(m.group(1)), int(m.group(2))
+        if den > 0 and 0 < num <= den:
+            return num / den
+    # '1/2 지분', '지분 1/2'
+    for m in re.finditer(r"(\d+)\s*/\s*(\d+)\s*지분", text):
+        num, den = int(m.group(1)), int(m.group(2))
+        if den > 0 and 0 < num <= den:
+            return num / den
+    for m in re.finditer(r"지분\s*(\d+)\s*/\s*(\d+)", text):
+        num, den = int(m.group(1)), int(m.group(2))
+        if den > 0 and 0 < num <= den:
+            return num / den
+    return None
+
+
+def detect_share_sale(item: Dict[str, Any]) -> Tuple[bool, Optional[float]]:
+    """지분매각 물건 여부와 지분 비율을 판별
+
+    Returns:
+        (is_share_sale, share_ratio)  # 비율을 특정할 수 없으면 None
+    """
+    texts: List[str] = []
+    for key in ("remarks", "location", "special_rights", "ai_verdict", "ai_report_json"):
+        val = item.get(key)
+        if not val:
+            continue
+        if isinstance(val, str):
+            texts.append(val)
+        else:
+            try:
+                texts.append(json.dumps(val, ensure_ascii=False))
+            except Exception:
+                texts.append(str(val))
+
+    ratio: Optional[float] = None
+
+    # 매각물건 목록(dspslStk...)의 지분 분자/분모가 가장 정확하다
+    objs = item.get("dspsl_objects") or item.get("dspsl_object_list")
+    if isinstance(objs, list):
+        for obj in objs:
+            if not isinstance(obj, dict):
+                continue
+            try:
+                nmrt = int(obj.get("dspslStkNmrtVal") or 0)
+                dnmn = int(obj.get("dspslStkDnmnVal") or 0)
+            except (TypeError, ValueError):
+                continue
+            if nmrt > 0 and dnmn > 0 and nmrt < dnmn:
+                ratio = nmrt / dnmn
+                break
+
+    text = " ".join(texts)
+
+    has_share_tag = re.search(r'"id"\s*:\s*"share"', text) is not None
+    has_share_phrase = re.search(
+        r"(지분\s*매각|지분매각|지분\s*경매|공유지분|지분\s*전부|지분\s*일부|"
+        r"\d+\s*분의\s*\d+|\d+\s*/\s*\d+\s*지분|지분\s*\d+\s*/\s*\d+)",
+        text,
+    ) is not None
+
+    is_share_sale = has_share_tag or has_share_phrase
+    if not is_share_sale:
+        return False, None
+
+    if ratio is None:
+        ratio = _parse_share_ratio(text)
+    return True, ratio
+
 
 def extract_assumed_deposit_info(item: Dict[str, Any]) -> Tuple[int, bool, str]:
     """
@@ -226,6 +363,11 @@ class MarketMatcher:
         appraisal = int(item.get("appraisal") or 0)
         item_floor = item.get("floor")
 
+        # 주거용(아파트·오피스텔·다세대)과 상업용(상가)은 시세 비교군이 다르다
+        property_category = classify_property_type(str(item.get("usage") or ""), str(item.get("location") or ""))
+        # 지분매각 물건: 시세는 '전체 물건' 기준이므로 지분 비율만큼 환산해야 한다
+        is_share_sale, share_ratio = detect_share_sale(item)
+
         adiv = str(item.get("legal_div_no") or "")
         aemd = str(item.get("addr_emd") or "")
         asgg = str(item.get("addr_sgg") or "")
@@ -294,6 +436,12 @@ class MarketMatcher:
                 if not any(k in n_name for k in target_facility_kws):
                     continue
 
+            # 주거용 물건에 상가(D02) 호가를 시세로 쓰는 오매칭 원천 차단 / 부동산 아닌 물건도 제외
+            if property_category in ("residential", "car") and _is_commercial_listing(n):
+                continue
+            if property_category == "car":
+                continue
+
             # 빌라인 경우 네이버 빌라(C02, C03, VL) 우선 매칭
             if is_villa_item:
                 if n_realty not in ("C02", "C03", "VL"):
@@ -356,7 +504,14 @@ class MarketMatcher:
             match_level = "동일시"
         else:
             chosen_sales = []
-            match_level = "동종 비교군 없음 (매칭차단)" if is_special_facility else "매칭없음"
+            if is_special_facility:
+                match_level = "동종 비교군 없음 (매칭차단)"
+            elif property_category == "residential":
+                match_level = "주거용 실매물 없음 (매칭차단)"
+            elif property_category == "car":
+                match_level = "부동산 아님 (매칭차단)"
+            else:
+                match_level = "매칭없음"
 
         # 동일 층수(특히 1층 상가 vs 비1층 상가) 및 면적 유사도 순 정렬
         def _similarity_key(s: Dict[str, Any]):
@@ -369,9 +524,12 @@ class MarketMatcher:
 
         # 만약 ±40% 면적 필터 때문에 동일동/동일구 매칭이 비었다면, 면적 제한을 완화해 가장 비슷한 동일동/동일구 상가를 후보로 확보 (특수시설/토지는 제외)
         fallback_Candidates = []
-        if not chosen_sales and not is_land and not is_special_facility:
+        if not chosen_sales and not is_land and not is_special_facility and property_category != "car":
             for n in self.naver_listings:
                 if (n.get("trade_type_cd") == "A1" or n.get("trade_type") == "매매") and (n.get("price_sale_10k") or 0) > 0:
+                    # 면적 필터를 완화하더라도 상품 종류(주거용/상업용)가 다르면 비교군에서 제외
+                    if property_category == "residential" and _is_commercial_listing(n):
+                        continue
                     n_emd = str(n.get("addr_emd") or "")
                     n_sgg = str(n.get("addr_sgg") or "")
                     if (aemd and n_emd == aemd) or (asgg and (n_sgg == asgg or asgg in n_sgg or n_sgg in asgg)):
@@ -383,6 +541,7 @@ class MarketMatcher:
         display_sales = [] if is_special_facility else (valid_sales if valid_sales else fallback_Candidates)
         market_price = 0
         min_market_price = 0
+        price_from_listings = False
         if valid_sales:
             prices_per_m2 = [s["price_sale_10k"] * 10000 / s["area_m2"] for s in valid_sales]
             avg_ppm2 = sum(prices_per_m2) / len(prices_per_m2)
@@ -391,18 +550,22 @@ class MarketMatcher:
             if has_area:
                 raw_mp = int(avg_ppm2 * area_m2)
                 raw_min_mp = int(min_ppm2 * area_m2)
+                price_from_listings = True
             elif appraisal > 0:
                 # 전용면적이 미상인 호실은 감정가 근처(0.6~1.8배) 실매물 평균 또는 감정가 기준 보정
                 near_sales = [s["price_sale_10k"] * 10000 for s in valid_sales if 0.5 * appraisal <= s["price_sale_10k"] * 10000 <= 1.8 * appraisal]
                 if near_sales:
                     raw_mp = int(sum(near_sales) / len(near_sales))
                     raw_min_mp = int(min(near_sales))
+                    price_from_listings = True
                 else:
                     raw_mp = appraisal
                     raw_min_mp = int(appraisal * 0.85)
+                    price_from_listings = False
             else:
                 raw_mp = int(sum(s["price_sale_10k"] * 10000 for s in valid_sales) / len(valid_sales))
                 raw_min_mp = int(min(s["price_sale_10k"] * 10000 for s in valid_sales))
+                price_from_listings = True
 
             # 이상치 가드: 감정가 대비 0.35배 ~ 2.5배 이내인 경우만 정상 시세로 채택 (단, 비교 매물 리스트인 display_sales는 유지)
             if appraisal > 0:
@@ -415,6 +578,16 @@ class MarketMatcher:
             else:
                 market_price = raw_mp
                 min_market_price = raw_min_mp
+
+        # 지분매각 물건은 전체 물건 시세를 지분 비율만큼 환산해야 실제 취득 대상과 비교가 된다
+        share_ratio_note = ""
+        if is_share_sale:
+            if share_ratio and 0 < share_ratio < 1 and market_price > 0 and price_from_listings:
+                market_price = int(market_price * share_ratio)
+                min_market_price = int(min_market_price * share_ratio)
+                share_ratio_note = f" · 지분 {share_ratio:.0%} 환산"
+                if len(display_sales) > 0 and match_level not in ("", None):
+                    match_level = f"{match_level}{share_ratio_note}"
 
         # 월세 매칭 우선순위 선정
         if not is_land and matched_emd_rent:
@@ -482,13 +655,19 @@ class MarketMatcher:
                 "detail_url": s.get("detail_url")
             })
 
+        if len(display_sales) == 0 and is_share_sale and not share_ratio_note:
+            match_level = f"{match_level} · 지분매각" if match_level and match_level != "미매칭" else "지분매각 (감정가 기준)"
+
         return {
             "market_price": market_price,
             "min_market_price": min_market_price,
             "safety_margin": safety_margin,
             "market_discount_pct": market_discount_pct,
             "market_match_count": len(display_sales),
-            "market_match_level": match_level if (len(display_sales) > 0 or is_special_facility) else "미매칭",
+            "market_match_level": match_level if (len(display_sales) > 0 or is_special_facility or property_category in ("residential", "car") or is_share_sale) else "미매칭",
+            "property_category": property_category,
+            "is_share_sale": is_share_sale,
+            "share_ratio": share_ratio,
             "senior_deposit_assumed": senior_deposit,
             "is_senior_risk": is_unknown_senior_risk or (senior_deposit > 0),
             "is_unknown_senior_risk": is_unknown_senior_risk,
@@ -508,9 +687,10 @@ class MarketMatcher:
             cursor = conn.cursor()
             
             items = cursor.execute("""
-                SELECT case_number, location, appraisal, min_bid, area_m2, floor,
+                SELECT case_number, location, usage, appraisal, min_bid, area_m2, floor,
                        legal_div_no, addr_sgg, addr_emd, tenant_deposit,
-                       is_payout_requested, ai_verdict, ai_report_json, remarks, rights_list
+                       is_payout_requested, ai_verdict, ai_report_json, remarks, rights_list,
+                       special_rights
                 FROM auction_items
             """).fetchall()
             

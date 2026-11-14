@@ -127,6 +127,9 @@ interface AuctionItem {
   is_unknown_senior_risk?: boolean;
   senior_risk_reason?: string;
   net_cost?: number;
+  property_category?: string;
+  is_share_sale?: boolean;
+  share_ratio?: number;
 }
 
 interface NaverListing {
@@ -181,6 +184,8 @@ function getPropertyType(location: string, usage?: string): string {
   if (u && !/^\d+$/.test(u) && u !== "기타") {
     if (u.includes("아파트")) return "🏢 아파트";
     if (u.includes("오피스텔")) return "🏬 오피스텔";
+    // 노유자·복지시설은 일반 빌라/다세대로 떨어뜨리지 않는다 (경매에서 별도 비교군·규제 적용)
+    if (u.includes("노유자") || u.includes("복지시설") || u.includes("요양") || u.includes("실버")) return "🏥 노유자/복지시설";
     if (u.includes("다세대") || u.includes("빌라") || u.includes("연립")) return "🏘️ 빌라/다세대";
     if (u.includes("상가주택") || u.includes("근린주택")) return "🏪🏠 상가주택";
     if (u.includes("주거용") || u.includes("주택") || u.includes("단독") || u.includes("다가구") || u.includes("도시형")) return "🏠 주택";
@@ -198,6 +203,7 @@ function getPropertyType(location: string, usage?: string): string {
 
   // 3. 소재지(location) 기반 주거용 판별
   if (loc.includes("상가주택")) return "🏪🏠 상가주택";
+  if (loc.includes("노유자") || loc.includes("복지시설") || loc.includes("요양원") || loc.includes("실버타운") || loc.includes("피더하우스")) return "🏥 노유자/복지시설";
   if (loc.includes("아파트") && !loc.includes("상가") && !loc.includes("점포")) return "🏢 아파트";
   if (loc.includes("오피스텔") && !loc.includes("상가") && !loc.includes("점포")) return "🏬 오피스텔";
   if (
@@ -1019,7 +1025,9 @@ export default function Home() {
                       item.rights_list,
                       item.tenant_registration_date,
                       item.tenant_deposit,
-                      item.is_payout_requested
+                      item.is_payout_requested,
+                      undefined,
+                      item.senior_deposit_assumed
                     );
                     return (
                       <span className={`px-2 py-0.5 text-xs font-semibold rounded-lg border shrink-0 ${analysis.statusBadge.color}`}>
@@ -1602,6 +1610,11 @@ export default function Home() {
                             ? `${selectedDetail.market_match_level} 평균 호가` 
                             : '감정가 추정'}
                         </span>
+                        {selectedDetail.is_share_sale && (
+                          <span className="inline-block mt-1 text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded px-1.5 py-0.5">
+                            ℹ️ 지분{selectedDetail.share_ratio ? ` ${Math.round(selectedDetail.share_ratio * 100)}%` : "매각"} 기준
+                          </span>
+                        )}
                       </div>
 
                       <div className="bg-amber-50/70 p-2.5 rounded-xl border border-amber-100">
@@ -1643,6 +1656,8 @@ export default function Home() {
                             ? '인수위험 (0원)'
                             : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
                             ? `+${formatMoney(selectedDetail.safety_margin)}`
+                            : selectedDetail.failed_count && selectedDetail.failed_count > 0
+                            ? `0원 (유찰 ${selectedDetail.failed_count}회)`
                             : '0원 (신건 1회차)'}
                         </span>
                         <span className={`text-[10px] font-bold block mt-0.5 ${
@@ -1656,6 +1671,8 @@ export default function Home() {
                             ? '보증금 인수 리스크'
                             : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
                             ? `${selectedDetail.market_discount_pct}% 저렴`
+                            : selectedDetail.failed_count && selectedDetail.failed_count > 0
+                            ? '유찰로 낙찰가 하락 시 마진 발생'
                             : '유찰 시 마진 발생'}
                         </span>
                       </div>
@@ -1732,7 +1749,8 @@ export default function Home() {
                       selectedDetail.tenant_registration_date,
                       selectedDetail.tenant_deposit,
                       selectedDetail.is_payout_requested,
-                      aiReport?.tenants
+                      aiReport?.tenants,
+                      selectedDetail.senior_deposit_assumed
                     );
                     const malso = analysis.malsoStandard;
 
@@ -1900,8 +1918,8 @@ export default function Home() {
                       <InvestmentCalculator
                         appraisal={selectedDetail.appraisal}
                         minBid={selectedDetail.min_bid}
-                        seniorDeposit={analysis.seniorDeposit}
-                        isHouse={!getPropertyType(selectedDetail.location, (selectedDetail as any).usage).includes("상가") && !getPropertyType(selectedDetail.location, (selectedDetail as any).usage).includes("토지")}
+                        seniorDeposit={Math.max(analysis.seniorDeposit || 0, selectedDetail.senior_deposit_assumed || 0)}
+                        isHouse={!["상가", "토지", "노유자"].some((t) => getPropertyType(selectedDetail.location, (selectedDetail as any).usage).includes(t))}
                         location={selectedDetail.location}
                       />
                     </>
