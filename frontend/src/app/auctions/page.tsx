@@ -245,6 +245,7 @@ export interface AuctionResultItem {
   ai_suggested_bid?: string;
   ai_report_json?: string;
   special_rights?: string;
+  remarks?: string;
   market_price?: number;
   safety_margin?: number;
   market_discount_pct?: number;

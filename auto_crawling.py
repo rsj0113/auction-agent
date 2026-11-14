@@ -334,6 +334,51 @@ class RightsAnalysisEngine:
         }
 
 
+def _infer_usage(loc: str, cur_usage: str = "", flr: int = 0) -> str:
+    if cur_usage and cur_usage.strip() not in ("", "기타") and not cur_usage.strip().isdigit():
+        return cur_usage.strip()
+    loc_s = loc or ""
+    if any(k in loc_s for k in ["Mercedes-Benz", "BMW", "차대번호", "차종 :", "연식 :"]):
+        return "차량/기타"
+
+    # 0. 특수 복지/노유자 시설
+    if any(k in loc_s or k in cur_usage for k in ["노유자", "복지시설", "요양시설", "사회복지", "어린이집", "유치원", "노인복지", "피더하우스"]):
+        return "노유자복지시설"
+
+    # 1. 단지내 상가 / 상가동
+    if any(k in loc_s for k in ["단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장"]):
+        return "상가/근린시설"
+
+    # 2. 명확한 주거용 우선 검사 (상가 오분류 방지)
+    apt_kw = ["아파트", "푸르지오", "자이", "래미안", "힐스테이트", "아이파크", "더샵", "롯데캐슬", "이편한세상", "e편한세상", "아크로", "데시앙", "센트레빌", "스카이뷰", "위브", "해링턴", "꿈에그린", "포레나", "호반베르디움", "베르디움", "우미린", "중흥에스클래스", "주공", "현대", "우성", "삼성", "한양", "벽산", "동아", "대림", "대우", "쌍용", "삼익", "선경", "한신", "극동", "경남", "동부", "금호", "코오롱", "신동아", "성원", "건영", "풍림", "삼환", "두산", "엘지", "청구", "미도", "진주", "시영", "그랑빌", "파크뷰", "리버파크", "트리지움", "엘스", "리센츠", "헬리오시티", "파크리오"]
+    if any(k in loc_s for k in apt_kw) and not any(k in loc_s for k in ["상가", "점포"]):
+        return "아파트"
+
+    offi_kw = ["오피스텔", "아트리움", "리버빌", "스테이트", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크"]
+    if any(k in loc_s for k in offi_kw) and not any(k in loc_s for k in ["상가", "점포"]):
+        return "오피스텔"
+
+    villa_kw = ["빌라", "다세대", "연립", "맨션", "하이츠", "빌리지", "타운", "주택", "하우스", "캐슬빌", "아트빌", "그린빌", "스카이빌", "드림빌", "청구빌", "현대빌", "삼성빌", "토브하우스"]
+    if any(k in loc_s for k in villa_kw) and not any(k in loc_s for k in ["상가", "점포", "피더하우스", "노유자", "복지"]):
+        return "다세대/빌라"
+
+    # 3. 명확한 상업용 시설 검사
+    comm_kw = ["상가", "근린", "지식산업", "프라자", "플라자", "에이스하이테크", "테크노", "비즈타워", "몰", "마켓", "스퀘어", "아케이드", "에스케이브이", "sk v1", "점포", "판매시설"]
+    if any(k in loc_s for k in comm_kw):
+        return "상가/근린시설"
+
+    dong_m = re.search(r"([1-9]\d{2,3})동", loc_s)
+    if dong_m and not any(k in loc_s for k in villa_kw):
+        return "아파트"
+    if flr >= 7 and "호" in loc_s:
+        return "아파트"
+    if "층" in loc_s and "호" in loc_s:
+        return "다세대/빌라"
+    if "임야" in loc_s or re.search(r"\b산\s*\d+", loc_s) or ("층" not in loc_s and "호" not in loc_s and re.search(r"\d+(-\d+)?$", loc_s.strip())):
+        return "토지/대지"
+    return "기타"
+
+
 # --- Module 2: Real Data Auction Crawler (Playwright with Advanced Navigation Flow) ---
 class AuctionCrawler:
     def __init__(self, headless: bool = True):
@@ -414,6 +459,10 @@ class AuctionCrawler:
         try:
             dma = (raw.get('data') or {}).get('dma_result') or {}
             gds = dma.get('dspslGdsDxdyInfo') or {}
+            if not gds:
+                dts_lst = dma.get('dspslGdsDtsLst') or []
+                if dts_lst and isinstance(dts_lst[0], dict):
+                    gds = dts_lst[0]
             auction_date = gds.get('dspslDxdyYmd') or ""
 
             # ── 비고란 및 매각조건 수집 (매각물건명세서 비고) ──
@@ -735,6 +784,8 @@ class AuctionCrawler:
         except Exception:
             pass
 
+        area_pyeong = round(area_m2 / 3.305785, 1) if area_m2 > 0 else 0.0
+
         # 임차인 목록 상세 비고란 통합
         if tenants_list:
             t_lines = []
@@ -749,7 +800,9 @@ class AuctionCrawler:
         # 비고란/을구 텍스트 기반 임차보증금 폴백 (임차권등기 보증금 누락 방어)
         if tenant_deposit == 0:
             all_text_search = f"{hyp_text} {remarks}"
-            m_dep = re.search(r'(?:보증금|임차보증금)[^\d]{0,10}(\d+(?:\.\d+)?억(?:\s*\d+만)?|\d+만|\d{1,3}(?:,\d{3})+)', all_text_search)
+            m_dep = re.search(r'(?:보증금|임차보증금)[^\d]{0,15}(\d+(?:\.\d+)?억(?:\s*\d+만)?|\d+만|\d{1,3}(?:,\d{3})+)\s*원?', all_text_search)
+            if not m_dep:
+                m_dep = re.search(r'(?:주택임차권등기|상가임차권등기|임차권등기|주택임차권|상가임차권|임차권)[^\n()]{0,35}\([^\d]{0,10}(\d+(?:\.\d+)?억(?:\s*\d+만)?|\d+만|\d{1,3}(?:,\d{3})+)\s*원?\)', all_text_search)
             if m_dep:
                 amt_str = m_dep.group(1)
                 val = 0
