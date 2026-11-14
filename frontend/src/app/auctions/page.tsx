@@ -175,6 +175,9 @@ interface AuctionItem {
   is_unknown_senior_risk?: boolean;
   senior_risk_reason?: string;
   net_cost?: number;
+  property_category?: string;
+  is_share_sale?: boolean;
+  share_ratio?: number;
   villa_trade_info?: VillaTradeInfo;
   post_auction_analysis?: PostAuctionAnalysis;
 }
@@ -351,6 +354,64 @@ export interface SeniorDepositAnalysis {
 }
 
 export function analyzeSeniorDeposit(
+  rightsListJson?: string,
+  tenantDate?: string,
+  deposit?: number,
+  isPayoutRequested?: number,
+  tenants?: any[],
+  assumedDeposit?: number
+): SeniorDepositAnalysis {
+  const core = analyzeSeniorDepositCore(rightsListJson, tenantDate, deposit, isPayoutRequested, tenants);
+
+  /**
+   * 보완 로직: 현황조사서(aiReport.tenants)에 전입일/보증금이 없거나 모두 후순위로 잡혔더라도,
+   * 매각물건명세서 비고·을구 권리(주택임차권등기 등)를 근거로 산출된 인수 보증금이 있으면
+   * '낙찰자 인수 예상 보증금 0원 / SAFE'로 표시하지 않고 그 금액을 인수액으로 되살린다.
+   */
+  const numericAssumed = typeof assumedDeposit === 'number' && Number.isFinite(assumedDeposit) ? Math.max(0, assumedDeposit) : 0;
+  const dep = deposit || 0;
+  const fallbackAmount = numericAssumed > 0 ? numericAssumed : (assumedDeposit === undefined ? dep : 0);
+
+  if (fallbackAmount <= 0 || core.seniorDeposit > 0) {
+    return core;
+  }
+
+  const malso = core.malsoStandard;
+  const payout = !!isPayoutRequested;
+  const amountText = formatMoney(fallbackAmount);
+
+  if (payout) {
+    return {
+      ...core,
+      hasTenant: true,
+      isSenior: true,
+      seniorDeposit: fallbackAmount,
+      seniorCount: Math.max(core.seniorCount, 1),
+      seniorNoPayoutDeposit: 0,
+      seniorPayoutDeposit: fallbackAmount,
+      statusBadge: { text: `선순위(배당): ${formatMoneyShort(fallbackAmount)}`, color: 'bg-amber-100 text-amber-800 border-amber-300 font-bold' },
+      depositText: `최대 ${amountText} (배당 후 잔여액 인수)`,
+      summaryText: `등기·매각물건명세서상 선순위 임차보증금 ${amountText}이 확인됩니다. 배당요구가 되어 낙찰대금에서 우선 배당되나, 낙찰가 부족 시 잔여 보증금은 낙찰자가 인수합니다.`,
+      riskLevel: 'WARNING'
+    };
+  }
+
+  return {
+    ...core,
+    hasTenant: true,
+    isSenior: true,
+    seniorDeposit: fallbackAmount,
+    seniorCount: Math.max(core.seniorCount, 1),
+    seniorNoPayoutDeposit: fallbackAmount,
+    seniorPayoutDeposit: 0,
+    statusBadge: { text: `🚨 선순위 (${formatMoneyShort(fallbackAmount)})`, color: 'bg-red-100 text-red-800 border-red-300 font-bold' },
+    depositText: `${amountText} 전액 인수`,
+    summaryText: `현황조사서상 전입일은 확인되지 않지만, 매각물건명세서 비고·을구 권리(주택임차권등기 등)상 선순위 보증금 ${amountText}의 매수인 인수 조건이 확인됩니다${malso ? ` (말소기준권리: ${malso.name} ${malso.date})` : ''}. 낙찰가와 별도로 이 금액을 전액 부담해야 하므로 입찰가 산정 시 반드시 반영하십시오.`,
+    riskLevel: 'CRITICAL'
+  };
+}
+
+function analyzeSeniorDepositCore(
   rightsListJson?: string,
   tenantDate?: string,
   deposit?: number,
@@ -606,6 +667,8 @@ function getPropertyType(location: string, usage?: string): string {
   if (u && !/^\d+$/.test(u) && u !== "기타") {
     if (u.includes("아파트")) return "🏢 아파트";
     if (u.includes("오피스텔")) return "🏬 오피스텔";
+    // 노유자·복지시설은 일반 빌라/다세대로 떨어뜨리지 않는다 (경매에서 별도 비교군·규제 적용)
+    if (u.includes("노유자") || u.includes("복지시설") || u.includes("요양") || u.includes("실버")) return "🏥 노유자/복지시설";
     if (u.includes("다세대") || u.includes("빌라") || u.includes("연립")) return "🏘️ 빌라/다세대";
     if (u.includes("상가주택") || u.includes("근린주택")) return "🏪🏠 상가주택";
     if (u.includes("주거용") || u.includes("주택") || u.includes("단독") || u.includes("다가구") || u.includes("도시형")) return "🏠 주택";
@@ -623,6 +686,7 @@ function getPropertyType(location: string, usage?: string): string {
 
   // 3. 소재지(location) 기반 주거용 판별
   if (loc.includes("상가주택")) return "🏪🏠 상가주택";
+  if (loc.includes("노유자") || loc.includes("복지시설") || loc.includes("요양원") || loc.includes("실버타운") || loc.includes("피더하우스")) return "🏥 노유자/복지시설";
   if (loc.includes("아파트") && !loc.includes("상가") && !loc.includes("점포")) return "🏢 아파트";
   if (loc.includes("오피스텔") && !loc.includes("상가") && !loc.includes("점포")) return "🏬 오피스텔";
   if (
@@ -1914,7 +1978,9 @@ export default function AuctionsPage() {
                       item.rights_list,
                       item.tenant_registration_date,
                       item.tenant_deposit,
-                      item.is_payout_requested
+                      item.is_payout_requested,
+                      undefined,
+                      item.senior_deposit_assumed
                     );
                     return (
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-md border shrink-0 ${analysis.statusBadge.color}`}>
@@ -3282,6 +3348,11 @@ export default function AuctionsPage() {
                             ? `${selectedDetail.market_match_level} 평균 호가` 
                             : '감정가 추정'}
                         </span>
+                        {selectedDetail.is_share_sale && (
+                          <span className="inline-block mt-1 text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded px-1.5 py-0.5">
+                            ℹ️ 지분{selectedDetail.share_ratio ? ` ${Math.round(selectedDetail.share_ratio * 100)}%` : "매각"} 기준
+                          </span>
+                        )}
                       </div>
 
                       <div className="bg-amber-50/70 p-2.5 rounded-xl border border-amber-100">
@@ -3323,6 +3394,8 @@ export default function AuctionsPage() {
                             ? '인수위험 (0원)'
                             : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
                             ? `+${formatMoney(selectedDetail.safety_margin)}`
+                            : selectedDetail.failed_count && selectedDetail.failed_count > 0
+                            ? `0원 (유찰 ${selectedDetail.failed_count}회)`
                             : '0원 (신건 1회차)'}
                         </span>
                         <span className={`text-[10px] font-bold block mt-0.5 ${
@@ -3336,6 +3409,8 @@ export default function AuctionsPage() {
                             ? '보증금 인수 리스크'
                             : selectedDetail.safety_margin && selectedDetail.safety_margin > 0
                             ? `${selectedDetail.market_discount_pct}% 저렴`
+                            : selectedDetail.failed_count && selectedDetail.failed_count > 0
+                            ? '유찰로 낙찰가 하락 시 마진 발생'
                             : '유찰 시 마진 발생'}
                         </span>
                       </div>
@@ -3532,7 +3607,8 @@ export default function AuctionsPage() {
                       selectedDetail.tenant_registration_date,
                       selectedDetail.tenant_deposit,
                       selectedDetail.is_payout_requested,
-                      aiReport?.tenants
+                      aiReport?.tenants,
+                      selectedDetail.senior_deposit_assumed
                     );
                     const malso = analysis.malsoStandard;
 
@@ -3700,8 +3776,8 @@ export default function AuctionsPage() {
                       <InvestmentCalculator
                         appraisal={selectedDetail.appraisal}
                         minBid={selectedDetail.min_bid}
-                        seniorDeposit={analysis.seniorDeposit}
-                        isHouse={!getPropertyType(selectedDetail.location, (selectedDetail as any).usage).includes("상가") && !getPropertyType(selectedDetail.location, (selectedDetail as any).usage).includes("토지")}
+                        seniorDeposit={Math.max(analysis.seniorDeposit || 0, selectedDetail.senior_deposit_assumed || 0)}
+                        isHouse={!["상가", "토지", "노유자"].some((t) => getPropertyType(selectedDetail.location, (selectedDetail as any).usage).includes(t))}
                         location={selectedDetail.location}
                       />
                     </>
