@@ -35,10 +35,12 @@ for region in "서울" "경기"; do
     done
 done
 
-# 상가(0203): 법원당 최대 50개씩 수집 (기존 9999개 무제한 호출로 인한 토큰/시간 과소모 방지)
+# 상가(0203): 법원당 최대 200개씩 수집
+# 성남지원처럼 진행 중인 상가 물건이 150건을 넘는 법원에서 12월 기일 물건(예: 대장동 클라우드베이6 2025타경52448)이
+# 기존 50개 한도에 잘리던 문제를 해결. 무제한(9999) 호출은 토큰/시간 과소모가 커서 200개로 상한을 둔다.
 for region in "서울" "경기"; do
-    echo "[$region] 상가(0203) 수집 (최대 50개) - $(date '+%H:%M:%S')" >> "$LOG"
-    $PYTHON auto_crawling.py --region "$region" --property-type "0203" --max-items 50 >> "$LOG" 2>&1
+    echo "[$region] 상가(0203) 수집 (최대 200개) - $(date '+%H:%M:%S')" >> "$LOG"
+    $PYTHON auto_crawling.py --region "$region" --property-type "0203" --max-items 200 >> "$LOG" 2>&1
 done
 
 # 네이버 부동산 상가 실매물(D02/D04) 정기 수집 및 시세 매칭 업데이트
