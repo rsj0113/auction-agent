@@ -32,8 +32,10 @@ export interface FeedItem {
   safety_grade: SafetyGrade;
   gap_amount: number;
   gap_amount_str: string;
+  gap_short_str?: string;
   ref_price_name: string;
   summary_bullets: string[];
+  card_tags?: string[];
   min_bid: number;
   min_bid_str: string;
   appraisal: number;

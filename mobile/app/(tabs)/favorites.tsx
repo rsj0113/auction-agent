@@ -89,7 +89,7 @@ export default function FavoritesScreen() {
             <Text style={{ fontSize: 48, marginBottom: 16 }}>⭐</Text>
             <Text style={styles.emptyTitle}>아직 찜한 매물이 없습니다</Text>
             <Text style={styles.emptySub}>
-              ‘오늘의 줍줍’ 피드에서 마음에 드는 매물에 별표(☆)를 눌러보세요.
+              ‘경매 떠먹기’ 화면에서 마음에 드는 매물에 별표(☆)를 눌러보세요.
             </Text>
           </View>
         }

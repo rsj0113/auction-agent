@@ -28,12 +28,11 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '오늘의 줍줍',
+          title: '경매 떠먹기',
+          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20 }}>🏠</Text>
+            <Text style={{ fontSize: 20 }}>🥄</Text>
           ),
-          headerTitle: '이지경매 ✨ 오늘의 줍줍',
-          headerTitleStyle: { fontSize: 18, fontWeight: '800', color: '#111827' },
         }}
       />
       <Tabs.Screen
@@ -43,7 +42,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 20 }}>⭐</Text>
           ),
-          headerTitle: '찜한 알짜 매물',
+          headerTitle: '이지경매 · 관심 매물',
           headerTitleStyle: { fontSize: 18, fontWeight: '800', color: '#111827' },
         }}
       />

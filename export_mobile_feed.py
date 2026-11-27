@@ -36,6 +36,17 @@ def format_krw(val: int) -> str:
     else:
         return f"{man:,}만원"
 
+def format_krw_short(val: int) -> str:
+    """스레드/카드뉴스용 짧은 금액 표기 (예: '2.1억', '4,300만')"""
+    if not val or val <= 0:
+        return "0원"
+    if val >= 100_000_000:
+        eok_float = val / 100_000_000
+        s = f"{eok_float:.1f}억"
+        return s.replace(".0억", "억")
+    man = val // 10_000
+    return f"{man:,}만"
+
 def calculate_d_day(auction_date_str: str) -> str:
     """auction_date (YYYYMMDD or YYYY-MM-DD)를 파싱해 D-Day 계산"""
     if not auction_date_str:
@@ -61,10 +72,10 @@ def calculate_d_day(auction_date_str: str) -> str:
 
 def determine_safety(row: dict) -> tuple[str, str]:
     """
-    초보자를 위한 신호등 등급(GREEN/YELLOW/RED) 및 권리 요약 문구 산출
-    - GREEN: 말소기준 이하 전부 소멸, 인수 보증금 0원, 특수권리 없음
-    - YELLOW: 임차인 배당요구 여부 확인 필요, 선순위 전세권 등 조사 필요
-    - RED: 대항력 있는 미배당 임차인, 유치권/법정지상권 등 인수 위험 권리
+    초보자를 위한 신호등 등급(GREEN/YELLOW/RED) 및 스레드식 직관 권리 요약 산출
+    - GREEN: 임차인/특수권리 없이 추가 인수금 0원
+    - YELLOW: 임차인 배당요구 완료 또는 사전 체크 권장
+    - RED: 선순위 임차인 보증금 인수 위험 또는 유치권·지분 등 특수조건
     """
     special = (row.get("special_rights") or "").strip()
     tenant_dep = row.get("tenant_deposit") or 0
@@ -78,24 +89,24 @@ def determine_safety(row: dict) -> tuple[str, str]:
     has_danger = any(k in special or k in remarks for k in danger_keywords)
 
     if has_danger:
-        return "RED", "⚠️ 인수 권리 주의 (유치권·지분 등 현장 조사 필수)"
+        return "RED", "유치권·지분 등 특수조건 있음 · 확인 필수"
 
     # 임차인 검사
     if tenant_dep > 0:
         if payout_req == 1 and ai_grade in ("S", "A"):
-            return "YELLOW", f"보증금 {format_krw(tenant_dep)} 전액 배당 예상 (배당요구 완료)"
+            return "YELLOW", f"세입자 있지만 배당요구 완료 · 인수 위험 낮음"
         else:
-            return "RED", f"선순위 임차인 보증금 {format_krw(tenant_dep)} 인수 위험 확인 필요"
+            return "RED", f"선순위 보증금 {format_krw_short(tenant_dep)}원 인수 가능성 체크"
     elif payout_req == 1:
-        return "YELLOW", "임차인 배당요구 접수됨 (권리신고 내역 확인 권장)"
+        return "YELLOW", "세입자 배당요구 접수 · 권리내역 한 번 더 확인"
     
     # AI 등급 기반
     if ai_grade in ("S", "A") or "안전" in ai_verdict or "소멸" in ai_verdict:
-        return "GREEN", "떠안는 권리 0원 · 말소기준권리 이하 모두 깨끗이 소멸"
+        return "GREEN", "임차인 0명 · 추가 인수금 0원"
     elif ai_grade == "B":
-        return "YELLOW", "선순위 권리 및 관리비 체납 여부 사전 열람 권장"
+        return "YELLOW", "입찰 전 세입자·미납 관리비만 확인하면 OK"
     else:
-        return "YELLOW", "입찰 전 매각물건명세서 상세 확인 요망"
+        return "YELLOW", "입찰 전 매각조건·현황 한 번 더 체크"
 
 def generate_feed(limit: int = 100) -> list[dict]:
     if not os.path.exists(DB_PATH):
@@ -168,35 +179,61 @@ def generate_feed(limit: int = 100) -> list[dict]:
         if market_price > min_bid:
             gap = market_price - min_bid
             ref_name = "최근 실거래가"
+            ref_short = "시세"
+            ref_val = market_price
         else:
             gap = max(0, appraisal - min_bid)
             ref_name = "감정가"
+            ref_short = "감정가"
+            ref_val = appraisal
 
         gap_str = format_krw(gap)
+        gap_short = format_krw_short(gap)
+        min_short = format_krw_short(min_bid)
         discount_pct = round((1 - min_bid / appraisal) * 100) if appraisal > 0 else 0
 
         # 신호등 등급 및 권리 한줄 요약
         safety_grade, right_summary = determine_safety(row)
 
-        # 후킹 한 줄 헤드라인
-        if gap >= 50_000_000:
-            headline = f"{short_loc} {pyeong_str}{usage_label}, {ref_name}보다 {gap_str} 쌈"
-        elif discount_pct >= 30:
-            headline = f"{short_loc} {pyeong_str}{usage_label}, {discount_pct}% 반값 유찰 줍줍"
-        else:
-            headline = f"{short_loc} {pyeong_str}{usage_label}, {format_krw(min_bid)}대 알짜 경매"
+        # 스레드식 후킹 동네명 (동/읍/면 우선, 없으면 시군구)
+        hook_loc = emd.strip() if emd and emd.strip() else short_loc
+        pyeong_short = f"{int(round(pyeong))}평 " if pyeong > 0 else ""
 
-        # 핵심 요약 3줄 (초보자용 불릿)
-        bullet_right = f"🛡️ {right_summary}"
-        
-        if ref_name == "최근 실거래가":
-            bullet_price = f"💰 주변 실거래({format_krw(market_price)}) 대비 {gap_str} 저렴 ({discount_pct}% 할인)"
+        # 스레드식 후킹 한 줄 헤드라인 (사건번호/딱딱한 용어 배제, 클릭 유도 카피)
+        if discount_pct >= 45:
+            headline = f"{hook_loc} {usage_label}가 반값? {ref_short}보다 {gap_short} 싼 이유"
+        elif safety_grade == "GREEN" and gap >= 80_000_000:
+            headline = f"{hook_loc} {pyeong_short}{usage_label}, {ref_short}보다 {gap_short} 싼데 인수금 0원"
+        elif safety_grade == "RED" and discount_pct >= 30:
+            headline = f"{hook_loc} {usage_label} -{discount_pct}% 급락! 싸게 나온 진짜 이유"
+        elif gap >= 100_000_000:
+            headline = f"{hook_loc} {pyeong_short}{usage_label}, 지금 {min_short}에 나왔다 ({gap_short} 할인)"
+        elif discount_pct >= 30:
+            headline = f"{discount_pct}% 떨어진 {hook_loc} {usage_label}, {min_short}대 노려볼까?"
+        elif safety_grade == "GREEN":
+            headline = f"임차인 0명 · {hook_loc} {usage_label}, {min_short}에 깔끔하게 시작"
         else:
-            bullet_price = f"💰 감정가({format_krw(appraisal)}) 대비 {discount_pct}% 유찰 ({gap_str} 할인)"
+            headline = f"{hook_loc} {pyeong_short}{usage_label}, {ref_short}보다 {gap_short} 저렴하게"
+
+        # 핵심 요약 3줄 (스레드식 직관 카피)
+        right_icon = "✅" if safety_grade == "GREEN" else ("🔎" if safety_grade == "YELLOW" else "🚨")
+        bullet_right = f"{right_icon} {right_summary}"
+        bullet_price = f"💸 {ref_short}({format_krw_short(ref_val)})보다 {gap_short} 저렴 (-{discount_pct}%)"
         
         deposit_req = int(min_bid * 0.1) # 입찰 보증금 10%
         d_day_str = calculate_d_day(auction_date_str)
-        bullet_cash = f"💵 입찰 준비금(10%) {format_krw(deposit_req)} 필요 · {d_day_str}"
+        bullet_cash = f"🪙 입찰 보증금 {format_krw(deposit_req)} 준비 · {d_day_str}"
+
+        # 카드형 심플 UI용 핵심 배지 3개
+        safety_tag = (
+            "추가 인수금 0원" if safety_grade == "GREEN"
+            else ("세입자·관리비 확인" if safety_grade == "YELLOW" else "특수조건 확인 필수")
+        )
+        card_tags = [
+            safety_tag,
+            f"📍 {short_loc}",
+            f"보증금 {format_krw_short(deposit_req)}",
+        ]
 
         # 썸네일 이미지 링크: DB의 실제 물건 사진(photo_url) 최우선 반영
         lat = row.get("lat")
@@ -268,12 +305,14 @@ def generate_feed(limit: int = 100) -> list[dict]:
             "safety_grade": safety_grade,
             "gap_amount": gap,
             "gap_amount_str": gap_str,
+            "gap_short_str": gap_short,
             "ref_price_name": ref_name,
             "summary_bullets": [
                 bullet_right,
                 bullet_price,
                 bullet_cash
             ],
+            "card_tags": card_tags,
             "min_bid": min_bid,
             "min_bid_str": format_krw(min_bid),
             "appraisal": appraisal,
