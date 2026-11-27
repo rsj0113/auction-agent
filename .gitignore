@@ -32,4 +32,6 @@ mobile/.expo/
 agent_inbox/hermes/done/
 agent_inbox/aider/done/
 .vercel
+mobile/.vercel/
+mobile/dist/
 attachments/
