@@ -82,7 +82,7 @@ export default function FavoritesScreen() {
             <Text style={styles.headerCount}>
               총 <Text style={{ color: '#2563eb', fontWeight: '800' }}>{favorites.length}건</Text>의 찜한 매물
             </Text>
-          ) : null
+          ) : undefined
         }
         ListEmptyComponent={
           <View style={styles.emptyBox}>

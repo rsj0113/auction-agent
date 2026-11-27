@@ -22,6 +22,9 @@ logs/.hermes_cursor
 # Node modules
 node_modules/
 mobile/node_modules/
+node_modules.bak/
+mobile/node_modules.bak/
+mobile/package-lock.json.bak
 .expo/
 mobile/.expo/
 
