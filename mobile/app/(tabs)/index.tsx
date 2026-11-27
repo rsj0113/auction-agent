@@ -48,6 +48,26 @@ type FilterType =
   | 'gyeonggi';
 type UsageFilterType = 'all' | '아파트' | '빌라' | '오피스텔' | '상가' | '토지';
 type ViewMode = 'list' | 'card' | 'map';
+type InfoModalType = 'notice' | 'guide' | null;
+
+interface WeatherState {
+  temp: number;
+  icon: string;
+}
+
+const OPEN_METEO_SEOUL_URL =
+  'https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current=temperature_2m,weather_code&timezone=Asia/Seoul';
+
+function mapWeatherCodeToIcon(code: number): string {
+  if (code === 0) return '☀️';
+  if (code === 1 || code === 2) return '🌤️';
+  if (code === 3) return '☁️';
+  if (code === 45 || code === 48) return '🌫️';
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return '🌧️';
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return '❄️';
+  if (code >= 95 && code <= 99) return '⛈️';
+  return '🌤️';
+}
 
 const VIEW_MODE_STORAGE_KEY = 'easy_auction_view_mode';
 
@@ -148,6 +168,8 @@ export default function FeedScreen() {
   const [isModeLoaded, setIsModeLoaded] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [infoModal, setInfoModal] = useState<InfoModalType>(null);
+  const [weather, setWeather] = useState<WeatherState | null>(null);
 
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [activeUsageFilter, setActiveUsageFilter] = useState<UsageFilterType>('all');
@@ -181,6 +203,53 @@ export default function FeedScreen() {
       }
     })();
   }, []);
+
+  // 서울 현재 날씨 로드 (Open-Meteo 무료 API, 실패/로딩 시 조용히 숨김)
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof window === 'undefined') return;
+    let cancelled = false;
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = setTimeout(() => {
+      try {
+        controller?.abort();
+      } catch {}
+    }, 6000);
+
+    fetch(OPEN_METEO_SEOUL_URL, controller ? { signal: controller.signal } : undefined)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.current) return;
+        const tempVal = data.current.temperature_2m;
+        const codeVal = data.current.weather_code;
+        if (typeof tempVal === 'number' && Number.isFinite(tempVal)) {
+          setWeather({
+            temp: Math.round(tempVal),
+            icon: mapWeatherCodeToIcon(typeof codeVal === 'number' ? codeVal : 0),
+          });
+        }
+      })
+      .catch(() => {
+        // 네트워크 실패 시 조용히 숨김 (레이아웃 흔들림 방지)
+      })
+      .finally(() => {
+        clearTimeout(timer);
+      });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      try {
+        controller?.abort();
+      } catch {}
+    };
+  }, []);
+
+  const openInfoModal = (type: Exclude<InfoModalType, null>) => {
+    setMenuVisible(false);
+    setTimeout(() => {
+      setInfoModal(type);
+    }, 80);
+  };
 
   const handleSelectViewMode = async (mode: ViewMode) => {
     setViewMode(mode);
@@ -691,11 +760,22 @@ export default function FeedScreen() {
       style={[styles.container, isLookbook && styles.containerEditorial]}
       edges={['top']}
     >
-      {/* 1. 미니멀 브랜드 헤더 (이지경매 / 경매 물건 떠먹기 + 우측 ☰) */}
+      {/* 1. 미니멀 브랜드 헤더 (이지경매 / 경매 물건 떠먹기 + 날씨 뱃지 + 우측 ☰) */}
       <View style={[styles.brandHeader, isLookbook && styles.brandHeaderEditorial]}>
-        <View style={styles.brandTitleWrap}>
-          <Text style={styles.brandTitle}>이지경매</Text>
-          <Text style={styles.brandSubtitle}>경매 물건 떠먹기</Text>
+        <View style={styles.brandLeftGroup}>
+          <View style={styles.brandTitleWrap}>
+            <Text style={styles.brandTitle}>이지경매</Text>
+            <Text style={styles.brandSubtitle} numberOfLines={1}>
+              경매 물건 떠먹기
+            </Text>
+          </View>
+          {isLookbook && weather && (
+            <View style={styles.weatherBadge} accessibilityLabel={`서울 현재 날씨 ${weather.temp}도`}>
+              <Text style={styles.weatherBadgeText} numberOfLines={1}>
+                {weather.icon} {weather.temp}° 서울
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.headerRight}>
@@ -935,6 +1015,179 @@ export default function FeedScreen() {
                 );
               })}
             </View>
+
+            {/* 바텀시트 하단: 공지사항 & 사용설명서 */}
+            <View style={styles.sheetInfoDivider} />
+            <View style={styles.sheetInfoRow}>
+              <TouchableOpacity
+                style={styles.sheetInfoBtn}
+                activeOpacity={0.8}
+                onPress={() => openInfoModal('notice')}
+              >
+                <Text style={styles.sheetInfoBtnIcon}>📢</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.sheetInfoBtnTitle}>공지사항</Text>
+                  <Text style={styles.sheetInfoBtnSub}>베타 · 업데이트 안내</Text>
+                </View>
+                <Text style={styles.sheetInfoChevron}>›</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.sheetInfoBtn}
+                activeOpacity={0.8}
+                onPress={() => openInfoModal('guide')}
+              >
+                <Text style={styles.sheetInfoBtnIcon}>📖</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.sheetInfoBtnTitle}>사용설명서</Text>
+                  <Text style={styles.sheetInfoBtnSub}>난이도 · 계산기 가이드</Text>
+                </View>
+                <Text style={styles.sheetInfoChevron}>›</Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* 5. 공지사항 & 사용설명서 모달 */}
+      <Modal
+        visible={infoModal !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setInfoModal(null)}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={() => setInfoModal(null)}>
+          <Pressable style={styles.infoSheet} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.sheetHandle} />
+            <View style={styles.sheetHeader}>
+              <View>
+                <Text style={styles.sheetTitle}>
+                  {infoModal === 'notice' ? '📢 공지사항' : '📖 이지경매 사용설명서'}
+                </Text>
+                <Text style={styles.sheetSub}>
+                  {infoModal === 'notice'
+                    ? '이지경매 최신 소식과 예정 기능을 안내드려요'
+                    : '경매 초보도 실수 없이 떠먹는 핵심 체크 가이드'}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.sheetCloseBtn}
+                onPress={() => setInfoModal(null)}
+                accessibilityLabel="닫기"
+              >
+                <Text style={styles.sheetCloseText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              style={styles.infoScroll}
+              contentContainerStyle={styles.infoScrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {infoModal === 'notice' ? (
+                <>
+                  <View style={styles.infoCard}>
+                    <View style={styles.infoCardHeader}>
+                      <View style={styles.infoTagBeta}>
+                        <Text style={styles.infoTagBetaText}>BETA OPEN</Text>
+                      </View>
+                      <Text style={styles.infoCardTitle}>이지경매 모바일 앱·웹 베타 오픈</Text>
+                    </View>
+                    <Text style={styles.infoCardBody}>
+                      어려운 등기부등본과 현황조사서를 10초 요약 브리핑과 에디토리얼 카드로 쉽게
+                      떠먹을 수 있는 이지경매 베타 서비스를 오픈했습니다. 오늘의 추천, 전체 탐색,
+                      동네 지도까지 앱과 웹에서 동일하게 이용하실 수 있습니다.
+                    </Text>
+                  </View>
+
+                  <View style={styles.infoCard}>
+                    <View style={styles.infoCardHeader}>
+                      <View style={styles.infoTagUpdate}>
+                        <Text style={styles.infoTagUpdateText}>DAILY SYNC</Text>
+                      </View>
+                      <Text style={styles.infoCardTitle}>매일 경매 데이터 자동 업데이트</Text>
+                    </View>
+                    <Text style={styles.infoCardBody}>
+                      수도권 16개 법원(서울·경기·인천)의 진행 매물, 유찰에 따른 최저가 변동, 법원
+                      감정평가서 실물 사진 및 전체 임차인 현황이 매일 주기적으로 수집·갱신됩니다.
+                    </Text>
+                  </View>
+
+                  <View style={styles.infoCard}>
+                    <View style={styles.infoCardHeader}>
+                      <View style={styles.infoTagRoadmap}>
+                        <Text style={styles.infoTagRoadmapText}>COMING SOON</Text>
+                      </View>
+                      <Text style={styles.infoCardTitle}>온비드 공매 · 맞춤 알림 추가 예정</Text>
+                    </View>
+                    <Text style={styles.infoCardBody}>
+                      앞으로 캠코 온비드(Onbid) 공매 매물 통합, 관심 동네·예산·용도별 신건/유찰
+                      맞춤 알림, 실거래가 기반 입찰가 시뮬레이터 고도화가 순차 추가될 예정입니다.
+                    </Text>
+                  </View>
+                </>
+              ) : (
+                <>
+                  <View style={styles.infoCard}>
+                    <Text style={styles.infoStepTitle}>① 난이도 3단계 분류 기준</Text>
+                    <View style={styles.guideList}>
+                      <Text style={styles.guideItem}>
+                        <Text style={styles.guideStrong}>🟢 초급</Text> : 임차인이 없거나 말소기준권리
+                        이후 권리가 전부 소멸해 추가 인수 부담이 적은 입문용 매물입니다.
+                      </Text>
+                      <Text style={styles.guideItem}>
+                        <Text style={styles.guideStrong}>🟡 중급</Text> : 대항력 임차인·배당요구
+                        여부·미납 관리비 등 기본적인 권리 체크가 필요한 매물입니다.
+                      </Text>
+                      <Text style={styles.guideItem}>
+                        <Text style={styles.guideStrong}>🔴 고수</Text> : 선순위 임차인·유치권·지분매각·법정지상권
+                        등 특수 권리가 있으나 큰 할인율과 수익을 노리는 전문가용 매물입니다.
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.infoCard}>
+                    <Text style={styles.infoStepTitle}>
+                      ② 선순위 인수 보증금 · 방공제 계산기 활용법
+                    </Text>
+                    <Text style={styles.infoCardBody}>
+                      상세 화면의 <Text style={styles.guideStrong}>필요 자기자본 계산기</Text>에서
+                      일반 LTV · 생애최초 · 보수적(경매) 조건을 눌러 실제 필요한 현금을 바로 비교해
+                      보세요. 주거용 일반 대출 시 지역별 소액임차보증금(방공제: 서울 5,500만 ·
+                      경기/인천 과밀억제 4,800만 · 기타 2,800만)이 자동 차감되며,{' '}
+                      <Text style={styles.guideStrong}>MCI·MCG 보증보험 토글</Text>이나 생애최초
+                      선택 시 면제 효과까지 계산됩니다.{'\n\n'}
+                      또한 <Text style={styles.guideStrong}>법원 원본 데이터</Text> 아코디언에서
+                      ‘선순위 인수 예상 보증금’과 ‘전체 조사된 임차인 현황’을 반드시 구분해 확인하세요.
+                    </Text>
+                  </View>
+
+                  <View style={[styles.infoCard, styles.infoCardWarn]}>
+                    <Text style={styles.infoStepTitle}>
+                      ③ 입찰 전 대법원 원문 최종 확인 권장 (면책 안내)
+                    </Text>
+                    <Text style={styles.infoCardBody}>
+                      이지경매의 AI 브리핑, 시세 추정, 대출 시뮬레이션은 빠른 탐색을 돕기 위한{' '}
+                      <Text style={styles.guideStrong}>참고용 정보</Text>입니다. 실제 입찰 전에는
+                      반드시 상세 화면 하단의{' '}
+                      <Text style={styles.guideStrong}>
+                        [대한민국 법원 경매정보(courtauction.go.kr) 바로가기]
+                      </Text>
+                      에서 매각물건명세서·현황조사서·등기부등본 원문과 현장 임장을 직접 확인하시기
+                      바라며, 최종 입찰 결정 및 책임은 입찰자 본인에게 있습니다.
+                    </Text>
+                  </View>
+                </>
+              )}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.infoConfirmBtn}
+              activeOpacity={0.85}
+              onPress={() => setInfoModal(null)}
+            >
+              <Text style={styles.infoConfirmBtnText}>확인했어요</Text>
+            </TouchableOpacity>
           </Pressable>
         </Pressable>
       </Modal>
@@ -963,27 +1216,55 @@ const styles = StyleSheet.create({
   },
   brandHeaderEditorial: {
     backgroundColor: '#FAF8F5',
+    paddingHorizontal: 16,
+  },
+  brandLeftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    minWidth: 0,
+    gap: 8,
+    marginRight: 8,
   },
   brandTitleWrap: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 8,
+    gap: 6,
+    flexShrink: 1,
+    minWidth: 0,
   },
   brandTitle: {
-    fontSize: 21,
+    fontSize: 20,
     fontWeight: '900',
     color: '#1C1917',
     letterSpacing: -0.5,
   },
   brandSubtitle: {
-    fontSize: 12.5,
+    fontSize: 12,
     fontWeight: '600',
     color: '#78716C',
+    flexShrink: 1,
+  },
+  weatherBadge: {
+    backgroundColor: '#F3EFE8',
+    borderWidth: 1,
+    borderColor: '#E7E2D8',
+    paddingHorizontal: 8,
+    paddingVertical: 3.5,
+    borderRadius: 999,
+    flexShrink: 0,
+  },
+  weatherBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#57534E',
+    letterSpacing: -0.2,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
+    flexShrink: 0,
   },
   lookbookCounterPill: {
     backgroundColor: '#EFECE6',
@@ -1215,6 +1496,161 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 11.5,
     fontWeight: '800',
+  },
+  sheetInfoDivider: {
+    height: 1,
+    backgroundColor: '#F0ECE4',
+    marginTop: 2,
+  },
+  sheetInfoRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  sheetInfoBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9,
+    paddingHorizontal: 13,
+    paddingVertical: 12,
+    borderRadius: 16,
+    backgroundColor: '#FAF8F5',
+    borderWidth: 1,
+    borderColor: '#E7E5E4',
+  },
+  sheetInfoBtnIcon: {
+    fontSize: 18,
+  },
+  sheetInfoBtnTitle: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: '#1C1917',
+  },
+  sheetInfoBtnSub: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#78716C',
+    marginTop: 1,
+  },
+  sheetInfoChevron: {
+    fontSize: 18,
+    color: '#A8A29E',
+    fontWeight: '600',
+  },
+
+  // ── 공지사항 & 사용설명서 모달 ──
+  infoSheet: {
+    width: '100%',
+    maxWidth: 480,
+    maxHeight: '84%',
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 22,
+    paddingTop: 12,
+    paddingBottom: 28,
+    gap: 14,
+  },
+  infoScroll: {
+    flexGrow: 0,
+  },
+  infoScrollContent: {
+    gap: 12,
+    paddingBottom: 6,
+  },
+  infoCard: {
+    backgroundColor: '#FAF8F5',
+    borderRadius: 18,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#ECE7DF',
+    gap: 8,
+  },
+  infoCardWarn: {
+    backgroundColor: '#FEF9F0',
+    borderColor: '#F3DFC1',
+  },
+  infoCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  infoTagBeta: {
+    backgroundColor: '#1C1917',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  infoTagBetaText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.4,
+  },
+  infoTagUpdate: {
+    backgroundColor: '#E7F3EC',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  infoTagUpdateText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#166534',
+    letterSpacing: 0.4,
+  },
+  infoTagRoadmap: {
+    backgroundColor: '#EFF6FF',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  infoTagRoadmapText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#1D4ED8',
+    letterSpacing: 0.4,
+  },
+  infoCardTitle: {
+    fontSize: 14.5,
+    fontWeight: '800',
+    color: '#1C1917',
+    flexShrink: 1,
+  },
+  infoStepTitle: {
+    fontSize: 14.5,
+    fontWeight: '900',
+    color: '#1C1917',
+  },
+  infoCardBody: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: '#44403C',
+  },
+  guideList: {
+    gap: 7,
+  },
+  guideItem: {
+    fontSize: 13,
+    lineHeight: 19.5,
+    color: '#44403C',
+  },
+  guideStrong: {
+    fontWeight: '800',
+    color: '#1C1917',
+  },
+  infoConfirmBtn: {
+    backgroundColor: '#1C1917',
+    borderRadius: 999,
+    paddingVertical: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoConfirmBtnText: {
+    fontSize: 14.5,
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
 
   // ── 상단 칩 필터 (전체 탐색 & 동네 지도) ──
