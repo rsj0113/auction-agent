@@ -564,21 +564,22 @@ def normalize_usage(raw_usage: str, location: str = "", remarks: str = "") -> st
     comm_loc_kw = (
         "단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장",
         "상가", "근린", "지식산업", "프라자", "플라자", "에이스하이테크", "테크노", "비즈타워",
-        "메디타워", "푸리마타워", "하이브랜드", "리빙관", "나인스에비뉴", "몰", "마켓", "스퀘어",
-        "아케이드", "에스케이브이", "sk v1", "점포", "판매시설", "성남아리스타", "코아루센타시아",
+        "메디타워", "푸리마타워", "불로장생타워", "그랑파사쥬", "하이브랜드", "리빙관", "나인스에비뉴",
+        "몰", "마켓", "스퀘어", "아케이드", "에스케이브이", "sk v1", "점포", "판매시설",
+        "성남아리스타", "코아루센타시아",
     )
     if any(k in loc_lower for k in comm_loc_kw):
         return "상가"
-    if any(k in rem for k in ("판매시설", "오픈상가", "일반음식점", "스크린야구장", "근린생활시설(학원", "근린생활시설(음식점")):
+    if any(k in rem for k in ("판매시설", "오픈상가", "일반음식점", "스크린야구장", "근린생활시설(학원", "근린생활시설(음식점", "음식점, 사무소", "독서실")):
         return "상가"
 
     has_apt_dong = bool(re.search(r"(?:제)?([1-9]\d{2,3})동", loc))
-    # 구획 상가 호수 패턴 (예: '2층나-36호', '제비1가009호')
-    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호", loc):
+    # 구획 상가 호수 패턴 (예: '2층나-36호', '제비1가009호', '13층13-36-1호')
+    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호|\d+-\d+-\d+호", loc):
         return "상가"
-    # 1층 대형 상가 호수 (101동~ 없는 단일 건물 1층 106호 이상 — 예: 성남아리스타 1층123호, 1층에이112호)
+    # 1층 대형 상가 호수 (101동~ 없는 단일 건물 1층 106호 이상 — 예: 성남아리스타 1층123호, 1층에이112호, 1층1043호)
     if flr == 1 and not has_apt_dong:
-        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2})호", loc)
+        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2,3})호", loc)
         if m_ho and int(m_ho.group(1)) >= 106:
             return "상가"
     # 지하2층 이상 (명시적 주거용 제외)
@@ -589,7 +590,7 @@ def normalize_usage(raw_usage: str, location: str = "", remarks: str = "") -> st
     offi_kw = (
         "오피스텔", "아트리움", "리버빌", "오피스", "메종", "르메이에르", "샤르망",
         "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티",
-        "자이엘라", "아이파크디어반", "더샵스타파크",
+        "자이엘라", "아이파크디어반", "더샵스타파크", "라포르테블랑",
     )
     is_offi_state = ("스테이트" in loc and "힐스테이트" not in loc)
     if (
@@ -631,6 +632,8 @@ def normalize_usage(raw_usage: str, location: str = "", remarks: str = "") -> st
 
     # 5. 빌라/다세대/상가/토지 fallback
     if any(k in raw for k in ("빌라", "다세대", "연립", "다가구", "단독", "주택")) or is_villa_name:
+        return "빌라"
+    if "주택임차권" in rem and "호" in loc:
         return "빌라"
     if any(k in raw for k in ("상가", "근린", "점포", "사무실", "오피스")):
         return "상가"
@@ -730,7 +733,7 @@ def estimate_rental_and_yield(
     }
 
 
-def generate_feed(limit: int = 500) -> list[dict]:
+def generate_feed(limit: int | None = None) -> list[dict]:
     if not os.path.exists(DB_PATH):
         raise FileNotFoundError(f"Database not found at {DB_PATH}")
 
@@ -739,13 +742,13 @@ def generate_feed(limit: int = 500) -> list[dict]:
     naver_indexes, win_stats, rent_by_sgg_usage = load_reference_indexes(conn)
 
     cursor = conn.cursor()
-    # DB 활성 매물 최대한 반영 (이상치·종결 제외, 사진 보유 & 주거/상가 & 미래 기일 우선 정렬)
+    # DB 활성 매물 전체 반영 (종결 제외, 최저가 100만원 이상 유효 매물 전부 노출, 건수 제한 해제)
     query = """
         SELECT *
         FROM auction_items
         WHERE COALESCE(status_flag, '') != 'CLOSED'
           AND appraisal > 0
-          AND min_bid >= 10000000
+          AND min_bid >= 1000000
         ORDER BY
             CASE WHEN usage IN ('아파트', '다세대/빌라', '오피스텔', '상가/근린시설') THEN 0 ELSE 1 END,
             CASE WHEN photo_url IS NOT NULL AND photo_url != '' THEN 0 ELSE 1 END,
@@ -1059,7 +1062,7 @@ def generate_feed(limit: int = 500) -> list[dict]:
             "court_name": row.get("court_name") or "",
         }
         feed_items.append(item)
-        if len(feed_items) >= limit:
+        if limit is not None and len(feed_items) >= limit:
             break
 
     print(f"🧹 중복 제거: 사건번호 중복 {dup_case_skipped}건 · 동일 주소 중복 {dup_loc_skipped}건 제외")
@@ -1067,8 +1070,8 @@ def generate_feed(limit: int = 500) -> list[dict]:
 
 
 def main():
-    print("🚀 [export_mobile_feed] DB에서 2단계 고도화 피드 생성 중...")
-    items = generate_feed(limit=500)
+    print("🚀 [export_mobile_feed] DB 활성 매물 전체 피드 생성 중 (건수 제한 해제)...")
+    items = generate_feed(limit=None)
 
     green_cnt = sum(1 for i in items if i["safety_grade"] == "GREEN")
     yellow_cnt = sum(1 for i in items if i["safety_grade"] == "YELLOW")
