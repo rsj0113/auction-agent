@@ -23,7 +23,7 @@ type FilterType = 'all' | 'clean' | 'budget_small' | 'budget_mid' | 'seoul' | 'g
 export default function FeedScreen() {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
-  const [activeFilter, setActiveFilter] = useState<FilterType>('clean');
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
   const items: FeedItem[] = feedData.items || [];
 

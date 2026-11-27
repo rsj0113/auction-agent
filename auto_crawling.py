@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import json
 import os
 import random
@@ -164,8 +165,8 @@ class AuctionDBAgent:
                     case_number, location, usage, appraisal, min_bid, prev_min_bid, failed_count,
                     rights_list, tenant_registration_date, tenant_deposit, is_payout_requested,
                     ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, last_updated, created_at, ai_model, status_flag,
-                    area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd, auction_date, remarks, special_rights
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd, auction_date, remarks, special_rights, photo_url
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(case_number) DO UPDATE SET
                     location=excluded.location,
                     usage=excluded.usage,
@@ -194,7 +195,8 @@ class AuctionDBAgent:
                     addr_emd=coalesce(excluded.addr_emd, auction_items.addr_emd),
                     auction_date=excluded.auction_date,
                     remarks=coalesce(excluded.remarks, auction_items.remarks),
-                    special_rights=coalesce(excluded.special_rights, auction_items.special_rights)
+                    special_rights=coalesce(excluded.special_rights, auction_items.special_rights),
+                    photo_url=coalesce(nullif(excluded.photo_url, ''), auction_items.photo_url)
             """, (
                 item['case_number'],
                 item['location'],
@@ -225,6 +227,7 @@ class AuctionDBAgent:
                 item.get('auction_date') or '',
                 item.get('remarks') or '',
                 item.get('special_rights') or '[]',
+                item.get('photo_url') or '',
                 status_flag,
             ))
             conn.commit()
@@ -829,6 +832,46 @@ class AuctionCrawler:
             is_share=is_share_case
         )
 
+        # ── 실제 물건 감정평가서/현황 사진 파싱 및 로컬 파일 저장 (csPicLst) ──
+        photo_url = ""
+        try:
+            cs_pic_lst = dma.get('csPicLst') or []
+            if not cs_pic_lst:
+                cs_pic_lst = dma2.get('csPicLst') or []
+            if cs_pic_lst and isinstance(cs_pic_lst, list):
+                for p_item in cs_pic_lst:
+                    if not isinstance(p_item, dict):
+                        continue
+                    b64_str = (p_item.get('picFile') or '').strip()
+                    cs_no_val = str(p_item.get('csNo') or '')
+                    p_seq = str(p_item.get('cortAuctnPicSeq') or '1')
+                    
+                    if b64_str and len(b64_str) > 100:
+                        clean_cs = re.sub(r'[^0-9a-zA-Z가-힣]', '_', cs_no_val) or "unknown"
+                        filename = f"{clean_cs}_{p_seq}.jpg"
+                        
+                        base_d = os.path.dirname(os.path.abspath(__file__))
+                        dir1 = os.path.join(base_d, "attachments", "photos")
+                        dir2 = os.path.join(base_d, "frontend", "public", "photos")
+                        os.makedirs(dir1, exist_ok=True)
+                        os.makedirs(dir2, exist_ok=True)
+                        
+                        try:
+                            img_b = base64.b64decode(b64_str)
+                            with open(os.path.join(dir1, filename), 'wb') as f_img:
+                                f_img.write(img_b)
+                            with open(os.path.join(dir2, filename), 'wb') as f_img:
+                                f_img.write(img_b)
+                            photo_url = f"/photos/{filename}"
+                            break
+                        except Exception:
+                            pass
+                    elif p_item.get('picFileUrl') and p_item.get('picTitlNm'):
+                        photo_url = f"https://www.courtauction.go.kr{p_item['picFileUrl']}{p_item['picTitlNm']}"
+                        break
+        except Exception:
+            pass
+
         return {
             "rights_list": rights_list,
             "tenant_registration_date": tenant_registration_date,
@@ -847,6 +890,7 @@ class AuctionCrawler:
             "failed_count": failed_count_parsed,
             "min_bid": min_bid_parsed,
             "prev_min_bid": prev_min_bid_parsed,
+            "photo_url": photo_url,
         }
 
     async def search(self, region: str = "서울", max_items: int = 5, court_code: str = "", debug_dump_path: str = "") -> list:
@@ -1602,6 +1646,7 @@ class AuctionCrawler:
                         "auction_date": detail_info.get("auction_date", ""),
                         "remarks": detail_info.get("remarks", ""),
                         "special_rights": detail_info.get("special_rights", "[]"),
+                        "photo_url": detail_info.get("photo_url", ""),
                     })
 
                 await browser.close()

@@ -15,9 +15,11 @@ import json
 import sqlite3
 from datetime import datetime, date
 
+import shutil
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "auction_db.sqlite")
 OUTPUT_PATH = os.path.join(BASE_DIR, "mobile_feed.json")
+APP_OUTPUT_PATH = os.path.join(BASE_DIR, "mobile", "assets", "mobile_feed.json")
 
 def format_krw(val: int) -> str:
     """원 단위를 'X억 Y,YYY만원' 또는 'Y,YYY만원' 문자열로 포맷팅"""
@@ -196,12 +198,16 @@ def generate_feed(limit: int = 100) -> list[dict]:
         d_day_str = calculate_d_day(auction_date_str)
         bullet_cash = f"💵 입찰 준비금(10%) {format_krw(deposit_req)} 필요 · {d_day_str}"
 
-        # 썸네일 이미지 링크
-        # 카카오/네이버 정적 맵 또는 건물 기본 로드뷰 에셋
+        # 썸네일 이미지 링크: DB의 실제 물건 사진(photo_url) 최우선 반영
         lat = row.get("lat")
         lng = row.get("lng")
-        photo_url = f"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
-        if "아파트" in usage_label:
+        db_photo = (row.get("photo_url") or "").strip()
+        if db_photo:
+            if db_photo.startswith("/"):
+                photo_url = f"https://frontend-nine-gules-14.vercel.app{db_photo}"
+            else:
+                photo_url = db_photo
+        elif "아파트" in usage_label:
             photo_url = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
         elif "오피스텔" in usage_label:
             photo_url = "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
@@ -262,9 +268,14 @@ def main():
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
 
+    # 모바일 앱 에셋 경로로도 동시 복사
+    os.makedirs(os.path.dirname(APP_OUTPUT_PATH), exist_ok=True)
+    shutil.copyfile(OUTPUT_PATH, APP_OUTPUT_PATH)
+
     print(f"✅ mobile_feed.json 생성 완료: 총 {len(items)}건")
     print(f"   🟢 GREEN(안전): {meta['green_count']}건 | 🟡 YELLOW: {meta['yellow_count']}건 | 🔴 RED: {meta['red_count']}건")
-    print(f"   저장 경로: {OUTPUT_PATH}")
+    print(f"   저장 경로 1: {OUTPUT_PATH}")
+    print(f"   저장 경로 2: {APP_OUTPUT_PATH}")
 
     # 샘플 3건 출력
     print("\n📋 [샘플 3건 미리보기]")
