@@ -4,12 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @format
  * @flow strict
+ * @format
  */
 
 import invariant from 'invariant';
-import * as path from 'path';
+import * as path from 'node:path';
 
 /**
  * This module provides path utility functions - similar to `node:path` -
@@ -46,10 +46,13 @@ const SEP_UP_FRAGMENT = path.sep + '..';
 const UP_FRAGMENT_SEP_LENGTH = UP_FRAGMENT_SEP.length;
 const CURRENT_FRAGMENT = '.' + path.sep;
 
+const IS_WIN32 = path.sep === '\\';
+const ROOT_BASE_IDX = IS_WIN32 ? 0 : 1;
+
 export class RootPathUtils {
   #rootDir: string;
-  #rootDirnames: $ReadOnlyArray<string>;
-  #rootParts: $ReadOnlyArray<string>;
+  #rootDirnames: ReadonlyArray<string>;
+  #rootParts: ReadonlyArray<string>;
   #rootDepth: number;
 
   constructor(rootDir: string) {
@@ -57,6 +60,8 @@ export class RootPathUtils {
     const rootDirnames = [];
     for (
       let next = rootDir, previous = null;
+      /* $FlowFixMe[invalid-compare] Error discovered during Constant Condition
+       * roll out. See https://fburl.com/workplace/5whu3i34. */
       previous !== next;
       previous = next, next = path.dirname(next)
     ) {
@@ -78,7 +83,7 @@ export class RootPathUtils {
     return this.#rootParts[this.#rootParts.length - 1 - n];
   }
 
-  getParts(): $ReadOnlyArray<string> {
+  getParts(): ReadonlyArray<string> {
     return this.#rootParts;
   }
 
@@ -95,7 +100,6 @@ export class RootPathUtils {
       absolutePath.startsWith(nextPart, endOfMatchingPrefix) &&
       (absolutePath.length === endOfMatchingPrefix + nextLength ||
         absolutePath[endOfMatchingPrefix + nextLength] === path.sep);
-
     ) {
       // Move our matching pointer forward and load the next part.
       endOfMatchingPrefix += nextLength + 1;
@@ -147,6 +151,12 @@ export class RootPathUtils {
     const right = pos === 0 ? normalPath : normalPath.slice(pos);
     if (right.length === 0) {
       return left;
+    } else if (IS_WIN32 && pos > this.#rootDepth * UP_FRAGMENT_SEP_LENGTH) {
+      // On a real file system, navigating to `..` at the top level (posix `/`
+      // or Windows drive) is a no-op, but we can't respect that on Windows
+      // because Metro uses e.g. `..\..\D:\foo` to represent cross-drive
+      // relative paths.
+      return right;
     }
     // left may already end in a path separator only if it is a filesystem root,
     // '/' or 'X:\'.
@@ -196,7 +206,9 @@ export class RootPathUtils {
     if (relativePath === '') {
       return {collapsedSegments: 0, normalPath};
     }
-    const left = normalPath + path.sep;
+    const left = normalPath.endsWith(path.sep)
+      ? normalPath
+      : normalPath + path.sep;
     const rawPath = left + relativePath;
     if (normalPath === '..' || normalPath.endsWith(SEP_UP_FRAGMENT)) {
       const collapsed = this.#tryCollapseIndirectionsInSuffix(rawPath, 0, 0);
@@ -297,9 +309,10 @@ export class RootPathUtils {
         };
       }
 
-      // Cap the number of indirections at the total number of root segments.
-      // File systems treat '..' at the root as '.'.
-      if (totalUpIndirections < this.#rootParts.length - 1) {
+      // Cap the number of indirections at the total number of root parts.
+      // File systems treat '..' at the root as '.'. For Windows, cross-device
+      // paths need to survive this.
+      if (totalUpIndirections < this.#rootParts.length - ROOT_BASE_IDX) {
         totalUpIndirections++;
       }
 
