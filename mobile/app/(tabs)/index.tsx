@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { FeedItem } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
+import WebAuctionMap from '../../components/WebAuctionMap';
 
 // react-native-maps는 네이티브 전용이므로 웹 환경에서는 조건부 로드
 let MapView: any = null;
@@ -500,13 +501,15 @@ export default function FeedScreen() {
   }, [filteredItems]);
 
   const renderMapView = () => {
-    if (Platform.OS === 'web' || !MapView) {
+    const isWeb = Platform.OS === 'web';
+
+    if (!isWeb && !MapView) {
       return (
         <View style={styles.webMapFallback}>
           <Text style={{ fontSize: 40, marginBottom: 12 }}>🗺️</Text>
-          <Text style={styles.webMapTitle}>동네 지도는 모바일 앱에서 최적화돼요</Text>
+          <Text style={styles.webMapTitle}>지도를 불러오는 중 문제가 발생했어요</Text>
           <Text style={styles.webMapSubtitle}>
-            웹 브라우저에서는 오늘의 추천이나 전체 탐색으로 바로 확인해 보세요!{'\n'}
+            오늘의 추천이나 전체 탐색으로 바로 확인해 보세요!{'\n'}
             (현재 조건 지도 매물: {mapItems.length}건)
           </Text>
           <View style={styles.webMapActionRow}>
@@ -536,43 +539,51 @@ export default function FeedScreen() {
 
     return (
       <View style={styles.mapContainer}>
-        <MapView
-          ref={mapRef}
-          style={styles.mapView}
-          initialRegion={initialRegion}
-          showsUserLocation={false}
-          showsCompass={true}
-          toolbarEnabled={false}
-        >
-          {mapItems.map((item) => {
-            const isSelected = selectedMapItem?.case_number === item.case_number;
-            const markerColor =
-              item.safety_grade === 'GREEN'
-                ? '#10b981'
-                : item.safety_grade === 'YELLOW'
-                ? '#f59e0b'
-                : '#ef4444';
+        {isWeb ? (
+          <WebAuctionMap
+            items={mapItems}
+            selectedCaseNumber={selectedMapItem?.case_number ?? null}
+            onSelectItem={setSelectedMapItem}
+          />
+        ) : (
+          <MapView
+            ref={mapRef}
+            style={styles.mapView}
+            initialRegion={initialRegion}
+            showsUserLocation={false}
+            showsCompass={true}
+            toolbarEnabled={false}
+          >
+            {mapItems.map((item) => {
+              const isSelected = selectedMapItem?.case_number === item.case_number;
+              const markerColor =
+                item.safety_grade === 'GREEN'
+                  ? '#10b981'
+                  : item.safety_grade === 'YELLOW'
+                  ? '#f59e0b'
+                  : '#ef4444';
 
-            return (
-              <Marker
-                key={item.case_number}
-                coordinate={{ latitude: item.lat!, longitude: item.lng! }}
-                onPress={() => setSelectedMapItem(item)}
-              >
-                <View style={[styles.customMarker, isSelected && styles.customMarkerSelected]}>
-                  <View style={[styles.markerDot, { backgroundColor: markerColor }]} />
-                  <Text style={styles.markerText}>{item.min_bid_str.replace(' ', '')}</Text>
-                </View>
-              </Marker>
-            );
-          })}
-        </MapView>
+              return (
+                <Marker
+                  key={item.case_number}
+                  coordinate={{ latitude: item.lat!, longitude: item.lng! }}
+                  onPress={() => setSelectedMapItem(item)}
+                >
+                  <View style={[styles.customMarker, isSelected && styles.customMarkerSelected]}>
+                    <View style={[styles.markerDot, { backgroundColor: markerColor }]} />
+                    <Text style={styles.markerText}>{item.min_bid_str.replace(' ', '')}</Text>
+                  </View>
+                </Marker>
+              );
+            })}
+          </MapView>
+        )}
 
         {selectedMapItem && (
           <View style={styles.mapFloatingCardWrap}>
             <TouchableOpacity
               style={styles.mapFloatingCard}
-              activeOpacity={0.9}
+              activeOpacity={0.92}
               onPress={() => router.push(`/detail/${encodeURIComponent(selectedMapItem.case_number)}`)}
             >
               <Image
@@ -583,7 +594,9 @@ export default function FeedScreen() {
               <View style={styles.mapCardDetails}>
                 <View style={styles.mapCardBadgeRow}>
                   {renderBadge(selectedMapItem.safety_grade, true)}
-                  <Text style={styles.mapCardDDay}>{selectedMapItem.d_day}</Text>
+                  <Text style={styles.mapCardDDay}>
+                    {selectedMapItem.usage} · {selectedMapItem.d_day}
+                  </Text>
                 </View>
                 <Text style={styles.mapCardHeadline} numberOfLines={1}>
                   {selectedMapItem.headline}
@@ -598,7 +611,10 @@ export default function FeedScreen() {
               </View>
               <TouchableOpacity
                 style={styles.mapCardCloseBtn}
-                onPress={() => setSelectedMapItem(null)}
+                onPress={(e: any) => {
+                  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+                  setSelectedMapItem(null);
+                }}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Text style={styles.mapCardCloseText}>✕</Text>
@@ -1725,6 +1741,8 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 16,
     right: 16,
+    zIndex: 1000,
+    elevation: 10,
   },
   mapFloatingCard: {
     backgroundColor: '#ffffff',
