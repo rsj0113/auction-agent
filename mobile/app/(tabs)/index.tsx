@@ -259,7 +259,9 @@ export default function FeedScreen() {
   };
 
   const cardMaxWidth = Math.min(winWidth - 32, 430);
-  const cardPhotoHeight = Math.max(210, Math.min(winHeight * 0.36, 310));
+  // 헤더·필터·하단 네비·탭바 높이를 제외한 가용 높이에 맞춰 사진 높이를 계산해 상단 씹힘 방지
+  const availableCardAreaHeight = Math.max(360, winHeight - 245);
+  const cardPhotoHeight = Math.max(145, Math.min(availableCardAreaHeight - 250, 245));
 
   const renderCardItem = ({ item }: { item: FeedItem }) => {
     const fav = isFavorite(item.case_number);
@@ -269,16 +271,21 @@ export default function FeedScreen() {
         ? item.card_tags.slice(0, 3)
         : [
             item.safety_grade === 'GREEN'
-              ? '추가 인수금 0원'
+              ? '초급 · 인수금 0원'
               : item.safety_grade === 'YELLOW'
-              ? '세입자·관리비 확인'
-              : '특수조건 확인 필수',
+              ? '중급 · 권리 체크'
+              : '고수 · 하이리턴',
             `📍 ${item.short_location}`,
             `보증금 ${item.deposit_required_str}`,
           ];
 
     return (
-      <View style={[styles.storyPage, { width: winWidth }]}>
+      <ScrollView
+        style={{ width: winWidth, flex: 1 }}
+        contentContainerStyle={styles.storyPageScrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
         <TouchableOpacity
           style={[styles.storyCard, { width: cardMaxWidth }]}
           activeOpacity={0.96}
@@ -288,7 +295,7 @@ export default function FeedScreen() {
           <View style={[styles.storyPhotoWrap, { height: cardPhotoHeight }]}>
             <Image source={{ uri: item.photo_url }} style={styles.storyPhoto} resizeMode="cover" />
 
-            {/* 좌상단 신호등 배지 */}
+            {/* 좌상단 난이도 배지 */}
             <View style={styles.storyTopLeft}>{renderBadge(item.safety_grade, true)}</View>
 
             {/* 우상단 찜 버튼 */}
@@ -297,7 +304,7 @@ export default function FeedScreen() {
               onPress={() => toggleFavorite(item)}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={{ fontSize: 22 }}>{fav ? '⭐' : '☆'}</Text>
+              <Text style={{ fontSize: 20 }}>{fav ? '⭐' : '☆'}</Text>
             </TouchableOpacity>
 
             {/* 좌하단 D-Day */}
@@ -366,7 +373,7 @@ export default function FeedScreen() {
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     );
   };
 
@@ -495,7 +502,7 @@ export default function FeedScreen() {
   // ──────────────────────────────────────────
   if (isModeLoaded && showOnboarding) {
     return (
-      <SafeAreaView style={styles.onboardingContainer}>
+      <SafeAreaView style={styles.onboardingContainer} edges={['top', 'bottom']}>
         <View style={styles.onboardingInner}>
           <View style={styles.onboardingBrandBox}>
             <Text style={styles.onboardingBrandTitle}>이지경매</Text>
@@ -544,7 +551,7 @@ export default function FeedScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* 1. 브랜드 헤더 ("이지경매" / 부제 "경매 물건 떠먹기") + 우측 ☰ 메뉴 */}
       <View style={styles.brandHeader}>
         <View style={styles.brandTitleWrap}>
@@ -1220,22 +1227,23 @@ const styles = StyleSheet.create({
   cardSwipeContainer: {
     flex: 1,
   },
-  storyPage: {
-    flex: 1,
+  storyPageScrollContent: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingTop: 14,
+    paddingBottom: 12,
   },
   storyCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 28,
+    borderRadius: 26,
     overflow: 'hidden',
     shadowColor: '#0f172a',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
-    shadowRadius: 22,
-    elevation: 6,
+    shadowRadius: 18,
+    elevation: 5,
   },
   storyPhotoWrap: {
     width: '100%',
@@ -1248,17 +1256,17 @@ const styles = StyleSheet.create({
   },
   storyTopLeft: {
     position: 'absolute',
-    top: 16,
-    left: 16,
+    top: 14,
+    left: 14,
   },
   storyFavBtn: {
     position: 'absolute',
-    top: 14,
-    right: 14,
+    top: 12,
+    right: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.94)',
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -1268,11 +1276,11 @@ const styles = StyleSheet.create({
   },
   storyBottomLeft: {
     position: 'absolute',
-    bottom: 14,
-    left: 16,
+    bottom: 12,
+    left: 14,
     backgroundColor: 'rgba(15, 23, 42, 0.78)',
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 4,
     borderRadius: 10,
   },
   storyDDayText: {
@@ -1281,65 +1289,65 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   storyBody: {
-    paddingHorizontal: 22,
-    paddingTop: 22,
-    paddingBottom: 20,
-    gap: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    gap: 12,
   },
   storyHook: {
-    fontSize: 21,
+    fontSize: 19,
     fontWeight: '900',
     color: '#0f172a',
-    lineHeight: 29,
+    lineHeight: 26,
     letterSpacing: -0.4,
   },
   storyPriceBlock: {
-    gap: 8,
+    gap: 6,
   },
   storyBigPrice: {
-    fontSize: 30,
+    fontSize: 27,
     fontWeight: '900',
     color: '#111827',
-    letterSpacing: -0.8,
+    letterSpacing: -0.7,
   },
   storyGapRow: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 7,
   },
   storyPctPill: {
     backgroundColor: '#2563eb',
-    paddingHorizontal: 9,
-    paddingVertical: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 8,
   },
   storyPctText: {
     color: '#ffffff',
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '900',
   },
   storyGapPill: {
     backgroundColor: '#ecfdf5',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
     borderRadius: 8,
   },
   storyGapText: {
     color: '#047857',
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '800',
   },
   storyTagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
   },
   storyTagPill: {
     backgroundColor: '#f1f5f9',
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
   },
   storyTagPillGreen: {
     backgroundColor: '#ecfdf5',
@@ -1348,7 +1356,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fef2f2',
   },
   storyTagText: {
-    fontSize: 12.5,
+    fontSize: 12,
     fontWeight: '700',
     color: '#334155',
   },
@@ -1360,15 +1368,15 @@ const styles = StyleSheet.create({
   },
   storyCtaBtn: {
     backgroundColor: '#2563eb',
-    paddingVertical: 15,
-    borderRadius: 16,
+    paddingVertical: 13,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4,
+    marginTop: 2,
   },
   storyCtaText: {
     color: '#ffffff',
-    fontSize: 15.5,
+    fontSize: 15,
     fontWeight: '800',
   },
   cardNavBar: {
