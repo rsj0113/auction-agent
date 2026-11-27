@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-11-27 20:34:57",
+  "generated_at": "2026-11-27 21:28:51",
   "total_count": 145,
   "green_count": 32,
   "yellow_count": 46,
   "red_count": 67,
   "rental_matched_count": 14,
-  "area_stats_matched_count": 77,
+  "area_stats_matched_count": 72,
   "items": [
     {
       "case_number": "2023타경71728",
@@ -1318,7 +1318,7 @@
     },
     {
       "case_number": "2023타경59626",
-      "headline": "서울 성동구 마장동 빌라 -36% 급락! 고수가 노리는 이유",
+      "headline": "서울 성동구 마장동 상가 -36% 급락! 고수가 노리는 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 243720000,
@@ -1344,7 +1344,7 @@
       "discount_pct": 36,
       "deposit_required": 43328000,
       "deposit_required_str": "4,332만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 0.0,
       "location": "서울특별시 성동구 마장로44길 19 지1층비101호 (마장동,마장동청계아르테미스)",
       "short_location": "서울 성동구 마장동",
@@ -1429,12 +1429,7 @@
         }
       ],
       "rental_estimate": null,
-      "area_winning_stats": {
-        "region_label": "성동구 빌라",
-        "sample_count": 3,
-        "avg_winning_rate": 89.4,
-        "avg_bidder_count": 2.0
-      },
+      "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
           {
@@ -2433,7 +2428,7 @@
     },
     {
       "case_number": "2023타경127584",
-      "headline": "서울 금천구 가산동 빌라가 반값? 감정가보다 2.2억 싼 이유",
+      "headline": "서울 금천구 가산동 오피스텔이 반값? 감정가보다 2.2억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 220774000,
@@ -2459,7 +2454,7 @@
       "discount_pct": 87,
       "deposit_required": 3422600,
       "deposit_required_str": "342만원",
-      "usage": "빌라",
+      "usage": "오피스텔",
       "area_pyeong": 0.0,
       "location": "서울특별시 금천구 가산디지털2로 169-41 제2층 제203호 (가산동, 이지크라운)",
       "short_location": "서울 금천구 가산동",
@@ -2563,10 +2558,10 @@
       ],
       "rental_estimate": null,
       "area_winning_stats": {
-        "region_label": "금천구 빌라",
-        "sample_count": 7,
-        "avg_winning_rate": 60.2,
-        "avg_bidder_count": 1.4
+        "region_label": "금천구 오피스텔",
+        "sample_count": 19,
+        "avg_winning_rate": 62.1,
+        "avg_bidder_count": 3.2
       },
       "raw_court_data": {
         "rights_list": [
@@ -2776,7 +2771,7 @@
     },
     {
       "case_number": "2025타경100969",
-      "headline": "경기 군포시 도마교동 빌라가 반값? 감정가보다 7.6억 싼 이유",
+      "headline": "경기 군포시 도마교동 상가가 반값? 감정가보다 7.6억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 764996000,
@@ -2802,7 +2797,7 @@
       "discount_pct": 79,
       "deposit_required": 20300400,
       "deposit_required_str": "2,030만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 16.0,
       "location": "경기도 군포시 도마교동 478 군포송정풍산리치안 1층에이112호",
       "short_location": "경기 군포시 도마교동",
@@ -3280,7 +3275,7 @@
     },
     {
       "case_number": "2022타경59047",
-      "headline": "경기 성남시 분당구 정자동 빌라가 반값? 감정가보다 3.7억 싼 이유",
+      "headline": "경기 성남시 분당구 정자동 기타가 반값? 감정가보다 3.7억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 369705000,
@@ -3306,7 +3301,7 @@
       "discount_pct": 88,
       "deposit_required": 4929500,
       "deposit_required_str": "492만원",
-      "usage": "빌라",
+      "usage": "기타",
       "area_pyeong": 0.0,
       "location": "경기도 성남시 분당구 불정로 112 1층에이123호 (정자동,피더하우스)",
       "short_location": "경기 성남시 분당구 정자동",
@@ -3645,7 +3640,7 @@
     },
     {
       "case_number": "2024타경1596",
-      "headline": "서울 서대문구 연희동 아파트가 반값? 감정가보다 1.3억 싼 이유",
+      "headline": "서울 서대문구 연희동 상가가 반값? 감정가보다 1.3억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 129888000,
@@ -3671,7 +3666,7 @@
       "discount_pct": 59,
       "deposit_required": 9011200,
       "deposit_required_str": "901만원",
-      "usage": "아파트",
+      "usage": "상가",
       "area_pyeong": 0.0,
       "location": "서울특별시 서대문구 연희로10길 79-20 지2층비201호 (연희동,스카이뷰)",
       "short_location": "서울 서대문구 연희동",
@@ -3834,7 +3829,7 @@
     },
     {
       "case_number": "2024타경3418",
-      "headline": "서울 구로구 구로동 아파트가 반값? 감정가보다 8.2억 싼 이유",
+      "headline": "서울 구로구 구로동 상가가 반값? 감정가보다 8.2억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 821255000,
@@ -3860,7 +3855,7 @@
       "discount_pct": 49,
       "deposit_required": 86164500,
       "deposit_required_str": "8,616만원",
-      "usage": "아파트",
+      "usage": "상가",
       "area_pyeong": 0.0,
       "location": "서울특별시 구로구 구로중앙로 134 제지하1층 제비1가009호 (구로동, 신구로자이 나인스에비뉴)",
       "short_location": "서울 구로구 구로동",
@@ -3958,10 +3953,10 @@
       ],
       "rental_estimate": null,
       "area_winning_stats": {
-        "region_label": "구로구 아파트",
-        "sample_count": 4,
-        "avg_winning_rate": 74.2,
-        "avg_bidder_count": 2.5
+        "region_label": "구로구 상가",
+        "sample_count": 6,
+        "avg_winning_rate": 51.9,
+        "avg_bidder_count": 1.5
       },
       "raw_court_data": {
         "rights_list": [
@@ -4538,7 +4533,7 @@
     },
     {
       "case_number": "2024타경1699",
-      "headline": "서울 성북구 동선동1가 빌라가 반값? 감정가보다 2.9억 싼 이유",
+      "headline": "서울 성북구 동선동1가 상가가 반값? 감정가보다 2.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 294964000,
@@ -4564,7 +4559,7 @@
       "discount_pct": 59,
       "deposit_required": 20463600,
       "deposit_required_str": "2,046만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 0.0,
       "location": "서울특별시 성북구 동소문로20나길 47 지하2층비207호 (동선동1가,코아루센타시아)",
       "short_location": "서울 성북구 동선동1가",
@@ -4657,25 +4652,8 @@
           "date": "20261124"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 20000000,
-        "est_deposit_str": "2,000만원",
-        "est_monthly_rent": 370000,
-        "est_monthly_rent_str": "37만원",
-        "est_jeonse": 100000000,
-        "est_jeonse_str": "1억원",
-        "annual_yield_pct": 2.4,
-        "gap_invest_cash": 104636000,
-        "gap_invest_cash_str": "1억 463만원",
-        "sample_count": 1,
-        "source_label": "법원 현황조사서 실임차 보증금 기준"
-      },
-      "area_winning_stats": {
-        "region_label": "성북구 빌라",
-        "sample_count": 4,
-        "avg_winning_rate": 53.9,
-        "avg_bidder_count": 2.5
-      },
+      "rental_estimate": null,
+      "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
           {
@@ -4718,7 +4696,7 @@
     },
     {
       "case_number": "2024타경2920",
-      "headline": "서울 성북구 동선동1가 빌라가 반값? 감정가보다 9,092만 싼 이유",
+      "headline": "서울 성북구 동선동1가 상가가 반값? 감정가보다 9,092만 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 90922000,
@@ -4744,7 +4722,7 @@
       "discount_pct": 59,
       "deposit_required": 6307800,
       "deposit_required_str": "630만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 0.0,
       "location": "서울특별시 성북구 동소문로20나길 47 지하2층비208호 (동선동1가,코아루센타시아)",
       "short_location": "서울 성북구 동선동1가",
@@ -4838,12 +4816,7 @@
         }
       ],
       "rental_estimate": null,
-      "area_winning_stats": {
-        "region_label": "성북구 빌라",
-        "sample_count": 4,
-        "avg_winning_rate": 53.9,
-        "avg_bidder_count": 2.5
-      },
+      "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
           {
@@ -4874,7 +4847,7 @@
     },
     {
       "case_number": "2025타경52919",
-      "headline": "경기 성남시 중원구 성남동 빌라가 반값? 감정가보다 6.6억 싼 이유",
+      "headline": "경기 성남시 중원구 성남동 상가가 반값? 감정가보다 6.6억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 663000000,
@@ -4900,7 +4873,7 @@
       "discount_pct": 51,
       "deposit_required": 63700000,
       "deposit_required_str": "6,370만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 467.1,
       "location": "경기도 성남시 중원구 성남동 4933 성남아리스타 1층 130호",
       "short_location": "경기 성남시 중원구 성남동",
@@ -5030,7 +5003,7 @@
     },
     {
       "case_number": "2025타경52824",
-      "headline": "경기 성남시 중원구 성남동 467평 빌라, 지금 9.1억에 나왔다 (3.9억 할인)",
+      "headline": "경기 성남시 중원구 성남동 467평 상가, 지금 9.1억에 나왔다 (3.9억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 390000000,
@@ -5056,7 +5029,7 @@
       "discount_pct": 30,
       "deposit_required": 91000000,
       "deposit_required_str": "9,100만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 467.1,
       "location": "경기도 성남시 중원구 성남동 4933 성남아리스타 1층123호",
       "short_location": "경기 성남시 중원구 성남동",
@@ -5323,7 +5296,7 @@
     },
     {
       "case_number": "2023타경80356",
-      "headline": "경기 파주시 야당동 빌라, 감정가보다 2억 싼데 인수금 0원",
+      "headline": "경기 파주시 야당동 아파트, 감정가보다 2억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 202200000,
@@ -5349,7 +5322,7 @@
       "discount_pct": 30,
       "deposit_required": 47180000,
       "deposit_required_str": "4,718만원",
-      "usage": "빌라",
+      "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "경기도 파주시 미래로 422 108동 7층701호 (야당동,한빛마을1단지한라비발디센트럴파크)",
       "short_location": "경기 파주시 야당동",
@@ -5426,10 +5399,10 @@
       ],
       "rental_estimate": null,
       "area_winning_stats": {
-        "region_label": "파주시 빌라",
-        "sample_count": 16,
-        "avg_winning_rate": 45.1,
-        "avg_bidder_count": 1.2
+        "region_label": "파주시 아파트",
+        "sample_count": 3,
+        "avg_winning_rate": 77.5,
+        "avg_bidder_count": 1.0
       },
       "raw_court_data": {
         "rights_list": [
@@ -5461,7 +5434,7 @@
     },
     {
       "case_number": "2023타경101582",
-      "headline": "서울 구로구 구로동 빌라가 반값? 감정가보다 7,084만 싼 이유",
+      "headline": "서울 구로구 구로동 아파트가 반값? 감정가보다 7,084만 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 70848000,
@@ -5487,7 +5460,7 @@
       "discount_pct": 59,
       "deposit_required": 4915200,
       "deposit_required_str": "491만원",
-      "usage": "빌라",
+      "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "서울특별시 구로구 가마산로26길 5 제9층 제903호 (구로동, 로제리움2차)",
       "short_location": "서울 구로구 구로동",
@@ -5591,10 +5564,10 @@
       ],
       "rental_estimate": null,
       "area_winning_stats": {
-        "region_label": "구로구 빌라",
-        "sample_count": 15,
-        "avg_winning_rate": 66.2,
-        "avg_bidder_count": 1.7
+        "region_label": "구로구 아파트",
+        "sample_count": 4,
+        "avg_winning_rate": 74.2,
+        "avg_bidder_count": 2.5
       },
       "raw_court_data": {
         "rights_list": [
@@ -5638,7 +5611,7 @@
     },
     {
       "case_number": "2024타경3528",
-      "headline": "서울 중구 신당동 빌라가 반값? 감정가보다 1.4억 싼 이유",
+      "headline": "서울 중구 신당동 상가가 반값? 감정가보다 1.4억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 137616000,
@@ -5664,7 +5637,7 @@
       "discount_pct": 49,
       "deposit_required": 14438400,
       "deposit_required_str": "1,443만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 0.0,
       "location": "서울특별시 중구 청계천로 334 2층나-36호",
       "short_location": "서울 중구 신당동",
@@ -5763,10 +5736,10 @@
       ],
       "rental_estimate": null,
       "area_winning_stats": {
-        "region_label": "중구 빌라",
-        "sample_count": 5,
-        "avg_winning_rate": 41.6,
-        "avg_bidder_count": 2.0
+        "region_label": "중구 상가",
+        "sample_count": 52,
+        "avg_winning_rate": 97.4,
+        "avg_bidder_count": 1.6
       },
       "raw_court_data": {
         "rights_list": [
@@ -5810,7 +5783,7 @@
     },
     {
       "case_number": "2024타경105103",
-      "headline": "경기 안양시 동안구 비산동 빌라, 신건 첫 입찰 (3.2억)",
+      "headline": "경기 안양시 동안구 비산동 아파트, 신건 첫 입찰 (3.2억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -5836,7 +5809,7 @@
       "discount_pct": 0,
       "deposit_required": 32300000,
       "deposit_required_str": "3,230만원",
-      "usage": "빌라",
+      "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "경기도 안양시 동안구 경수대로 947 2층211호 (비산동,비산화성파크드림)",
       "short_location": "경기 안양시 동안구 비산동",
@@ -8651,7 +8624,7 @@
     },
     {
       "case_number": "2024타경794",
-      "headline": "경기 수원시 권선구 금곡동 빌라, 감정가보다 1,243만 저렴하게",
+      "headline": "경기 수원시 권선구 금곡동 아파트, 감정가보다 1,243만 저렴하게",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 12430000,
@@ -8677,7 +8650,7 @@
       "discount_pct": 6,
       "deposit_required": 18500000,
       "deposit_required_str": "1,850만원",
-      "usage": "빌라",
+      "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "경기도 수원시 권선구 금곡로196번길 15 7층710호 (금곡동,커낼파크)",
       "short_location": "경기 수원시 권선구 금곡동",
@@ -8780,12 +8753,7 @@
         }
       ],
       "rental_estimate": null,
-      "area_winning_stats": {
-        "region_label": "권선구 빌라",
-        "sample_count": 20,
-        "avg_winning_rate": 60.7,
-        "avg_bidder_count": 1.0
-      },
+      "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
           {
@@ -8824,7 +8792,7 @@
     },
     {
       "case_number": "2024타경5253",
-      "headline": "경기 고양시 덕양구 지축동 빌라가 반값? 감정가보다 4억 싼 이유",
+      "headline": "경기 고양시 덕양구 지축동 상가가 반값? 감정가보다 4억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 395908000,
@@ -8850,7 +8818,7 @@
       "discount_pct": 76,
       "deposit_required": 12509200,
       "deposit_required_str": "1,250만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 0.0,
       "location": "경기도 고양시 덕양구 지축로 70 2층210호 (지축동,지축푸리마타워)",
       "short_location": "경기 고양시 덕양구 지축동",
@@ -9007,7 +8975,7 @@
     },
     {
       "case_number": "2023타경57385",
-      "headline": "서울 광진구 중곡동 오피스텔가 반값? 감정가보다 1.9억 싼 이유",
+      "headline": "서울 광진구 중곡동 오피스텔이 반값? 감정가보다 1.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 185386000,
@@ -9355,7 +9323,7 @@
     },
     {
       "case_number": "2025타경3082",
-      "headline": "36% 떨어진 서울 서초구 양재동 빌라, 1.5억대 노려볼까?",
+      "headline": "36% 떨어진 서울 서초구 양재동 상가, 1.5억대 노려볼까?",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 85320000,
@@ -9381,7 +9349,7 @@
       "discount_pct": 36,
       "deposit_required": 15168000,
       "deposit_required_str": "1,516만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 2.7,
       "location": "서울특별시 서초구 양재동 215 하이브랜드 1층리빙관1층145호",
       "short_location": "서울 서초구 양재동",
@@ -9467,11 +9435,23 @@
           "date": "20261028"
         }
       ],
-      "rental_estimate": null,
+      "rental_estimate": {
+        "est_deposit": 10000000,
+        "est_deposit_str": "1,000만원",
+        "est_monthly_rent": 1000000,
+        "est_monthly_rent_str": "100만원",
+        "est_jeonse": 0,
+        "est_jeonse_str": "",
+        "annual_yield_pct": 8.5,
+        "gap_invest_cash": 0,
+        "gap_invest_cash_str": "",
+        "sample_count": 24,
+        "source_label": "네이버 부동산 서초구 월세"
+      },
       "area_winning_stats": {
-        "region_label": "서초구 빌라",
-        "sample_count": 5,
-        "avg_winning_rate": 55.3,
+        "region_label": "서초구 상가",
+        "sample_count": 14,
+        "avg_winning_rate": 47.8,
         "avg_bidder_count": 1.0
       },
       "raw_court_data": {
@@ -10158,7 +10138,7 @@
     },
     {
       "case_number": "2024타경110679",
-      "headline": "경기 안양시 만안구 안양동 오피스텔가 반값? 감정가보다 2.7억 싼 이유",
+      "headline": "경기 안양시 만안구 안양동 오피스텔이 반값? 감정가보다 2.7억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 273112000,
@@ -10496,7 +10476,7 @@
     },
     {
       "case_number": "2025타경2820",
-      "headline": "경기 성남시 수정구 창곡동 빌라가 반값? 감정가보다 6.8억 싼 이유",
+      "headline": "경기 성남시 수정구 창곡동 상가가 반값? 감정가보다 6.8억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 681630000,
@@ -10522,7 +10502,7 @@
       "discount_pct": 76,
       "deposit_required": 21537000,
       "deposit_required_str": "2,153만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 393.2,
       "location": "경기도 성남시 수정구 창곡동 595 더퍼스트메디타워 1층106호",
       "short_location": "경기 성남시 수정구 창곡동",
@@ -10532,9 +10512,9 @@
       "d_day": "32일 전 마감",
       "lat": 37.471029,
       "lng": 127.139698,
-      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photo_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
       "photos": [
-        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
       ],
       "photo_source": "stock",
       "photo_source_label": "🖼️ 참고 이미지",
@@ -10615,17 +10595,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 16000000,
-        "est_deposit_str": "1,600만원",
-        "est_monthly_rent": 290000,
-        "est_monthly_rent_str": "29만원",
-        "est_jeonse": 80000000,
-        "est_jeonse_str": "8,000만원",
-        "annual_yield_pct": 1.7,
-        "gap_invest_cash": 135370000,
-        "gap_invest_cash_str": "1억 3,537만원",
-        "sample_count": 1,
-        "source_label": "법원 현황조사서 실임차 보증금 기준"
+        "est_deposit": 30000000,
+        "est_deposit_str": "3,000만원",
+        "est_monthly_rent": 2300000,
+        "est_monthly_rent_str": "230만원",
+        "est_jeonse": 0,
+        "est_jeonse_str": "",
+        "annual_yield_pct": 14.9,
+        "gap_invest_cash": 0,
+        "gap_invest_cash_str": "",
+        "sample_count": 1847,
+        "source_label": "네이버 부동산 창곡동 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -11352,7 +11332,7 @@
     },
     {
       "case_number": "2025타경63300",
-      "headline": "경기 고양시 덕양구 고양동 빌라가 반값? 감정가보다 2억 싼 이유",
+      "headline": "경기 고양시 덕양구 고양동 아파트가 반값? 감정가보다 2억 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 204000000,
@@ -11378,7 +11358,7 @@
       "discount_pct": 51,
       "deposit_required": 19600000,
       "deposit_required_str": "1,960만원",
-      "usage": "빌라",
+      "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "경기도 고양시 덕양구 푸른마을로 56 504동 17층1704호 (고양동,푸른마을5단지)",
       "short_location": "경기 고양시 덕양구 고양동",
@@ -11388,9 +11368,9 @@
       "d_day": "22일 전 마감",
       "lat": 37.644965,
       "lng": 126.826242,
-      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
       "photos": [
-        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
       ],
       "photo_source": "stock",
       "photo_source_label": "🖼️ 참고 이미지",
@@ -12007,7 +11987,7 @@
     },
     {
       "case_number": "2023타경4780",
-      "headline": "임차인 0명 · 경기 남양주시 다산동 빌라, 7.5억에 깔끔하게 시작",
+      "headline": "임차인 0명 · 경기 남양주시 다산동 아파트, 7.5억에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 0,
@@ -12033,7 +12013,7 @@
       "discount_pct": 0,
       "deposit_required": 75000000,
       "deposit_required_str": "7,500만원",
-      "usage": "빌라",
+      "usage": "아파트",
       "area_pyeong": 24.9,
       "location": "경기도 남양주시 다산순환로 300 2101동 4층 404호 (다산동,다산반도유보라메이플타운)",
       "short_location": "경기 남양주시 다산동",
@@ -12043,9 +12023,9 @@
       "d_day": "15일 전 마감",
       "lat": 37.626769,
       "lng": 127.21946,
-      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
       "photos": [
-        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
       ],
       "photo_source": "stock",
       "photo_source_label": "🖼️ 참고 이미지",
@@ -12092,10 +12072,10 @@
       ],
       "rental_estimate": null,
       "area_winning_stats": {
-        "region_label": "남양주시 빌라",
-        "sample_count": 12,
-        "avg_winning_rate": 40.3,
-        "avg_bidder_count": 2.0
+        "region_label": "남양주시 아파트",
+        "sample_count": 4,
+        "avg_winning_rate": 85.8,
+        "avg_bidder_count": 5.2
       },
       "raw_court_data": {
         "rights_list": [
@@ -12303,7 +12283,7 @@
     },
     {
       "case_number": "2024타경1542",
-      "headline": "서울 강서구 마곡동 빌라가 반값? 감정가보다 9.2억 싼 이유",
+      "headline": "서울 강서구 마곡동 상가가 반값? 감정가보다 9.2억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 917729280,
@@ -12329,7 +12309,7 @@
       "discount_pct": 87,
       "deposit_required": 14227072,
       "deposit_required_str": "1,422만원",
-      "usage": "빌라",
+      "usage": "상가",
       "area_pyeong": 0.0,
       "location": "서울특별시 강서구 강서로 433 제1층 제127호 (마곡동, 마곡오드카운티2차)",
       "short_location": "서울 강서구 마곡동",
@@ -12339,9 +12319,9 @@
       "d_day": "30일 전 마감",
       "lat": 37.562081,
       "lng": 126.82613,
-      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photo_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
       "photos": [
-        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
       ],
       "photo_source": "stock",
       "photo_source_label": "🖼️ 참고 이미지",
@@ -12429,10 +12409,10 @@
       ],
       "rental_estimate": null,
       "area_winning_stats": {
-        "region_label": "강서구 빌라",
-        "sample_count": 31,
-        "avg_winning_rate": 65.5,
-        "avg_bidder_count": 2.6
+        "region_label": "강서구 상가",
+        "sample_count": 12,
+        "avg_winning_rate": 64.6,
+        "avg_bidder_count": 1.5
       },
       "raw_court_data": {
         "rights_list": [
@@ -13670,7 +13650,7 @@
     },
     {
       "case_number": "2022타경54440",
-      "headline": "서울 강동구 천호동 빌라가 반값? 감정가보다 3.2억 싼 이유",
+      "headline": "서울 강동구 천호동 오피스텔이 반값? 감정가보다 3.2억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 319310000,
@@ -13696,7 +13676,7 @@
       "discount_pct": 96,
       "deposit_required": 1469000,
       "deposit_required_str": "146만원",
-      "usage": "빌라",
+      "usage": "오피스텔",
       "area_pyeong": 0.0,
       "location": "서울특별시 강동구 성안로25길 21 3층303호 (천호동,성우스타팰리스)",
       "short_location": "서울 강동구 천호동",
@@ -13706,9 +13686,9 @@
       "d_day": "18일 전 마감",
       "lat": 37.544008,
       "lng": 127.131272,
-      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photo_url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
       "photos": [
-        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
       ],
       "photo_source": "stock",
       "photo_source_label": "🖼️ 참고 이미지",
@@ -13781,12 +13761,7 @@
         }
       ],
       "rental_estimate": null,
-      "area_winning_stats": {
-        "region_label": "강동구 빌라",
-        "sample_count": 8,
-        "avg_winning_rate": 60.4,
-        "avg_bidder_count": 1.1
-      },
+      "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
           {
@@ -14627,7 +14602,7 @@
     },
     {
       "case_number": "2023타경74754",
-      "headline": "경기 포천시 신북면 2257평 아파트, 신건 첫 입찰 (7,009만)",
+      "headline": "경기 포천시 신북면 2257평 토지, 신건 첫 입찰 (7,009만)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -14653,7 +14628,7 @@
       "discount_pct": -109427,
       "deposit_required": 7009700,
       "deposit_required_str": "700만원",
-      "usage": "아파트",
+      "usage": "토지",
       "area_pyeong": 2257.0,
       "location": "경기도 포천시 신북면 삼성당리 101-1",
       "short_location": "경기 포천시 신북면",
@@ -14663,9 +14638,9 @@
       "d_day": "3일 전 마감",
       "lat": 37.900539,
       "lng": 127.194251,
-      "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photo_url": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
       "photos": [
-        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"
       ],
       "photo_source": "stock",
       "photo_source_label": "🖼️ 참고 이미지",
@@ -14740,9 +14715,9 @@
       ],
       "rental_estimate": null,
       "area_winning_stats": {
-        "region_label": "포천시 아파트",
-        "sample_count": 3,
-        "avg_winning_rate": 83.9,
+        "region_label": "포천시 토지",
+        "sample_count": 18,
+        "avg_winning_rate": 59.7,
         "avg_bidder_count": 2.0
       },
       "raw_court_data": {

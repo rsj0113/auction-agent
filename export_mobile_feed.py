@@ -512,17 +512,129 @@ def load_reference_indexes(conn: sqlite3.Connection) -> tuple[dict, dict, dict]:
     return (naver_by_emd, naver_by_sgg), win_stats, rent_by_sgg_usage
 
 
-def normalize_usage(raw_usage: str, location: str = "") -> str:
-    text = f"{raw_usage} {location}"
-    if "아파트" in text:
-        return "아파트"
-    if "오피스텔" in text:
-        return "오피스텔"
-    if any(k in text for k in ("빌라", "다세대", "연립", "다가구", "단독", "주택")):
-        return "빌라"
-    if any(k in text for k in ("상가", "근린", "점포", "사무실", "오피스")):
+def _extract_floor_from_location(location: str) -> int:
+    """소재지 문자열에서 층수 추출 (지하는 음수, 미확인 시 0)"""
+    if not location:
+        return 0
+    m_under = re.search(
+        r"(?:제?지하|제지|(?<![가-힣A-Za-z])지|(?<![A-Za-z])[bB])\s*([1-9])\s*(?:층|,|~)",
+        location,
+    )
+    if m_under:
+        return -int(m_under.group(1))
+    if re.search(r"(?:지하도상가|지하상가|지하층|지하\s*도)", location):
+        return -1
+    m_ground = re.search(
+        r"(?<!지하)(?<!제지하)(?<!제지)(?<!(?<![가-힣])지)(?<!(?<![A-Za-z])[bB])(?:제)?\s*([1-9][0-9]?)\s*층",
+        location,
+    )
+    if m_ground:
+        return int(m_ground.group(1))
+    return 0
+
+
+def normalize_usage(raw_usage: str, location: str = "", remarks: str = "") -> str:
+    """
+    DB 원본 usage 오류를 소재지(단지·브랜드·동·층·호) 및 비고 원문으로 교정하여
+    '아파트' / '오피스텔' / '빌라' / '상가' / '토지' / '기타' 중 하나로 정규화한다.
+    """
+    raw = (raw_usage or "").strip()
+    loc = (location or "").strip()
+    loc_lower = loc.lower()
+    rem = (remarks or "").strip()
+    flr = _extract_floor_from_location(loc)
+
+    # 0. 순수 토지 판별 (층/호/동 표기가 없고 지번으로 끝나는 경우 — '삼성당리' 등 행정지명 오탐 방지)
+    has_unit = bool(re.search(r"(?:층|호|동\s+\d)", loc))
+    if loc and not has_unit and not any(k in loc for k in ("아파트", "빌라", "오피스텔", "상가", "주택", "타워", "프라자")):
+        if (
+            any(k in raw for k in ("토지", "대지", "임야", "전", "답", "농지"))
+            or "임야" in loc
+            or re.search(r"\b산\s*\d+", loc)
+            or re.search(r"\d+(-\d+)?$", loc)
+        ):
+            if raw not in ("기타", "차량/기타", "노유자복지시설"):
+                return "토지"
+
+    # 1. 특수 노유자/복지시설
+    if any(k in loc or k in raw or k in rem for k in ("노유자", "복지시설", "요양시설", "노인복지", "피더하우스")):
+        return "기타"
+
+    # 2. 명확한 상가/근린시설 (단지내 상가, 판매시설, 상업 타워/몰, 1층 대형 호수, 구획 상가 호수)
+    comm_loc_kw = (
+        "단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장",
+        "상가", "근린", "지식산업", "프라자", "플라자", "에이스하이테크", "테크노", "비즈타워",
+        "메디타워", "푸리마타워", "하이브랜드", "리빙관", "나인스에비뉴", "몰", "마켓", "스퀘어",
+        "아케이드", "에스케이브이", "sk v1", "점포", "판매시설", "성남아리스타", "코아루센타시아",
+    )
+    if any(k in loc_lower for k in comm_loc_kw):
         return "상가"
-    if any(k in text for k in ("토지", "대지", "임야", "전", "답", "농지")):
+    if any(k in rem for k in ("판매시설", "오픈상가", "일반음식점", "스크린야구장", "근린생활시설(학원", "근린생활시설(음식점")):
+        return "상가"
+
+    has_apt_dong = bool(re.search(r"(?:제)?([1-9]\d{2,3})동", loc))
+    # 구획 상가 호수 패턴 (예: '2층나-36호', '제비1가009호')
+    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호", loc):
+        return "상가"
+    # 1층 대형 상가 호수 (101동~ 없는 단일 건물 1층 106호 이상 — 예: 성남아리스타 1층123호, 1층에이112호)
+    if flr == 1 and not has_apt_dong:
+        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2})호", loc)
+        if m_ho and int(m_ho.group(1)) >= 106:
+            return "상가"
+    # 지하2층 이상 (명시적 주거용 제외)
+    if flr <= -2 and not any(k in loc for k in ("빌라", "다세대", "연립", "주택")):
+        return "상가"
+
+    # 3. 오피스텔 (오피스텔 전용 브랜드·키워드 + 비고 공부상 오피스텔; '힐스테이트' 오탐 제외)
+    offi_kw = (
+        "오피스텔", "아트리움", "리버빌", "오피스", "메종", "르메이에르", "샤르망",
+        "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티",
+        "자이엘라", "아이파크디어반", "더샵스타파크",
+    )
+    is_offi_state = ("스테이트" in loc and "힐스테이트" not in loc)
+    if (
+        any(k in loc for k in offi_kw)
+        or is_offi_state
+        or "오피스텔" in raw
+        or re.search(r"(?:건축물대장상|공부상)[^.]{0,16}오피스텔", rem)
+    ):
+        return "오피스텔"
+
+    # 4. 아파트 (단지·브랜드 키워드 + 101동~ & 6층 이상 휴리스틱 + 7층 이상 공동주택)
+    villa_kw = (
+        "빌라", "다세대", "연립", "맨션", "하이츠", "빌리지", "주택", "하우스",
+        "캐슬빌", "아트빌", "그린빌", "스카이빌", "드림빌", "청구빌", "현대빌", "삼성빌",
+        "샤인빌", "블루빌", "스위트빌", "리즈빌", "아인스빌", "엠에스 빌", "하우징",
+    )
+    apt_strong_kw = (
+        "아파트", "단지", "마을", "비발디", "한라비발디", "자이", "래미안", "푸르지오",
+        "힐스테이트", "아이파크", "더샵", "e편한", "이편한", "이-편한", "롯데캐슬", "주공",
+        "센트럴파크", "호반", "우미린", "포레나", "반도유보라", "유보라", "한양수자인", "수자인",
+        "화성파크드림", "파크드림", "아크로", "데시앙", "센트레빌", "위브", "해링턴", "꿈에그린",
+        "베르디움", "중흥에스클래스", "파크뷰", "리버파크", "트리지움", "엘스", "리센츠",
+        "헬리오시티", "파크리오", "그랑빌",
+    )
+    apt_secondary_kw = ("센트럴", "파크", "포레", "스카이뷰")
+
+    is_villa_name = any(k in loc for k in villa_kw)
+    if flr >= 0:
+        if any(k in loc for k in apt_strong_kw) and not is_villa_name:
+            return "아파트"
+        if any(k in loc for k in apt_secondary_kw) and not is_villa_name and (has_apt_dong or flr >= 5):
+            return "아파트"
+        if has_apt_dong and flr >= 6 and not is_villa_name:
+            return "아파트"
+        if flr >= 7 and "호" in loc and not is_villa_name:
+            return "아파트"
+        if "아파트" in raw and not is_villa_name:
+            return "아파트"
+
+    # 5. 빌라/다세대/상가/토지 fallback
+    if any(k in raw for k in ("빌라", "다세대", "연립", "다가구", "단독", "주택")) or is_villa_name:
+        return "빌라"
+    if any(k in raw for k in ("상가", "근린", "점포", "사무실", "오피스")):
+        return "상가"
+    if any(k in raw for k in ("토지", "대지", "임야", "전", "답", "농지")):
         return "토지"
     return "기타"
 
@@ -681,7 +793,7 @@ def generate_feed(limit: int = 500) -> list[dict]:
         failed_count = int(row.get("failed_count") or 0)
         auction_date_str = (row.get("auction_date") or "").strip()
 
-        usage_label = normalize_usage(raw_usage, location)
+        usage_label = normalize_usage(raw_usage, location, (row.get("remarks") or "").strip())
 
         # 지역 명확 표기 (시/도 + 시/군/구 + 동/읍/면, 예: '서울 성동구 마장동', '경기 파주시 와동동')
         short_loc = build_full_region_label(location, sgg, emd)
@@ -733,8 +845,9 @@ def generate_feed(limit: int = 500) -> list[dict]:
         hook_loc = short_loc
         pyeong_short = f"{int(round(pyeong))}평 " if pyeong > 0 else ""
 
+        usage_josa = "이" if usage_label == "오피스텔" else "가"
         if discount_pct >= 45:
-            headline = f"{hook_loc} {usage_label}가 반값? {ref_short}보다 {gap_short} 싼 이유"
+            headline = f"{hook_loc} {usage_label}{usage_josa} 반값? {ref_short}보다 {gap_short} 싼 이유"
         elif safety_grade == "GREEN" and gap >= 80_000_000:
             headline = f"{hook_loc} {pyeong_short}{usage_label}, {ref_short}보다 {gap_short} 싼데 인수금 0원"
         elif safety_grade == "RED" and discount_pct >= 30:

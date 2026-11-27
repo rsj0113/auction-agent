@@ -339,43 +339,96 @@ class RightsAnalysisEngine:
         }
 
 
+def _extract_floor_from_location(loc: str) -> int:
+    if not loc:
+        return 0
+    m_under = re.search(r'(?:제?지하|제지|(?<![가-힣A-Za-z])지|(?<![A-Za-z])[bB])\s*([1-9])\s*(?:층|,|~)', loc)
+    if m_under:
+        return -int(m_under.group(1))
+    if re.search(r'(?:지하도상가|지하상가|지하층|지하\s*도)', loc):
+        return -1
+    m_ground = re.search(r'(?<!지하)(?<!제지하)(?<!제지)(?<!(?<![가-힣])지)(?<!(?<![A-Za-z])[bB])(?:제)?\s*([1-9][0-9]?)\s*층', loc)
+    if m_ground:
+        return int(m_ground.group(1))
+    return 0
+
+
 def _infer_usage(loc: str, cur_usage: str = "", flr: int = 0) -> str:
     if cur_usage and cur_usage.strip() not in ("", "기타") and not cur_usage.strip().isdigit():
         return cur_usage.strip()
     loc_s = loc or ""
+    loc_lower = loc_s.lower()
+    if not flr:
+        flr = _extract_floor_from_location(loc_s)
     if any(k in loc_s for k in ["Mercedes-Benz", "BMW", "차대번호", "차종 :", "연식 :"]):
         return "차량/기타"
+
+    # 0-a. 순수 토지 판별 (층/호/동 없는 지번 — '삼성당리' 등 행정지명 오탐 방지)
+    has_unit = bool(re.search(r"(?:층|호|동\s+\d)", loc_s))
+    if loc_s and not has_unit and not any(k in loc_s for k in ["아파트", "빌라", "오피스텔", "상가", "주택", "타워", "프라자"]):
+        if "임야" in loc_s or re.search(r"\b산\s*\d+", loc_s) or re.search(r"\d+(-\d+)?$", loc_s.strip()):
+            return "토지/대지"
 
     # 0. 특수 복지/노유자 시설
     if any(k in loc_s or k in cur_usage for k in ["노유자", "복지시설", "요양시설", "사회복지", "어린이집", "유치원", "노인복지", "피더하우스"]):
         return "노유자복지시설"
 
-    # 1. 단지내 상가 / 상가동
-    if any(k in loc_s for k in ["단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장"]):
+    # 1. 단지내 상가 / 상가동 / 대형 상업시설 / 1층 대형 호수·구획 상가 호수
+    comm_pre_kw = [
+        "단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장",
+        "하이브랜드", "리빙관", "나인스에비뉴", "메디타워", "푸리마타워", "성남아리스타", "코아루센타시아",
+    ]
+    if any(k in loc_s for k in comm_pre_kw):
         return "상가/근린시설"
 
-    # 2. 명확한 주거용 우선 검사 (상가 오분류 방지)
-    apt_kw = ["아파트", "푸르지오", "자이", "래미안", "힐스테이트", "아이파크", "더샵", "롯데캐슬", "이편한세상", "e편한세상", "아크로", "데시앙", "센트레빌", "스카이뷰", "위브", "해링턴", "꿈에그린", "포레나", "호반베르디움", "베르디움", "우미린", "중흥에스클래스", "주공", "현대", "우성", "삼성", "한양", "벽산", "동아", "대림", "대우", "쌍용", "삼익", "선경", "한신", "극동", "경남", "동부", "금호", "코오롱", "신동아", "성원", "건영", "풍림", "삼환", "두산", "엘지", "청구", "미도", "진주", "시영", "그랑빌", "파크뷰", "리버파크", "트리지움", "엘스", "리센츠", "헬리오시티", "파크리오"]
-    if any(k in loc_s for k in apt_kw) and not any(k in loc_s for k in ["상가", "점포"]):
-        return "아파트"
+    has_apt_dong = bool(re.search(r"(?:제)?([1-9]\d{2,3})동", loc_s))
+    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호", loc_s):
+        return "상가/근린시설"
+    if flr == 1 and not has_apt_dong:
+        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2})호", loc_s)
+        if m_ho and int(m_ho.group(1)) >= 106:
+            return "상가/근린시설"
+    if flr <= -2 and not any(k in loc_s for k in ["빌라", "다세대", "연립", "주택"]):
+        return "상가/근린시설"
 
-    offi_kw = ["오피스텔", "아트리움", "리버빌", "스테이트", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크"]
-    if any(k in loc_s for k in offi_kw) and not any(k in loc_s for k in ["상가", "점포"]):
+    # 2. 명확한 오피스텔 전용 브랜드 우선 검사 (푸르지오시티·자이엘라 등이 아파트로 오분류되지 않도록)
+    offi_kw = ["오피스텔", "아트리움", "리버빌", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크"]
+    if (any(k in loc_s for k in offi_kw) or ("스테이트" in loc_s and "힐스테이트" not in loc_s)) and not any(k in loc_s for k in ["상가", "점포"]):
         return "오피스텔"
 
-    villa_kw = ["빌라", "다세대", "연립", "맨션", "하이츠", "빌리지", "타운", "주택", "하우스", "캐슬빌", "아트빌", "그린빌", "스카이빌", "드림빌", "청구빌", "현대빌", "삼성빌", "토브하우스"]
-    if any(k in loc_s for k in villa_kw) and not any(k in loc_s for k in ["상가", "점포", "피더하우스", "노유자", "복지"]):
+    # 3. 명확한 주거용 아파트 우선 검사 (상가·빌라 오분류 방지)
+    villa_kw = ["빌라", "다세대", "연립", "맨션", "하이츠", "빌리지", "주택", "하우스", "캐슬빌", "아트빌", "그린빌", "스카이빌", "드림빌", "청구빌", "현대빌", "삼성빌", "샤인빌", "블루빌", "스위트빌", "리즈빌", "아인스빌", "토브하우스", "하우징"]
+    is_villa_name = any(k in loc_s for k in villa_kw)
+
+    apt_kw = [
+        "아파트", "단지", "마을", "한라비발디", "비발디", "센트럴파크", "푸르지오", "자이", "래미안",
+        "힐스테이트", "아이파크", "더샵", "롯데캐슬", "이편한세상", "e편한세상", "e편한", "이편한", "이-편한",
+        "아크로", "데시앙", "센트레빌", "위브", "해링턴", "꿈에그린", "포레나", "호반베르디움", "호반",
+        "베르디움", "우미린", "중흥에스클래스", "반도유보라", "유보라", "한양수자인", "수자인", "화성파크드림", "파크드림",
+        "주공", "현대", "우성", "삼성래미안", "한양", "벽산", "동아", "대림", "대우", "쌍용", "삼익", "선경",
+        "한신", "극동", "경남", "동부", "금호", "코오롱", "신동아", "성원", "건영", "풍림", "삼환", "두산",
+        "엘지", "청구", "미도", "진주", "시영", "그랑빌", "파크뷰", "리버파크", "트리지움", "엘스", "리센츠",
+        "헬리오시티", "파크리오",
+    ]
+    apt_secondary_kw = ["센트럴", "파크", "포레", "스카이뷰"]
+    if flr >= 0 and not is_villa_name and not any(k in loc_s for k in ["상가", "점포"]):
+        if any(k in loc_s for k in apt_kw):
+            return "아파트"
+        if any(k in loc_s for k in apt_secondary_kw) and (has_apt_dong or flr >= 5):
+            return "아파트"
+
+    if is_villa_name and not any(k in loc_s for k in ["상가", "점포", "피더하우스", "노유자", "복지"]):
         return "다세대/빌라"
 
-    # 3. 명확한 상업용 시설 검사
+    # 4. 명확한 상업용 시설 검사
     comm_kw = ["상가", "근린", "지식산업", "프라자", "플라자", "에이스하이테크", "테크노", "비즈타워", "몰", "마켓", "스퀘어", "아케이드", "에스케이브이", "sk v1", "점포", "판매시설"]
-    if any(k in loc_s for k in comm_kw):
+    if any(k in loc_lower for k in comm_kw):
         return "상가/근린시설"
 
-    dong_m = re.search(r"([1-9]\d{2,3})동", loc_s)
-    if dong_m and not any(k in loc_s for k in villa_kw):
+    # 5. 동·층 휴리스틱 (101동~ + 6층 이상 또는 7층 이상 공동주택 → 아파트)
+    if has_apt_dong and flr >= 6 and not is_villa_name:
         return "아파트"
-    if flr >= 7 and "호" in loc_s:
+    if flr >= 7 and "호" in loc_s and not is_villa_name:
         return "아파트"
     if "층" in loc_s and "호" in loc_s:
         return "다세대/빌라"
@@ -1231,39 +1284,78 @@ class AuctionCrawler:
                     if cur_usage and cur_usage.strip() not in ("", "기타") and not cur_usage.strip().isdigit():
                         return cur_usage.strip()
                     loc_s = loc or ""
+                    loc_lower = loc_s.lower()
+                    if not flr:
+                        flr = _extract_floor_from_location(loc_s)
                     if any(k in loc_s for k in ["Mercedes-Benz", "BMW", "차대번호", "차종 :", "연식 :"]):
                         return "차량/기타"
 
+                    # 0-a. 순수 토지 판별 (층/호/동 없는 지번 — '삼성당리' 등 행정지명 오탐 방지)
+                    has_unit = bool(re.search(r"(?:층|호|동\s+\d)", loc_s))
+                    if loc_s and not has_unit and not any(k in loc_s for k in ["아파트", "빌라", "오피스텔", "상가", "주택", "타워", "프라자"]):
+                        if "임야" in loc_s or re.search(r"\b산\s*\d+", loc_s) or re.search(r"\d+(-\d+)?$", loc_s.strip()):
+                            return "토지/대지"
+
                     # 0. 특수 복지/노유자 시설
-                    if any(k in loc_s or k in cur_usage for k in ["노유자", "복지시설", "요양시설", "사회복지", "어린이집", "유치원", "노인복지"]):
+                    if any(k in loc_s or k in cur_usage for k in ["노유자", "복지시설", "요양시설", "사회복지", "어린이집", "유치원", "노인복지", "피더하우스"]):
                         return "노유자복지시설"
 
-                    # 1. 단지내 상가 / 상가동
-                    if any(k in loc_s for k in ["단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장"]):
+                    # 1. 단지내 상가 / 상가동 / 대형 상업시설 / 1층 대형 호수·구획 상가 호수
+                    comm_pre_kw = [
+                        "단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장",
+                        "하이브랜드", "리빙관", "나인스에비뉴", "메디타워", "푸리마타워", "성남아리스타", "코아루센타시아",
+                    ]
+                    if any(k in loc_s for k in comm_pre_kw):
                         return "상가/근린시설"
 
-                    # 2. 명확한 주거용 우선 검사 (상가 오분류 방지)
-                    apt_kw = ["아파트", "푸르지오", "자이", "래미안", "힐스테이트", "아이파크", "더샵", "롯데캐슬", "이편한세상", "e편한세상", "아크로", "데시앙", "센트레빌", "스카이뷰", "위브", "해링턴", "꿈에그린", "포레나", "호반베르디움", "베르디움", "우미린", "중흥에스클래스", "주공", "현대", "우성", "삼성", "한양", "벽산", "동아", "대림", "대우", "쌍용", "삼익", "선경", "한신", "극동", "경남", "동부", "금호", "코오롱", "신동아", "성원", "건영", "풍림", "삼환", "두산", "엘지", "청구", "미도", "진주", "시영", "그랑빌", "파크뷰", "리버파크", "트리지움", "엘스", "리센츠", "헬리오시티", "파크리오"]
-                    if any(k in loc_s for k in apt_kw) and not any(k in loc_s for k in ["상가", "점포"]):
-                        return "아파트"
+                    has_apt_dong = bool(re.search(r"(?:제)?([1-9]\d{2,3})동", loc_s))
+                    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호", loc_s):
+                        return "상가/근린시설"
+                    if flr == 1 and not has_apt_dong:
+                        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2})호", loc_s)
+                        if m_ho and int(m_ho.group(1)) >= 106:
+                            return "상가/근린시설"
+                    if flr <= -2 and not any(k in loc_s for k in ["빌라", "다세대", "연립", "주택"]):
+                        return "상가/근린시설"
 
-                    offi_kw = ["오피스텔", "아트리움", "리버빌", "스테이트", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크"]
-                    if any(k in loc_s for k in offi_kw) and not any(k in loc_s for k in ["상가", "점포"]):
+                    # 2. 명확한 오피스텔 전용 브랜드 우선 검사
+                    offi_kw = ["오피스텔", "아트리움", "리버빌", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크"]
+                    if (any(k in loc_s for k in offi_kw) or ("스테이트" in loc_s and "힐스테이트" not in loc_s)) and not any(k in loc_s for k in ["상가", "점포"]):
                         return "오피스텔"
 
-                    villa_kw = ["빌라", "다세대", "연립", "맨션", "하이츠", "빌리지", "타운", "주택", "하우스", "캐슬빌", "아트빌", "그린빌", "스카이빌", "드림빌", "청구빌", "현대빌", "삼성빌", "토브하우스"]
-                    if any(k in loc_s for k in villa_kw) and not any(k in loc_s for k in ["상가", "점포", "피더하우스", "노유자", "복지"]):
+                    # 3. 명확한 주거용 아파트 우선 검사 (상가·빌라 오분류 방지)
+                    villa_kw = ["빌라", "다세대", "연립", "맨션", "하이츠", "빌리지", "주택", "하우스", "캐슬빌", "아트빌", "그린빌", "스카이빌", "드림빌", "청구빌", "현대빌", "삼성빌", "샤인빌", "블루빌", "스위트빌", "리즈빌", "아인스빌", "토브하우스", "하우징"]
+                    is_villa_name = any(k in loc_s for k in villa_kw)
+
+                    apt_kw = [
+                        "아파트", "단지", "마을", "한라비발디", "비발디", "센트럴파크", "푸르지오", "자이", "래미안",
+                        "힐스테이트", "아이파크", "더샵", "롯데캐슬", "이편한세상", "e편한세상", "e편한", "이편한", "이-편한",
+                        "아크로", "데시앙", "센트레빌", "위브", "해링턴", "꿈에그린", "포레나", "호반베르디움", "호반",
+                        "베르디움", "우미린", "중흥에스클래스", "반도유보라", "유보라", "한양수자인", "수자인", "화성파크드림", "파크드림",
+                        "주공", "현대", "우성", "삼성래미안", "한양", "벽산", "동아", "대림", "대우", "쌍용", "삼익", "선경",
+                        "한신", "극동", "경남", "동부", "금호", "코오롱", "신동아", "성원", "건영", "풍림", "삼환", "두산",
+                        "엘지", "청구", "미도", "진주", "시영", "그랑빌", "파크뷰", "리버파크", "트리지움", "엘스", "리센츠",
+                        "헬리오시티", "파크리오",
+                    ]
+                    apt_secondary_kw = ["센트럴", "파크", "포레", "스카이뷰"]
+                    if flr >= 0 and not is_villa_name and not any(k in loc_s for k in ["상가", "점포"]):
+                        if any(k in loc_s for k in apt_kw):
+                            return "아파트"
+                        if any(k in loc_s for k in apt_secondary_kw) and (has_apt_dong or flr >= 5):
+                            return "아파트"
+
+                    if is_villa_name and not any(k in loc_s for k in ["상가", "점포", "피더하우스", "노유자", "복지"]):
                         return "다세대/빌라"
 
-                    # 3. 명확한 상업용 시설 검사
+                    # 4. 명확한 상업용 시설 검사
                     comm_kw = ["상가", "근린", "지식산업", "프라자", "플라자", "에이스하이테크", "테크노", "비즈타워", "몰", "마켓", "스퀘어", "아케이드", "에스케이브이", "sk v1", "점포", "판매시설"]
-                    if any(k in loc_s for k in comm_kw):
+                    if any(k in loc_lower for k in comm_kw):
                         return "상가/근린시설"
 
-                    dong_m = re.search(r"([1-9]\d{2,3})동", loc_s)
-                    if dong_m and not any(k in loc_s for k in villa_kw):
+                    # 5. 동·층 휴리스틱 (101동~ + 6층 이상 또는 7층 이상 공동주택 → 아파트)
+                    if has_apt_dong and flr >= 6 and not is_villa_name:
                         return "아파트"
-                    if flr >= 7 and "호" in loc_s:
+                    if flr >= 7 and "호" in loc_s and not is_villa_name:
                         return "아파트"
                     if "층" in loc_s and "호" in loc_s:
                         return "다세대/빌라"
@@ -1332,7 +1424,8 @@ class AuctionCrawler:
                         location_raw = await cols[3].inner_text()
                         location_lines = [l.strip() for l in location_raw.split('\n') if l.strip()]
                         location = next((l for l in location_lines if l not in ("지도", "지적도")), "소재지 정보 없음")
-                        usage = _infer_usage(location, usage_clean)
+                        flr_parsed = _extract_floor_from_location(location)
+                        usage = _infer_usage(location, usage_clean, flr_parsed)
 
                         row_full_text = await row.inner_text()
                         for match in case_matches:
@@ -1491,7 +1584,7 @@ class AuctionCrawler:
                                 from core.geocoder import geocode_address
                                 lat_v, lng_v = geocode_address(bi['location'])
                                 new_batch.append((
-                                    cn, bi['location'], bi.get('usage') or _infer_usage(bi['location']),
+                                    cn, bi['location'], bi.get('usage') or _infer_usage(bi['location'], "", _extract_floor_from_location(bi['location'])),
                                     app_v, min_v, min_v, 1 if app_v > min_v else 0, "[]", "", 0, 0,
                                     score_v, grade_v, f"감정가 대비 {disc_v}% 할인 매물", f"{int(min_v * 1.03):,}원",
                                     rep_v, now_init, now_init, "Rule-Engine", "NEW",
@@ -1518,7 +1611,7 @@ class AuctionCrawler:
                     appraisal   = bi['appraisal']
                     min_bid     = bi['min_bid']
                     location    = bi['location']
-                    usage       = bi.get('usage') or _infer_usage(location)
+                    usage       = bi.get('usage') or _infer_usage(location, "", _extract_floor_from_location(location))
                     row_id      = bi.get('row_id', -1)
 
                     # 스마트 증분 스킵: 이미 DB에 존재하고 최저가 변동이 없으며 등기/권리 정보가 있는 경우 상세 XHR 스킵
