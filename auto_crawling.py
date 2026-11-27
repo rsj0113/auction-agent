@@ -54,6 +54,10 @@ GYEONGGI_COURTS = {
     "고양지원": "",
     "남양주지원": "",
 }
+INCHEON_COURTS = {
+    "인천지방법원": "",
+    "부천지원": "",
+}
 
 console = Console()
 
@@ -376,23 +380,24 @@ def _infer_usage(loc: str, cur_usage: str = "", flr: int = 0) -> str:
     # 1. 단지내 상가 / 상가동 / 대형 상업시설 / 1층 대형 호수·구획 상가 호수
     comm_pre_kw = [
         "단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장",
-        "하이브랜드", "리빙관", "나인스에비뉴", "메디타워", "푸리마타워", "성남아리스타", "코아루센타시아",
+        "하이브랜드", "리빙관", "나인스에비뉴", "메디타워", "푸리마타워", "불로장생타워", "그랑파사쥬",
+        "성남아리스타", "코아루센타시아",
     ]
     if any(k in loc_s for k in comm_pre_kw):
         return "상가/근린시설"
 
     has_apt_dong = bool(re.search(r"(?:제)?([1-9]\d{2,3})동", loc_s))
-    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호", loc_s):
+    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호|\d+-\d+-\d+호", loc_s):
         return "상가/근린시설"
     if flr == 1 and not has_apt_dong:
-        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2})호", loc_s)
+        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2,3})호", loc_s)
         if m_ho and int(m_ho.group(1)) >= 106:
             return "상가/근린시설"
     if flr <= -2 and not any(k in loc_s for k in ["빌라", "다세대", "연립", "주택"]):
         return "상가/근린시설"
 
     # 2. 명확한 오피스텔 전용 브랜드 우선 검사 (푸르지오시티·자이엘라 등이 아파트로 오분류되지 않도록)
-    offi_kw = ["오피스텔", "아트리움", "리버빌", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크"]
+    offi_kw = ["오피스텔", "아트리움", "리버빌", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크", "라포르테블랑"]
     if (any(k in loc_s for k in offi_kw) or ("스테이트" in loc_s and "힐스테이트" not in loc_s)) and not any(k in loc_s for k in ["상가", "점포"]):
         return "오피스텔"
 
@@ -954,7 +959,7 @@ class AuctionCrawler:
             "photos": json.dumps(photos, ensure_ascii=False),
         }
 
-    async def search(self, region: str = "서울", max_items: int = 5, court_code: str = "", debug_dump_path: str = "") -> list:
+    async def search(self, region: str = "서울", max_items: int = 50, court_code: str = "", debug_dump_path: str = "") -> list:
         async with async_playwright() as p:
             # 크롬 내부 기본 팝업 차단 필터가 window.open 및 form.submit을 막지 못하도록 원천 무력화합니다.
             launch_args = [
@@ -1303,23 +1308,24 @@ class AuctionCrawler:
                     # 1. 단지내 상가 / 상가동 / 대형 상업시설 / 1층 대형 호수·구획 상가 호수
                     comm_pre_kw = [
                         "단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장",
-                        "하이브랜드", "리빙관", "나인스에비뉴", "메디타워", "푸리마타워", "성남아리스타", "코아루센타시아",
+                        "하이브랜드", "리빙관", "나인스에비뉴", "메디타워", "푸리마타워", "불로장생타워", "그랑파사쥬",
+                        "성남아리스타", "코아루센타시아",
                     ]
                     if any(k in loc_s for k in comm_pre_kw):
                         return "상가/근린시설"
 
                     has_apt_dong = bool(re.search(r"(?:제)?([1-9]\d{2,3})동", loc_s))
-                    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호", loc_s):
+                    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호|\d+-\d+-\d+호", loc_s):
                         return "상가/근린시설"
                     if flr == 1 and not has_apt_dong:
-                        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2})호", loc_s)
+                        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2,3})호", loc_s)
                         if m_ho and int(m_ho.group(1)) >= 106:
                             return "상가/근린시설"
                     if flr <= -2 and not any(k in loc_s for k in ["빌라", "다세대", "연립", "주택"]):
                         return "상가/근린시설"
 
                     # 2. 명확한 오피스텔 전용 브랜드 우선 검사
-                    offi_kw = ["오피스텔", "아트리움", "리버빌", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크"]
+                    offi_kw = ["오피스텔", "아트리움", "리버빌", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크", "라포르테블랑"]
                     if (any(k in loc_s for k in offi_kw) or ("스테이트" in loc_s and "힐스테이트" not in loc_s)) and not any(k in loc_s for k in ["상가", "점포"]):
                         return "오피스텔"
 
@@ -1923,8 +1929,8 @@ class AuctionAnalyzer:
 # --- Main Execution ---
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--region", default="서울")
-    parser.add_argument("--max-items", type=int, default=2)
+    parser.add_argument("--region", default="수도권")
+    parser.add_argument("--max-items", type=int, default=50)
     parser.add_argument("--property-type", default="", help="0203: 상가, 0205: 오피스텔, 0201: 아파트 등")
     parser.add_argument("--no-headless", action="store_true", help="브라우저 화면 및 개발자 도구를 보여줍니다.")
     parser.add_argument("--api-key", default=None)
@@ -1978,12 +1984,14 @@ async def main():
     engine = RightsAnalysisEngine()
     analyzer = AuctionAnalyzer(api_key=args.api_key)
 
-    # 지역에 따라 법원 목록 결정
-    all_known_courts = {**SEOUL_COURTS, **GYEONGGI_COURTS}
+    # 지역에 따라 법원 목록 결정 (서울 5 + 경기 9 + 인천 2 = 총 16개 수도권 법원)
+    all_known_courts = {**SEOUL_COURTS, **GYEONGGI_COURTS, **INCHEON_COURTS}
     if args.region == "서울":
         court_list = SEOUL_COURTS
     elif args.region == "경기":
         court_list = GYEONGGI_COURTS
+    elif args.region == "인천":
+        court_list = INCHEON_COURTS
     elif args.region in ("전체", "수도권"):
         court_list = all_known_courts
     else:

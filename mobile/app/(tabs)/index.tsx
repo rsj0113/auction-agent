@@ -44,6 +44,7 @@ type FilterType =
   | 'budget_mid'
   | 'seoul'
   | 'gyeonggi';
+type UsageFilterType = 'all' | '아파트' | '빌라' | '오피스텔' | '상가' | '토지';
 type ViewMode = 'list' | 'card' | 'map';
 
 const VIEW_MODE_STORAGE_KEY = 'easy_auction_view_mode';
@@ -143,6 +144,7 @@ export default function FeedScreen() {
   const [menuVisible, setMenuVisible] = useState(false);
 
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [activeUsageFilter, setActiveUsageFilter] = useState<UsageFilterType>('all');
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [selectedMapItem, setSelectedMapItem] = useState<FeedItem | null>(null);
 
@@ -192,9 +194,19 @@ export default function FeedScreen() {
     }
   };
 
-  // '전체 탐색' & '동네 지도'용 필터링 적용 목록 (145건 전체 대상)
+  // 용도별 매물 건수 집계 (용도 필터 칩 배지용)
+  const usageCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: items.length };
+    for (const it of items) {
+      counts[it.usage] = (counts[it.usage] || 0) + 1;
+    }
+    return counts;
+  }, [items]);
+
+  // '전체 탐색' & '동네 지도'용 필터링 적용 목록 (용도 + 난이도/금액/지역 교차 필터)
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
+      if (activeUsageFilter !== 'all' && item.usage !== activeUsageFilter) return false;
       if (activeFilter === 'beginner' && item.safety_grade !== 'GREEN') return false;
       if (activeFilter === 'intermediate' && item.safety_grade !== 'YELLOW') return false;
       if (activeFilter === 'advanced' && item.safety_grade !== 'RED') return false;
@@ -204,10 +216,15 @@ export default function FeedScreen() {
       if (activeFilter === 'gyeonggi' && !item.location.includes('경기') && !item.location.includes('인천')) return false;
       return true;
     });
-  }, [items, activeFilter]);
+  }, [items, activeFilter, activeUsageFilter]);
 
   const handleFilterChange = (type: FilterType) => {
     setActiveFilter(type);
+    setSelectedMapItem(null);
+  };
+
+  const handleUsageFilterChange = (usage: UsageFilterType) => {
+    setActiveUsageFilter(usage);
     setSelectedMapItem(null);
   };
 
@@ -679,15 +696,46 @@ export default function FeedScreen() {
         </View>
       </View>
 
-      {/* 2. 상단 필터 바 ('전체 탐색' & '동네 지도'에서 145건 전체 필터링) */}
+      {/* 2. 상단 필터 바 ('전체 탐색' & '동네 지도'에서 용도 + 난이도/금액/지역 교차 필터링) */}
       {!isLookbook && (
         <View style={styles.filterBar}>
+          {/* 1행: 용도 필터 칩 (전체 | 아파트 | 빌라 | 오피스텔 | 상가 | 토지) */}
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.filterList}
             data={[
-              { type: 'all', label: `전체 ${items.length}` },
+              { type: 'all', label: `전체 ${usageCounts.all || 0}` },
+              { type: '아파트', label: `아파트 ${usageCounts['아파트'] || 0}` },
+              { type: '빌라', label: `빌라 ${usageCounts['빌라'] || 0}` },
+              { type: '오피스텔', label: `오피스텔 ${usageCounts['오피스텔'] || 0}` },
+              { type: '상가', label: `상가 ${usageCounts['상가'] || 0}` },
+              { type: '토지', label: `토지 ${usageCounts['토지'] || 0}` },
+            ]}
+            keyExtractor={(i) => i.type}
+            renderItem={({ item }) => {
+              const isSelected = activeUsageFilter === item.type;
+              return (
+                <TouchableOpacity
+                  style={[styles.usageChip, isSelected && styles.usageChipActive]}
+                  onPress={() => handleUsageFilterChange(item.type as UsageFilterType)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.usageChipText, isSelected && styles.usageChipTextActive]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+
+          {/* 2행: 난이도 · 금액 · 지역 필터 칩 */}
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[styles.filterList, styles.filterListSecondary]}
+            data={[
+              { type: 'all', label: `전체 조건 (${filteredItems.length}건)` },
               { type: 'beginner', label: '🟢 초급' },
               { type: 'intermediate', label: '🟡 중급' },
               { type: 'advanced', label: '🔴 고수' },
@@ -1151,17 +1199,43 @@ const styles = StyleSheet.create({
   // ── 상단 칩 필터 (전체 탐색 & 동네 지도) ──
   filterBar: {
     backgroundColor: '#ffffff',
-    paddingVertical: 8,
+    paddingTop: 6,
+    paddingBottom: 9,
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
+    gap: 7,
   },
   filterList: {
     paddingHorizontal: 16,
-    gap: 8,
+    gap: 7,
+  },
+  filterListSecondary: {
+    paddingTop: 1,
+  },
+  usageChip: {
+    paddingHorizontal: 13,
+    paddingVertical: 6,
+    borderRadius: 18,
+    backgroundColor: '#FAF8F5',
+    borderWidth: 1,
+    borderColor: '#E7E5E4',
+  },
+  usageChipActive: {
+    backgroundColor: '#2563EB',
+    borderColor: '#2563EB',
+  },
+  usageChipText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: '#44403C',
+  },
+  usageChipTextActive: {
+    color: '#ffffff',
+    fontWeight: '800',
   },
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    paddingHorizontal: 13,
+    paddingVertical: 6,
     borderRadius: 20,
     backgroundColor: '#f1f5f9',
   },

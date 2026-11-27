@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-11-27 21:28:51",
-  "total_count": 145,
-  "green_count": 32,
-  "yellow_count": 46,
-  "red_count": 67,
+  "generated_at": "2026-11-27 22:38:50",
+  "total_count": 167,
+  "green_count": 33,
+  "yellow_count": 51,
+  "red_count": 83,
   "rental_matched_count": 14,
-  "area_stats_matched_count": 72,
+  "area_stats_matched_count": 92,
   "items": [
     {
       "case_number": "2023타경71728",
@@ -3270,184 +3270,6 @@
         "legal_div_no": "1174010800",
         "failed_count": 6,
         "auction_date": "20261130"
-      },
-      "court_name": ""
-    },
-    {
-      "case_number": "2022타경59047",
-      "headline": "경기 성남시 분당구 정자동 기타가 반값? 감정가보다 3.7억 싼 이유",
-      "safety_grade": "RED",
-      "difficulty": "ADVANCED",
-      "gap_amount": 369705000,
-      "gap_amount_str": "3억 6,970만원",
-      "gap_short_str": "3.7억",
-      "ref_price_name": "감정가",
-      "market_price": 0,
-      "market_price_str": "",
-      "summary_bullets": [
-        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
-        "💸 감정가(4.2억)보다 3.7억 저렴 (-88%)",
-        "🪙 입찰 보증금 492만원 준비 · D-10"
-      ],
-      "card_tags": [
-        "고수 · 하이리턴",
-        "📍 경기 성남시 분당구 정자동",
-        "보증금 492만"
-      ],
-      "min_bid": 49295000,
-      "min_bid_str": "4,929만원",
-      "appraisal": 419000000,
-      "appraisal_str": "4억 1,900만원",
-      "discount_pct": 88,
-      "deposit_required": 4929500,
-      "deposit_required_str": "492만원",
-      "usage": "기타",
-      "area_pyeong": 0.0,
-      "location": "경기도 성남시 분당구 불정로 112 1층에이123호 (정자동,피더하우스)",
-      "short_location": "경기 성남시 분당구 정자동",
-      "floor": 1,
-      "failed_count": 6,
-      "auction_date": "20261207",
-      "d_day": "D-10",
-      "lat": 37.363746,
-      "lng": 127.111252,
-      "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_15.jpg",
-      "photos": [
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_15.jpg",
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_16.jpg",
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_17.jpg",
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_18.jpg",
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_1.jpg",
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_2.jpg",
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_3.jpg",
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_4.jpg",
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_5.jpg",
-        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_6.jpg"
-      ],
-      "photo_source": "court",
-      "photo_source_label": "🏛️ 법원 감정평가서 10장",
-      "ai_analysis": {
-        "score": 25,
-        "grade": "D",
-        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 88.2%)",
-        "suggested_bid": "50,773,850원 부근",
-        "expected_yield": "보수적 접근 필요",
-        "key_points": [
-          "감정가 대비 88.2% 할인 매물",
-          "유찰 6회 진행"
-        ],
-        "risks": [
-          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
-        ],
-        "extinguished_rights": [
-          "말소기준권리 이후 후순위 제한물권 일체"
-        ],
-        "retained_rights": [
-          "선순위 임차보증금 인수 주의"
-        ],
-        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
-        "malso_right": {
-          "name": "경매개시결정",
-          "date": "2026-02-27",
-          "right_holder": "",
-          "claim_amount": 0
-        },
-        "assumed_deposit": 8,
-        "assumed_deposit_str": "0만원",
-        "senior_unknown_count": 0
-      },
-      "bid_history": [
-        {
-          "round": 1,
-          "price": 419000000,
-          "price_str": "4억 1,900만원",
-          "ratio_pct": 100,
-          "status": "유찰",
-          "is_current": false,
-          "date": "1차 유찰"
-        },
-        {
-          "round": 4,
-          "price": 143720000,
-          "price_str": "1억 4,372만원",
-          "ratio_pct": 34,
-          "status": "유찰",
-          "is_current": false,
-          "date": "4차 유찰"
-        },
-        {
-          "round": 5,
-          "price": 100600000,
-          "price_str": "1억 60만원",
-          "ratio_pct": 24,
-          "status": "유찰",
-          "is_current": false,
-          "date": "5차 유찰"
-        },
-        {
-          "round": 6,
-          "price": 70420000,
-          "price_str": "7,042만원",
-          "ratio_pct": 17,
-          "status": "유찰",
-          "is_current": false,
-          "date": "6차 유찰"
-        },
-        {
-          "round": 7,
-          "price": 49295000,
-          "price_str": "4,929만원",
-          "ratio_pct": 12,
-          "status": "현재 진행",
-          "is_current": true,
-          "date": "20261207"
-        }
-      ],
-      "rental_estimate": null,
-      "area_winning_stats": null,
-      "raw_court_data": {
-        "rights_list": [
-          {
-            "name": "경매개시결정",
-            "date": "2026.02.27"
-          }
-        ],
-        "remarks": "[매각물건명세서 비고]\n1. 공부상 1층은 외형상 2층으로 본건 현관문에는 223호로 표시되어 있음.\n2. 본건 공부상 용도는 노유자시설(노인복지시설)로 입주자 제한여부는 개별확인요망.\n3. 선순위가등기권자 유철재는 담보가등기권자로  2025.1.17.자 권리신고 및 배당요구신청서를 제출함.\n\n[매각조건 비고]\n1. 공부상 1층은 외형상 2층으로 본건 현관문에는 223호로 표시되어 있음.\n2. 본건 공부상 용도는 노유자시설(노인복지시설)로 입주자 제한여부는 개별확인요망.\n3. 선순위가등기권자 유철재는 담보가등기권자로  2025.1.17.자 권리신고 및 배당요구신청서를 제출함.\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 을구 순위 1번 주택임차권등기 있음(임차보증금: 금380,000,000원, 주민등록일자: 2017.12.06, 점유개시일자: 2017.12.06, 확정일자:2017.12.06.) 배당에서 임차보증금이 전액 배당되지 아니하면 잔액을 매수인이 인수함.\n\n[매각물건명세서 을구/최선순위설정]\n2021. 9. 29. 담보가등기\n\n[임차인 현황]\n- 최재훈: 전입 2017.12.06, 보증금 8원, 확정 2017.12.06, 배당요구 없음 (1층에이123호)",
-        "special_rights": [
-          {
-            "id": "prior_provisional",
-            "name": "선순위 가처분/가등기",
-            "short": "선순위가처분",
-            "badge_color": "bg-rose-100 text-rose-800 border-rose-300",
-            "risk_level": "CRITICAL",
-            "icon": "🚨",
-            "desc": "말소기준권리보다 앞선 처분금지가처분 또는 소유권이전청구권가등기로 낙찰자가 소유권을 상실할 위험이 있는 고위험 권리입니다."
-          }
-        ],
-        "tenants_list": [
-          {
-            "name": "최재훈",
-            "room": "1층에이123호",
-            "move_in_date": "2017.12.06",
-            "deposit": 8,
-            "deposit_str": "0만원",
-            "monthly_rent": "100만원",
-            "fixed_date": "2017.12.06",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          }
-        ],
-        "senior_assumed_deposit": 8,
-        "senior_assumed_deposit_str": "0만원",
-        "senior_unknown_count": 0,
-        "tenant_registration_date": "2017.12.06",
-        "tenant_deposit": 8,
-        "tenant_deposit_str": "0만원",
-        "is_payout_requested": false,
-        "court_name": "",
-        "legal_div_no": "4113510300",
-        "failed_count": 6,
-        "auction_date": "20261207"
       },
       "court_name": ""
     },
@@ -9973,6 +9795,358 @@
       "court_name": ""
     },
     {
+      "case_number": "2023타경126956",
+      "headline": "서울 강서구 공항동 빌라가 반값? 감정가보다 1.6억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 157167000,
+      "gap_amount_str": "1억 5,716만원",
+      "gap_short_str": "1.6억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(1.6억)보다 1.6억 저렴 (-99%)",
+        "🪙 입찰 보증금 18만원 준비 · D-4"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 강서구 공항동",
+        "보증금 18만"
+      ],
+      "min_bid": 1833000,
+      "min_bid_str": "183만원",
+      "appraisal": 159000000,
+      "appraisal_str": "1억 5,900만원",
+      "discount_pct": 99,
+      "deposit_required": 183300,
+      "deposit_required_str": "18만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 강서구 송정로 53 제101동 제4층 제404호 (공항동, 발쿠치네하우스)",
+      "short_location": "서울 강서구 공항동",
+      "floor": 4,
+      "failed_count": 20,
+      "auction_date": "20261201",
+      "d_day": "D-4",
+      "lat": 37.559187,
+      "lng": 126.842588,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 98.8%)",
+        "suggested_bid": "1,887,990원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 98.8% 할인 매물",
+          "유찰 20회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "가압류",
+          "date": "2022-06-30",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 135000000,
+        "assumed_deposit_str": "1억 3,500만원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 159000000,
+          "price_str": "1억 5,900만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 3580000,
+          "price_str": "358만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "18차 유찰"
+        },
+        {
+          "round": 19,
+          "price": 2860000,
+          "price_str": "286만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "19차 유찰"
+        },
+        {
+          "round": 20,
+          "price": 2290000,
+          "price_str": "229만원",
+          "ratio_pct": 1,
+          "status": "유찰",
+          "is_current": false,
+          "date": "20차 유찰"
+        },
+        {
+          "round": 21,
+          "price": 1833000,
+          "price_str": "183만원",
+          "ratio_pct": 1,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261201"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "강서구 빌라",
+        "sample_count": 31,
+        "avg_winning_rate": 65.5,
+        "avg_bidder_count": 2.6
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "가압류",
+            "date": "2022.06.30"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.26"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각조건 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 임차인이 있음(임대차보증금 135,000,000원, 전입일자 2021.10.29., 확정일자 2021.10.06.).\n배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수함.\n\n[매각물건명세서 을구/최선순위설정]\n2022.06.30. 가압류\n\n[임차인 현황]\n- 박미라: 전입 2021.10.29, 보증금 미상, 확정 미상, 배당요구 없음 (제101동 제4층 제404호)",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "박미라",
+            "room": "제101동 제4층 제404호",
+            "move_in_date": "2021.10.29",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 135000000,
+        "senior_assumed_deposit_str": "1억 3,500만원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2021.10.29",
+        "tenant_deposit": 135000000,
+        "tenant_deposit_str": "1억 3,500만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1150010800",
+        "failed_count": 20,
+        "auction_date": "20261201"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2022타경113253",
+      "headline": "서울 중랑구 상봉동 빌라가 반값? 감정가보다 2.8억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 277760000,
+      "gap_amount_str": "2억 7,776만원",
+      "gap_short_str": "2.8억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.8억)보다 2.8억 저렴 (-99%)",
+        "🪙 입찰 보증금 32만원 준비 · D-4"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 중랑구 상봉동",
+        "보증금 32만"
+      ],
+      "min_bid": 3240000,
+      "min_bid_str": "324만원",
+      "appraisal": 281000000,
+      "appraisal_str": "2억 8,100만원",
+      "discount_pct": 99,
+      "deposit_required": 324000,
+      "deposit_required_str": "32만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 중랑구 동일로118길 36 5층501호 (상봉동,해피리움)",
+      "short_location": "서울 중랑구 상봉동",
+      "floor": 5,
+      "failed_count": 20,
+      "auction_date": "20261201",
+      "d_day": "D-4",
+      "lat": 37.602885,
+      "lng": 127.092666,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 98.8%)",
+        "suggested_bid": "3,337,200원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 98.8% 할인 매물",
+          "유찰 20회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2023-03-14",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 3,
+        "assumed_deposit_str": "0만원",
+        "senior_unknown_count": 0
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 281000000,
+          "price_str": "2억 8,100만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 6330000,
+          "price_str": "633만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "18차 유찰"
+        },
+        {
+          "round": 19,
+          "price": 5060000,
+          "price_str": "506만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "19차 유찰"
+        },
+        {
+          "round": 20,
+          "price": 4050000,
+          "price_str": "405만원",
+          "ratio_pct": 1,
+          "status": "유찰",
+          "is_current": false,
+          "date": "20차 유찰"
+        },
+        {
+          "round": 21,
+          "price": 3240000,
+          "price_str": "324만원",
+          "ratio_pct": 1,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261201"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "중랑구 빌라",
+        "sample_count": 6,
+        "avg_winning_rate": 86.5,
+        "avg_bidder_count": 1.8
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.03.14"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n임차인 전찬민은 대항력있는 임차인으로 배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수함\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각조건 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[소멸되지 않는 권리]\n을구 1번 2022. 11. 7. 접수 제158833호 주택임차권등기\n\n[매각물건명세서 을구/최선순위설정]\n2022. 1. 13. 압류\n\n[임차인 현황]\n- 전찬민: 전입 2020.10.20, 보증금 3원, 확정 미상, 배당요구 없음 (5층501호)",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "전찬민",
+            "room": "5층501호",
+            "move_in_date": "2020.10.20",
+            "deposit": 3,
+            "deposit_str": "0만원",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 3,
+        "senior_assumed_deposit_str": "0만원",
+        "senior_unknown_count": 0,
+        "tenant_registration_date": "2020.10.20",
+        "tenant_deposit": 3,
+        "tenant_deposit_str": "0만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1126010200",
+        "failed_count": 20,
+        "auction_date": "20261201"
+      },
+      "court_name": ""
+    },
+    {
       "case_number": "2025타경168",
       "headline": "경기 군포시 당동 아파트가 반값? 감정가보다 2.9억 싼 이유",
       "safety_grade": "RED",
@@ -10297,6 +10471,185 @@
         "legal_div_no": "4117110100",
         "failed_count": 13,
         "auction_date": "20261201"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경118641",
+      "headline": "서울 강서구 화곡동 빌라가 반값? 감정가보다 1.5억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 154038000,
+      "gap_amount_str": "1억 5,403만원",
+      "gap_short_str": "1.5억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(1.6억)보다 1.5억 저렴 (-95%)",
+        "🪙 입찰 보증금 89만원 준비 · D-6"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 강서구 화곡동",
+        "보증금 89만"
+      ],
+      "min_bid": 8962000,
+      "min_bid_str": "896만원",
+      "appraisal": 163000000,
+      "appraisal_str": "1억 6,300만원",
+      "discount_pct": 95,
+      "deposit_required": 896200,
+      "deposit_required_str": "89만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 강서구 가로공원로 236-15 제2층 제202호 (화곡동, 엘케이드림빌)",
+      "short_location": "서울 강서구 화곡동",
+      "floor": 2,
+      "failed_count": 13,
+      "auction_date": "20261203",
+      "d_day": "D-6",
+      "lat": 37.539709,
+      "lng": 126.84429,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 94.5%)",
+        "suggested_bid": "9,230,860원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 94.5% 할인 매물",
+          "유찰 13회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2023-09-12",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 150000000,
+        "assumed_deposit_str": "1억 5,000만원",
+        "senior_unknown_count": 2
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 163000000,
+          "price_str": "1억 6,300만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 11,
+          "price": 17500000,
+          "price_str": "1,750만원",
+          "ratio_pct": 11,
+          "status": "유찰",
+          "is_current": false,
+          "date": "11차 유찰"
+        },
+        {
+          "round": 12,
+          "price": 14000000,
+          "price_str": "1,400만원",
+          "ratio_pct": 9,
+          "status": "유찰",
+          "is_current": false,
+          "date": "12차 유찰"
+        },
+        {
+          "round": 13,
+          "price": 11200000,
+          "price_str": "1,120만원",
+          "ratio_pct": 7,
+          "status": "유찰",
+          "is_current": false,
+          "date": "13차 유찰"
+        },
+        {
+          "round": 14,
+          "price": 8962000,
+          "price_str": "896만원",
+          "ratio_pct": 5,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261203"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "강서구 빌라",
+        "sample_count": 31,
+        "avg_winning_rate": 65.5,
+        "avg_bidder_count": 2.6
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.09.12"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.07"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n집합건축물대장상 제1종근린생활시설(의원)로 등재되어 있으나, 현황 주택(주거용)으로 이용중임\n\n[소멸되지 않는 권리]\n을구 3번 주택임차권등기와 관련하여 매수인에게 대항할 수 있는 임차인이 있음(임차보증금 150,000,000원, 전입일자 2018.06.01. 확정일자 2018.06.01.)\n배당에서 보증금이 전액 변제되지 않으면 잔액을 매수인이 인수함\n\n[매각물건명세서 을구/최선순위설정]\n2023.09.12. 경매개시결정\n\n[임차인 현황]\n- 박종길(조진숙의 배우자): 전입 2018.06.01, 보증금 미상, 확정 미상, 배당요구 없음 (제2층 제202호)\n- 유재욱: 전입 2019.06.03, 보증금 미상, 확정 미상, 배당요구 없음 (제2층 제202호)",
+        "special_rights": [],
+        "tenants_list": [
+          {
+            "name": "박종길(조진숙의 배우자)",
+            "room": "제2층 제202호",
+            "move_in_date": "2018.06.01",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "유재욱",
+            "room": "제2층 제202호",
+            "move_in_date": "2019.06.03",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 150000000,
+        "senior_assumed_deposit_str": "1억 5,000만원",
+        "senior_unknown_count": 2,
+        "tenant_registration_date": "2018.06.01",
+        "tenant_deposit": 150000000,
+        "tenant_deposit_str": "1억 5,000만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1150010300",
+        "failed_count": 13,
+        "auction_date": "20261203"
       },
       "court_name": ""
     },
@@ -11986,6 +12339,184 @@
       "court_name": ""
     },
     {
+      "case_number": "2023타경108446",
+      "headline": "서울 구로구 오류동 아파트가 반값? 감정가보다 2.4억 싼 이유",
+      "safety_grade": "YELLOW",
+      "difficulty": "INTERMEDIATE",
+      "gap_amount": 237236000,
+      "gap_amount_str": "2억 3,723만원",
+      "gap_short_str": "2.4억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🟡 입찰 전 점유현황·미납 관리비 체크 권장",
+        "💸 감정가(2.4억)보다 2.4억 저렴 (-99%)",
+        "🪙 입찰 보증금 17만원 준비 · 9일 전 마감"
+      ],
+      "card_tags": [
+        "중급 · 권리 체크",
+        "📍 서울 구로구 오류동",
+        "보증금 17만"
+      ],
+      "min_bid": 1764000,
+      "min_bid_str": "176만원",
+      "appraisal": 239000000,
+      "appraisal_str": "2억 3,900만원",
+      "discount_pct": 99,
+      "deposit_required": 176400,
+      "deposit_required_str": "17만원",
+      "usage": "아파트",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 구로구 경인로15나길 20 제104동 제3층 제302호 (오류동, 양지마을)",
+      "short_location": "서울 구로구 오류동",
+      "floor": 3,
+      "failed_count": 22,
+      "auction_date": "20261118",
+      "d_day": "9일 전 마감",
+      "lat": 37.487236,
+      "lng": 126.887491,
+      "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 68,
+        "grade": "B",
+        "verdict": "시스템 정밀 권리분석 (UNKNOWN): 말소기준권리를 찾을 수 없습니다. 등기정보를 직접 확인하십시오. (할인율 0.0%)",
+        "suggested_bid": "입찰가 산정 대기",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 0.0% 할인 매물",
+          "유찰 1회 진행"
+        ],
+        "risks": [
+          "말소기준권리를 찾을 수 없습니다. 등기정보를 직접 확인하십시오."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "없음"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [UNKNOWN]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "가압류",
+          "date": "2022-06-24",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 239000000,
+          "price_str": "2억 3,900만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 20,
+          "price": 3440000,
+          "price_str": "344만원",
+          "ratio_pct": 1,
+          "status": "유찰",
+          "is_current": false,
+          "date": "20차 유찰"
+        },
+        {
+          "round": 21,
+          "price": 2760000,
+          "price_str": "276만원",
+          "ratio_pct": 1,
+          "status": "유찰",
+          "is_current": false,
+          "date": "21차 유찰"
+        },
+        {
+          "round": 22,
+          "price": 2200000,
+          "price_str": "220만원",
+          "ratio_pct": 1,
+          "status": "유찰",
+          "is_current": false,
+          "date": "22차 유찰"
+        },
+        {
+          "round": 23,
+          "price": 1764000,
+          "price_str": "176만원",
+          "ratio_pct": 1,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261118"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "구로구 아파트",
+        "sample_count": 4,
+        "avg_winning_rate": 74.2,
+        "avg_bidder_count": 2.5
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "가압류",
+            "date": "2022.06.24"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.08.21"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각조건 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[소멸되지 않는 권리]\n을구 순위 5번 전세권등기(2022.02.04. 등기)",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "이계선",
+            "room": "제104동 제3층 제302호",
+            "move_in_date": "2022년 1월 24일(전입세대확인서)",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1153010800",
+        "failed_count": 22,
+        "auction_date": "20261118"
+      },
+      "court_name": ""
+    },
+    {
       "case_number": "2023타경4780",
       "headline": "임차인 0명 · 경기 남양주시 다산동 아파트, 7.5억에 깔끔하게 시작",
       "safety_grade": "GREEN",
@@ -12098,6 +12629,1363 @@
         "legal_div_no": "4136011200",
         "failed_count": 0,
         "auction_date": "20261112"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2022타경4762",
+      "headline": "임차인 0명 · 서울 동대문구 제기동 상가, 440만에 깔끔하게 시작",
+      "safety_grade": "GREEN",
+      "difficulty": "BEGINNER",
+      "gap_amount": 0,
+      "gap_amount_str": "0원",
+      "gap_short_str": "0원",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🟢 임차인 0명 · 추가 인수금 0원 (권리 심플)",
+        "💸 감정가(440만)보다 0원 저렴 (-0%)",
+        "🪙 입찰 보증금 44만원 준비 · 3일 전 마감"
+      ],
+      "card_tags": [
+        "초급 · 인수금 0원",
+        "📍 서울 동대문구 제기동",
+        "보증금 44만"
+      ],
+      "min_bid": 4400000,
+      "min_bid_str": "440만원",
+      "appraisal": 4400000,
+      "appraisal_str": "440만원",
+      "discount_pct": 0,
+      "deposit_required": 440000,
+      "deposit_required_str": "44만원",
+      "usage": "상가",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 동대문구 왕산로 117 13층13-36-1호 (제기동,불로장생타워)",
+      "short_location": "서울 동대문구 제기동",
+      "floor": 13,
+      "failed_count": 0,
+      "auction_date": "20261124",
+      "d_day": "3일 전 마감",
+      "lat": 37.573412,
+      "lng": 127.044868,
+      "photo_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 68,
+        "grade": "B",
+        "verdict": "시스템 정밀 권리분석 (SAFE): 현황조사서상 대항력 있는 임차인이 확인되지 않습니다(소유자/채무자 점유 추정). (할인율 0.0%)",
+        "suggested_bid": "4,532,000원 부근",
+        "expected_yield": "6~9%",
+        "key_points": [
+          "감정가 대비 0.0% 할인 매물",
+          "유찰 0회 진행"
+        ],
+        "risks": [
+          "현황조사서상 대항력 있는 임차인이 확인되지 않습니다(소유자/채무자 점유 추정)."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "없음"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [SAFE]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2024-07-30",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 0
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 4400000,
+          "price_str": "440만원",
+          "ratio_pct": 100,
+          "status": "진행 예정",
+          "is_current": true,
+          "date": "20261124"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "동대문구 상가",
+        "sample_count": 3,
+        "avg_winning_rate": 144.5,
+        "avg_bidder_count": 2.0
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.07.30"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n- 오픈형 상가로 공실상태임\n- 바닥에 건물번호표지와 경계표지를 확인할 수 있음(감정평가서)\n\n[매각조건 비고]\n- 오픈형 상가로 공실상태임\n- 바닥에 건물번호표지와 경계표지를 확인할 수 있음(감정평가서)\n\n[매각물건명세서 을구/최선순위설정]\n2007. 9. 10. 근저당권",
+        "special_rights": [],
+        "tenants_list": [],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 0,
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1123010300",
+        "failed_count": 0,
+        "auction_date": "20261124"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경61287",
+      "headline": "서울 은평구 응암동 빌라가 반값? 감정가보다 2.1억 싼 이유",
+      "safety_grade": "YELLOW",
+      "difficulty": "INTERMEDIATE",
+      "gap_amount": 212521000,
+      "gap_amount_str": "2억 1,252만원",
+      "gap_short_str": "2.1억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🟡 세입자 점유·배당내역 한 번 더 확인",
+        "💸 감정가(2.1억)보다 2.1억 저렴 (-99%)",
+        "🪙 입찰 보증금 24만원 준비 · 17일 전 마감"
+      ],
+      "card_tags": [
+        "중급 · 권리 체크",
+        "📍 서울 은평구 응암동",
+        "보증금 24만"
+      ],
+      "min_bid": 2479000,
+      "min_bid_str": "247만원",
+      "appraisal": 215000000,
+      "appraisal_str": "2억 1,500만원",
+      "discount_pct": 99,
+      "deposit_required": 247900,
+      "deposit_required_str": "24만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 은평구 응암로16길 8-14 4층404호 (응암동,동인에버빌)",
+      "short_location": "서울 은평구 응암동",
+      "floor": 4,
+      "failed_count": 20,
+      "auction_date": "20261110",
+      "d_day": "17일 전 마감",
+      "lat": 37.603155,
+      "lng": 126.928615,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 98.8%)",
+        "suggested_bid": "2,553,370원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 98.8% 할인 매물",
+          "유찰 20회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "압류",
+          "date": "2021-02-08",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 215000000,
+          "price_str": "2억 1,500만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 4840000,
+          "price_str": "484만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "18차 유찰"
+        },
+        {
+          "round": 19,
+          "price": 3870000,
+          "price_str": "387만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "19차 유찰"
+        },
+        {
+          "round": 20,
+          "price": 3100000,
+          "price_str": "310만원",
+          "ratio_pct": 1,
+          "status": "유찰",
+          "is_current": false,
+          "date": "20차 유찰"
+        },
+        {
+          "round": 21,
+          "price": 2479000,
+          "price_str": "247만원",
+          "ratio_pct": 1,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261110"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "은평구 빌라",
+        "sample_count": 8,
+        "avg_winning_rate": 77.5,
+        "avg_bidder_count": 1.9
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2021.02.08"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.12"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n특별매각조건: 매수신청보증금 최저매각가격의 20%임\n\n[매각조건 비고]\n특별매각조건: 매수신청보증금 최저매각가격의 20%임",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "정용호",
+            "room": "4층404호",
+            "move_in_date": "2019.11.04",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2019.11.04",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1138010700",
+        "failed_count": 20,
+        "auction_date": "20261110"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경4858",
+      "headline": "서울 양천구 신월동 빌라가 반값? 감정가보다 2.4억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 243164000,
+      "gap_amount_str": "2억 4,316만원",
+      "gap_short_str": "2.4억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.5억)보다 2.4억 저렴 (-99%)",
+        "🪙 입찰 보증금 28만원 준비 · 9일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 양천구 신월동",
+        "보증금 28만"
+      ],
+      "min_bid": 2836000,
+      "min_bid_str": "283만원",
+      "appraisal": 246000000,
+      "appraisal_str": "2억 4,600만원",
+      "discount_pct": 99,
+      "deposit_required": 283600,
+      "deposit_required_str": "28만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 양천구 남부순환로59길 7 제3층 제302호 (신월동, 토브하우스)",
+      "short_location": "서울 양천구 신월동",
+      "floor": 3,
+      "failed_count": 20,
+      "auction_date": "20261118",
+      "d_day": "9일 전 마감",
+      "lat": 37.512811,
+      "lng": 126.878414,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 55,
+        "grade": "C",
+        "verdict": "시스템 정밀 권리분석 (WARNING): 현황조사서상 대항력 있는 임차인이 확인되지 않습니다(소유자/채무자 점유 추정). 단, 할인율 98.8%로 비정상적입니다. (할인율 98.8%)",
+        "suggested_bid": "2,921,080원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 98.8% 할인 매물",
+          "유찰 20회 진행"
+        ],
+        "risks": [
+          "현황조사서상 대항력 있는 임차인이 확인되지 않습니다(소유자/채무자 점유 추정). 단, 할인율 98.8%로 비정상적입니다."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "없음"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [WARNING]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "가압류",
+          "date": "2023-06-12",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 246000000,
+          "price_str": "2억 4,600만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 5540000,
+          "price_str": "554만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "18차 유찰"
+        },
+        {
+          "round": 19,
+          "price": 4430000,
+          "price_str": "443만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "19차 유찰"
+        },
+        {
+          "round": 20,
+          "price": 3550000,
+          "price_str": "355만원",
+          "ratio_pct": 1,
+          "status": "유찰",
+          "is_current": false,
+          "date": "20차 유찰"
+        },
+        {
+          "round": 21,
+          "price": 2836000,
+          "price_str": "283만원",
+          "ratio_pct": 1,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261118"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "양천구 빌라",
+        "sample_count": 17,
+        "avg_winning_rate": 78.6,
+        "avg_bidder_count": 1.9
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "가압류",
+            "date": "2023.06.12"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.12.18"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n특별매각조건: 매수신청보증금 최저매각가격의 20%임\n\n[매각조건 비고]\n특별매각조건: 매수신청보증금 최저매각가격의 20%임\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 을구 순위3번 임차권등기(배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수함)\n\n[매각물건명세서 을구/최선순위설정]\n2023.06.12. 가압류\n\n[임차인 현황]\n- 주희진: 전입 2021년 1월 22일(전입세대확인서), 보증금 미상, 확정 미상, 배당요구 없음 (제3층 제302호)",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "주희진",
+            "room": "제3층 제302호",
+            "move_in_date": "2021년 1월 22일(전입세대확인서)",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1147010300",
+        "failed_count": 20,
+        "auction_date": "20261118"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경57705",
+      "headline": "서울 강동구 천호동 아파트가 반값? 감정가보다 2.2억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 223893000,
+      "gap_amount_str": "2억 2,389만원",
+      "gap_short_str": "2.2억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.3억)보다 2.2억 저렴 (-98%)",
+        "🪙 입찰 보증금 41만원 준비 · 18일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 강동구 천호동",
+        "보증금 41만"
+      ],
+      "min_bid": 4107000,
+      "min_bid_str": "410만원",
+      "appraisal": 228000000,
+      "appraisal_str": "2억 2,800만원",
+      "discount_pct": 98,
+      "deposit_required": 410700,
+      "deposit_required_str": "41만원",
+      "usage": "아파트",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 강동구 진황도로25길 18 8층805호 (천호동,스카이캐슬라)",
+      "short_location": "서울 강동구 천호동",
+      "floor": 8,
+      "failed_count": 18,
+      "auction_date": "20261109",
+      "d_day": "18일 전 마감",
+      "lat": 37.540616,
+      "lng": 127.125377,
+      "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 98.2%)",
+        "suggested_bid": "4,230,210원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 98.2% 할인 매물",
+          "유찰 18회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "압류",
+          "date": "2022-01-20",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 228000000,
+          "price_str": "2억 2,800만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 8020000,
+          "price_str": "802만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "16차 유찰"
+        },
+        {
+          "round": 17,
+          "price": 6420000,
+          "price_str": "642만원",
+          "ratio_pct": 3,
+          "status": "유찰",
+          "is_current": false,
+          "date": "17차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 5130000,
+          "price_str": "513만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "18차 유찰"
+        },
+        {
+          "round": 19,
+          "price": 4107000,
+          "price_str": "410만원",
+          "ratio_pct": 2,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261109"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": null,
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2022.01.20"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.11.15"
+          }
+        ],
+        "remarks": "[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n1. 을구 순위번호 5번 2022.10.12. 접수 제123938호로 경료된 주택임차권등기는 향후 배당에서 보증금 전액을 배당받지 못하면 말소되지 아니하고, 그 잔액을 매수인이 인수함.\n2. 을구 순위번호 4번 2020.12.16. 제214276호로 경료된 전세권설정등기.",
+        "special_rights": [],
+        "tenants_list": [
+          {
+            "name": "전상아",
+            "room": "8층805호",
+            "move_in_date": "2020.09.29",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2020.09.29",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1174010900",
+        "failed_count": 18,
+        "auction_date": "20261109"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경5533",
+      "headline": "서울 강북구 수유동 빌라가 반값? 감정가보다 2.2억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 216195000,
+      "gap_amount_str": "2억 1,619만원",
+      "gap_short_str": "2.2억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.2억)보다 2.2억 저렴 (-98%)",
+        "🪙 입찰 보증금 39만원 준비 · 17일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 강북구 수유동",
+        "보증금 39만"
+      ],
+      "min_bid": 3965000,
+      "min_bid_str": "396만원",
+      "appraisal": 220160000,
+      "appraisal_str": "2억 2,016만원",
+      "discount_pct": 98,
+      "deposit_required": 396500,
+      "deposit_required_str": "39만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 강북구 삼양로117길 35 501호",
+      "short_location": "서울 강북구 수유동",
+      "floor": 1,
+      "failed_count": 18,
+      "auction_date": "20261110",
+      "d_day": "17일 전 마감",
+      "lat": 37.63268,
+      "lng": 127.035674,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 98.2%)",
+        "suggested_bid": "4,083,950원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 98.2% 할인 매물",
+          "유찰 18회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2023-12-11",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 3
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 220160000,
+          "price_str": "2억 2,016만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 7750000,
+          "price_str": "775만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "16차 유찰"
+        },
+        {
+          "round": 17,
+          "price": 6200000,
+          "price_str": "620만원",
+          "ratio_pct": 3,
+          "status": "유찰",
+          "is_current": false,
+          "date": "17차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 4960000,
+          "price_str": "496만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "18차 유찰"
+        },
+        {
+          "round": 19,
+          "price": 3965000,
+          "price_str": "396만원",
+          "ratio_pct": 2,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261110"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "강북구 빌라",
+        "sample_count": 9,
+        "avg_winning_rate": 59.7,
+        "avg_bidder_count": 1.1
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.12.11"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.23"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n제시외 건물 포함\n\n[매각조건 비고]\n제시외 건물 포함\n재매각임. 매수신청보증금 20%\n\n[소멸되지 않는 권리]\n을구 1번 2023.7.27.자 주택임차권등기(대항력 있는 임차인으로 배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수함)",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "최정상",
+            "room": "502호",
+            "move_in_date": "2019.10.02",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "이정아",
+            "room": "202호",
+            "move_in_date": "2019.08.20",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "박정훈",
+            "room": "301호",
+            "move_in_date": "2021.11.01",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 3,
+        "tenant_registration_date": "2019.08.20",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1130010300",
+        "failed_count": 18,
+        "auction_date": "20261110"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2024타경102929",
+      "headline": "서울 중랑구 상봉동 빌라가 반값? 감정가보다 2.8억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 276921000,
+      "gap_amount_str": "2억 7,692만원",
+      "gap_short_str": "2.8억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.8억)보다 2.8억 저렴 (-98%)",
+        "🪙 입찰 보증금 50만원 준비 · 17일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 중랑구 상봉동",
+        "보증금 50만"
+      ],
+      "min_bid": 5079000,
+      "min_bid_str": "507만원",
+      "appraisal": 282000000,
+      "appraisal_str": "2억 8,200만원",
+      "discount_pct": 98,
+      "deposit_required": 507900,
+      "deposit_required_str": "50만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 중랑구 동일로118길 36 제5층 제504호 (상봉동,해피리움)",
+      "short_location": "서울 중랑구 상봉동",
+      "floor": 5,
+      "failed_count": 18,
+      "auction_date": "20261110",
+      "d_day": "17일 전 마감",
+      "lat": 37.616499,
+      "lng": 127.097811,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 98.2%)",
+        "suggested_bid": "5,231,370원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 98.2% 할인 매물",
+          "유찰 18회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "압류",
+          "date": "2022-01-13",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 282000000,
+          "price_str": "2억 8,200만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 9920000,
+          "price_str": "992만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "16차 유찰"
+        },
+        {
+          "round": 17,
+          "price": 7940000,
+          "price_str": "794만원",
+          "ratio_pct": 3,
+          "status": "유찰",
+          "is_current": false,
+          "date": "17차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 6350000,
+          "price_str": "635만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "18차 유찰"
+        },
+        {
+          "round": 19,
+          "price": 5079000,
+          "price_str": "507만원",
+          "ratio_pct": 2,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261110"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "중랑구 빌라",
+        "sample_count": 6,
+        "avg_winning_rate": 86.5,
+        "avg_bidder_count": 1.8
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2022.01.13"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.05.16"
+          }
+        ],
+        "remarks": "[소멸되지 않는 권리]\n을구 1번 2022.12.29.자 주택임차권등기(대항력 있는 임차인으로 배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수함)",
+        "special_rights": [],
+        "tenants_list": [
+          {
+            "name": "박아름",
+            "room": "제5층 제504호",
+            "move_in_date": "2020.10.20",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2020.10.20",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1126010200",
+        "failed_count": 18,
+        "auction_date": "20261110"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경113554",
+      "headline": "서울 강서구 공항동 아파트가 반값? 감정가보다 2.5억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 245497000,
+      "gap_amount_str": "2억 4,549만원",
+      "gap_short_str": "2.5억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.5억)보다 2.5억 저렴 (-98%)",
+        "🪙 입찰 보증금 45만원 준비 · 2일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 강서구 공항동",
+        "보증금 45만"
+      ],
+      "min_bid": 4503000,
+      "min_bid_str": "450만원",
+      "appraisal": 250000000,
+      "appraisal_str": "2억 5,000만원",
+      "discount_pct": 98,
+      "deposit_required": 450300,
+      "deposit_required_str": "45만원",
+      "usage": "아파트",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 강서구 공항대로4길 11 제103동 제3층 제304호 (공항동, 에스엠파크빌)",
+      "short_location": "서울 강서구 공항동",
+      "floor": 3,
+      "failed_count": 18,
+      "auction_date": "20261125",
+      "d_day": "2일 전 마감",
+      "lat": 37.556867,
+      "lng": 126.847323,
+      "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 35,
+        "grade": "D",
+        "verdict": "위험한 임차인 권리가 존재하며, 경매 회차가 많고 할인율이 극단적으로 높음.",
+        "suggested_bid": "4,500,000원 ~ 6,000,000원",
+        "expected_yield": "불확실한 수익률",
+        "key_points": [
+          "강서구 내 위치 및 교통 접근성",
+          "감정가 대비 비정상적인 할인율"
+        ],
+        "risks": [
+          "임차인이 인수되는 경우 보증금 전액 회수가 어려움",
+          "18회 유찰된 물건으로 시장에서 외면받고 있는 상태"
+        ],
+        "extinguished_rights": [
+          "소유자의 권리",
+          "전세 임차인의 배당요구 권리"
+        ],
+        "retained_rights": [
+          "임차보증금 205,000,000원"
+        ],
+        "analysis_detail": "이 물건은 서울 강서구에 위치한 아파트로, 감정가는 250,000,000원이지만 최저매각가격은 4,503,000원으로 심각한 할인율(98.2%)을 보이고 있습니다. 유찰이 18회 진행된 상태이며, 이로 인해 물건의 실제 시장 가치나 상태에 대한 신뢰성에 문제가 있을 수 있습니다. 또한, 건축물대장상 제2종 근린생활시설로 등록되어 있으나 실제로는 다세대 주택으로 사용되고 있어 법적 하자도 우려됩니다. 대항력을 갖춘 임차인이 존재하며, 보증금 205,000,000원이 인수권리로 남아 있습니다. 따라서, 안전한 투자 관점에서는 매수 시 큰 리스크가 따를 수 있어 신중한 접근이 필요합니다. 따라서 입찰을 추천하지 않으며, 최저가 이상의 수준에서 참여할 경우 최대한 손해를 최소화할 수 있는 선에서 결정하는 것이 바람직합니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2023-10-10",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 205000000,
+        "assumed_deposit_str": "2억 500만원",
+        "senior_unknown_count": 0
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 250000000,
+          "price_str": "2억 5,000만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 8800000,
+          "price_str": "880만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "16차 유찰"
+        },
+        {
+          "round": 17,
+          "price": 7040000,
+          "price_str": "704만원",
+          "ratio_pct": 3,
+          "status": "유찰",
+          "is_current": false,
+          "date": "17차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 5630000,
+          "price_str": "563만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "18차 유찰"
+        },
+        {
+          "round": 19,
+          "price": 4503000,
+          "price_str": "450만원",
+          "ratio_pct": 2,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261125"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "강서구 아파트",
+        "sample_count": 5,
+        "avg_winning_rate": 68.0,
+        "avg_bidder_count": 1.8
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.10.10"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n-특별매각조건 매수신청보증금 최저매각가격의 20%\n-건축물대장 상 용도가 제2종근린생활시설(사무소)로 등록되어 있으나 외부관찰 및 탐문조사 결과 다세대주택으로 이용중임.\n\n[매각조건 비고]\n-특별매각조건 매수신청보증금 최저매각가격의 20%\n-건축물대장 상 용도가 제2종근린생활시설(사무소)로 등록되어 있으나 외부관찰 및 탐문조사 결과 다세대주택으로 이용중임.\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 임차인이 있음(임대차보증금 205,000,000원, 전입일자 2018.09.12., 확정일자 2018.09.17.).\n배당에서 보증금이 전액 변제되지 아니하면 매수인이 인수함\n\n[매각물건명세서 을구/최선순위설정]\n2023.07.11. \n강제경매개시결정\n\n[임차인 현황]\n- 문소희: 전입 2018년 9월 12일, 보증금 205,000,000원, 확정 2018년 9월 17일, 배당요구 없음 (제103동 제3층 제304호)",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "문소희",
+            "room": "제103동 제3층 제304호",
+            "move_in_date": "2018년 9월 12일",
+            "deposit": 205000000,
+            "deposit_str": "2억 500만원",
+            "monthly_rent": "",
+            "fixed_date": "2018년 9월 17일",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 205000000,
+        "senior_assumed_deposit_str": "2억 500만원",
+        "senior_unknown_count": 0,
+        "tenant_registration_date": "",
+        "tenant_deposit": 205000000,
+        "tenant_deposit_str": "2억 500만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1150010800",
+        "failed_count": 18,
+        "auction_date": "20261125"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경5882",
+      "headline": "서울 구로구 개봉동 오피스텔이 반값? 감정가보다 2.5억 싼 이유",
+      "safety_grade": "YELLOW",
+      "difficulty": "INTERMEDIATE",
+      "gap_amount": 251388000,
+      "gap_amount_str": "2억 5,138만원",
+      "gap_short_str": "2.5억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🟡 세입자 점유·배당내역 한 번 더 확인",
+        "💸 감정가(2.6억)보다 2.5억 저렴 (-98%)",
+        "🪙 입찰 보증금 46만원 준비 · 1일 전 마감"
+      ],
+      "card_tags": [
+        "중급 · 권리 체크",
+        "📍 서울 구로구 개봉동",
+        "보증금 46만"
+      ],
+      "min_bid": 4612000,
+      "min_bid_str": "461만원",
+      "appraisal": 256000000,
+      "appraisal_str": "2억 5,600만원",
+      "discount_pct": 98,
+      "deposit_required": 461200,
+      "deposit_required_str": "46만원",
+      "usage": "오피스텔",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 구로구 고척로18길 59-9 제4층 제402호 (개봉동, 라움)",
+      "short_location": "서울 구로구 개봉동",
+      "floor": 4,
+      "failed_count": 18,
+      "auction_date": "20261126",
+      "d_day": "1일 전 마감",
+      "lat": 37.501301,
+      "lng": 126.893758,
+      "photo_url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 98.2%)",
+        "suggested_bid": "4,750,360원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 98.2% 할인 매물",
+          "유찰 18회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "가압류",
+          "date": "2022-11-22",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 256000000,
+          "price_str": "2억 5,600만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 9010000,
+          "price_str": "901만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "16차 유찰"
+        },
+        {
+          "round": 17,
+          "price": 7210000,
+          "price_str": "721만원",
+          "ratio_pct": 3,
+          "status": "유찰",
+          "is_current": false,
+          "date": "17차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 5760000,
+          "price_str": "576만원",
+          "ratio_pct": 2,
+          "status": "유찰",
+          "is_current": false,
+          "date": "18차 유찰"
+        },
+        {
+          "round": 19,
+          "price": 4612000,
+          "price_str": "461만원",
+          "ratio_pct": 2,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261126"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "구로구 오피스텔",
+        "sample_count": 5,
+        "avg_winning_rate": 75.0,
+        "avg_bidder_count": 1.2
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "가압류",
+            "date": "2022.11.22"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.13"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n공부상 용도는 업무시설(오피스텔)이나 실제 주거용으로 이용중임, 특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각조건 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 주택임차권등기(2023.10.24. 접수, 임차인 강욱)는 임차보증금이 전액 변제되지 아니하면 말소되지 아니함\n\n[매각물건명세서 을구/최선순위설정]\n2022.11.22. 가압류\n\n[임차인 현황]\n- 강욱: 전입 2019.10.14, 보증금 미상, 확정 미상, 배당요구 없음 (제4층 제402호)",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "강욱",
+            "room": "제4층 제402호",
+            "move_in_date": "2019.10.14",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2019.10.14",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1153010700",
+        "failed_count": 18,
+        "auction_date": "20261126"
       },
       "court_name": ""
     },
@@ -12278,6 +14166,1045 @@
         "legal_div_no": "1144010700",
         "failed_count": 17,
         "auction_date": "20261103"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경127836",
+      "headline": "서울 강서구 화곡동 빌라가 반값? 감정가보다 2.1억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 205271000,
+      "gap_amount_str": "2억 527만원",
+      "gap_short_str": "2.1억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.1억)보다 2.1억 저렴 (-98%)",
+        "🪙 입찰 보증금 47만원 준비 · 17일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 강서구 화곡동",
+        "보증금 47만"
+      ],
+      "min_bid": 4729000,
+      "min_bid_str": "472만원",
+      "appraisal": 210000000,
+      "appraisal_str": "2억 1,000만원",
+      "discount_pct": 98,
+      "deposit_required": 472900,
+      "deposit_required_str": "47만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 강서구 곰달래로41길 8-5 제1동 제4층 제402호 (화곡동, 현경뜰안채)",
+      "short_location": "서울 강서구 화곡동",
+      "floor": 4,
+      "failed_count": 17,
+      "auction_date": "20261110",
+      "d_day": "17일 전 마감",
+      "lat": 37.541278,
+      "lng": 126.846119,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 97.7%)",
+        "suggested_bid": "4,870,870원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 97.7% 할인 매물",
+          "유찰 17회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "근저당",
+          "date": "2019-11-06",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 210000000,
+          "price_str": "2억 1,000만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 15,
+          "price": 9240000,
+          "price_str": "924만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "15차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 7390000,
+          "price_str": "739만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "16차 유찰"
+        },
+        {
+          "round": 17,
+          "price": 5910000,
+          "price_str": "591만원",
+          "ratio_pct": 3,
+          "status": "유찰",
+          "is_current": false,
+          "date": "17차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 4729000,
+          "price_str": "472만원",
+          "ratio_pct": 2,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261110"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "강서구 빌라",
+        "sample_count": 31,
+        "avg_winning_rate": 65.5,
+        "avg_bidder_count": 2.6
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2019.11.06"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.25"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n- 특별매각조건 매수신청보증금 최저매각가격의 20%\n- 매수인에게 대항할 수 있는 임차인이 있음(임대차보증금 190,000,000원, 전입일자 2017.08.24., 확정일자 2017.08.18.)\n- 배당에서 보증금이 전액 변제되지 아니하면 매수인이 인수함\n\n[매각조건 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "임유경",
+            "room": "제1동 제4층 제402호",
+            "move_in_date": "2017.08.24",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2017.08.24",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1150010300",
+        "failed_count": 17,
+        "auction_date": "20261110"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경58135",
+      "headline": "서울 송파구 송파동 빌라가 반값? 감정가보다 3.5억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 351894000,
+      "gap_amount_str": "3억 5,189만원",
+      "gap_short_str": "3.5억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(3.6억)보다 3.5억 저렴 (-98%)",
+        "🪙 입찰 보증금 81만원 준비 · 4일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 송파구 송파동",
+        "보증금 81만"
+      ],
+      "min_bid": 8106000,
+      "min_bid_str": "810만원",
+      "appraisal": 360000000,
+      "appraisal_str": "3억 6,000만원",
+      "discount_pct": 98,
+      "deposit_required": 810600,
+      "deposit_required_str": "81만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 송파구 송파대로36가길 15-16 5층501호 (송파동,성보팰리채)",
+      "short_location": "서울 송파구 송파동",
+      "floor": 5,
+      "failed_count": 17,
+      "auction_date": "20261123",
+      "d_day": "4일 전 마감",
+      "lat": 37.502314,
+      "lng": 127.108242,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 97.7%)",
+        "suggested_bid": "8,349,180원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 97.7% 할인 매물",
+          "유찰 17회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2023-11-20",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 360000000,
+          "price_str": "3억 6,000만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 15,
+          "price": 15830000,
+          "price_str": "1,583만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "15차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 12670000,
+          "price_str": "1,267만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "16차 유찰"
+        },
+        {
+          "round": 17,
+          "price": 10130000,
+          "price_str": "1,013만원",
+          "ratio_pct": 3,
+          "status": "유찰",
+          "is_current": false,
+          "date": "17차 유찰"
+        },
+        {
+          "round": 18,
+          "price": 8106000,
+          "price_str": "810만원",
+          "ratio_pct": 2,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261123"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "송파구 빌라",
+        "sample_count": 8,
+        "avg_winning_rate": 77.9,
+        "avg_bidder_count": 2.8
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.11.20"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 재매각임. 매수보증금은 20%임.\n2. 본 건 집합건축물대장 전유부상 위반건축물 등재되어 있음(주거 24㎡, 감정평가서 참조).\n\n[매각조건 비고]\n1. 재매각임. 매수보증금은 20%임.\n2. 본 건 집합건축물대장 전유부상 위반건축물 등재되어 있음(주거 24㎡, 감정평가서 참조).\n\n[소멸되지 않는 권리]\n을구 순위번호 3번 2021.04.21. 제69487호 전세권설정 등기, 을구 순위번호 4번 2023.04.10. 제47240호 주택임차권 등기(대항력 있는 임차인이며 배당에서 전액 변제되지 않으면 잔액을 매수인이 인수함)\n\n[매각물건명세서 을구/최선순위설정]\n2023.09.04. 개시결정\n\n[임차인 현황]\n- 김남훈: 전입 2021.04.05, 보증금 미상, 확정 미상, 배당요구 없음 (5층501호)",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          },
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "김남훈",
+            "room": "5층501호",
+            "move_in_date": "2021.04.05",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2021.04.05",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1171010400",
+        "failed_count": 17,
+        "auction_date": "20261123"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2024타경105836",
+      "headline": "서울 중랑구 상봉동 빌라가 반값? 감정가보다 2.9억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 287670000,
+      "gap_amount_str": "2억 8,767만원",
+      "gap_short_str": "2.9억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(3억)보다 2.9억 저렴 (-97%)",
+        "🪙 입찰 보증금 83만원 준비 · 17일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 중랑구 상봉동",
+        "보증금 83만"
+      ],
+      "min_bid": 8330000,
+      "min_bid_str": "833만원",
+      "appraisal": 296000000,
+      "appraisal_str": "2억 9,600만원",
+      "discount_pct": 97,
+      "deposit_required": 833000,
+      "deposit_required_str": "83만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 중랑구 동일로118길 36 제3층 제302호 (상봉동,해피리움)",
+      "short_location": "서울 중랑구 상봉동",
+      "floor": 3,
+      "failed_count": 16,
+      "auction_date": "20261110",
+      "d_day": "17일 전 마감",
+      "lat": 37.611187,
+      "lng": 127.088274,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 97.2%)",
+        "suggested_bid": "8,579,900원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 97.2% 할인 매물",
+          "유찰 16회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "압류",
+          "date": "2022-01-24",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 296000000,
+          "price_str": "2억 9,600만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 14,
+          "price": 16270000,
+          "price_str": "1,627만원",
+          "ratio_pct": 5,
+          "status": "유찰",
+          "is_current": false,
+          "date": "14차 유찰"
+        },
+        {
+          "round": 15,
+          "price": 13020000,
+          "price_str": "1,302만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "15차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 10410000,
+          "price_str": "1,041만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "16차 유찰"
+        },
+        {
+          "round": 17,
+          "price": 8330000,
+          "price_str": "833만원",
+          "ratio_pct": 3,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261110"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "중랑구 빌라",
+        "sample_count": 6,
+        "avg_winning_rate": 86.5,
+        "avg_bidder_count": 1.8
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2022.01.24"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.06.21"
+          }
+        ],
+        "remarks": "[소멸되지 않는 권리]\n을구 3번 2023.3.2.자 주택임차권등기(대항력 있는 임차인으로 배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수함)",
+        "special_rights": [],
+        "tenants_list": [
+          {
+            "name": "김지탁",
+            "room": "제3층 제302호",
+            "move_in_date": "2021.01.27",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2021.01.27",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1126010200",
+        "failed_count": 16,
+        "auction_date": "20261110"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경60534",
+      "headline": "서울 광진구 화양동 빌라가 반값? 감정가보다 2.2억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 220611000,
+      "gap_amount_str": "2억 2,061만원",
+      "gap_short_str": "2.2억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.3억)보다 2.2억 저렴 (-97%)",
+        "🪙 입찰 보증금 63만원 준비 · 11일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 광진구 화양동",
+        "보증금 63만"
+      ],
+      "min_bid": 6389000,
+      "min_bid_str": "638만원",
+      "appraisal": 227000000,
+      "appraisal_str": "2억 2,700만원",
+      "discount_pct": 97,
+      "deposit_required": 638900,
+      "deposit_required_str": "63만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 광진구 능동로 170 4층405호 (화양동,신원리브웰 화양동 주상복합)",
+      "short_location": "서울 광진구 화양동",
+      "floor": 4,
+      "failed_count": 16,
+      "auction_date": "20261116",
+      "d_day": "11일 전 마감",
+      "lat": 37.539446,
+      "lng": 127.089371,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 97.2%)",
+        "suggested_bid": "6,580,670원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 97.2% 할인 매물",
+          "유찰 16회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2024-02-12",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 227000000,
+          "price_str": "2억 2,700만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 14,
+          "price": 12480000,
+          "price_str": "1,248만원",
+          "ratio_pct": 5,
+          "status": "유찰",
+          "is_current": false,
+          "date": "14차 유찰"
+        },
+        {
+          "round": 15,
+          "price": 9980000,
+          "price_str": "998만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "15차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 7990000,
+          "price_str": "799만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "16차 유찰"
+        },
+        {
+          "round": 17,
+          "price": 6389000,
+          "price_str": "638만원",
+          "ratio_pct": 3,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261116"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "광진구 빌라",
+        "sample_count": 9,
+        "avg_winning_rate": 96.0,
+        "avg_bidder_count": 7.0
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.12"
+          }
+        ],
+        "remarks": "[소멸되지 않는 권리]\n2023.11.30. 접수 제171816호로 경료된 을구 1번 주택임차권등기는 배당에서 전액 변제받지 않으면 잔액을 매수인이 인수함.",
+        "special_rights": [],
+        "tenants_list": [
+          {
+            "name": "김채연",
+            "room": "4층405호",
+            "move_in_date": "2020.12.15",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2020.12.15",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1121010700",
+        "failed_count": 16,
+        "auction_date": "20261116"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2024타경108408",
+      "headline": "서울 강북구 수유동 빌라가 반값? 감정가보다 1.5억 싼 이유",
+      "safety_grade": "YELLOW",
+      "difficulty": "INTERMEDIATE",
+      "gap_amount": 145688000,
+      "gap_amount_str": "1억 4,568만원",
+      "gap_short_str": "1.5억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🟡 세입자 점유·배당내역 한 번 더 확인",
+        "💸 감정가(1.5억)보다 1.5억 저렴 (-96%)",
+        "🪙 입찰 보증금 53만원 준비 · 17일 전 마감"
+      ],
+      "card_tags": [
+        "중급 · 권리 체크",
+        "📍 서울 강북구 수유동",
+        "보증금 53만"
+      ],
+      "min_bid": 5312000,
+      "min_bid_str": "531만원",
+      "appraisal": 151000000,
+      "appraisal_str": "1억 5,100만원",
+      "discount_pct": 96,
+      "deposit_required": 531200,
+      "deposit_required_str": "53만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 강북구 도봉로71가길 16 제3층 제302호 (수유동,하이시티)",
+      "short_location": "서울 강북구 수유동",
+      "floor": 3,
+      "failed_count": 15,
+      "auction_date": "20261110",
+      "d_day": "17일 전 마감",
+      "lat": 37.638332,
+      "lng": 127.015959,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 96.5%)",
+        "suggested_bid": "5,471,360원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 96.5% 할인 매물",
+          "유찰 15회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "근저당",
+          "date": "2020-04-17",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 151000000,
+          "price_str": "1억 5,100만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 13,
+          "price": 10380000,
+          "price_str": "1,038만원",
+          "ratio_pct": 7,
+          "status": "유찰",
+          "is_current": false,
+          "date": "13차 유찰"
+        },
+        {
+          "round": 14,
+          "price": 8300000,
+          "price_str": "830만원",
+          "ratio_pct": 5,
+          "status": "유찰",
+          "is_current": false,
+          "date": "14차 유찰"
+        },
+        {
+          "round": 15,
+          "price": 6640000,
+          "price_str": "664만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "15차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 5312000,
+          "price_str": "531만원",
+          "ratio_pct": 4,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261110"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "강북구 빌라",
+        "sample_count": 9,
+        "avg_winning_rate": 59.7,
+        "avg_bidder_count": 1.1
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2020.04.17"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.07.25"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n집합건축물대장상 건축과-11013호(2017.10.12.)에 따라 위반건축물 표기[지상3층 근린생활시설을 주거용(원룸주택)으로 사용]되어 있어 추후 이행강제금 부과나 철거 등의 대상이 될수 있으므로 매수신청인들의 주의를 요함.",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "명도산",
+            "room": "제3층 제302호",
+            "move_in_date": "2019.03.04",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2019.03.04",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1130010300",
+        "failed_count": 15,
+        "auction_date": "20261110"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경116198",
+      "headline": "서울 강북구 수유동 빌라가 반값? 감정가보다 1.1억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 113848000,
+      "gap_amount_str": "1억 1,384만원",
+      "gap_short_str": "1.1억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 선순위 보증금 0만원 인수 가능성 체크",
+        "💸 감정가(1.2억)보다 1.1억 저렴 (-96%)",
+        "🪙 입찰 보증금 41만원 준비 · 3일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 강북구 수유동",
+        "보증금 41만"
+      ],
+      "min_bid": 4152000,
+      "min_bid_str": "415만원",
+      "appraisal": 118000000,
+      "appraisal_str": "1억 1,800만원",
+      "discount_pct": 96,
+      "deposit_required": 415200,
+      "deposit_required_str": "41만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 강북구 인수봉로72길 31-27 비동 1층101호 (수유동,신성젠트리스)",
+      "short_location": "서울 강북구 수유동",
+      "floor": 1,
+      "failed_count": 15,
+      "auction_date": "20261124",
+      "d_day": "3일 전 마감",
+      "lat": 37.633166,
+      "lng": 127.020834,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 96.5%)",
+        "suggested_bid": "4,276,560원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 96.5% 할인 매물",
+          "유찰 15회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "압류",
+          "date": "2022-03-28",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 5,
+        "assumed_deposit_str": "0만원",
+        "senior_unknown_count": 0
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 118000000,
+          "price_str": "1억 1,800만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 13,
+          "price": 8110000,
+          "price_str": "811만원",
+          "ratio_pct": 7,
+          "status": "유찰",
+          "is_current": false,
+          "date": "13차 유찰"
+        },
+        {
+          "round": 14,
+          "price": 6490000,
+          "price_str": "649만원",
+          "ratio_pct": 6,
+          "status": "유찰",
+          "is_current": false,
+          "date": "14차 유찰"
+        },
+        {
+          "round": 15,
+          "price": 5190000,
+          "price_str": "519만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "15차 유찰"
+        },
+        {
+          "round": 16,
+          "price": 4152000,
+          "price_str": "415만원",
+          "ratio_pct": 4,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261124"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "강북구 빌라",
+        "sample_count": 9,
+        "avg_winning_rate": 59.7,
+        "avg_bidder_count": 1.1
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2022.03.28"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.01.22"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2022.03.28. 압류\n\n[임차인 현황]\n- 천대희: 전입 2020.08.04, 보증금 5원, 확정 미상, 배당요구 없음 (비동 1층101호)",
+        "special_rights": [],
+        "tenants_list": [
+          {
+            "name": "천대희",
+            "room": "비동 1층101호",
+            "move_in_date": "2020.08.04",
+            "deposit": 5,
+            "deposit_str": "0만원",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 5,
+        "senior_assumed_deposit_str": "0만원",
+        "senior_unknown_count": 0,
+        "tenant_registration_date": "2020.08.04",
+        "tenant_deposit": 5,
+        "tenant_deposit_str": "0만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1130010300",
+        "failed_count": 15,
+        "auction_date": "20261124"
       },
       "court_name": ""
     },
@@ -12635,6 +15562,325 @@
         "legal_div_no": "1154010300",
         "failed_count": 14,
         "auction_date": "20261028"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경61537",
+      "headline": "서울 강동구 천호동 아파트가 반값? 감정가보다 2억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 200764000,
+      "gap_amount_str": "2억 76만원",
+      "gap_short_str": "2억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.1억)보다 2억 저렴 (-96%)",
+        "🪙 입찰 보증금 92만원 준비 · 18일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 강동구 천호동",
+        "보증금 92만"
+      ],
+      "min_bid": 9236000,
+      "min_bid_str": "923만원",
+      "appraisal": 210000000,
+      "appraisal_str": "2억 1,000만원",
+      "discount_pct": 96,
+      "deposit_required": 923600,
+      "deposit_required_str": "92만원",
+      "usage": "아파트",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 강동구 진황도로25길 18 10층1001호 (천호동,스카이캐슬라)",
+      "short_location": "서울 강동구 천호동",
+      "floor": 10,
+      "failed_count": 14,
+      "auction_date": "20261109",
+      "d_day": "18일 전 마감",
+      "lat": 37.540989,
+      "lng": 127.126161,
+      "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 55,
+        "grade": "C",
+        "verdict": "시스템 정밀 권리분석 (WARNING): 현황조사서상 대항력 있는 임차인이 확인되지 않습니다(소유자/채무자 점유 추정). 단, 할인율 95.6%로 비정상적입니다. (할인율 95.6%)",
+        "suggested_bid": "9,513,080원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 95.6% 할인 매물",
+          "유찰 14회 진행"
+        ],
+        "risks": [
+          "현황조사서상 대항력 있는 임차인이 확인되지 않습니다(소유자/채무자 점유 추정). 단, 할인율 95.6%로 비정상적입니다."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "없음"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [WARNING]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "가압류",
+          "date": "2023-11-29",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 0
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 210000000,
+          "price_str": "2억 1,000만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 12,
+          "price": 18040000,
+          "price_str": "1,804만원",
+          "ratio_pct": 9,
+          "status": "유찰",
+          "is_current": false,
+          "date": "12차 유찰"
+        },
+        {
+          "round": 13,
+          "price": 14430000,
+          "price_str": "1,443만원",
+          "ratio_pct": 7,
+          "status": "유찰",
+          "is_current": false,
+          "date": "13차 유찰"
+        },
+        {
+          "round": 14,
+          "price": 11540000,
+          "price_str": "1,154만원",
+          "ratio_pct": 5,
+          "status": "유찰",
+          "is_current": false,
+          "date": "14차 유찰"
+        },
+        {
+          "round": 15,
+          "price": 9236000,
+          "price_str": "923만원",
+          "ratio_pct": 4,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261109"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": null,
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "가압류",
+            "date": "2023.11.29"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.26"
+          }
+        ],
+        "remarks": "[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n을구 순위번호 4번 2022.11.02. 접수 제133933호로 경료된 주택임차권등기는 향후 배당에서 보증금 전액을 배당받지 못하면 말소되지 아니하고, 그 잔액을 매수인이 인수함.",
+        "special_rights": [],
+        "tenants_list": [],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 0,
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1174010900",
+        "failed_count": 14,
+        "auction_date": "20261109"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2024타경109685",
+      "headline": "서울 도봉구 쌍문동 빌라가 반값? 감정가보다 2.2억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 215104000,
+      "gap_amount_str": "2억 1,510만원",
+      "gap_short_str": "2.2억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.2억)보다 2.2억 저렴 (-96%)",
+        "🪙 입찰 보증금 98만원 준비 · 17일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 서울 도봉구 쌍문동",
+        "보증금 98만"
+      ],
+      "min_bid": 9896000,
+      "min_bid_str": "989만원",
+      "appraisal": 225000000,
+      "appraisal_str": "2억 2,500만원",
+      "discount_pct": 96,
+      "deposit_required": 989600,
+      "deposit_required_str": "98만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 도봉구 도당로2길 51 3층301호 (쌍문동,쌍문동주택)",
+      "short_location": "서울 도봉구 쌍문동",
+      "floor": 3,
+      "failed_count": 14,
+      "auction_date": "20261110",
+      "d_day": "17일 전 마감",
+      "lat": 37.666316,
+      "lng": 127.036697,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 95.6%)",
+        "suggested_bid": "10,192,880원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 95.6% 할인 매물",
+          "유찰 14회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2024-06-04",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 225000000,
+          "price_str": "2억 2,500만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 12,
+          "price": 19330000,
+          "price_str": "1,933만원",
+          "ratio_pct": 9,
+          "status": "유찰",
+          "is_current": false,
+          "date": "12차 유찰"
+        },
+        {
+          "round": 13,
+          "price": 15460000,
+          "price_str": "1,546만원",
+          "ratio_pct": 7,
+          "status": "유찰",
+          "is_current": false,
+          "date": "13차 유찰"
+        },
+        {
+          "round": 14,
+          "price": 12370000,
+          "price_str": "1,237만원",
+          "ratio_pct": 5,
+          "status": "유찰",
+          "is_current": false,
+          "date": "14차 유찰"
+        },
+        {
+          "round": 15,
+          "price": 9896000,
+          "price_str": "989만원",
+          "ratio_pct": 4,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261110"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "도봉구 빌라",
+        "sample_count": 5,
+        "avg_winning_rate": 64.1,
+        "avg_bidder_count": 1.4
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.06.04"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.08.14"
+          }
+        ],
+        "remarks": "[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n을구1번 주택임차권등기(대항력있는 임차인으로 배당에서 보증금 전액이 변제되지 아니하면 잔액을 매수인이 인수함)",
+        "special_rights": [],
+        "tenants_list": [
+          {
+            "name": "최하준",
+            "room": "3층301호",
+            "move_in_date": "2019.12.20",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2019.12.20",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1132010500",
+        "failed_count": 14,
+        "auction_date": "20261110"
       },
       "court_name": ""
     },
@@ -13127,6 +16373,195 @@
         "legal_div_no": "1126010200",
         "failed_count": 12,
         "auction_date": "20261110"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2023타경10275",
+      "headline": "경기 수원시 팔달구 팔달로1가 빌라가 반값? 감정가보다 2.4억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 235254000,
+      "gap_amount_str": "2억 3,525만원",
+      "gap_short_str": "2.4억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(2.4억)보다 2.4억 저렴 (-98%)",
+        "🪙 입찰 보증금 47만원 준비 · 23일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 경기 수원시 팔달구 팔달로1가",
+        "보증금 47만"
+      ],
+      "min_bid": 4746000,
+      "min_bid_str": "474만원",
+      "appraisal": 240000000,
+      "appraisal_str": "2억 4,000만원",
+      "discount_pct": 98,
+      "deposit_required": 474600,
+      "deposit_required_str": "47만원",
+      "usage": "빌라",
+      "area_pyeong": 0.0,
+      "location": "경기도 수원시 팔달구 정조로 800-3 2층201호",
+      "short_location": "경기 수원시 팔달구 팔달로1가",
+      "floor": 2,
+      "failed_count": 11,
+      "auction_date": "20261104",
+      "d_day": "23일 전 마감",
+      "lat": 37.275562,
+      "lng": 127.009805,
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 98.0%)",
+        "suggested_bid": "4,888,380원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 98.0% 할인 매물",
+          "유찰 11회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "가압류",
+          "date": "2016-09-02",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 2
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 240000000,
+          "price_str": "2억 4,000만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 9,
+          "price": 13840000,
+          "price_str": "1,384만원",
+          "ratio_pct": 6,
+          "status": "유찰",
+          "is_current": false,
+          "date": "9차 유찰"
+        },
+        {
+          "round": 10,
+          "price": 9680000,
+          "price_str": "968만원",
+          "ratio_pct": 4,
+          "status": "유찰",
+          "is_current": false,
+          "date": "10차 유찰"
+        },
+        {
+          "round": 11,
+          "price": 6780000,
+          "price_str": "678만원",
+          "ratio_pct": 3,
+          "status": "유찰",
+          "is_current": false,
+          "date": "11차 유찰"
+        },
+        {
+          "round": 12,
+          "price": 4746000,
+          "price_str": "474만원",
+          "ratio_pct": 2,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261104"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "팔달구 빌라",
+        "sample_count": 11,
+        "avg_winning_rate": 51.4,
+        "avg_bidder_count": 1.0
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "가압류",
+            "date": "2016.09.02"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.12.27"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 공부상 전유면적은 70.11㎡이나, 현황은 위반건축물로 인하여 본건 201호로 53.09㎡가 이용되고 있고 17.02㎡는 다른 인접 호수의 일부로 이용되고 있으므로 입찰시 주의요함.\n2. 감정평가 및 매각은 공부상 전용면적인 70.11㎡를 기준으로 함.\n3. 호별배치는 공부상 제201호를 기준으로 제201호부터 제203호까지 순차적으로 되어 있는 것으로 추정됨\n\n[매각조건 비고]\n1. 공부상 전유면적은 70.11㎡이나, 현황은 위반건축물로 인하여 본건 201호로 53.09㎡가 이용되고 있고 17.02㎡는 다른 인접 호수의 일부로 이용되고 있으므로 입찰시 주의요함.\n2. 감정평가 및 매각은 공부상 전용면적인 70.11㎡를 기준으로 함.\n3. 호별배치는 공부상 제201호를 기준으로 제201호부터 제203호까지 순차적으로 되어 있는 것으로 추정됨\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 을구 7번 임차권등기(임차보증금 110,000,000원, 전입일자 2016.07.20. 확정일자 2016.07.20.)가 있으므로 배당에서 전액 변제되지 아니하면 잔액이 매수인에게 인수될 수 있음",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "유진솔",
+            "room": "2층201호",
+            "move_in_date": "2016.07.20",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "황의돈",
+            "room": "2층201호",
+            "move_in_date": "2016.08.09",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 2,
+        "tenant_registration_date": "2016.07.20",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4111510100",
+        "failed_count": 11,
+        "auction_date": "20261104"
       },
       "court_name": ""
     },
@@ -14601,85 +18036,87 @@
       "court_name": ""
     },
     {
-      "case_number": "2023타경74754",
-      "headline": "경기 포천시 신북면 2257평 토지, 신건 첫 입찰 (7,009만)",
-      "safety_grade": "RED",
-      "difficulty": "ADVANCED",
-      "gap_amount": 0,
-      "gap_amount_str": "0원",
-      "gap_short_str": "0원",
+      "case_number": "2024타경1467",
+      "headline": "36% 떨어진 서울 구로구 구로동 상가, 792만대 노려볼까?",
+      "safety_grade": "YELLOW",
+      "difficulty": "INTERMEDIATE",
+      "gap_amount": 4460400,
+      "gap_amount_str": "446만원",
+      "gap_short_str": "446만",
       "ref_price_name": "감정가",
       "market_price": 0,
       "market_price_str": "",
       "summary_bullets": [
-        "🔴 법정지상권·지분매각 등 복잡 권리 · 고수용 하이리턴",
-        "💸 감정가(6만)보다 0원 저렴 (--109427%)",
-        "🪙 입찰 보증금 700만원 준비 · 3일 전 마감"
+        "🟡 세입자 배당요구 완료 · 배당순서만 체크",
+        "💸 감정가(1,239만)보다 446만 저렴 (-36%)",
+        "🪙 입찰 보증금 79만원 준비 · 30일 전 마감"
       ],
       "card_tags": [
-        "고수 · 하이리턴",
-        "📍 경기 포천시 신북면",
-        "보증금 700만"
+        "중급 · 권리 체크",
+        "📍 서울 구로구 구로동",
+        "보증금 79만"
       ],
-      "min_bid": 70097000,
-      "min_bid_str": "7,009만원",
-      "appraisal": 64000,
-      "appraisal_str": "6만원",
-      "discount_pct": -109427,
-      "deposit_required": 7009700,
-      "deposit_required_str": "700만원",
-      "usage": "토지",
-      "area_pyeong": 2257.0,
-      "location": "경기도 포천시 신북면 삼성당리 101-1",
-      "short_location": "경기 포천시 신북면",
-      "floor": 1,
-      "failed_count": 3,
-      "auction_date": "20261124",
-      "d_day": "3일 전 마감",
-      "lat": 37.900539,
-      "lng": 127.194251,
-      "photo_url": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+      "min_bid": 7929600,
+      "min_bid_str": "792만원",
+      "appraisal": 12390000,
+      "appraisal_str": "1,239만원",
+      "discount_pct": 36,
+      "deposit_required": 792960,
+      "deposit_required_str": "79만원",
+      "usage": "상가",
+      "area_pyeong": 0.0,
+      "location": "서울특별시 구로구 구로중앙로 134 제지하1층 제비1라032호 (구로동, 신구로자이 나인스에비뉴)",
+      "short_location": "서울 구로구 구로동",
+      "floor": -1,
+      "failed_count": 2,
+      "auction_date": "20261028",
+      "d_day": "30일 전 마감",
+      "lat": 37.493237,
+      "lng": 126.890095,
+      "photo_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
       "photos": [
-        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
       ],
       "photo_source": "stock",
       "photo_source_label": "🖼️ 참고 이미지",
       "ai_analysis": {
-        "score": 25,
+        "score": 35,
         "grade": "D",
-        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 -109426.6%) | 지분매각(50%) 물건: 배타적 점유 불가·공유자 우선매수권 주의",
-        "suggested_bid": "72,199,910원 부근",
-        "expected_yield": "보수적 접근 필요",
+        "verdict": "권리파악이 명확하지 않으며, 감정가 및 최저가 모두 0원인 특수물건으로 판단됨. 리스크가 높아 신중한 접근 필요.",
+        "suggested_bid": "자료 부족으로 인근 실거래가 참고 후 보수적 입찰 (예: 1,000,000원 ~ 2,000,000원)",
+        "expected_yield": "0%",
         "key_points": [
-          "감정가 대비 -109426.6% 할인 매물",
-          "유찰 3회 진행"
+          "감정가 및 최저가 0원으로 실거래가 자료 및 권리 파악이 불가능한 특수권리 possibly 존재",
+          "유찰 1회로 시장에서는 큰 기대 어려움",
+          "리스크 식별이 어렵고, 등기정보 파싱이 불가하여 등기부 직접확인 필요"
         ],
         "risks": [
-          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험.",
-          "지분매각 물건입니다. 전체 물건이 아닌 지분만 취득하므로 단독 점유·처분이 어렵고 공유자 우선매수권 행사 시 낙찰이 무효가 될 수 있습니다. 시세 비교도 지분 비율 기준으로 해석해야 합니다."
+          "권리 상태 불명확으로 인한 권리 상충 가능성 존재",
+          "임차인 또는 기타 권리자가 존재할 경우 인수불가 또는 금융권 관련 리스크가 높음",
+          "지분경매 또는 특수권리 가능성에 따른 법적 하자 우려"
         ],
         "extinguished_rights": [
-          "말소기준권리 이후 후순위 제한물권 일체"
+          "말소권리 없음(정보없음)"
         ],
         "retained_rights": [
-          "선순위 임차보증금 인수 주의"
+          "없음"
         ],
-        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "analysis_detail": "이 매물은 감정가와 최저가격이 모두 0원으로, 법원 또는 경매 사무국의 특수한 사유가 존재하는 물건으로 판단됩니다. 시스템상 말소기준권리와 권리관계 파악이 불가하며, 유찰횟수도 1회로 아직 재경매 가능성은 남아 있지만, 감정액이 나오지 않아서 구체적 가치를 산출하기 어렵습니다. 인근 실거래가 참고 및 전문가 현장 확인이 반드시 필요하며, 권리관계 명확화 후 투자 여부를 결정하는 것이 바람직합니다. 또한, 등기부 상태를 직접 점검하여 말소권리·미등기권리 여부를 반드시 확인해야 하며, 임차인 내역이 공개되지 않아 임차인 리스크 역시 최소.WARNING 수준으로 분류합니다.",
         "malso_right": {
-          "name": "경매개시결정",
-          "date": "2023-05-08",
+          "name": "근저당",
+          "date": "2010-01-06",
           "right_holder": "",
           "claim_amount": 0
         },
         "assumed_deposit": 0,
         "assumed_deposit_str": "0원",
-        "senior_unknown_count": 1
+        "senior_unknown_count": 0
       },
       "bid_history": [
         {
           "round": 1,
-          "price": 64000,
-          "price_str": "6만원",
+          "price": 12390000,
+          "price_str": "1,239만원",
           "ratio_pct": 100,
           "status": "유찰",
           "is_current": false,
@@ -14687,104 +18124,67 @@
         },
         {
           "round": 2,
-          "price": 50000,
-          "price_str": "5만원",
-          "ratio_pct": 78,
+          "price": 9910000,
+          "price_str": "991만원",
+          "ratio_pct": 80,
           "status": "유찰",
           "is_current": false,
           "date": "2차 유찰"
         },
         {
           "round": 3,
-          "price": 40000,
-          "price_str": "4만원",
-          "ratio_pct": 62,
-          "status": "유찰",
-          "is_current": false,
-          "date": "3차 유찰"
-        },
-        {
-          "round": 4,
-          "price": 70097000,
-          "price_str": "7,009만원",
-          "ratio_pct": 109527,
+          "price": 7929600,
+          "price_str": "792만원",
+          "ratio_pct": 64,
           "status": "현재 진행",
           "is_current": true,
-          "date": "20261124"
+          "date": "20261028"
         }
       ],
       "rental_estimate": null,
       "area_winning_stats": {
-        "region_label": "포천시 토지",
-        "sample_count": 18,
-        "avg_winning_rate": 59.7,
-        "avg_bidder_count": 2.0
+        "region_label": "구로구 상가",
+        "sample_count": 6,
+        "avg_winning_rate": 51.9,
+        "avg_bidder_count": 1.5
       },
       "raw_court_data": {
         "rights_list": [
           {
-            "name": "경매개시결정",
-            "date": "2023.05.08"
+            "name": "근저당",
+            "date": "2010.01.06"
           },
           {
             "name": "경매개시결정",
-            "date": "2023.07.31"
+            "date": "2024.06.13"
           }
         ],
-        "remarks": "[매각물건명세서 비고]\n1. 일괄매각(목록 1. 지상에 소재하는 제시외 비닐하우스 1동 및 목록 2. 지상에 소재하는 제시외 목조기와지붕 단층주택 35.15㎡, 창고 등은 매각에서 제외-법정지상권 성립여부 불분명)\n2. 제시외 건물로 제한받는 단가 목록 1. 64,000원/㎡, 목록 2. 39,000원/㎡\n3. 지분매각임(공유자의 우선매수신고는 1회에 한하여 허용됨)\n4. 목록 2. 지상 농작물(삼포)는 매각에서 제외\n5. 농지취득자격증명원 필요함(미제출시 보증금 몰수)\n6. 신북면의 2023.7.21.자 사실조회 회신에 의하면 목록 2. 지상 일부에 전용허가를 받지 아니하고 타 용도로 전용된 불법 건축물이 있으며 원상복구 대상임\n\n[매각조건 비고]\n일괄매각(제시외 비닐하우스 및 목조기와지붕 단층주택 35.15㎡, 창고 등은 매각에서 제외-법정지상권 성립여부 불분명).제시외 건물로 제한받는 단가 목록 1. 64,000원/㎡, 목록 2. 39,000원/㎡.지분매각임(공유자의 우선매수신고는 1회에 한하여 허용됨).농지취득자격증명원 필요함(미제출시 보증금 몰수).목록 2. 지상 농작물(삼포)는 매각에서 제외.목록 2. 지상 일부에 전용허가를 받지 아니하고 타 용도로 전용된 불법 건축물이 있으며 원상복구 대상임.\n\n[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n해당사항없음\n\n[매각물건명세서 을구/최선순위설정]\n2023.05.08. 경매개시결정\n\n[지분매각 내역]\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n\n[임차인 현황]\n- 김성남: 전입 2015.04.13, 보증금 미상, 확정 미상, 배당요구 없음 ()\n- 김성남: 전입 2015.04.13, 보증금 미상, 확정 미상, 배당요구 없음 ()",
-        "special_rights": [
-          {
-            "id": "share",
-            "name": "지분 매각",
-            "short": "지분매각",
-            "badge_color": "bg-purple-100 text-purple-700 border-purple-200",
-            "risk_level": "MEDIUM",
-            "icon": "ℹ️",
-            "desc": "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다. 전체 배타적 점유가 불가하며 공유자 우선매수권 또는 공유물분할 청구 소송이 필요합니다."
-          },
-          {
-            "id": "superficies",
-            "name": "법정지상권 성립여지",
-            "short": "법정지상권",
-            "badge_color": "bg-orange-100 text-orange-800 border-orange-200",
-            "risk_level": "HIGH",
-            "icon": "🏛️",
-            "desc": "토지만 매각되는 사건 등으로 지상 건물 소유자를 위한 법정지상권이 성립할 여지가 있어 토지 인도 청구 및 지료 산정이 쟁점이 됩니다."
-          },
-          {
-            "id": "farmland",
-            "name": "농취증(농지취득자격) 필요",
-            "short": "농취증",
-            "badge_color": "bg-emerald-100 text-emerald-800 border-emerald-200",
-            "risk_level": "MEDIUM",
-            "icon": "🌾",
-            "desc": "농지(전·답·과수원)로서 낙찰 후 최고가매수신고인 증명서를 발급받아 관할 지자체에서 농지취득자격증명을 기일 내 제출해야 하며, 미제출 시 보증금이 몰수됩니다."
-          }
-        ],
+        "remarks": "[매각물건명세서 비고]\n- 건축물대장상 판매시설임\n-부동산의 현황 및 점유관계조사서상 대상 부동산은 세계로 식자재 마트가 입점하여 운영중이고, 경계벽이 없고 벽면이나 바닥에는 호수표시가 없는 오픈상가임, 대상 부동산은 중앙에스컬레이터 우측 세번째 기둥에서  밑으로 두번째에 위치하는 것으로 보이나 별도 확인이 필요함\n-감정서상 인접 구분건물들과 일체로 판매시설(세계로식자재마트)의 일부로 이용중임\n-감정서상 경계표지 및 구분건물번호표지 없이 동일층 수십개호를 일체로 하여 대형판매시설 매장의 일부로 이용 중으로 집합건축물대장상 건축물현황도 및 관리사무소 배치도면을 기준으로 위치확인이 가능하며, 임대차종료시 일괄하여 원상복구가 가능한것으로 탐문조사됨\n\n[매각조건 비고]\n오픈상가",
+        "special_rights": [],
         "tenants_list": [
           {
-            "name": "김성남",
-            "room": "",
-            "move_in_date": "2015.04.13",
+            "name": "주식회사 세계로더블유스토어(대표이사 임춘례)",
+            "room": "제지하1층 제비1라032호",
+            "move_in_date": "미상",
             "deposit": 0,
             "deposit_str": "미상",
             "monthly_rent": "",
             "fixed_date": "미상",
             "is_payout_requested": false,
-            "seniority": "SENIOR"
+            "seniority": "UNKNOWN"
           }
         ],
         "senior_assumed_deposit": 0,
         "senior_assumed_deposit_str": "0원",
-        "senior_unknown_count": 1,
-        "tenant_registration_date": "2015.04.13",
-        "tenant_deposit": 0,
-        "tenant_deposit_str": "0원",
-        "is_payout_requested": false,
+        "senior_unknown_count": 0,
+        "tenant_registration_date": "2025.04.02",
+        "tenant_deposit": 50000000,
+        "tenant_deposit_str": "5,000만원",
+        "is_payout_requested": true,
         "court_name": "",
-        "legal_div_no": "4165034028",
-        "failed_count": 3,
-        "auction_date": "20261124"
+        "legal_div_no": "1153010200",
+        "failed_count": 2,
+        "auction_date": "20261028"
       },
       "court_name": ""
     },
@@ -14942,6 +18342,481 @@
       "court_name": ""
     },
     {
+      "case_number": "2024타경103107",
+      "headline": "경기 안양시 동안구 호계동 상가가 반값? 시세보다 15.9억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 1594094000,
+      "gap_amount_str": "15억 9,409만원",
+      "gap_short_str": "15.9억",
+      "ref_price_name": "최근 실거래가",
+      "market_price": 2313500000,
+      "market_price_str": "23억 1,350만원",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 시세(23.1억)보다 15.9억 저렴 (-74%)",
+        "🪙 입찰 보증금 7,194만원 준비 · 17일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 경기 안양시 동안구 호계동",
+        "보증금 7,194만"
+      ],
+      "min_bid": 719406000,
+      "min_bid_str": "7억 1,940만원",
+      "appraisal": 2730183400,
+      "appraisal_str": "27억 3,018만원",
+      "discount_pct": 74,
+      "deposit_required": 71940600,
+      "deposit_required_str": "7,194만원",
+      "usage": "상가",
+      "area_pyeong": 103.3,
+      "location": "경기도 안양시 동안구 호계동 966-34",
+      "short_location": "경기 안양시 동안구 호계동",
+      "floor": 1,
+      "failed_count": 2,
+      "auction_date": "20261110",
+      "d_day": "17일 전 마감",
+      "lat": 37.388095,
+      "lng": 126.968265,
+      "photo_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 73.6%)",
+        "suggested_bid": "740,988,180원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 73.6% 할인 매물",
+          "유찰 2회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "근저당",
+          "date": "2022-12-08",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 65000000,
+        "assumed_deposit_str": "6,500만원",
+        "senior_unknown_count": 17
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 2730183400,
+          "price_str": "27억 3,018만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 2,
+          "price": 1911130000,
+          "price_str": "19억 1,113만원",
+          "ratio_pct": 70,
+          "status": "유찰",
+          "is_current": false,
+          "date": "2차 유찰"
+        },
+        {
+          "round": 3,
+          "price": 719406000,
+          "price_str": "7억 1,940만원",
+          "ratio_pct": 26,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261110"
+        }
+      ],
+      "rental_estimate": {
+        "est_deposit": 58000000,
+        "est_deposit_str": "5,800만원",
+        "est_monthly_rent": 2902498,
+        "est_monthly_rent_str": "290만원",
+        "est_jeonse": 0,
+        "est_jeonse_str": "",
+        "annual_yield_pct": 5.3,
+        "gap_invest_cash": 0,
+        "gap_invest_cash_str": "",
+        "sample_count": 279,
+        "source_label": "DB 인근 임대 매칭"
+      },
+      "area_winning_stats": null,
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2022.12.08"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.06.18"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 일괄매각, 제시외 건물 포함\n2. 본건 건물은 제시목록 및 공부상 용도가 음식점, 사무소, 독서실로 되어 있으나, 실제 2~6층은 원룸으로 변경 사용중이며, 건축물대장 상 무단용도변경 등 위반내용 및 위반건축물 표기가 있는바 유의하고, 위반건축물 이행강제금 여부도 필요시 확인 요함(감정평가서 참조). 감정평가는 제시된 목록 상 원래 용도인 근린생활시설을 기준으로 평가함\n3. 현황조사서에 의하면 본건 건물에 2개의 도로명 주소가 부여되어 있음(안양시 동안구 경수대로 519-56, 안양시 동안구 엘에스로 50-6)\n\n[매각조건 비고]\n1. 일괄매각, 제시외 건물 포함\n2. 본건 건물은 제시목록 및 공부상 용도가 음식점, 사무소, 독서실로 되어 있으나, 실제 2~6층은 원룸으로 변경 사용중이며, 건축물대장 상 무단용도변경 등 위반내용 및 위반건축물 표기가 있는바 유의하고, 위반건축물 이행강제금 여부도 필요시 확인 요함(감정평가서 참조). 감정평가는 제시된 목록 상 원래 용도인 근린생활시설을 기준으로 평가함\n3. 현황조사서에 의하면 본건 건물에 2개의 도로명 주소가 부여되어 있음(안양시 동안구 경수대로 519-56, 안양시 동안구 엘에스로 50-6)\n\n[소멸되지 않는 권리]\n본건 건물 관련, 매수인에게 대항할 수 있는 을구 순위 6번 임차권등기(2023.06.26. 등기, 보증금 38,000,000원, 전입일 2020.05.29., 확정일 2020.05.29.), 을구 순위 8번 임차권등기(2023.10.16. 등기, 보증금 50,000,000원, 전입일 2017.05.08., 확정일 2017.05.08.), 을구 순위 9번 임차권등기(2023.11.24. 등기, 보증금 75,000,000원, 전입일 2021.10.27., 확정일 2021.10.27.), 을구 순위 11번 임차권등기(2024.05.21. 등기, 보증금 56,000,000원, 전입일 2021.12.01., 확정일 2021.12.06.), 을구 순위 12번 임차권등기(2024.06.26. 등기, 보증금 75,000,000원, 전입일 2021.03.26., 확정일 2021.03.26.), 을구 순위 13번 임차권등기(2024.08.09. 등기, 보증금 50,000,000원, 전입일 2009.12.07., 확정일 2009.12.07.),  을구 순위 15번 임차권등기(2024.09.23. 등기, 보증금 60,000,000원, 전입일 2020.02.20., 확정일 2020.02.20.), 을구 순위 16번 임차권등기(2025.01.07. 등기, 보증금 70,000,000원, 전입일 2013.11.07., 확정일 2013.11.07.(1차), 없음(2차)) 있음. 배당에서 각 보증금이 전액 변제되지 않으면 잔액을 매수인이 각 인수함.",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "우명근",
+            "room": "",
+            "move_in_date": "2024.03.25",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "JUNIOR"
+          },
+          {
+            "name": "장시완",
+            "room": "",
+            "move_in_date": "2021.06.08",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "신승철",
+            "room": "",
+            "move_in_date": "2013.12.26",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "조남천",
+            "room": "",
+            "move_in_date": "2024.03.29",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "JUNIOR"
+          },
+          {
+            "name": "이은주",
+            "room": "",
+            "move_in_date": "2022.04.28",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "최명식",
+            "room": "",
+            "move_in_date": "2021.03.29",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "이성구",
+            "room": "",
+            "move_in_date": "2021.12.01",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "나종연",
+            "room": "",
+            "move_in_date": "2023.12.19",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "JUNIOR"
+          },
+          {
+            "name": "장안창",
+            "room": "",
+            "move_in_date": "2010.06.10",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "조형탁",
+            "room": "",
+            "move_in_date": "2024.03.27",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "JUNIOR"
+          },
+          {
+            "name": "김남학",
+            "room": "",
+            "move_in_date": "2020.02.13",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "송창근",
+            "room": "",
+            "move_in_date": "2024.04.08",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "JUNIOR"
+          },
+          {
+            "name": "이상훈",
+            "room": "",
+            "move_in_date": "2021.06.30",
+            "deposit": 5000000,
+            "deposit_str": "500만원",
+            "monthly_rent": "35만원",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "박용범",
+            "room": "",
+            "move_in_date": "2016.07.13",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "김태호",
+            "room": "",
+            "move_in_date": "2009.12.07",
+            "deposit": 50000000,
+            "deposit_str": "5,000만원",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "조광유",
+            "room": "",
+            "move_in_date": "2020.11.27",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "황지용",
+            "room": "",
+            "move_in_date": "2022.06.24",
+            "deposit": 5000000,
+            "deposit_str": "500만원",
+            "monthly_rent": "30만원",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "박현우",
+            "room": "",
+            "move_in_date": "2020.02.20",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "심대진",
+            "room": "",
+            "move_in_date": "2018.06.15",
+            "deposit": 5000000,
+            "deposit_str": "500만원",
+            "monthly_rent": "40만원",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "안정환",
+            "room": "",
+            "move_in_date": "2023.08.07",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "JUNIOR"
+          },
+          {
+            "name": "이영진",
+            "room": "",
+            "move_in_date": "2011.08.18",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "조영임",
+            "room": "",
+            "move_in_date": "2013.11.07",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "김봉산",
+            "room": "",
+            "move_in_date": "2024.03.22",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "JUNIOR"
+          },
+          {
+            "name": "김원형",
+            "room": "",
+            "move_in_date": "2020.05.01",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "장민종",
+            "room": "",
+            "move_in_date": "2021.01.12",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "이선후",
+            "room": "",
+            "move_in_date": "2021.03.26",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "LI WANSHOU",
+            "room": "",
+            "move_in_date": "2017.08.29",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "CUI MINGRI",
+            "room": "",
+            "move_in_date": "2022.09.13",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          },
+          {
+            "name": "정인경",
+            "room": "",
+            "move_in_date": "2024.04.09",
+            "deposit": 20000000,
+            "deposit_str": "2,000만원",
+            "monthly_rent": "100만원",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "JUNIOR"
+          }
+        ],
+        "senior_assumed_deposit": 65000000,
+        "senior_assumed_deposit_str": "6,500만원",
+        "senior_unknown_count": 17,
+        "tenant_registration_date": "2009.12.07",
+        "tenant_deposit": 65000000,
+        "tenant_deposit_str": "6,500만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4117310400",
+        "failed_count": 2,
+        "auction_date": "20261110"
+      },
+      "court_name": ""
+    },
+    {
       "case_number": "2024타경1072",
       "headline": "서울 중구 신당동 889평 상가, 감정가보다 5,500만 저렴하게",
       "safety_grade": "RED",
@@ -15078,6 +18953,184 @@
         "legal_div_no": "1114016200",
         "failed_count": 1,
         "auction_date": "20261126"
+      },
+      "court_name": ""
+    },
+    {
+      "case_number": "2022타경59047",
+      "headline": "경기 성남시 분당구 정자동 기타가 반값? 감정가보다 3.7억 싼 이유",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 369705000,
+      "gap_amount_str": "3억 6,970만원",
+      "gap_short_str": "3.7억",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(4.2억)보다 3.7억 저렴 (-88%)",
+        "🪙 입찰 보증금 492만원 준비 · D-10"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 경기 성남시 분당구 정자동",
+        "보증금 492만"
+      ],
+      "min_bid": 49295000,
+      "min_bid_str": "4,929만원",
+      "appraisal": 419000000,
+      "appraisal_str": "4억 1,900만원",
+      "discount_pct": 88,
+      "deposit_required": 4929500,
+      "deposit_required_str": "492만원",
+      "usage": "기타",
+      "area_pyeong": 0.0,
+      "location": "경기도 성남시 분당구 불정로 112 1층에이123호 (정자동,피더하우스)",
+      "short_location": "경기 성남시 분당구 정자동",
+      "floor": 1,
+      "failed_count": 6,
+      "auction_date": "20261207",
+      "d_day": "D-10",
+      "lat": 37.363746,
+      "lng": 127.111252,
+      "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_15.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_15.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_16.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_17.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_18.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_6.jpg"
+      ],
+      "photo_source": "court",
+      "photo_source_label": "🏛️ 법원 감정평가서 10장",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 88.2%)",
+        "suggested_bid": "50,773,850원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 88.2% 할인 매물",
+          "유찰 6회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2026-02-27",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 8,
+        "assumed_deposit_str": "0만원",
+        "senior_unknown_count": 0
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 419000000,
+          "price_str": "4억 1,900만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 4,
+          "price": 143720000,
+          "price_str": "1억 4,372만원",
+          "ratio_pct": 34,
+          "status": "유찰",
+          "is_current": false,
+          "date": "4차 유찰"
+        },
+        {
+          "round": 5,
+          "price": 100600000,
+          "price_str": "1억 60만원",
+          "ratio_pct": 24,
+          "status": "유찰",
+          "is_current": false,
+          "date": "5차 유찰"
+        },
+        {
+          "round": 6,
+          "price": 70420000,
+          "price_str": "7,042만원",
+          "ratio_pct": 17,
+          "status": "유찰",
+          "is_current": false,
+          "date": "6차 유찰"
+        },
+        {
+          "round": 7,
+          "price": 49295000,
+          "price_str": "4,929만원",
+          "ratio_pct": 12,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261207"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": null,
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2026.02.27"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 공부상 1층은 외형상 2층으로 본건 현관문에는 223호로 표시되어 있음.\n2. 본건 공부상 용도는 노유자시설(노인복지시설)로 입주자 제한여부는 개별확인요망.\n3. 선순위가등기권자 유철재는 담보가등기권자로  2025.1.17.자 권리신고 및 배당요구신청서를 제출함.\n\n[매각조건 비고]\n1. 공부상 1층은 외형상 2층으로 본건 현관문에는 223호로 표시되어 있음.\n2. 본건 공부상 용도는 노유자시설(노인복지시설)로 입주자 제한여부는 개별확인요망.\n3. 선순위가등기권자 유철재는 담보가등기권자로  2025.1.17.자 권리신고 및 배당요구신청서를 제출함.\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 을구 순위 1번 주택임차권등기 있음(임차보증금: 금380,000,000원, 주민등록일자: 2017.12.06, 점유개시일자: 2017.12.06, 확정일자:2017.12.06.) 배당에서 임차보증금이 전액 배당되지 아니하면 잔액을 매수인이 인수함.\n\n[매각물건명세서 을구/최선순위설정]\n2021. 9. 29. 담보가등기\n\n[임차인 현황]\n- 최재훈: 전입 2017.12.06, 보증금 8원, 확정 2017.12.06, 배당요구 없음 (1층에이123호)",
+        "special_rights": [
+          {
+            "id": "prior_provisional",
+            "name": "선순위 가처분/가등기",
+            "short": "선순위가처분",
+            "badge_color": "bg-rose-100 text-rose-800 border-rose-300",
+            "risk_level": "CRITICAL",
+            "icon": "🚨",
+            "desc": "말소기준권리보다 앞선 처분금지가처분 또는 소유권이전청구권가등기로 낙찰자가 소유권을 상실할 위험이 있는 고위험 권리입니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "최재훈",
+            "room": "1층에이123호",
+            "move_in_date": "2017.12.06",
+            "deposit": 8,
+            "deposit_str": "0만원",
+            "monthly_rent": "100만원",
+            "fixed_date": "2017.12.06",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 8,
+        "senior_assumed_deposit_str": "0만원",
+        "senior_unknown_count": 0,
+        "tenant_registration_date": "2017.12.06",
+        "tenant_deposit": 8,
+        "tenant_deposit_str": "0만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4113510300",
+        "failed_count": 6,
+        "auction_date": "20261207"
       },
       "court_name": ""
     },
@@ -25258,6 +29311,194 @@
       "court_name": ""
     },
     {
+      "case_number": "2023타경74754",
+      "headline": "경기 포천시 신북면 2257평 토지, 신건 첫 입찰 (7,009만)",
+      "safety_grade": "RED",
+      "difficulty": "ADVANCED",
+      "gap_amount": 0,
+      "gap_amount_str": "0원",
+      "gap_short_str": "0원",
+      "ref_price_name": "감정가",
+      "market_price": 0,
+      "market_price_str": "",
+      "summary_bullets": [
+        "🔴 법정지상권·지분매각 등 복잡 권리 · 고수용 하이리턴",
+        "💸 감정가(6만)보다 0원 저렴 (--109427%)",
+        "🪙 입찰 보증금 700만원 준비 · 3일 전 마감"
+      ],
+      "card_tags": [
+        "고수 · 하이리턴",
+        "📍 경기 포천시 신북면",
+        "보증금 700만"
+      ],
+      "min_bid": 70097000,
+      "min_bid_str": "7,009만원",
+      "appraisal": 64000,
+      "appraisal_str": "6만원",
+      "discount_pct": -109427,
+      "deposit_required": 7009700,
+      "deposit_required_str": "700만원",
+      "usage": "토지",
+      "area_pyeong": 2257.0,
+      "location": "경기도 포천시 신북면 삼성당리 101-1",
+      "short_location": "경기 포천시 신북면",
+      "floor": 1,
+      "failed_count": 3,
+      "auction_date": "20261124",
+      "d_day": "3일 전 마감",
+      "lat": 37.900539,
+      "lng": 127.194251,
+      "photo_url": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"
+      ],
+      "photo_source": "stock",
+      "photo_source_label": "🖼️ 참고 이미지",
+      "ai_analysis": {
+        "score": 25,
+        "grade": "D",
+        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 -109426.6%) | 지분매각(50%) 물건: 배타적 점유 불가·공유자 우선매수권 주의",
+        "suggested_bid": "72,199,910원 부근",
+        "expected_yield": "보수적 접근 필요",
+        "key_points": [
+          "감정가 대비 -109426.6% 할인 매물",
+          "유찰 3회 진행"
+        ],
+        "risks": [
+          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험.",
+          "지분매각 물건입니다. 전체 물건이 아닌 지분만 취득하므로 단독 점유·처분이 어렵고 공유자 우선매수권 행사 시 낙찰이 무효가 될 수 있습니다. 시세 비교도 지분 비율 기준으로 해석해야 합니다."
+        ],
+        "extinguished_rights": [
+          "말소기준권리 이후 후순위 제한물권 일체"
+        ],
+        "retained_rights": [
+          "선순위 임차보증금 인수 주의"
+        ],
+        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
+        "malso_right": {
+          "name": "경매개시결정",
+          "date": "2023-05-08",
+          "right_holder": "",
+          "claim_amount": 0
+        },
+        "assumed_deposit": 0,
+        "assumed_deposit_str": "0원",
+        "senior_unknown_count": 1
+      },
+      "bid_history": [
+        {
+          "round": 1,
+          "price": 64000,
+          "price_str": "6만원",
+          "ratio_pct": 100,
+          "status": "유찰",
+          "is_current": false,
+          "date": "1차 유찰"
+        },
+        {
+          "round": 2,
+          "price": 50000,
+          "price_str": "5만원",
+          "ratio_pct": 78,
+          "status": "유찰",
+          "is_current": false,
+          "date": "2차 유찰"
+        },
+        {
+          "round": 3,
+          "price": 40000,
+          "price_str": "4만원",
+          "ratio_pct": 62,
+          "status": "유찰",
+          "is_current": false,
+          "date": "3차 유찰"
+        },
+        {
+          "round": 4,
+          "price": 70097000,
+          "price_str": "7,009만원",
+          "ratio_pct": 109527,
+          "status": "현재 진행",
+          "is_current": true,
+          "date": "20261124"
+        }
+      ],
+      "rental_estimate": null,
+      "area_winning_stats": {
+        "region_label": "포천시 토지",
+        "sample_count": 18,
+        "avg_winning_rate": 59.7,
+        "avg_bidder_count": 2.0
+      },
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.05.08"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.07.31"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 일괄매각(목록 1. 지상에 소재하는 제시외 비닐하우스 1동 및 목록 2. 지상에 소재하는 제시외 목조기와지붕 단층주택 35.15㎡, 창고 등은 매각에서 제외-법정지상권 성립여부 불분명)\n2. 제시외 건물로 제한받는 단가 목록 1. 64,000원/㎡, 목록 2. 39,000원/㎡\n3. 지분매각임(공유자의 우선매수신고는 1회에 한하여 허용됨)\n4. 목록 2. 지상 농작물(삼포)는 매각에서 제외\n5. 농지취득자격증명원 필요함(미제출시 보증금 몰수)\n6. 신북면의 2023.7.21.자 사실조회 회신에 의하면 목록 2. 지상 일부에 전용허가를 받지 아니하고 타 용도로 전용된 불법 건축물이 있으며 원상복구 대상임\n\n[매각조건 비고]\n일괄매각(제시외 비닐하우스 및 목조기와지붕 단층주택 35.15㎡, 창고 등은 매각에서 제외-법정지상권 성립여부 불분명).제시외 건물로 제한받는 단가 목록 1. 64,000원/㎡, 목록 2. 39,000원/㎡.지분매각임(공유자의 우선매수신고는 1회에 한하여 허용됨).농지취득자격증명원 필요함(미제출시 보증금 몰수).목록 2. 지상 농작물(삼포)는 매각에서 제외.목록 2. 지상 일부에 전용허가를 받지 아니하고 타 용도로 전용된 불법 건축물이 있으며 원상복구 대상임.\n\n[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n해당사항없음\n\n[매각물건명세서 을구/최선순위설정]\n2023.05.08. 경매개시결정\n\n[지분매각 내역]\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n\n[임차인 현황]\n- 김성남: 전입 2015.04.13, 보증금 미상, 확정 미상, 배당요구 없음 ()\n- 김성남: 전입 2015.04.13, 보증금 미상, 확정 미상, 배당요구 없음 ()",
+        "special_rights": [
+          {
+            "id": "share",
+            "name": "지분 매각",
+            "short": "지분매각",
+            "badge_color": "bg-purple-100 text-purple-700 border-purple-200",
+            "risk_level": "MEDIUM",
+            "icon": "ℹ️",
+            "desc": "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다. 전체 배타적 점유가 불가하며 공유자 우선매수권 또는 공유물분할 청구 소송이 필요합니다."
+          },
+          {
+            "id": "superficies",
+            "name": "법정지상권 성립여지",
+            "short": "법정지상권",
+            "badge_color": "bg-orange-100 text-orange-800 border-orange-200",
+            "risk_level": "HIGH",
+            "icon": "🏛️",
+            "desc": "토지만 매각되는 사건 등으로 지상 건물 소유자를 위한 법정지상권이 성립할 여지가 있어 토지 인도 청구 및 지료 산정이 쟁점이 됩니다."
+          },
+          {
+            "id": "farmland",
+            "name": "농취증(농지취득자격) 필요",
+            "short": "농취증",
+            "badge_color": "bg-emerald-100 text-emerald-800 border-emerald-200",
+            "risk_level": "MEDIUM",
+            "icon": "🌾",
+            "desc": "농지(전·답·과수원)로서 낙찰 후 최고가매수신고인 증명서를 발급받아 관할 지자체에서 농지취득자격증명을 기일 내 제출해야 하며, 미제출 시 보증금이 몰수됩니다."
+          }
+        ],
+        "tenants_list": [
+          {
+            "name": "김성남",
+            "room": "",
+            "move_in_date": "2015.04.13",
+            "deposit": 0,
+            "deposit_str": "미상",
+            "monthly_rent": "",
+            "fixed_date": "미상",
+            "is_payout_requested": false,
+            "seniority": "SENIOR"
+          }
+        ],
+        "senior_assumed_deposit": 0,
+        "senior_assumed_deposit_str": "0원",
+        "senior_unknown_count": 1,
+        "tenant_registration_date": "2015.04.13",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4165034028",
+        "failed_count": 3,
+        "auction_date": "20261124"
+      },
+      "court_name": ""
+    },
+    {
       "case_number": "2024타경2407",
       "headline": "경기 파주시 목동동 토지가 반값? 감정가보다 4.2억 싼 이유",
       "safety_grade": "RED",
@@ -25458,481 +29699,6 @@
         "legal_div_no": "4148011700",
         "failed_count": 2,
         "auction_date": "20261104"
-      },
-      "court_name": ""
-    },
-    {
-      "case_number": "2024타경103107",
-      "headline": "경기 안양시 동안구 호계동 기타가 반값? 시세보다 15.9억 싼 이유",
-      "safety_grade": "RED",
-      "difficulty": "ADVANCED",
-      "gap_amount": 1594094000,
-      "gap_amount_str": "15억 9,409만원",
-      "gap_short_str": "15.9억",
-      "ref_price_name": "최근 실거래가",
-      "market_price": 2313500000,
-      "market_price_str": "23억 1,350만원",
-      "summary_bullets": [
-        "🔴 인수 등 복잡 권리 · 고수용 하이리턴",
-        "💸 시세(23.1억)보다 15.9억 저렴 (-74%)",
-        "🪙 입찰 보증금 7,194만원 준비 · 17일 전 마감"
-      ],
-      "card_tags": [
-        "고수 · 하이리턴",
-        "📍 경기 안양시 동안구 호계동",
-        "보증금 7,194만"
-      ],
-      "min_bid": 719406000,
-      "min_bid_str": "7억 1,940만원",
-      "appraisal": 2730183400,
-      "appraisal_str": "27억 3,018만원",
-      "discount_pct": 74,
-      "deposit_required": 71940600,
-      "deposit_required_str": "7,194만원",
-      "usage": "기타",
-      "area_pyeong": 103.3,
-      "location": "경기도 안양시 동안구 호계동 966-34",
-      "short_location": "경기 안양시 동안구 호계동",
-      "floor": 1,
-      "failed_count": 2,
-      "auction_date": "20261110",
-      "d_day": "17일 전 마감",
-      "lat": 37.388095,
-      "lng": 126.968265,
-      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
-      "photos": [
-        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
-      ],
-      "photo_source": "stock",
-      "photo_source_label": "🖼️ 참고 이미지",
-      "ai_analysis": {
-        "score": 25,
-        "grade": "D",
-        "verdict": "시스템 정밀 권리분석 (CRITICAL): 대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험. (할인율 73.6%)",
-        "suggested_bid": "740,988,180원 부근",
-        "expected_yield": "보수적 접근 필요",
-        "key_points": [
-          "감정가 대비 73.6% 할인 매물",
-          "유찰 2회 진행"
-        ],
-        "risks": [
-          "대항력 있는 선순위 임차인이 배당요구를 하지 않았습니다. 보증금 전액 인수 위험."
-        ],
-        "extinguished_rights": [
-          "말소기준권리 이후 후순위 제한물권 일체"
-        ],
-        "retained_rights": [
-          "선순위 임차보증금 인수 주의"
-        ],
-        "analysis_detail": "법원 현황조사서 및 매각물건명세서 기반 자동 권리분석 완료 물건입니다. 권리 위험도는 [CRITICAL]이며, 상세 모달에서 [실시간 재분석]을 누르시면 GPT-4o-mini 심층 컨설팅 리포트를 즉시 받아보실 수 있습니다.",
-        "malso_right": {
-          "name": "근저당",
-          "date": "2022-12-08",
-          "right_holder": "",
-          "claim_amount": 0
-        },
-        "assumed_deposit": 65000000,
-        "assumed_deposit_str": "6,500만원",
-        "senior_unknown_count": 17
-      },
-      "bid_history": [
-        {
-          "round": 1,
-          "price": 2730183400,
-          "price_str": "27억 3,018만원",
-          "ratio_pct": 100,
-          "status": "유찰",
-          "is_current": false,
-          "date": "1차 유찰"
-        },
-        {
-          "round": 2,
-          "price": 1911130000,
-          "price_str": "19억 1,113만원",
-          "ratio_pct": 70,
-          "status": "유찰",
-          "is_current": false,
-          "date": "2차 유찰"
-        },
-        {
-          "round": 3,
-          "price": 719406000,
-          "price_str": "7억 1,940만원",
-          "ratio_pct": 26,
-          "status": "현재 진행",
-          "is_current": true,
-          "date": "20261110"
-        }
-      ],
-      "rental_estimate": {
-        "est_deposit": 58000000,
-        "est_deposit_str": "5,800만원",
-        "est_monthly_rent": 2902498,
-        "est_monthly_rent_str": "290만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 5.3,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 279,
-        "source_label": "DB 인근 임대 매칭"
-      },
-      "area_winning_stats": null,
-      "raw_court_data": {
-        "rights_list": [
-          {
-            "name": "근저당",
-            "date": "2022.12.08"
-          },
-          {
-            "name": "경매개시결정",
-            "date": "2024.06.18"
-          }
-        ],
-        "remarks": "[매각물건명세서 비고]\n1. 일괄매각, 제시외 건물 포함\n2. 본건 건물은 제시목록 및 공부상 용도가 음식점, 사무소, 독서실로 되어 있으나, 실제 2~6층은 원룸으로 변경 사용중이며, 건축물대장 상 무단용도변경 등 위반내용 및 위반건축물 표기가 있는바 유의하고, 위반건축물 이행강제금 여부도 필요시 확인 요함(감정평가서 참조). 감정평가는 제시된 목록 상 원래 용도인 근린생활시설을 기준으로 평가함\n3. 현황조사서에 의하면 본건 건물에 2개의 도로명 주소가 부여되어 있음(안양시 동안구 경수대로 519-56, 안양시 동안구 엘에스로 50-6)\n\n[매각조건 비고]\n1. 일괄매각, 제시외 건물 포함\n2. 본건 건물은 제시목록 및 공부상 용도가 음식점, 사무소, 독서실로 되어 있으나, 실제 2~6층은 원룸으로 변경 사용중이며, 건축물대장 상 무단용도변경 등 위반내용 및 위반건축물 표기가 있는바 유의하고, 위반건축물 이행강제금 여부도 필요시 확인 요함(감정평가서 참조). 감정평가는 제시된 목록 상 원래 용도인 근린생활시설을 기준으로 평가함\n3. 현황조사서에 의하면 본건 건물에 2개의 도로명 주소가 부여되어 있음(안양시 동안구 경수대로 519-56, 안양시 동안구 엘에스로 50-6)\n\n[소멸되지 않는 권리]\n본건 건물 관련, 매수인에게 대항할 수 있는 을구 순위 6번 임차권등기(2023.06.26. 등기, 보증금 38,000,000원, 전입일 2020.05.29., 확정일 2020.05.29.), 을구 순위 8번 임차권등기(2023.10.16. 등기, 보증금 50,000,000원, 전입일 2017.05.08., 확정일 2017.05.08.), 을구 순위 9번 임차권등기(2023.11.24. 등기, 보증금 75,000,000원, 전입일 2021.10.27., 확정일 2021.10.27.), 을구 순위 11번 임차권등기(2024.05.21. 등기, 보증금 56,000,000원, 전입일 2021.12.01., 확정일 2021.12.06.), 을구 순위 12번 임차권등기(2024.06.26. 등기, 보증금 75,000,000원, 전입일 2021.03.26., 확정일 2021.03.26.), 을구 순위 13번 임차권등기(2024.08.09. 등기, 보증금 50,000,000원, 전입일 2009.12.07., 확정일 2009.12.07.),  을구 순위 15번 임차권등기(2024.09.23. 등기, 보증금 60,000,000원, 전입일 2020.02.20., 확정일 2020.02.20.), 을구 순위 16번 임차권등기(2025.01.07. 등기, 보증금 70,000,000원, 전입일 2013.11.07., 확정일 2013.11.07.(1차), 없음(2차)) 있음. 배당에서 각 보증금이 전액 변제되지 않으면 잔액을 매수인이 각 인수함.",
-        "special_rights": [
-          {
-            "id": "violation",
-            "name": "위반건축물",
-            "short": "위반건축물",
-            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
-            "risk_level": "HIGH",
-            "icon": "⚠️",
-            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
-          }
-        ],
-        "tenants_list": [
-          {
-            "name": "우명근",
-            "room": "",
-            "move_in_date": "2024.03.25",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "JUNIOR"
-          },
-          {
-            "name": "장시완",
-            "room": "",
-            "move_in_date": "2021.06.08",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "신승철",
-            "room": "",
-            "move_in_date": "2013.12.26",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "조남천",
-            "room": "",
-            "move_in_date": "2024.03.29",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "JUNIOR"
-          },
-          {
-            "name": "이은주",
-            "room": "",
-            "move_in_date": "2022.04.28",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "최명식",
-            "room": "",
-            "move_in_date": "2021.03.29",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "이성구",
-            "room": "",
-            "move_in_date": "2021.12.01",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "나종연",
-            "room": "",
-            "move_in_date": "2023.12.19",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "JUNIOR"
-          },
-          {
-            "name": "장안창",
-            "room": "",
-            "move_in_date": "2010.06.10",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "조형탁",
-            "room": "",
-            "move_in_date": "2024.03.27",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "JUNIOR"
-          },
-          {
-            "name": "김남학",
-            "room": "",
-            "move_in_date": "2020.02.13",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "송창근",
-            "room": "",
-            "move_in_date": "2024.04.08",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "JUNIOR"
-          },
-          {
-            "name": "이상훈",
-            "room": "",
-            "move_in_date": "2021.06.30",
-            "deposit": 5000000,
-            "deposit_str": "500만원",
-            "monthly_rent": "35만원",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "박용범",
-            "room": "",
-            "move_in_date": "2016.07.13",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "김태호",
-            "room": "",
-            "move_in_date": "2009.12.07",
-            "deposit": 50000000,
-            "deposit_str": "5,000만원",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "조광유",
-            "room": "",
-            "move_in_date": "2020.11.27",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "황지용",
-            "room": "",
-            "move_in_date": "2022.06.24",
-            "deposit": 5000000,
-            "deposit_str": "500만원",
-            "monthly_rent": "30만원",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "박현우",
-            "room": "",
-            "move_in_date": "2020.02.20",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "심대진",
-            "room": "",
-            "move_in_date": "2018.06.15",
-            "deposit": 5000000,
-            "deposit_str": "500만원",
-            "monthly_rent": "40만원",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "안정환",
-            "room": "",
-            "move_in_date": "2023.08.07",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "JUNIOR"
-          },
-          {
-            "name": "이영진",
-            "room": "",
-            "move_in_date": "2011.08.18",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "조영임",
-            "room": "",
-            "move_in_date": "2013.11.07",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "김봉산",
-            "room": "",
-            "move_in_date": "2024.03.22",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "JUNIOR"
-          },
-          {
-            "name": "김원형",
-            "room": "",
-            "move_in_date": "2020.05.01",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "장민종",
-            "room": "",
-            "move_in_date": "2021.01.12",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "이선후",
-            "room": "",
-            "move_in_date": "2021.03.26",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "LI WANSHOU",
-            "room": "",
-            "move_in_date": "2017.08.29",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "CUI MINGRI",
-            "room": "",
-            "move_in_date": "2022.09.13",
-            "deposit": 0,
-            "deposit_str": "미상",
-            "monthly_rent": "",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "SENIOR"
-          },
-          {
-            "name": "정인경",
-            "room": "",
-            "move_in_date": "2024.04.09",
-            "deposit": 20000000,
-            "deposit_str": "2,000만원",
-            "monthly_rent": "100만원",
-            "fixed_date": "미상",
-            "is_payout_requested": false,
-            "seniority": "JUNIOR"
-          }
-        ],
-        "senior_assumed_deposit": 65000000,
-        "senior_assumed_deposit_str": "6,500만원",
-        "senior_unknown_count": 17,
-        "tenant_registration_date": "2009.12.07",
-        "tenant_deposit": 65000000,
-        "tenant_deposit_str": "6,500만원",
-        "is_payout_requested": false,
-        "court_name": "",
-        "legal_div_no": "4117310400",
-        "failed_count": 2,
-        "auction_date": "20261110"
       },
       "court_name": ""
     },
