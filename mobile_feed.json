@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-27 13:17:51",
+  "generated_at": "2026-11-27 13:35:52",
   "total_count": 83,
   "green_count": 19,
   "yellow_count": 38,
@@ -35,6 +35,59 @@
       "lat": 37.555374,
       "lng": 127.046121,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경59626_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2019.07.03"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.09.27"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 공부상 제2종근린생활시설(일반음식점)로 현황상 사무실 및 공장으로 사용중임\n2. 일민건설주식회사 유치권점유신고서 제출(2025.03.12.)하였으나 유치권점유 취하서 제출함(2025.03.20.)\n3. 재매각(매수신청보증금 20%)\n\n[매각조건 비고]\n1. 공부상 제2종근린생활시설(일반음식점)로 현황상 사무실 및 공장으로 사용중임\n2. 일민건설주식회사 유치권점유신고서 제출(2025.03.12.)하였으나 유치권점유 취하서 제출함(2025.03.20.)\n3. 재매각(매수신청보증금 20%)\n\n[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n해당사항없음\n\n[매각물건명세서 을구/최선순위설정]\n2019.07.03. 근저당권\n\n[임차인 현황]\n- 유상훈: 전입 2023.07.19, 보증금 미상, 확정 미상, 배당요구 없음 (지1층비101호)",
+        "special_rights": [
+          {
+            "id": "lien",
+            "name": "유치권 신고 있음",
+            "short": "유치권",
+            "badge_color": "bg-red-100 text-red-700 border-red-200",
+            "risk_level": "CRITICAL",
+            "icon": "🚨",
+            "desc": "공사대금 등 유치권 신고가 접수된 매물입니다. 낙찰자에게 대항할 수 있는 유치권인지 점유 및 피담보채권의 실재성을 철저히 조사해야 합니다."
+          },
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "2023.07.19",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1120010500",
+        "failed_count": 2,
+        "auction_date": "20261207"
+      },
       "court_name": ""
     },
     {
@@ -67,6 +120,40 @@
       "lat": 37.762263,
       "lng": 126.775169,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경6191_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2021.11.18"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.04.05"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2021.11.18.근저당",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4148012200",
+        "failed_count": 1,
+        "auction_date": "20261208"
+      },
       "court_name": ""
     },
     {
@@ -99,6 +186,50 @@
       "lat": 37.632713,
       "lng": 127.225382,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_18.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_18.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_19.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_20.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_21.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_22.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_23.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_24.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_25.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_26.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경71728_27.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2021.11.25"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.05.24"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1.일괄매각\n2.대지권의 목적인 토지는 2022. 3. 24. 장현리463-19(1,871㎡) 및 463-25(82㎡)로 분할됨\n3.유치권신고인 박월범이 2023. 5. 23.자로 공사대금 290,000,000원을 위하여 유치권이 있다는 신고가 있으나, 신청채권자 의정부서부새마을금고의 승계인 한국자산관리공사로부터 위 유치권이 부존재하다는 의정부지방법원 2024나228815 확정판결이 제출됨\n4.유치권신고인 장나영이 2023. 5. 24.자로 공사대금 689,200,000원을 위하여 유치권이 있다는 신고가 있으나 그 성립 여부는 불분명\n\n[매각조건 비고]\n일괄매각\n\n[매각물건명세서 을구/최선순위설정]\n2021.11.25.근저당\n\n[임차인 현황]\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층102호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층102호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층102호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층102호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층102호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층102호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층102호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층102호)\n- 이연희: 전입 2023.02.15, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 김민영: 전입 2022.10.21, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)\n- 홍다혜: 전입 2023.03.22, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층303호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층303호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층303호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층303호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층303호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층303호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층303호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (3층303호)\n- 안병진: 전입 2022.12.08, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 광림: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층403호)\n- 내각인력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층403호)\n- 박월범: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층403호)\n- 배동승: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층403호)\n- 심퍼니처: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층403호)\n- 페인트콜: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층403호)\n- 하양타일: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층403호)\n- 하영전력: 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (4층403호)",
+        "special_rights": [
+          {
+            "id": "lien",
+            "name": "유치권 신고 있음",
+            "short": "유치권",
+            "badge_color": "bg-red-100 text-red-700 border-red-200",
+            "risk_level": "CRITICAL",
+            "icon": "🚨",
+            "desc": "공사대금 등 유치권 신고가 접수된 매물입니다. 낙찰자에게 대항할 수 있는 유치권인지 점유 및 피담보채권의 실재성을 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "2022.10.21",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4136025321",
+        "failed_count": 3,
+        "auction_date": "20261209"
+      },
       "court_name": ""
     },
     {
@@ -131,6 +262,36 @@
       "lat": 37.398646,
       "lng": 126.949752,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경109310_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2025.01.06"
+          }
+        ],
+        "remarks": "[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n해당사항없음\n\n[매각물건명세서 을구/최선순위설정]\n2015.5.15.근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4117310400",
+        "failed_count": 2,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -163,6 +324,40 @@
       "lat": 37.384253,
       "lng": 126.914357,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_13.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_13.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_14.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_15.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_16.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1543_6.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2016.11.03"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2025.11.28"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2016.11.03. 근저당권\n\n[임차인 현황]\n- 김병준: 전입 2016.11.16, 보증금 미상, 확정 미상, 배당요구 없음 (4층402호)",
+        "special_rights": [],
+        "tenant_registration_date": "2016.11.16",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4117110100",
+        "failed_count": 1,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -195,6 +390,39 @@
       "lat": 37.516457,
       "lng": 126.857031,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경121060_9.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2013.03.04"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.03.13"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2013.03.04. 근저당권\n\n[임차인 현황]\n- 김정구: 전입 2013.05.20, 보증금 미상, 확정 미상, 배당요구 없음 (제5층 제501호)",
+        "special_rights": [],
+        "tenant_registration_date": "2013.05.20",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1147010100",
+        "failed_count": 0,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -227,6 +455,40 @@
       "lat": 37.396042,
       "lng": 126.918891,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_10.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1697_11.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "0220.09.23"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2025.12.22"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n20220.09.23. 근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4117110100",
+        "failed_count": 0,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -259,6 +521,50 @@
       "lat": 37.434076,
       "lng": 126.986774,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_10.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_10.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_11.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_12.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_13.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_14.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경1888_5.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2016.12.27"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2026.01.30"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n집합건축대장상 위반건축물[3층 무단증축(일조권 위반) 16.12㎡] 등재\n\n[매각조건 비고]\n집합건축대장상 위반건축물[3층 무단증축(일조권 위반) 16.12㎡] 등재\n\n[매각물건명세서 을구/최선순위설정]\n2016.12.27. 근저당권",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4129010900",
+        "failed_count": 0,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -291,6 +597,40 @@
       "lat": 37.347039,
       "lng": 126.961653,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_10.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100859_11.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2024.12.11"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2025.05.21"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 등기사항전부증명서 및 집합건축물대장상 학의동 113번지, 113-1번지 양지상에 소재하는 것으로 되어 있으나, 토지대장상 113-1번지는 113번지에 합병된 것으로 되어 있음.\n2. 주택임차권의 승계인인 주택도시보증공사로부터 우선변제권만 주장하고 대항력을 포기하며, 임대차보증금 전액을 변제받지 못하더라도 매수인에 대한 잔존임대차보증금 반환청구권을 포기하고 임차권등기를 말소하는 것에 동의한다는 확약서(2026.4.3.)가 제출되었음.\n\n[매각조건 비고]\n1. 등기사항전부증명서 및 집합건축물대장상 학의동 113번지, 113-1번지 양지상에 소재하는 것으로 되어 있으나, 토지대장상 113-1번지는 113번지에 합병된 것으로 되어 있음.\n2. 주택임차권의 승계인인 주택도시보증공사로부터 우선변제권만 주장하고 대항력을 포기하며, 임대차보증금 전액을 변제받지 못하더라도 매수인에 대한 잔존임대차보증금 반환청구권을 포기하고 임차권등기를 말소하는 것에 동의한다는 확약서(2026.4.3.)가 제출되었음.\n\n[매각물건명세서 을구/최선순위설정]\n2024.12.11.압류",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4143010600",
+        "failed_count": 8,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -323,6 +663,36 @@
       "lat": 37.362381,
       "lng": 126.930521,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_18.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_18.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_19.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_20.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_21.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_22.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_23.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_24.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_25.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경100969_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2025.06.19"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2023.06.16.자 근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4141010900",
+        "failed_count": 7,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -355,6 +725,34 @@
       "lat": 37.601875,
       "lng": 127.094983,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경1210_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경1210_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경1210_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경1210_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경1210_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경1210_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경1210_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경1210_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경1210_8.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.07.03"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2016.2.3. 압류\n\n[임차인 현황]\n- 김종환: 전입 2015.05.28, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)",
+        "special_rights": [],
+        "tenant_registration_date": "2015.05.28",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1126010200",
+        "failed_count": 7,
+        "auction_date": "20261208"
+      },
       "court_name": ""
     },
     {
@@ -387,6 +785,40 @@
       "lat": 37.527606,
       "lng": 127.114835,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경61278_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.12.28"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.18"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n주택도시보증공사로부터 2026.08.07.자에 '임차보증금에 대하여 우선변제권만 주장하고 대항력은 포기하며, 임대차 보증금 전액을 변제받지 못하더라도 임차권등기를 말소하는 데 동의한다'는 내용의 확약서가 제출됨\n\n[매각조건 비고]\n주택도시보증공사로부터 2026.08.07.자에 '임차보증금에 대하여 우선변제권만 주장하고 대항력은 포기하며, 임대차 보증금 전액을 변제받지 못하더라도 임차권등기를 말소하는 데 동의한다'는 내용의 확약서가 제출됨\n\n[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n해당사항없음\n\n[매각물건명세서 을구/최선순위설정]\n2023.12.28. 경매개시결정\n\n[임차인 현황]\n- 신윤아: 전입 미전입, 보증금 미상, 확정 미상, 배당요구 없음 (5층508호)",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1174010800",
+        "failed_count": 6,
+        "auction_date": "20261130"
+      },
       "court_name": ""
     },
     {
@@ -419,6 +851,46 @@
       "lat": 37.65172,
       "lng": 127.06139,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_16.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_17.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_18.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_19.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경19_6.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.03.21"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 지분매각임. 공유자의 우선매수신고 제한 있음(1회에 한하여 허용)\n2. 감정평가서 및 재현황조사보고서에 의하면, 본건 부동산(지하1층 5-1호)의 남쪽 일부분은 현재 상호명 '고려정 흑염소'(지하 1층 7호 및 8호)의 주방 일부로 이용되고 있는 것으로 추정되며 정확한 위치 및 면적은 측량 등 별도 확인이 필요하다고 함.\n\n[매각조건 비고]\n지분매각임. 공유자의 우선매수신고 제한 있음(1회에 한하여 허용)\n\n[매각물건명세서 을구/최선순위설정]\n2021. 8. 26. 근저당권\n\n[지분매각 내역]\n갑구 9번 이승호 지분 2분의 1 전부\n\n[임차인 현황]\n- 황진희: 전입 2007.10.25, 보증금 20,000,000원, 확정 미상, 배당요구 없음 (지하1층5-1호)",
+        "special_rights": [
+          {
+            "id": "share",
+            "name": "지분 매각",
+            "short": "지분매각",
+            "badge_color": "bg-purple-100 text-purple-700 border-purple-200",
+            "risk_level": "MEDIUM",
+            "icon": "ℹ️",
+            "desc": "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다. 전체 배타적 점유가 불가하며 공유자 우선매수권 또는 공유물분할 청구 소송이 필요합니다."
+          }
+        ],
+        "tenant_registration_date": "2007.10.25",
+        "tenant_deposit": 20000000,
+        "tenant_deposit_str": "2,000만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1135010500",
+        "failed_count": 0,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -451,6 +923,50 @@
       "lat": 37.580205,
       "lng": 127.048242,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5380_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2019.05.20"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.21"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 일괄매각\n2. 감정평가서에 의하면, 지하1층은 일부외벽선이 건축물현황도와 상이한 것으로 추정되고, 지1층과 2층은 공용부분 일부를 건축물현황도와 상이하게 구조 및 용도 변경하여 이용 중이며 그 외 자세한 사항은 감정평가서를 참고 바람\n3. 감정평가에 대한 사실조회서(2024. 9. 13.자)에 의하면,  \n 1)106호,107호 CAFE에서 사용하고 있는 108호 일부분은 2층 랭스터디 카페 출입을 위한 상향식 계단을 설치함으로 인해 생겨난 잔여 공간 및 계단 하부공간을 이용하고 있는 것으로 보이며, 108호에 설치된 벽돌 계단의 철거 및 원상복구에는 비용이 소요되므로 확인 후 입찰 요함\n 2)2층 랭스터디 카페는 202호와 203호 외에 202호와 203호 사이에 있는 공용부분인 복도의 일부에 출입문을 설치하여 복도를 함께 사용 중임. 이 경계를 구별할 표지는 없으나 건축물현황도 등을 통해 각 호별 위치를 물리적으로 특정할 수 있으며 향후 경계벽 복원이 가능한 상태로 판단됨\n 3)2층은 일부 공용부분의 불법적 용도 및 구조 등의 변경으로 인해 건축물현황도와 현황 용도 및 구조가 서로 상이하여, 2층에 설치되어 있는 화장실의 이용과 1층에 소재하는 2층 전용 출입구로의 출입은 현재 202호를 통해서만 가능함\n4. 건축물대장상 위반건축물로 등재되어 있는 바,  원상복구 의무 및 이행강제금 부과 여부 등을 관할 구청에 확인 요함\n\n[매각조건 비고]\n일괄매각\n\n[매각물건명세서 을구/최선순위설정]\n2019.05.20. 근저당권\n\n[임차인 현황]\n- 김진이: 전입 2020.12.08, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 백정흠: 전입 2023.07.26, 보증금 미상, 확정 미상, 배당요구 없음 (1층103호)\n- 김선희: 전입 2017.11.30, 보증금 미상, 확정 미상, 배당요구 없음 (1층104호)\n- 김선희: 전입 2017.11.30, 보증금 미상, 확정 미상, 배당요구 없음 (1층105호)\n- 김윤강: 전입 2019.05.14, 보증금 미상, 확정 미상, 배당요구 없음 (1층106호)\n- 김승욱: 전입 2018.11.08, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 김승욱: 전입 2018.11.08, 보증금 미상, 확정 미상, 배당요구 없음 (2층203호)",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "2017.11.30",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1123010800",
+        "failed_count": 10,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -483,6 +999,46 @@
       "lat": 37.478267,
       "lng": 126.880446,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경127584_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.16"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n- 집합건축물대장상 ‘오피스텔’로 등재되어 있으나, 현황 주거용으로 사용중임\n- 특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각조건 비고]\n- 특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[소멸되지 않는 권리]\n- 을구 1번 주택임차권 등기와 관련하여 매수인에게 대항할 수 있는 임차인이 있음(임차보증금260,000,000원, 전입일자 2020.10.12, 확정일자 2020.09.07)\n배당에서 보증금이 전액 변제되지 않으면 잔액을 매수인이 인수함\n\n[매각물건명세서 을구/최선순위설정]\n2024.01.15. \n강제경매개시결정",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 260000000,
+        "tenant_deposit_str": "2억 6,000만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1154010100",
+        "failed_count": 9,
+        "auction_date": "20261204"
+      },
       "court_name": ""
     },
     {
@@ -515,6 +1071,46 @@
       "lat": 37.363746,
       "lng": 127.111252,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_15.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_15.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_16.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_17.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_18.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2022타경59047_6.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2026.02.27"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 공부상 1층은 외형상 2층으로 본건 현관문에는 223호로 표시되어 있음.\n2. 본건 공부상 용도는 노유자시설(노인복지시설)로 입주자 제한여부는 개별확인요망.\n3. 선순위가등기권자 유철재는 담보가등기권자로  2025.1.17.자 권리신고 및 배당요구신청서를 제출함.\n\n[매각조건 비고]\n1. 공부상 1층은 외형상 2층으로 본건 현관문에는 223호로 표시되어 있음.\n2. 본건 공부상 용도는 노유자시설(노인복지시설)로 입주자 제한여부는 개별확인요망.\n3. 선순위가등기권자 유철재는 담보가등기권자로  2025.1.17.자 권리신고 및 배당요구신청서를 제출함.\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 을구 순위 1번 주택임차권등기 있음(임차보증금: 금380,000,000원, 주민등록일자: 2017.12.06, 점유개시일자: 2017.12.06, 확정일자:2017.12.06.) 배당에서 임차보증금이 전액 배당되지 아니하면 잔액을 매수인이 인수함.\n\n[매각물건명세서 을구/최선순위설정]\n2021. 9. 29. 담보가등기\n\n[임차인 현황]\n- 최재훈: 전입 2017.12.06, 보증금 8원, 확정 2017.12.06, 배당요구 없음 (1층에이123호)",
+        "special_rights": [
+          {
+            "id": "prior_provisional",
+            "name": "선순위 가처분/가등기",
+            "short": "선순위가처분",
+            "badge_color": "bg-rose-100 text-rose-800 border-rose-300",
+            "risk_level": "CRITICAL",
+            "icon": "🚨",
+            "desc": "말소기준권리보다 앞선 처분금지가처분 또는 소유권이전청구권가등기로 낙찰자가 소유권을 상실할 위험이 있는 고위험 권리입니다."
+          }
+        ],
+        "tenant_registration_date": "2017.12.06",
+        "tenant_deposit": 8,
+        "tenant_deposit_str": "0만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4113510300",
+        "failed_count": 6,
+        "auction_date": "20261207"
+      },
       "court_name": ""
     },
     {
@@ -547,6 +1143,49 @@
       "lat": 37.667132,
       "lng": 127.035264,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경4462_9.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2001.09.27"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.01.04"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n지분매각. 공유자의 우선매수신고는 1회에 한하여 허용\n\n[매각조건 비고]\n지분매각. 공유자의 우선매수신고 제한있음(1회에 한하여 허용)\n\n[매각물건명세서 을구/최선순위설정]\n2001.09.27. 근저당권\n\n[지분매각 내역]\n갑구 2번 최정인 지분 7분의2 전부\n\n[임차인 현황]\n- 최동국: 전입 1994.10.05, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)",
+        "special_rights": [
+          {
+            "id": "share",
+            "name": "지분 매각",
+            "short": "지분매각",
+            "badge_color": "bg-purple-100 text-purple-700 border-purple-200",
+            "risk_level": "MEDIUM",
+            "icon": "ℹ️",
+            "desc": "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다. 전체 배타적 점유가 불가하며 공유자 우선매수권 또는 공유물분할 청구 소송이 필요합니다."
+          }
+        ],
+        "tenant_registration_date": "1994.10.05",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1132010700",
+        "failed_count": 4,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -579,6 +1218,46 @@
       "lat": 37.575288,
       "lng": 126.933576,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경1596_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2026.07.20"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 제시외 건물 포함(철근콘크리트조 주택일부 32㎡)\n2. 공부상 근린생활시설(학원)이나 현황 주택(원룸형 4개호: 표찰상 B201, B202, B203, B204)으로 이용 중이며, PIT부분을 주택내부(제시외건물)로 사용하고 있음.\n3. 건축물대장상 위반건축물로 표기되어 있음(무단 대수선 및 용도변경)\n\n[매각조건 비고]\n제시외 건물 포함\n\n[매각물건명세서 을구/최선순위설정]\n2019.9.30. 근저당권\n\n[임차인 현황]\n- 유주현: 전입 2023.12.29, 보증금 미상, 확정 미상, 배당요구 없음 (지2층비201호)\n- 노솔지: 전입 2023.02.14, 보증금 미상, 확정 미상, 배당요구 없음 (지2층비201호)",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "2023.02.14",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1141011700",
+        "failed_count": 4,
+        "auction_date": "20261208"
+      },
       "court_name": ""
     },
     {
@@ -611,6 +1290,37 @@
       "lat": 37.575288,
       "lng": 126.933576,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2026.07.20"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 제시외 건물 포함(철근콘크리트조 주택일부 32㎡)\n2. 공부상 근린생활시설(학원)이나 현황 주택(원룸형 4개호: 표찰상 B201, B202, B203, B204)으로 이용 중이며, PIT부분을 주택내부(제시외건물)로 사용하고 있음.\n3. 건축물대장상 위반건축물로 표기되어 있음(무단 대수선 및 용도변경)\n\n[매각조건 비고]\n제시외 건물 포함\n\n[매각물건명세서 을구/최선순위설정]\n2019.9.30. 근저당권\n\n[임차인 현황]\n- 유주현: 전입 2023.12.29, 보증금 미상, 확정 미상, 배당요구 없음 (지2층비201호)\n- 노솔지: 전입 2023.02.14, 보증금 미상, 확정 미상, 배당요구 없음 (지2층비201호)",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "2023.02.14",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1141011700",
+        "failed_count": 4,
+        "auction_date": "20261208"
+      },
       "court_name": ""
     },
     {
@@ -643,6 +1353,37 @@
       "lat": 37.575288,
       "lng": 126.933576,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2026.07.20"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 제시외 건물 포함(철근콘크리트조 주택일부 32㎡)\n2. 공부상 근린생활시설(학원)이나 현황 주택(원룸형 4개호: 표찰상 B201, B202, B203, B204)으로 이용 중이며, PIT부분을 주택내부(제시외건물)로 사용하고 있음.\n3. 건축물대장상 위반건축물로 표기되어 있음(무단 대수선 및 용도변경)\n\n[매각조건 비고]\n제시외 건물 포함\n\n[매각물건명세서 을구/최선순위설정]\n2019.9.30. 근저당권\n\n[임차인 현황]\n- 전영훈: 전입 2024.02.29, 보증금 미상, 확정 미상, 배당요구 없음 (지1층비101호)\n- 조동현: 전입 2020.02.14, 보증금 미상, 확정 미상, 배당요구 없음 (지1층비101호)\n- 조은익: 전입 2023.01.19, 보증금 미상, 확정 미상, 배당요구 없음 (지1층비101호)\n- 이동혁: 전입 2020.03.20, 보증금 미상, 확정 미상, 배당요구 없음 (지1층비101호)\n- 백혜림: 전입 2020.02.19, 보증금 미상, 확정 미상, 배당요구 없음 (지1층비101호)\n- FU XINYUE: 전입 2023.06.27, 보증금 미상, 확정 미상, 배당요구 없음 (지1층비101호)\n- 김원희: 전입 2019.11.21, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 최진옥: 전입 2021.05.03, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)\n- 엄태윤: 전입 2022.02.07, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 한민규: 전입 2022.02.18, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 김명주: 전입 2023.01.17, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 박선영: 전입 2023.03.06, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)\n- 정진기: 전입 2019.11.20, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 성의정: 전입 2021.05.20, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 최지환: 전입 2021.12.20, 보증금 미상, 확정 미상, 배당요구 없음 (3층301호)\n- 전현준: 전입 2019.12.02, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 강수한: 전입 2022.01.24, 보증금 미상, 확정 미상, 배당요구 없음 (3층302호)\n- 김기민: 전입 2021.02.22, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 이재경: 전입 2020.02.03, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 이승미: 전입 2019.10.10, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 송명근: 전입 2022.03.02, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 김나연: 전입 2019.12.06, 보증금 미상, 확정 미상, 배당요구 없음 (4층401호)\n- 황혜정: 전입 2020.11.10, 보증금 미상, 확정 미상, 배당요구 없음 (4층402호)\n- 이산형: 전입 2019.12.12, 보증금 미상, 확정 미상, 배당요구 없음 (4층402호)\n- 강상우: 전입 2021.12.16, 보증금 미상, 확정 미상, 배당요구 없음 (4층402호)\n- 박하연: 전입 2023.02.15, 보증금 미상, 확정 미상, 배당요구 없음 (4층402호)\n- 오준우: 전입 2021.09.17, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 전은혜: 전입 2020.12.28, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)\n- 이혜진: 전입 2022.06.17, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "2019.10.10",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1141011700",
+        "failed_count": 4,
+        "auction_date": "20261208"
+      },
       "court_name": ""
     },
     {
@@ -675,6 +1416,48 @@
       "lat": 37.492304,
       "lng": 126.891692,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_16.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_16.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_17.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_18.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_19.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_20.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_21.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_22.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_23.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_24.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3418_1.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "담보가등기",
+            "date": "2009.06.11"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.23"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.30"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.24"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n일괄매각\n집합건축물대장상 판매시설\n대상물건은 오픈상가 구조로서 견고한 벽체로 구분되어 있지 않은 상태이며, 경계를 명확하게 구분한 바닥경계의 표시 및 건물번호표지 등이 설치되어 있지 않고 대상 물건을 포함하여 경계 표시 없는 다른 호수와 함께 별도의 호별구분 없이 인테리어공사로 임의 구획하여 통칭 ‘천객D.C마트’, 통칭 ‘세계로 마트’ 복도, 기계실 등으로 이용 중으로, 경계확인은 측량을 요함(감정평가서 참조). 대상물건의 위치확인은 집합건축물대장상의 건축물현황도 및 상가관리단(4층 소재)에 비치된 도면으로 위치를 확인하고 상가관리단 직원의 안내로 대상물건의 위치를 개략적으로 확인함(감정평가서 참조).\n\n[매각조건 비고]\n일괄매각\n\n[매각물건명세서 을구/최선순위설정]\n2009.06.11.담보가등기\n\n[임차인 현황]\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1가009호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1가013호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1가025호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1가030호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1가093호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1가094호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1나025호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1나081호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1나082호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1나083호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1라034호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1라043호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1라044호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1라045호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1라046호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마031호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마032호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마033호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마034호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마035호)",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1153010200",
+        "failed_count": 3,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -707,6 +1490,39 @@
       "lat": 37.492304,
       "lng": 126.891692,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "담보가등기",
+            "date": "2009.06.11"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.23"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.30"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.24"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n일괄매각\n집합건축물대장상 판매시설\n대상물건은 오픈상가 구조로서 견고한 벽체로 구분되어 있지 않은 상태이며, 경계를 명확하게 구분한 바닥경계의 표시 및 건물번호표지 등이 설치되어 있지 않고 대상 물건을 포함하여 경계 표시 없는 다른 호수와 함께 별도의 호별구분 없이 인테리어공사로 임의 구획하여 통칭 ‘천객D.C마트’, 통칭 ‘세계로 마트’ 복도, 기계실 등으로 이용 중으로, 경계확인은 측량을 요함(감정평가서 참조). 대상물건의 위치확인은 집합건축물대장상의 건축물현황도 및 상가관리단(4층 소재)에 비치된 도면으로 위치를 확인하고 상가관리단 직원의 안내로 대상물건의 위치를 개략적으로 확인함(감정평가서 참조).\n\n[매각조건 비고]\n일괄매각\n\n[매각물건명세서 을구/최선순위설정]\n2009.06.11.담보가등기\n\n[임차인 현황]\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마060호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마073호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마100호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마119호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마123호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마124호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마125호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1마127호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바009호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바014호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바016호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바024호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바036호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바039호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바040호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바061호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바062호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바063호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바064호)\n- 양지희(천객DC마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바065호)",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1153010200",
+        "failed_count": 3,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -739,6 +1555,39 @@
       "lat": 37.492304,
       "lng": 126.891692,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "담보가등기",
+            "date": "2009.06.11"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.23"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.30"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.24"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n일괄매각\n집합건축물대장상 판매시설\n대상물건은 오픈상가 구조로서 견고한 벽체로 구분되어 있지 않은 상태이며, 경계를 명확하게 구분한 바닥경계의 표시 및 건물번호표지 등이 설치되어 있지 않고 대상 물건을 포함하여 경계 표시 없는 다른 호수와 함께 별도의 호별구분 없이 인테리어공사로 임의 구획하여 통칭 ‘천객D.C마트’, 통칭 ‘세계로 마트’ 복도, 기계실 등으로 이용 중으로, 경계확인은 측량을 요함(감정평가서 참조). 대상물건의 위치확인은 집합건축물대장상의 건축물현황도 및 상가관리단(4층 소재)에 비치된 도면으로 위치를 확인하고 상가관리단 직원의 안내로 대상물건의 위치를 개략적으로 확인함(감정평가서 참조).\n\n[매각조건 비고]\n일괄매각\n\n[매각물건명세서 을구/최선순위설정]\n2009.06.11.담보가등기\n\n[임차인 현황]\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바073호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바074호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바075호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바076호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바083호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바084호)\n- 임춘례(세계로마트 대표): 전입 미상, 보증금 미상, 확정 미상, 배당요구 없음 (제지하1층 제비1바091호)",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1153010200",
+        "failed_count": 3,
+        "auction_date": "20261201"
+      },
       "court_name": ""
     },
     {
@@ -771,6 +1620,33 @@
       "lat": 37.471029,
       "lng": 127.139698,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권 (농협은행)",
+            "date": "2024.07.28",
+            "amount": "6억 9,210만원",
+            "is_malso": true
+          },
+          {
+            "name": "경매개시결정 (임의경매)",
+            "date": "2025.08.07"
+          }
+        ],
+        "remarks": "현황상 유리창을 통하여 본건 106호 안을 보았을 때 집기 등이 보이지 않아 공실로 추정됨",
+        "special_rights": [],
+        "tenant_registration_date": "2025.03.16",
+        "tenant_deposit": 80000000,
+        "tenant_deposit_str": "8,000만원",
+        "is_payout_requested": true,
+        "court_name": "",
+        "legal_div_no": "41131108",
+        "failed_count": 4,
+        "auction_date": "20261026"
+      },
       "court_name": ""
     },
     {
@@ -803,6 +1679,31 @@
       "lat": 37.583919,
       "lng": 127.010151,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2018.01.25"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.05.07"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n- 현황조사보고서 및 감정평가서에 의하면 매각물건은 인접호(비202호 ~ 비214호)와 일괄하여 이용중인 근린생활시설(스크린야구장, 상호 스트라이크존 성신여대역구장)의 일부(야구게임실, 흡연실, 창고 등)로 기준시점 현재 공실상태이고, 관리사무소에 문의한 바 일부 관리비를 미납중인 것으로 탐문조사됨\n- 현황조사보고서에 의하면 이 사건 매각물건 지하2층 비207호 단독으로 임대차를 한 내역은 없으며, 위 스크린야구장은 보증금 1억원, 월600만원에 임차한 것으로 조사됨\n- 2025.10.23.자 성북세무서의 사실조회회신에 의하면 위 스트라이크존 성신여대역구장 사업장을 2024.03.26. 폐업한 것으로 확인됨\n-야구장 시설 중 일부(비211호 ~비214호)는 야구장 시설을 해체하여 원상복구 공사 중이고, 입주자대표회의 공고문(2026. 2. 1.자)에는 공용부분 침범으로 단전단수 조치되고 향후 공용부분 원상복구 비용 부담한다는 취지로 기재됨(2026. 4. 9.자 사실조회 참고)\n- 무단으로 공용부분을 막고 사용한 부분에 대하여 매수인의 원상복구 의무 가능성이 있고 해당 공용부분에 대한 미납관리비는 매수인이 부담할 수 있음(구체적인 부담내역은 해당 관리소에 확인 요함)\n\n[매각물건명세서 을구/최선순위설정]\n2018.01.25. 근저당",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 100000000,
+        "tenant_deposit_str": "1억원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1129011600",
+        "failed_count": 4,
+        "auction_date": "20261124"
+      },
       "court_name": ""
     },
     {
@@ -835,6 +1736,27 @@
       "lat": 37.754144,
       "lng": 126.788051,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.19"
+          }
+        ],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4148011100",
+        "failed_count": 3,
+        "auction_date": "20261111"
+      },
       "court_name": ""
     },
     {
@@ -867,6 +1789,41 @@
       "lat": 37.644965,
       "lng": 126.826242,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2018.03.30"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.06.09"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각조건 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4147111600",
+        "failed_count": 2,
+        "auction_date": "20261105"
+      },
       "court_name": ""
     },
     {
@@ -899,6 +1856,40 @@
       "lat": 37.768335,
       "lng": 126.773387,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경80356_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2022.06.14"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.25"
+          }
+        ],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4148010800",
+        "failed_count": 1,
+        "auction_date": "20261110"
+      },
       "court_name": ""
     },
     {
@@ -931,6 +1922,31 @@
       "lat": 37.323033,
       "lng": 126.813561,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2018.12.21"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.06.26"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2018.12.21. 근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4127310900",
+        "failed_count": 1,
+        "auction_date": "20261118"
+      },
       "court_name": ""
     },
     {
@@ -963,6 +1979,31 @@
       "lat": 37.323033,
       "lng": 126.813561,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2018.12.21"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.06.26"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2018.12.21. 근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4127310900",
+        "failed_count": 1,
+        "auction_date": "20261118"
+      },
       "court_name": ""
     },
     {
@@ -995,6 +2036,31 @@
       "lat": 37.769003,
       "lng": 126.789955,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2020.10.15"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.07.31"
+          }
+        ],
+        "remarks": "[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n해당사항없음\n\n[매각물건명세서 을구/최선순위설정]\n2020.10.15.근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4148010800",
+        "failed_count": 1,
+        "auction_date": "20261125"
+      },
       "court_name": ""
     },
     {
@@ -1027,6 +2093,42 @@
       "lat": 37.40435,
       "lng": 127.105833,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경51951_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권 (기업은행)",
+            "date": "2023.08.15",
+            "amount": "2억 1,637만원",
+            "is_malso": true
+          },
+          {
+            "name": "경매개시결정 (임의경매)",
+            "date": "2025.05.16"
+          }
+        ],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "임차인없음",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "41135109",
+        "failed_count": 6,
+        "auction_date": "20261026"
+      },
       "court_name": ""
     },
     {
@@ -1059,6 +2161,31 @@
       "lat": 37.589333,
       "lng": 127.013005,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2017.12.28"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.07.12"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n- 현황조사서 및 감정평가서에 의하면 매각물건은 인접호(비202호 ~ 비214호)와 일괄하여 이용중인 근린생활시설(스크린야구장, 상호 스트라이크존 성신여대역구장)의 일부로 기준시점 현재 공실상태이고, 관리사무소에 문의한 바 일부 관리비를 미납중인 것으로 탐문조사됨\n- 2025.10.23.자 성북세무서의 사실조회회신에 의하면 위 스트라이크존 성신여대역구장 사업장은 2024.03.26. 폐업한 것으로 확인됨\n- 야구장 시설 중 일부(비211호 ~비214호)는 야구장 시설을 해체하여 원상복구 공사 중이고, 입주자대표회의 공고문(2026. 2. 1.자)에는 공용부분 침범으로 단전·단수 조치되고 향후 공용부분 원상복구 비용 부담한다는 취지로 기재됨(첨부사진 참고)\n- 무단으로 공용부분을 막고 사용한 부분에 대하여 매수인의 원상복구 의무 가능성이 있고 해당 공용부분에 대한 미납관리비는 매수인이 부담할 수 있음(구체적인 부담내역은 해당 관리소에 확인 요함)\n\n[매각물건명세서 을구/최선순위설정]\n2017.12.28. 근저당",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1129011600",
+        "failed_count": 4,
+        "auction_date": "20261124"
+      },
       "court_name": ""
     },
     {
@@ -1091,6 +2218,41 @@
       "lat": 37.626819,
       "lng": 127.205709,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2015.06.11"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2025.03.10"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 재매각임, 매수신청보증금 20%\n2. 출입문(현관) 표시 102호가 매각 대상임\n3. 집합건축물대장 건축물현황도와 현황 출입문(현관) 표시가 상이한 상태로, 건축물현황도상 101호가 출입문(현관)에는 102호로 표시되어 있음\n\n[매각조건 비고]\n1. 재매각임, 매수신청보증금 20%\n2. 출입문(현관) 표시 102호가 매각 대상임\n3. 집합건축물대장 건축물현황도와 현황 출입문(현관) 표시가 상이한 상태로, 건축물현황도상 101호가 출입문(현관)에는 102호로 표시되어 있음",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "2017.09.20",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4136025622",
+        "failed_count": 3,
+        "auction_date": "20261104"
+      },
       "court_name": ""
     },
     {
@@ -1123,6 +2285,42 @@
       "lat": 37.432977,
       "lng": 127.139774,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52919_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권 (국민은행)",
+            "date": "2022.05.15",
+            "amount": "9억 2,308만원",
+            "is_malso": true
+          },
+          {
+            "name": "경매개시결정 (임의경매)",
+            "date": "2025.03.18"
+          }
+        ],
+        "remarks": "1.본건은 제2종근린생활시설(일반음식점)로서 인접호수인 131호와 함께 벽체 등 경계 구분 없이 일체로 일반음식점(상호:경성밥상)으로 이용중이었으나, 현황은 폐업되어 '공실' 상태임\n2.집합건축물대장의 건축물 현황도상 원상복귀명령 가능성 있으므로 입찰시 확인요망",
+        "special_rights": [],
+        "tenant_registration_date": "임차인없음",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "41133101",
+        "failed_count": 2,
+        "auction_date": "20261026"
+      },
       "court_name": ""
     },
     {
@@ -1155,6 +2353,31 @@
       "lat": 37.326189,
       "lng": 126.8016,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2014.03.31"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.21"
+          }
+        ],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4127310200",
+        "failed_count": 2,
+        "auction_date": "20261112"
+      },
       "court_name": ""
     },
     {
@@ -1187,6 +2410,42 @@
       "lat": 37.431339,
       "lng": 127.134918,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_11.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_11.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_12.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_13.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_14.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_15.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_16.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_17.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_18.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_19.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경52824_20.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권 (기업은행)",
+            "date": "2024.09.15",
+            "amount": "8억 7,015만원",
+            "is_malso": true
+          },
+          {
+            "name": "경매개시결정 (임의경매)",
+            "date": "2025.12.03"
+          }
+        ],
+        "remarks": "현황상 공실임",
+        "special_rights": [],
+        "tenant_registration_date": "임차인없음",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "41133101",
+        "failed_count": 1,
+        "auction_date": "20261026"
+      },
       "court_name": ""
     },
     {
@@ -1219,6 +2478,42 @@
       "lat": 37.426956,
       "lng": 127.096863,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2026타경115_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권 (농협은행)",
+            "date": "2023.10.08",
+            "amount": "7억 9,716만원",
+            "is_malso": true
+          },
+          {
+            "name": "경매개시결정 (임의경매)",
+            "date": "2025.04.19"
+          }
+        ],
+        "remarks": "1.일괄매각\n2.근린생활시설로 이용중이며 목록1.,2. 일괄로 '한의원'임",
+        "special_rights": [],
+        "tenant_registration_date": "임차인없음",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "41131112",
+        "failed_count": 1,
+        "auction_date": "20261026"
+      },
       "court_name": ""
     },
     {
@@ -1251,6 +2546,31 @@
       "lat": 37.644223,
       "lng": 127.222792,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2018.03.27"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.06.05"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2018.03.27.근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4136011200",
+        "failed_count": 0,
+        "auction_date": "20261117"
+      },
       "court_name": ""
     },
     {
@@ -1283,6 +2603,40 @@
       "lat": 37.545818,
       "lng": 126.964366,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_9.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_10.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_11.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_12.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경3528_3.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2019.07.30"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2025.08.13"
+          }
+        ],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "2020.10.15",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1114016200",
+        "failed_count": 3,
+        "auction_date": "20261028"
+      },
       "court_name": ""
     },
     {
@@ -1315,6 +2669,22 @@
       "lat": 37.393288,
       "lng": 126.956593,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "",
+        "failed_count": 1,
+        "auction_date": ""
+      },
       "court_name": ""
     },
     {
@@ -1347,6 +2717,22 @@
       "lat": 37.318091,
       "lng": 126.816939,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "",
+        "failed_count": 1,
+        "auction_date": ""
+      },
       "court_name": ""
     },
     {
@@ -1379,6 +2765,27 @@
       "lat": 37.568291,
       "lng": 126.99034,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.20"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n등기사항전부증명서와 집합건축물대장상의 면적과 구조가 상이하므로, 현황과 일치하는 대장기준으로 감정평가함(감정평가서 참조)\n\n[매각물건명세서 을구/최선순위설정]\n2022.5.20.근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1111018300",
+        "failed_count": 1,
+        "auction_date": "20261126"
+      },
       "court_name": ""
     },
     {
@@ -1411,6 +2818,27 @@
       "lat": 37.504766,
       "lng": 127.109165,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2022.01.17"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2010. 4. 30. 근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1171010400",
+        "failed_count": 0,
+        "auction_date": "20261123"
+      },
       "court_name": ""
     },
     {
@@ -1443,6 +2871,50 @@
       "lat": 37.511391,
       "lng": 126.862397,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2021.05.07"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.01.11"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n감정평가 이후 2024.01.26. 집합건축물대장상 위반건축물 표기(1.패널/새시, 주거, 14㎡ 무단증축 2.패널/새시, 주거, 3㎡ 무단증축 3.패널/새시, 주거, 7㎡ 무단증축) 내용 있음\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각조건 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각물건명세서 을구/최선순위설정]\n2021.05.07. 근저당권",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          },
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1147010200",
+        "failed_count": 0,
+        "auction_date": "20261126"
+      },
       "court_name": ""
     },
     {
@@ -1475,6 +2947,50 @@
       "lat": 37.511391,
       "lng": 126.862397,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2021.05.07"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.01.11"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n감정평가 이후 2024.01.26. 집합건축물대장상 위반건축물 표기(1.패널/새시, 주거, 14㎡ 무단증축 2.패널/새시, 주거, 3㎡ 무단증축 3.패널/새시, 주거, 7㎡ 무단증축) 내용 있음\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각조건 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각물건명세서 을구/최선순위설정]\n2021.05.07. 근저당권",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          },
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1147010200",
+        "failed_count": 0,
+        "auction_date": "20261126"
+      },
       "court_name": ""
     },
     {
@@ -1507,6 +3023,40 @@
       "lat": 37.495961,
       "lng": 126.889031,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경101582_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2022.12.15"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.05.01"
+          }
+        ],
+        "remarks": "[소멸되지 않는 권리]\n갑구 3번 소유권이전담보가등기(2019.06.27. 등기)가 담보가등기인지 순위보전가등기인지 권리신고가 없으므로 말소되지 않고 매수인이 인수함. 만약 가등기된 대물반환예약이 완결되는 경우에는 매수인이 소유권을 상실할 수 있음.",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1153010200",
+        "failed_count": 4,
+        "auction_date": "20261119"
+      },
       "court_name": ""
     },
     {
@@ -1539,6 +3089,27 @@
       "lat": 37.6603,
       "lng": 127.065397,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.08.08"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n2026. 9. 15.  최저매각가격을 금1,500,000.000원으로 정정",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1135010600",
+        "failed_count": 1,
+        "auction_date": "20261103"
+      },
       "court_name": ""
     },
     {
@@ -1571,6 +3142,31 @@
       "lat": 37.663261,
       "lng": 127.059105,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2020.09.21"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.07.22"
+          }
+        ],
+        "remarks": "[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n해당사항없음",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1135010400",
+        "failed_count": 1,
+        "auction_date": "20261110"
+      },
       "court_name": ""
     },
     {
@@ -1603,6 +3199,36 @@
       "lat": 37.557198,
       "lng": 126.859067,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경116126_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.11.22"
+          }
+        ],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1150010600",
+        "failed_count": 1,
+        "auction_date": "20261118"
+      },
       "court_name": ""
     },
     {
@@ -1635,6 +3261,66 @@
       "lat": 37.584288,
       "lng": 127.043681,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_82.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_82.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_83.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_84.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_85.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_86.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_87.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_88.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_89.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_90.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5663_91.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.20"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.13"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.03"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.19"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.18"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.12.30"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 제시외 건물을 포함하여 평가한 가액임.\n2. 집합건축물대장상 1개의 구분건물(다가구주택 9가구)로 등재되어 있으나, 현황 및 감정평가서에 의하면 다가구 주택 15개(401호, 402호, 403호, 403-1호, 404호, 404-1호, 404-2호, 405호, 405-1호, 406호, 407호, 407-1호, 408호, 409호, 409-1호)로 구분되어 있음.\n3. 공부상 도면과 다른 공용부분의 구조변경 및 주거점용 등의 사항이 있어 추후 이행강제금 부과나 철거 등의 대상이 될 수 있으므로 이와 관련하여 매수인의 주의를 요함.\n4. 건축물대장에 위반건축물로 등재되어 있으며, 감정평가서에 의하면 건축물현황도상 공용부분인 보일러실 및 실외기실은 ‘문패상 403-1호’로 주거용으로 무단 용도변경, 증개축 되어 있음.\n\n[매각조건 비고]\n제시외 건물 포함",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1123010800",
+        "failed_count": 0,
+        "auction_date": "20261103"
+      },
       "court_name": ""
     },
     {
@@ -1667,6 +3353,57 @@
       "lat": 37.584288,
       "lng": 127.043681,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.20"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.13"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.03"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.19"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.18"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.12.30"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 제시외 건물을 포함하여 평가한 가액임.\n2. 집합건축물대장상 1개의 구분건물(다가구주택 9가구)로 등재되어 있으나, 현황 및 감정평가서에 의하면 다가구 주택 15개(401호, 402호, 403호, 403-1호, 404호, 404-1호, 404-2호, 405호, 405-1호, 406호, 407호, 407-1호, 408호, 409호, 409-1호)로 구분되어 있음.\n3. 공부상 도면과 다른 공용부분의 구조변경 및 주거점용 등의 사항이 있어 추후 이행강제금 부과나 철거 등의 대상이 될 수 있으므로 이와 관련하여 매수인의 주의를 요함.\n4. 건축물대장에 위반건축물로 등재되어 있으며, 감정평가서에 의하면 건축물현황도상 공용부분인 보일러실 및 실외기실은 ‘문패상 403-1호’로 주거용으로 무단 용도변경, 증개축 되어 있음.\n\n[매각조건 비고]\n제시외 건물 포함",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1123010800",
+        "failed_count": 0,
+        "auction_date": "20261103"
+      },
       "court_name": ""
     },
     {
@@ -1699,6 +3436,57 @@
       "lat": 37.584288,
       "lng": 127.043681,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.20"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.13"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.03"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.19"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.18"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.12.30"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 제시외 건물을 포함하여 평가한 가액임.\n2. 집합건축물대장상 1개의 구분건물(다가구주택 9가구)로 등재되어 있으나, 현황 및 감정평가서에 의하면 다가구 주택 15개(401호, 402호, 403호, 403-1호, 404호, 404-1호, 404-2호, 405호, 405-1호, 406호, 407호, 407-1호, 408호, 409호, 409-1호)로 구분되어 있음.\n3. 공부상 도면과 다른 공용부분의 구조변경 및 주거점용 등의 사항이 있어 추후 이행강제금 부과나 철거 등의 대상이 될 수 있으므로 이와 관련하여 매수인의 주의를 요함.\n4. 건축물대장에 위반건축물로 등재되어 있으며, 감정평가서에 의하면 건축물현황도상 공용부분인 보일러실 및 실외기실은 ‘문패상 403-1호’로 주거용으로 무단 용도변경, 증개축 되어 있음.\n\n[매각조건 비고]\n제시외 건물 포함",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1123010800",
+        "failed_count": 0,
+        "auction_date": "20261103"
+      },
       "court_name": ""
     },
     {
@@ -1731,6 +3519,57 @@
       "lat": 37.584288,
       "lng": 127.043681,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.20"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.13"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.03"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.19"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.18"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.12.30"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 제시외 건물을 포함하여 평가한 가액임.\n2. 집합건축물대장상 1개의 구분건물(다가구주택 9가구)로 등재되어 있으나, 현황 및 감정평가서에 의하면 다가구 주택 15개(401호, 402호, 403호, 403-1호, 404호, 404-1호, 404-2호, 405호, 405-1호, 406호, 407호, 407-1호, 408호, 409호, 409-1호)로 구분되어 있음.\n3. 공부상 도면과 다른 공용부분의 구조변경 및 주거점용 등의 사항이 있어 추후 이행강제금 부과나 철거 등의 대상이 될 수 있으므로 이와 관련하여 매수인의 주의를 요함.\n4. 건축물대장에 위반건축물로 등재되어 있으며, 감정평가서에 의하면 건축물현황도상 공용부분인 보일러실 및 실외기실은 ‘문패상 403-1호’로 주거용으로 무단 용도변경, 증개축 되어 있음.\n\n[매각조건 비고]\n제시외 건물 포함",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1123010800",
+        "failed_count": 0,
+        "auction_date": "20261103"
+      },
       "court_name": ""
     },
     {
@@ -1763,6 +3602,57 @@
       "lat": 37.584288,
       "lng": 127.043681,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.20"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.13"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.03"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.19"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.18"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.12.30"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 제시외 건물을 포함하여 평가한 가액임.\n2. 집합건축물대장상 1개의 구분건물(다가구주택 9가구)로 등재되어 있으나, 현황 및 감정평가서에 의하면 다가구 주택 15개(401호, 402호, 403호, 403-1호, 404호, 404-1호, 404-2호, 405호, 405-1호, 406호, 407호, 407-1호, 408호, 409호, 409-1호)로 구분되어 있음.\n3. 공부상 도면과 다른 공용부분의 구조변경 및 주거점용 등의 사항이 있어 추후 이행강제금 부과나 철거 등의 대상이 될 수 있으므로 이와 관련하여 매수인의 주의를 요함.\n4. 건축물대장에 위반건축물로 등재되어 있으며, 감정평가서에 의하면 건축물현황도상 공용부분인 보일러실 및 실외기실은 ‘문패상 403-1호’로 주거용으로 무단 용도변경, 증개축 되어 있음.\n\n[매각조건 비고]\n제시외 건물 포함",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1123010800",
+        "failed_count": 0,
+        "auction_date": "20261103"
+      },
       "court_name": ""
     },
     {
@@ -1795,6 +3685,57 @@
       "lat": 37.584288,
       "lng": 127.043681,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.20"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.13"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.03"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.19"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.10.18"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.12.30"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 제시외 건물을 포함하여 평가한 가액임.\n2. 집합건축물대장상 1개의 구분건물(다가구주택 9가구)로 등재되어 있으나, 현황 및 감정평가서에 의하면 다가구 주택 15개(401호, 402호, 403호, 403-1호, 404호, 404-1호, 404-2호, 405호, 405-1호, 406호, 407호, 407-1호, 408호, 409호, 409-1호)로 구분되어 있음.\n3. 공부상 도면과 다른 공용부분의 구조변경 및 주거점용 등의 사항이 있어 추후 이행강제금 부과나 철거 등의 대상이 될 수 있으므로 이와 관련하여 매수인의 주의를 요함.\n4. 건축물대장에 위반건축물로 등재되어 있으며, 감정평가서에 의하면 건축물현황도상 공용부분인 보일러실 및 실외기실은 ‘문패상 403-1호’로 주거용으로 무단 용도변경, 증개축 되어 있음.\n\n[매각조건 비고]\n제시외 건물 포함",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1123010800",
+        "failed_count": 0,
+        "auction_date": "20261103"
+      },
       "court_name": ""
     },
     {
@@ -1827,6 +3768,27 @@
       "lat": 37.626769,
       "lng": 127.21946,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.05"
+          }
+        ],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4136011200",
+        "failed_count": 0,
+        "auction_date": "20261112"
+      },
       "court_name": ""
     },
     {
@@ -1859,6 +3821,31 @@
       "lat": 37.571643,
       "lng": 127.041136,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2020.07.14"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.01.22"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2020.07.14. 근저당권",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1123010600",
+        "failed_count": 0,
+        "auction_date": "20261124"
+      },
       "court_name": ""
     },
     {
@@ -1891,6 +3878,41 @@
       "lat": 37.562081,
       "lng": 126.82613,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2023.02.03"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.06.19"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n임차인 김경필로부터 임차목적물(127호)의 인테리어 공사대금채권(12,859,000원, 공사도급계약서 첨부)에 대해 유치권신고서가 제출(2024.06.13.)되었으나,  이에 대해 경매신청채권자로부터 유치권부존재확인판결이 제출되었음(서울남부지방법원 2025가단210677 유치권부존재확인)\n인접호수와 일괄하여 근린생활시설로 이용중으로 경계벽 제거는 일시적으로 물리적인 복원이 가능함. 다만, 인접호수의 각 소유자가 다르며 종합적인 경계벽 복구 여부는 인접호수의 임대차계약서의 추가 검토가 필요함. 복구시 예상비용은 일반사무실 면적 기준으로 약 7,800,000원 예상되나 정확한 비용은 별도 확인이 요구됨",
+        "special_rights": [
+          {
+            "id": "lien",
+            "name": "유치권 신고 있음",
+            "short": "유치권",
+            "badge_color": "bg-red-100 text-red-700 border-red-200",
+            "risk_level": "CRITICAL",
+            "icon": "🚨",
+            "desc": "공사대금 등 유치권 신고가 접수된 매물입니다. 낙찰자에게 대항할 수 있는 유치권인지 점유 및 피담보채권의 실재성을 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "2022.04.08",
+        "tenant_deposit": 20000000,
+        "tenant_deposit_str": "2,000만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1150010500",
+        "failed_count": 14,
+        "auction_date": "20261028"
+      },
       "court_name": ""
     },
     {
@@ -1923,6 +3945,50 @@
       "lat": 37.560403,
       "lng": 126.848496,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2021.12.08"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.05.09"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n특별매각조건 : 채권자는 매수인에 대해 배당받지 못하는 잔액에 대한 임대차보증금 반환청구권을 포기하고, 임차권등기를 말소하는 것을 조건으로 매각\n본건 건축물 테라스 부분에 제시외 건물(경량패널조)이 소재하는 바, 향후 위반건축물 등재, 원상복구 등 시정명령, 이행강제금 부과 등의 가능성을 배제할 수 없으므로, 경매 진행시 유의하시기 바람\n\n[매각조건 비고]\n제시외 건물 있음\n임차인 및 주택임차권 승계인 주택도시보증공사의 매수인에 대한 대항력 포기 조건 매각",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          },
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "2020.06.26",
+        "tenant_deposit": 5,
+        "tenant_deposit_str": "0만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1150010900",
+        "failed_count": 14,
+        "auction_date": "20261117"
+      },
       "court_name": ""
     },
     {
@@ -1955,6 +4021,31 @@
       "lat": 37.522663,
       "lng": 127.115459,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "가압류",
+            "date": "2019.09.02"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2022.12.26"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 갑구 순위 3번 소유권이전등기청구권 가등기: 매매예약에 따른 순위보전 가등기로 신고함(가등기권자 이종관, 2022.12.22.제출), 만약 가등기된 매매예약이 완결되는 경우 매수인이 소유권을 상실하게 됨\n2. 주택도시보증공사 : 우선변제권만 주장하고 대항력을 포기하며, 배당금으로 임대차보증금반환채권을 전액받지 못하더라도 매수인에 대한 잔존 임대차보증금 반환청구권을 포기하고 임차권등기말소에 동의한다는 대항력포기확약서를 제출(2024.12.04.)\n\n[매각조건 비고]\n1. 갑구 순위 3번 소유권이전등기청구권 가등기: 매매예약에 따른 순위보전 가등기로 신고(가등기권자 이종관, 2022.12.22.제출), 만약 가등기된 매매예약이 완결되는 경우 매수인이 소유권을 상실하게 됨\n2. 주택도시보증공사 : 우선변제권만 주장하고 대항력을 포기하며, 배당금으로 임대차보증금반환채권을 전액받지 못하더라도 매수인에 대한 잔존 임대차보증금 반환청구권을 포기하고 임차권등기말소에 동의한다는 대항력포기확약서를 제출(2024.12.04.)\n\n[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n갑구 순위 3번 2018.5.11.자 소유권이전등기청구권가등기",
+        "special_rights": [],
+        "tenant_registration_date": "2022.03.23",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1174010800",
+        "failed_count": 10,
+        "auction_date": "20261102"
+      },
       "court_name": ""
     },
     {
@@ -1987,6 +4078,41 @@
       "lat": 37.589263,
       "lng": 127.018753,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.05.09"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2026.09.22"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n특별매각조건있음(신청채권자 및 임차인은 배당금으로 임대차보증금반환채권 전액을 변제받지 못하더라도 잔존 임대차보증금반환채권을 포기하고 임차권 등기를 말소함.).",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "2023.08.05",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1129013300",
+        "failed_count": 5,
+        "auction_date": "20261110"
+      },
       "court_name": ""
     },
     {
@@ -2019,6 +4145,36 @@
       "lat": 37.349455,
       "lng": 127.10944,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_10.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_10.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_11.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_12.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경794_7.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.04.08"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n신청채권자 겸 대항력 있는 임차인의 보증금 197,430,000원이 배당에서 전액 변제되지 않을 경우 잔액을 매수인이 인수하므로 입찰시 주의요망\n\n[매각조건 비고]\n신청채권자 겸 대항력 있는 임차인의 보증금 197,430,000원이 배당에서 전액 변제되지 않을 경우 잔액을 매수인이 인수하므로 입찰시 주의요망",
+        "special_rights": [],
+        "tenant_registration_date": "2021.02.01",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4111312200",
+        "failed_count": 4,
+        "auction_date": "20261102"
+      },
       "court_name": ""
     },
     {
@@ -2051,6 +4207,40 @@
       "lat": 37.637601,
       "lng": 126.82171,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경5253_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2023.09.01"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.09.30"
+          }
+        ],
+        "remarks": "",
+        "special_rights": [],
+        "tenant_registration_date": "2024.06.07",
+        "tenant_deposit": 10000000,
+        "tenant_deposit_str": "1,000만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4147110900",
+        "failed_count": 4,
+        "auction_date": "20261104"
+      },
       "court_name": ""
     },
     {
@@ -2083,6 +4273,31 @@
       "lat": 37.534928,
       "lng": 127.080815,
       "photo_url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2022.11.08"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.11.06"
+          }
+        ],
+        "remarks": "[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n2024.05.02. 접수 제69504호로 경료된 을구4번 주택임차권등기는 배당에서 전액 변제받지 않으면 잔액을 매수인이 인수함\n\n[매각물건명세서 을구/최선순위설정]\n2022.11.08.근저당권\n\n[임차인 현황]\n- 박지희: 전입 2021.06.03, 보증금 미상, 확정 미상, 배당요구 없음 (9층901호)",
+        "special_rights": [],
+        "tenant_registration_date": "2021.06.03",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1121010100",
+        "failed_count": 4,
+        "auction_date": "20261116"
+      },
       "court_name": ""
     },
     {
@@ -2115,6 +4330,31 @@
       "lat": 37.534928,
       "lng": 127.080815,
       "photo_url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2022.11.08"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.11.06"
+          }
+        ],
+        "remarks": "[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n2024.05.02. 접수 제69504호로 경료된 을구4번 주택임차권등기는 배당에서 전액 변제받지 않으면 잔액을 매수인이 인수함\n\n[매각물건명세서 을구/최선순위설정]\n2022.11.08.근저당권\n\n[임차인 현황]\n- 박지희: 전입 2021.06.03, 보증금 미상, 확정 미상, 배당요구 없음 (9층901호)",
+        "special_rights": [],
+        "tenant_registration_date": "2021.06.03",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1121010100",
+        "failed_count": 4,
+        "auction_date": "20261116"
+      },
       "court_name": ""
     },
     {
@@ -2147,6 +4387,36 @@
       "lat": 37.609113,
       "lng": 126.928193,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경60434_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.11.11"
+          }
+        ],
+        "remarks": "[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 을구 3번 임차권등기(임대차보증금 220,500,000원, 전입일자 2018.01.22. 확정일자 2018.01.22.)가 있으므로 배당에서 전액 변제되지 아니하면 잔액을 매수인에게 인수될 수 있음)\n\n[매각물건명세서 을구/최선순위설정]\n2023. 5. 17. 압류\n\n[임차인 현황]\n- 정선영: 전입 2023.03.30, 보증금 미상, 확정 미상, 배당요구 없음 (비동 2층201호)",
+        "special_rights": [],
+        "tenant_registration_date": "2023.03.30",
+        "tenant_deposit": 220500000,
+        "tenant_deposit_str": "2억 2,050만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1138010500",
+        "failed_count": 4,
+        "auction_date": "20261117"
+      },
       "court_name": ""
     },
     {
@@ -2179,6 +4449,27 @@
       "lat": 37.313783,
       "lng": 126.803131,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.01.29"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n-사무실과 작업장으로 이용중임\n\n[매각조건 비고]\n-사무실과 작업장으로 이용중임",
+        "special_rights": [],
+        "tenant_registration_date": "2013.10.31",
+        "tenant_deposit": 20000000,
+        "tenant_deposit_str": "2,000만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4127310900",
+        "failed_count": 3,
+        "auction_date": "20261117"
+      },
       "court_name": ""
     },
     {
@@ -2211,6 +4502,27 @@
       "lat": 37.313783,
       "lng": 126.803131,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.01.29"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n-사무실과 작업장으로 이용중임\n\n[매각조건 비고]\n-사무실과 작업장으로 이용중임",
+        "special_rights": [],
+        "tenant_registration_date": "2013.10.31",
+        "tenant_deposit": 20000000,
+        "tenant_deposit_str": "2,000만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4127310900",
+        "failed_count": 3,
+        "auction_date": "20261117"
+      },
       "court_name": ""
     },
     {
@@ -2243,6 +4555,27 @@
       "lat": 37.313783,
       "lng": 126.803131,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.01.29"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n-사무실과 작업장으로 이용중임\n\n[매각조건 비고]\n-사무실과 작업장으로 이용중임",
+        "special_rights": [],
+        "tenant_registration_date": "2013.10.31",
+        "tenant_deposit": 20000000,
+        "tenant_deposit_str": "2,000만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4127310900",
+        "failed_count": 3,
+        "auction_date": "20261117"
+      },
       "court_name": ""
     },
     {
@@ -2275,6 +4608,40 @@
       "lat": 37.467417,
       "lng": 127.040631,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_15.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_15.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_16.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_17.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_18.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3082_6.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2006.05.11"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2025.11.24"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n이 사건 부동산은 건물번호표지 또는 경계구분이 명확하지 않음",
+        "special_rights": [],
+        "tenant_registration_date": "2023.09.22",
+        "tenant_deposit": 20000000,
+        "tenant_deposit_str": "2,000만원",
+        "is_payout_requested": true,
+        "court_name": "",
+        "legal_div_no": "1165010200",
+        "failed_count": 2,
+        "auction_date": "20261028"
+      },
       "court_name": ""
     },
     {
@@ -2307,6 +4674,27 @@
       "lat": 37.529841,
       "lng": 127.090593,
       "photo_url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.05.07"
+          }
+        ],
+        "remarks": "[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n해당사항없음",
+        "special_rights": [],
+        "tenant_registration_date": "2021.07.06",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1121010100",
+        "failed_count": 2,
+        "auction_date": "20261116"
+      },
       "court_name": ""
     },
     {
@@ -2339,6 +4727,49 @@
       "lat": 37.477269,
       "lng": 126.928559,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_7.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2025타경3860_4.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당",
+            "date": "2021.07.02"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2026.02.19"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n지분경매\n\n[매각조건 비고]\n지분경매",
+        "special_rights": [
+          {
+            "id": "share",
+            "name": "지분 매각",
+            "short": "지분매각",
+            "badge_color": "bg-purple-100 text-purple-700 border-purple-200",
+            "risk_level": "MEDIUM",
+            "icon": "ℹ️",
+            "desc": "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다. 전체 배타적 점유가 불가하며 공유자 우선매수권 또는 공유물분할 청구 소송이 필요합니다."
+          }
+        ],
+        "tenant_registration_date": "2018.01.08",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1162010200",
+        "failed_count": 1,
+        "auction_date": "20261028"
+      },
       "court_name": ""
     },
     {
@@ -2371,6 +4802,31 @@
       "lat": 37.530693,
       "lng": 126.877153,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권",
+            "date": "2011.08.08"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.12.05"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 건물명칭이 '다정주택 2차'로 표시되어 있음(현황조사서 참조)\n2. 집합건축물대장상 건축과-3566(2025.05.02.)호에 의거 건축물 표시변경(현황도면 변경 : 301호↔302호)\n\n[매각물건명세서 을구/최선순위설정]\n2011.08.08. 근저당권\n\n[임차인 현황]\n- 안명규: 전입 2001.06.26, 보증금 없음, 확정 미상, 배당요구 없음 (제3층 제302호)",
+        "special_rights": [],
+        "tenant_registration_date": "2001.06.26",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1147010200",
+        "failed_count": 0,
+        "auction_date": "20261119"
+      },
       "court_name": ""
     },
     {
@@ -2403,6 +4859,31 @@
       "lat": 37.460938,
       "lng": 126.899988,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "전세권",
+            "date": "2019.03.29"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.07.04"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n집합건축물대장상 용도는 '사무소'로 기재되어 있으나 현재 주택으로 이용중임\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 주택임차권등기(2023.02.07. 접수 임차인 이태욱)는 임차보증금이 전액 변제되지 아니하면 말소되지 아니함\n\n[매각물건명세서 을구/최선순위설정]\n2019.03.29. 전세권\n\n[임차인 현황]\n- 이태욱: 전입 2019년 4월 12일(전입세대확인서), 보증금 미상, 확정 미상, 배당요구 없음 (제2층 제202호)",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1154010200",
+        "failed_count": 24,
+        "auction_date": "20261126"
+      },
       "court_name": ""
     },
     {
@@ -2435,6 +4916,36 @@
       "lat": 37.597171,
       "lng": 126.922612,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경50369_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.27"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n이 사건 부동산은 대조 A2구역 가로주택정비사업으로 지정되어 정비사업이 진행 중(2024. 7. 31. 조합설립인가)임. 조합원의 지위승계 및 현금청산 대상여부는 관할구청 또는 가로주택정비사업조합에 확인이 필요함.\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 을구 순위 3번 주택임차권등기 있음.(임대차보증금 308,000,000원, 전입일자 2020.07.03, 확정일자 2020.06.01.)  배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수할 수 있음.\n\n[매각물건명세서 을구/최선순위설정]\n2022. 06. 07.  압류\n\n[임차인 현황]\n- 김일중: 전입 2020.07.03, 보증금 미상, 확정 미상, 배당요구 없음 (3층303호)",
+        "special_rights": [],
+        "tenant_registration_date": "2020.07.03",
+        "tenant_deposit": 308000000,
+        "tenant_deposit_str": "3억 800만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1138010600",
+        "failed_count": 13,
+        "auction_date": "20261117"
+      },
       "court_name": ""
     },
     {
@@ -2467,6 +4978,47 @@
       "lat": 37.523671,
       "lng": 126.866032,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "근저당권 (기업은행)",
+            "date": "2023.11.19",
+            "amount": "2억 2,818만원",
+            "is_malso": true
+          },
+          {
+            "name": "압류",
+            "date": "2023.04.20"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.11.19"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[매각조건 비고]\n특별매각조건 매수신청보증금 최저매각가격의 20%\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 주택임차권등기(2024.08.01. 임차인 김인영)는 임차보증금이 전액 변제되지 아니하면 말소되지 아니함",
+        "special_rights": [
+          {
+            "id": "resale",
+            "name": "재매각 (보증금 20~30%)",
+            "short": "재매각",
+            "badge_color": "bg-red-100 text-red-800 border-red-300",
+            "risk_level": "HIGH",
+            "icon": "🔄",
+            "desc": "이전 낙찰자의 대금 미납으로 다시 경매되는 물건입니다. 통상 입찰보증금이 최저가의 20~30%로 상향 적용되며 이전 낙찰자의 미납 사유를 철저히 조사해야 합니다."
+          }
+        ],
+        "tenant_registration_date": "2020.08.14",
+        "tenant_deposit": 246000000,
+        "tenant_deposit_str": "2억 4,600만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1147010300",
+        "failed_count": 10,
+        "auction_date": "20261028"
+      },
       "court_name": ""
     },
     {
@@ -2499,6 +5051,31 @@
       "lat": 37.607785,
       "lng": 127.089526,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2023.02.01"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.03.05"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n제시외 건물 포함\n\n[매각조건 비고]\n제시외 건물 포함\n\n[소멸되지 않는 권리]\n2024. 4. 16. 접수 제62701호로 경료된 을구 1번 임차권등기는 배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수함\n\n[매각물건명세서 을구/최선순위설정]\n2023.02.01. 압류\n\n[임차인 현황]\n- 이가연: 전입 2022.04.12, 보증금 307,000,000원, 확정 미상, 배당요구 없음 (4층401호)",
+        "special_rights": [],
+        "tenant_registration_date": "2022.04.12",
+        "tenant_deposit": 307000000,
+        "tenant_deposit_str": "3억 700만원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1126010200",
+        "failed_count": 10,
+        "auction_date": "20261124"
+      },
       "court_name": ""
     },
     {
@@ -2531,6 +5108,41 @@
       "lat": 37.570103,
       "lng": 127.040862,
       "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "압류",
+            "date": "2021.02.22"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.02.12"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 공부상 근린생활시설(사무소)로 되어 있으나, 현황 주거용으로 이용중으로 건축물대장 도면과 내부가 상이(내부구조가 다르고, 도면상 공용부분의 일부를 점유, 이용)한 것으로 확인되었는바, 향후 이에 대한 적법성 여부, 이행강제금 부과여부 및 원상회복의무 발생여부 등에 관하여 관할 관청에 확인을 요함(감정평가서 참조). \n2. 본건 집합건축물대장(표제부, 갑) 상에 위반건축물로 등재되어 있는바, 경매참여시 확인 요함.\n\n[매각조건 비고]\n1. 공부상 근린생활시설(사무소)로 되어 있으나, 현황 주거용으로 이용중으로 건축물대장 도면과 내부가 상이(내부구조가 다르고, 도면상 공용부분의 일부를 점유, 이용)한 것으로 확인되었는바, 향후 이에 대한 적법성 여부, 이행강제금 부과여부 및 원상회복의무 발생여부 등에 관하여 관할 관청에 확인을 요함(감정평가서 참조). \n2. 본건 집합건축물대장(표제부, 갑) 상에 위반건축물로 등재되어 있는바, 경매참여시 확인 요함.\n\n[매각물건명세서 을구/최선순위설정]\n2021.02.22. 압류\n\n[임차인 현황]\n- 이종혜: 전입 2020.01.31, 보증금 미상, 확정 미상, 배당요구 없음 (2층201호)",
+        "special_rights": [
+          {
+            "id": "violation",
+            "name": "위반건축물",
+            "short": "위반건축물",
+            "badge_color": "bg-rose-100 text-rose-700 border-rose-200",
+            "risk_level": "HIGH",
+            "icon": "⚠️",
+            "desc": "건축물대장상 위반건축물로 등재된 매물입니다. 시가표준액 기준 매년 이행강제금이 반복 부과될 수 있으며 원상복구 의무가 따릅니다."
+          }
+        ],
+        "tenant_registration_date": "2020.01.31",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1120010300",
+        "failed_count": 9,
+        "auction_date": "20261123"
+      },
       "court_name": ""
     },
     {
@@ -2563,6 +5175,40 @@
       "lat": 37.602419,
       "lng": 126.937457,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_7.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_8.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_9.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경54958_10.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "가압류",
+            "date": "2022.10.27"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2024.07.18"
+          }
+        ],
+        "remarks": "[소멸되지 않는 권리]\n- 갑구 순위 5번 소유권이전등기청구권 가등기는 말소되지 않고 매수인이 인수함. 만약 가등기된 매매예약이 완결되는 경우에는 매수인이 소유권을 상실하게 됨.\n- 매수인에게 대항할 수 있는 을구 순위 1번 임차권등기 있음. 배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수함",
+        "special_rights": [],
+        "tenant_registration_date": "2021.05.31",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1138010500",
+        "failed_count": 7,
+        "auction_date": "20261110"
+      },
       "court_name": ""
     },
     {
@@ -2595,6 +5241,29 @@
       "lat": 37.601241,
       "lng": 126.923399,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2024타경2612_1.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경2612_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경2612_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2024타경2612_3.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2025.03.27"
+          }
+        ],
+        "remarks": "[매각물건명세서 을구/최선순위설정]\n2023. 8. 23. 근저당권\n\n[임차인 현황]\n- 정원형: 전입 2022.02.25, 보증금 미상, 확정 미상, 배당요구 없음 (2층202호)",
+        "special_rights": [],
+        "tenant_registration_date": "2022.02.25",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1138010500",
+        "failed_count": 7,
+        "auction_date": "20261117"
+      },
       "court_name": ""
     },
     {
@@ -2627,6 +5296,36 @@
       "lat": 37.457266,
       "lng": 126.893447,
       "photo_url": "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_12.jpg",
+      "photos": [
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_12.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_13.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_14.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_1.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_2.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_3.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_4.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_5.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_6.jpg",
+        "https://frontend-nine-gules-14.vercel.app/photos/2023타경5165_7.jpg"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2024.01.16"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n본건 현관에 관리비 장기 미납에 대한 안내문 부착되어 있음(감정평가서 참조)\n\n[소멸되지 않는 권리]\n매수인에게 대항할 수 있는 임차인이 있음(임대차보증금 340,000,000원, 전입일자 2022. 11. 30, 확정일자 2021. 5. 12.) \n배당에서 보증금이 전액 변제되지 아니하면 잔액을 매수인이 인수함",
+        "special_rights": [],
+        "tenant_registration_date": "",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "1154010200",
+        "failed_count": 6,
+        "auction_date": "20261112"
+      },
       "court_name": ""
     },
     {
@@ -2659,6 +5358,59 @@
       "lat": 37.900539,
       "lng": 127.194251,
       "photo_url": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "photos": [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+      ],
+      "raw_court_data": {
+        "rights_list": [
+          {
+            "name": "경매개시결정",
+            "date": "2023.05.08"
+          },
+          {
+            "name": "경매개시결정",
+            "date": "2023.07.31"
+          }
+        ],
+        "remarks": "[매각물건명세서 비고]\n1. 일괄매각(목록 1. 지상에 소재하는 제시외 비닐하우스 1동 및 목록 2. 지상에 소재하는 제시외 목조기와지붕 단층주택 35.15㎡, 창고 등은 매각에서 제외-법정지상권 성립여부 불분명)\n2. 제시외 건물로 제한받는 단가 목록 1. 64,000원/㎡, 목록 2. 39,000원/㎡\n3. 지분매각임(공유자의 우선매수신고는 1회에 한하여 허용됨)\n4. 목록 2. 지상 농작물(삼포)는 매각에서 제외\n5. 농지취득자격증명원 필요함(미제출시 보증금 몰수)\n6. 신북면의 2023.7.21.자 사실조회 회신에 의하면 목록 2. 지상 일부에 전용허가를 받지 아니하고 타 용도로 전용된 불법 건축물이 있으며 원상복구 대상임\n\n[매각조건 비고]\n일괄매각(제시외 비닐하우스 및 목조기와지붕 단층주택 35.15㎡, 창고 등은 매각에서 제외-법정지상권 성립여부 불분명).제시외 건물로 제한받는 단가 목록 1. 64,000원/㎡, 목록 2. 39,000원/㎡.지분매각임(공유자의 우선매수신고는 1회에 한하여 허용됨).농지취득자격증명원 필요함(미제출시 보증금 몰수).목록 2. 지상 농작물(삼포)는 매각에서 제외.목록 2. 지상 일부에 전용허가를 받지 아니하고 타 용도로 전용된 불법 건축물이 있으며 원상복구 대상임.\n\n[지상권 관련 내역]\n해당사항없음\n\n[소멸되지 않는 권리]\n해당사항없음\n\n[매각물건명세서 을구/최선순위설정]\n2023.05.08. 경매개시결정\n\n[지분매각 내역]\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n갑구1번 지분 2분의 1 차남순 지분 전부\n\n[임차인 현황]\n- 김성남: 전입 2015.04.13, 보증금 미상, 확정 미상, 배당요구 없음 ()\n- 김성남: 전입 2015.04.13, 보증금 미상, 확정 미상, 배당요구 없음 ()",
+        "special_rights": [
+          {
+            "id": "share",
+            "name": "지분 매각",
+            "short": "지분매각",
+            "badge_color": "bg-purple-100 text-purple-700 border-purple-200",
+            "risk_level": "MEDIUM",
+            "icon": "ℹ️",
+            "desc": "부동산 전체가 아닌 특정 공유자의 지분만 경매되는 매물입니다. 전체 배타적 점유가 불가하며 공유자 우선매수권 또는 공유물분할 청구 소송이 필요합니다."
+          },
+          {
+            "id": "superficies",
+            "name": "법정지상권 성립여지",
+            "short": "법정지상권",
+            "badge_color": "bg-orange-100 text-orange-800 border-orange-200",
+            "risk_level": "HIGH",
+            "icon": "🏛️",
+            "desc": "토지만 매각되는 사건 등으로 지상 건물 소유자를 위한 법정지상권이 성립할 여지가 있어 토지 인도 청구 및 지료 산정이 쟁점이 됩니다."
+          },
+          {
+            "id": "farmland",
+            "name": "농취증(농지취득자격) 필요",
+            "short": "농취증",
+            "badge_color": "bg-emerald-100 text-emerald-800 border-emerald-200",
+            "risk_level": "MEDIUM",
+            "icon": "🌾",
+            "desc": "농지(전·답·과수원)로서 낙찰 후 최고가매수신고인 증명서를 발급받아 관할 지자체에서 농지취득자격증명을 기일 내 제출해야 하며, 미제출 시 보증금이 몰수됩니다."
+          }
+        ],
+        "tenant_registration_date": "2015.04.13",
+        "tenant_deposit": 0,
+        "tenant_deposit_str": "0원",
+        "is_payout_requested": false,
+        "court_name": "",
+        "legal_div_no": "4165034028",
+        "failed_count": 3,
+        "auction_date": "20261124"
+      },
       "court_name": ""
     }
   ]

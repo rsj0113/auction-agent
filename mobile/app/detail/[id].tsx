@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,17 +7,24 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
+  Dimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { FeedItem } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
 
 const feedData = require('../../assets/mobile_feed.json');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function DetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { isFavorite, toggleFavorite } = useFavorites();
+  
+  const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+  const [isRawExpanded, setIsRawExpanded] = useState(false);
 
   const caseNumber = decodeURIComponent(id || '');
   const items: FeedItem[] = feedData.items || [];
@@ -37,6 +44,16 @@ export default function DetailScreen() {
   }
 
   const fav = isFavorite(item.case_number);
+  const photos = (item.photos && item.photos.length > 0) ? item.photos : [item.photo_url];
+  const rawData = item.raw_court_data;
+
+  const onPhotoScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const offsetX = e.nativeEvent.contentOffset.x;
+    const nextIdx = Math.round(offsetX / SCREEN_WIDTH);
+    if (nextIdx !== activePhotoIdx && nextIdx >= 0 && nextIdx < photos.length) {
+      setActivePhotoIdx(nextIdx);
+    }
+  };
 
   const renderBadge = (grade: string) => {
     if (grade === 'GREEN') {
@@ -63,16 +80,45 @@ export default function DetailScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* 상단 메인 사진 & 뱃지 */}
-        <View style={styles.imageBox}>
-          <Image source={{ uri: item.photo_url }} style={styles.image} resizeMode="cover" />
+        {/* 상단 다중 사진 좌우 스와이프 갤러리 */}
+        <View style={styles.galleryBox}>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={onPhotoScroll}
+            scrollEventThrottle={16}
+            style={styles.galleryScroll}
+          >
+            {photos.map((pUrl, idx) => (
+              <Image
+                key={idx}
+                source={{ uri: pUrl }}
+                style={styles.galleryImage}
+                resizeMode="cover"
+              />
+            ))}
+          </ScrollView>
+
+          {/* 좌측 상단 안전등급 뱃지 */}
           <View style={styles.badgeWrap}>{renderBadge(item.safety_grade)}</View>
+
+          {/* 좌측 하단 D-Day */}
           <View style={styles.dDayWrap}>
             <Text style={styles.dDayText}>{item.d_day}</Text>
           </View>
+
+          {/* 우측 하단 사진 카운터 */}
+          {photos.length > 1 && (
+            <View style={styles.photoCountWrap}>
+              <Text style={styles.photoCountText}>
+                📷 {activePhotoIdx + 1} / {photos.length}
+              </Text>
+            </View>
+          )}
         </View>
 
-        {/* 핵심 브리핑 헤드라인 */}
+        {/* 핵심 브리핑 본문 */}
         <View style={styles.contentWrap}>
           <Text style={styles.headlineText}>{item.headline}</Text>
           <Text style={styles.locationText}>{item.location}</Text>
@@ -130,7 +176,134 @@ export default function DetailScreen() {
             </View>
           </View>
 
-          {/* 4. 법원 및 입찰 안내 메타 정보 */}
+          {/* 4. 법원 원문 데이터 접이식(아코디언) 섹션 */}
+          <View style={styles.accordionCard}>
+            <TouchableOpacity
+              style={styles.accordionHeader}
+              onPress={() => setIsRawExpanded(!isRawExpanded)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.accordionTitleRow}>
+                <Text style={styles.accordionIcon}>📋</Text>
+                <View>
+                  <Text style={styles.accordionTitle}>법원 원본 데이터 투명 공개</Text>
+                  <Text style={styles.accordionSubtitle}>
+                    {isRawExpanded ? '터치하여 접기' : '대법원 공적장부 원문 근거 확인'}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.accordionArrow}>{isRawExpanded ? '▲' : '▼'}</Text>
+            </TouchableOpacity>
+
+            {isRawExpanded && (
+              <View style={styles.accordionBody}>
+                {/* 등기부 권리 내역 전체 */}
+                <View style={styles.rawSection}>
+                  <Text style={styles.rawSectionTitle}>📑 등기부 권리 내역 (갑구/을구)</Text>
+                  {rawData?.rights_list && rawData.rights_list.length > 0 ? (
+                    <View style={styles.rawRightsTable}>
+                      {rawData.rights_list.map((r, rIdx) => (
+                        <View key={rIdx} style={styles.rawRightItem}>
+                          <View style={styles.rawRightHeader}>
+                            <View style={styles.rawRightBadge}>
+                              <Text style={styles.rawRightBadgeText}>
+                                {r.type || r.name || '권리'}
+                              </Text>
+                            </View>
+                            {r.is_standard_right && (
+                              <View style={styles.standardRightTag}>
+                                <Text style={styles.standardRightTagText}>말소기준권리</Text>
+                              </View>
+                            )}
+                            <Text style={styles.rawRightDate}>{r.registration_date || '-'}</Text>
+                          </View>
+                          <View style={styles.rawRightDetails}>
+                            <Text style={styles.rawRightRow}>
+                              <Text style={styles.rawRightKey}>권리자: </Text>
+                              <Text style={styles.rawRightVal}>{r.right_holder || '미상'}</Text>
+                            </Text>
+                            {r.claim_amount && (
+                              <Text style={styles.rawRightRow}>
+                                <Text style={styles.rawRightKey}>채권액: </Text>
+                                <Text style={styles.rawRightVal}>
+                                  {typeof r.claim_amount === 'number'
+                                    ? `${(r.claim_amount / 10000).toLocaleString()}만원`
+                                    : r.claim_amount}
+                                </Text>
+                              </Text>
+                            )}
+                            {r.remarks && (
+                              <Text style={styles.rawRightRemarks}>{r.remarks}</Text>
+                            )}
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  ) : (
+                    <Text style={styles.rawEmptyText}>등록된 등기부 권리 내역이 없습니다.</Text>
+                  )}
+                </View>
+
+                {/* 현황조사서 임차인 상세 */}
+                <View style={styles.rawSection}>
+                  <Text style={styles.rawSectionTitle}>🏠 현황조사서 임차인 현황</Text>
+                  <View style={styles.rawTenantBox}>
+                    <View style={styles.rawTenantRow}>
+                      <Text style={styles.rawTenantKey}>전입일자</Text>
+                      <Text style={styles.rawTenantVal}>
+                        {rawData?.tenant_registration_date || '전입 세대 미상/없음'}
+                      </Text>
+                    </View>
+                    <View style={styles.rawTenantRow}>
+                      <Text style={styles.rawTenantKey}>보증금</Text>
+                      <Text style={styles.rawTenantVal}>
+                        {rawData?.tenant_deposit && rawData.tenant_deposit > 0
+                          ? rawData.tenant_deposit_str
+                          : '0원 (확인된 보증금 없음)'}
+                      </Text>
+                    </View>
+                    <View style={styles.rawTenantRow}>
+                      <Text style={styles.rawTenantKey}>배당요구 신청</Text>
+                      <Text
+                        style={[
+                          styles.rawTenantVal,
+                          rawData?.is_payout_requested ? styles.payoutYes : styles.payoutNo,
+                        ]}
+                      >
+                        {rawData?.is_payout_requested ? '신청 완료 (배당요구함)' : '신청 내역 없음'}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* 매각물건명세서 비고 & 특수조건 */}
+                <View style={styles.rawSection}>
+                  <Text style={styles.rawSectionTitle}>📝 매각물건명세서 비고 및 특수조건</Text>
+                  {rawData?.special_rights && rawData.special_rights.length > 0 && (
+                    <View style={styles.specialTagsRow}>
+                      {rawData.special_rights.map((tag, tIdx) => (
+                        <View key={tIdx} style={styles.specialTagPill}>
+                          <Text style={styles.specialTagText}>⚠️ {tag}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                  <View style={styles.remarksBox}>
+                    <Text style={styles.remarksText}>
+                      {rawData?.remarks?.trim() || '법원 매각물건명세서상 특별한 비고 기재사항이 없습니다.'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* 데이터 출처 고지 */}
+                <Text style={styles.rawDisclaimer}>
+                  ※ 본 정보는 대한민국 법원경매정보(courtauction.go.kr)에서 수집된 공식 장부 원본입니다.
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* 5. 법원 및 입찰 안내 메타 정보 */}
           <View style={styles.metaCard}>
             <Text style={styles.metaRow}>
               <Text style={styles.metaKey}>관할 법원: </Text>
@@ -194,15 +367,19 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '700',
   },
-  imageBox: {
+  galleryBox: {
     width: '100%',
-    height: 240,
+    height: 250,
     position: 'relative',
-    backgroundColor: '#cbd5e1',
+    backgroundColor: '#0f172a',
   },
-  image: {
+  galleryScroll: {
     width: '100%',
     height: '100%',
+  },
+  galleryImage: {
+    width: SCREEN_WIDTH,
+    height: 250,
   },
   badgeWrap: {
     position: 'absolute',
@@ -248,7 +425,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 16,
     left: 16,
-    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+    backgroundColor: 'rgba(15, 23, 42, 0.85)',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 8,
@@ -257,6 +434,20 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 12,
     fontWeight: '800',
+  },
+  photoCountWrap: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    backgroundColor: 'rgba(15, 23, 42, 0.75)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  photoCountText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '700',
   },
   contentWrap: {
     padding: 20,
@@ -391,6 +582,198 @@ const styles = StyleSheet.create({
     color: '#334155',
     lineHeight: 20,
     fontWeight: '500',
+  },
+  /* 접이식 법원 원문 데이터 스타일 */
+  accordionCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    overflow: 'hidden',
+  },
+  accordionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 18,
+    backgroundColor: '#f8fafc',
+  },
+  accordionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  accordionIcon: {
+    fontSize: 20,
+  },
+  accordionTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#0f172a',
+  },
+  accordionSubtitle: {
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  accordionArrow: {
+    fontSize: 14,
+    color: '#64748b',
+    fontWeight: '800',
+  },
+  accordionBody: {
+    padding: 18,
+    gap: 18,
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9',
+  },
+  rawSection: {
+    gap: 8,
+  },
+  rawSectionTitle: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: '#1e293b',
+  },
+  rawRightsTable: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 12,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  rawRightItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+    paddingBottom: 8,
+    gap: 4,
+  },
+  rawRightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  rawRightBadge: {
+    backgroundColor: '#e0e7ff',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  rawRightBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#3730a3',
+  },
+  standardRightTag: {
+    backgroundColor: '#fee2e2',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  standardRightTagText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#991b1b',
+  },
+  rawRightDate: {
+    fontSize: 11,
+    color: '#64748b',
+    fontWeight: '600',
+    marginLeft: 'auto',
+  },
+  rawRightDetails: {
+    gap: 2,
+    paddingLeft: 4,
+  },
+  rawRightRow: {
+    fontSize: 12,
+  },
+  rawRightKey: {
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  rawRightVal: {
+    color: '#1e293b',
+    fontWeight: '700',
+  },
+  rawRightRemarks: {
+    fontSize: 11,
+    color: '#475569',
+    backgroundColor: '#f1f5f9',
+    padding: 4,
+    borderRadius: 4,
+    marginTop: 2,
+  },
+  rawEmptyText: {
+    fontSize: 12,
+    color: '#94a3b8',
+    padding: 10,
+  },
+  rawTenantBox: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    gap: 6,
+  },
+  rawTenantRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  rawTenantKey: {
+    fontSize: 12.5,
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  rawTenantVal: {
+    fontSize: 13,
+    color: '#0f172a',
+    fontWeight: '700',
+  },
+  payoutYes: {
+    color: '#16a34a',
+  },
+  payoutNo: {
+    color: '#64748b',
+  },
+  specialTagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 6,
+  },
+  specialTagPill: {
+    backgroundColor: '#fef2f2',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fecaca',
+  },
+  specialTagText: {
+    color: '#b91c1c',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  remarksBox: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  remarksText: {
+    fontSize: 12,
+    color: '#334155',
+    lineHeight: 18,
+  },
+  rawDisclaimer: {
+    fontSize: 11,
+    color: '#94a3b8',
+    lineHeight: 15,
   },
   metaCard: {
     backgroundColor: '#f8fafc',

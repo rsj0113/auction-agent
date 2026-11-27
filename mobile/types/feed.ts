@@ -1,5 +1,31 @@
 export type SafetyGrade = 'GREEN' | 'YELLOW' | 'RED';
 
+export interface RawCourtRight {
+  type?: string;
+  name?: string;
+  right_holder?: string;
+  registration_date?: string;
+  claim_amount?: number | string;
+  is_standard_right?: boolean;
+  is_extinguished?: boolean;
+  remarks?: string;
+  [key: string]: any;
+}
+
+export interface RawCourtData {
+  rights_list: RawCourtRight[];
+  remarks: string;
+  special_rights: string[];
+  tenant_registration_date?: string;
+  tenant_deposit?: number;
+  tenant_deposit_str?: string;
+  is_payout_requested?: boolean;
+  court_name?: string;
+  legal_div_no?: string;
+  failed_count?: number;
+  auction_date?: string;
+}
+
 export interface FeedItem {
   case_number: string;
   headline: string;
@@ -26,6 +52,8 @@ export interface FeedItem {
   lat?: number | null;
   lng?: number | null;
   photo_url: string;
+  photos?: string[];
+  raw_court_data?: RawCourtData;
   court_name: string;
 }
 

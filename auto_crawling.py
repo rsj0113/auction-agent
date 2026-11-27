@@ -165,8 +165,8 @@ class AuctionDBAgent:
                     case_number, location, usage, appraisal, min_bid, prev_min_bid, failed_count,
                     rights_list, tenant_registration_date, tenant_deposit, is_payout_requested,
                     ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json, last_updated, created_at, ai_model, status_flag,
-                    area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd, auction_date, remarks, special_rights, photo_url
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    area_m2, area_pyeong, floor, legal_div_no, addr_sgg, addr_emd, auction_date, remarks, special_rights, photo_url, photos
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(case_number) DO UPDATE SET
                     location=excluded.location,
                     usage=excluded.usage,
@@ -196,7 +196,8 @@ class AuctionDBAgent:
                     auction_date=excluded.auction_date,
                     remarks=coalesce(excluded.remarks, auction_items.remarks),
                     special_rights=coalesce(excluded.special_rights, auction_items.special_rights),
-                    photo_url=coalesce(nullif(excluded.photo_url, ''), auction_items.photo_url)
+                    photo_url=coalesce(nullif(excluded.photo_url, ''), auction_items.photo_url),
+                    photos=coalesce(nullif(excluded.photos, '[]'), nullif(excluded.photos, ''), auction_items.photos)
             """, (
                 item['case_number'],
                 item['location'],
@@ -228,6 +229,7 @@ class AuctionDBAgent:
                 item.get('remarks') or '',
                 item.get('special_rights') or '[]',
                 item.get('photo_url') or '',
+                item.get('photos') or '[]',
                 status_flag,
             ))
             conn.commit()
@@ -832,19 +834,20 @@ class AuctionCrawler:
             is_share=is_share_case
         )
 
-        # ── 실제 물건 감정평가서/현황 사진 파싱 및 로컬 파일 저장 (csPicLst) ──
+        # ── 실제 물건 감정평가서/현황 사진 파싱 및 로컬 파일 저장 (csPicLst 최대 10장) ──
         photo_url = ""
+        photos = []
         try:
             cs_pic_lst = dma.get('csPicLst') or []
             if not cs_pic_lst:
                 cs_pic_lst = dma2.get('csPicLst') or []
             if cs_pic_lst and isinstance(cs_pic_lst, list):
-                for p_item in cs_pic_lst:
+                for p_item in cs_pic_lst[:10]:
                     if not isinstance(p_item, dict):
                         continue
                     b64_str = (p_item.get('picFile') or '').strip()
                     cs_no_val = str(p_item.get('csNo') or '')
-                    p_seq = str(p_item.get('cortAuctnPicSeq') or '1')
+                    p_seq = str(p_item.get('cortAuctnPicSeq') or len(photos) + 1)
                     
                     if b64_str and len(b64_str) > 100:
                         clean_cs = re.sub(r'[^0-9a-zA-Z가-힣]', '_', cs_no_val) or "unknown"
@@ -862,13 +865,17 @@ class AuctionCrawler:
                                 f_img.write(img_b)
                             with open(os.path.join(dir2, filename), 'wb') as f_img:
                                 f_img.write(img_b)
-                            photo_url = f"/photos/{filename}"
-                            break
+                            saved_path = f"/photos/{filename}"
+                            photos.append(saved_path)
+                            if not photo_url:
+                                photo_url = saved_path
                         except Exception:
                             pass
                     elif p_item.get('picFileUrl') and p_item.get('picTitlNm'):
-                        photo_url = f"https://www.courtauction.go.kr{p_item['picFileUrl']}{p_item['picTitlNm']}"
-                        break
+                        ext_url = f"https://www.courtauction.go.kr{p_item['picFileUrl']}{p_item['picTitlNm']}"
+                        photos.append(ext_url)
+                        if not photo_url:
+                            photo_url = ext_url
         except Exception:
             pass
 
@@ -891,6 +898,7 @@ class AuctionCrawler:
             "min_bid": min_bid_parsed,
             "prev_min_bid": prev_min_bid_parsed,
             "photo_url": photo_url,
+            "photos": json.dumps(photos, ensure_ascii=False),
         }
 
     async def search(self, region: str = "서울", max_items: int = 5, court_code: str = "", debug_dump_path: str = "") -> list:
@@ -1647,6 +1655,7 @@ class AuctionCrawler:
                         "remarks": detail_info.get("remarks", ""),
                         "special_rights": detail_info.get("special_rights", "[]"),
                         "photo_url": detail_info.get("photo_url", ""),
+                        "photos": detail_info.get("photos", "[]"),
                     })
 
                 await browser.close()

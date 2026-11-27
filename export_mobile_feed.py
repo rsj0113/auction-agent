@@ -214,6 +214,54 @@ def generate_feed(limit: int = 100) -> list[dict]:
         else:
             photo_url = "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80"
 
+        # 다중 사진 목록 파싱 (최대 10장)
+        db_photos_raw = row.get("photos")
+        photos_list = []
+        if db_photos_raw:
+            try:
+                parsed_p = json.loads(db_photos_raw) if isinstance(db_photos_raw, str) else db_photos_raw
+                if isinstance(parsed_p, list):
+                    for p in parsed_p:
+                        if p.startswith("/"):
+                            photos_list.append(f"https://frontend-nine-gules-14.vercel.app{p}")
+                        else:
+                            photos_list.append(p)
+            except Exception:
+                pass
+        if not photos_list and photo_url:
+            photos_list = [photo_url]
+
+        # 대법원 원천 데이터 (등기부 권리내역, 임차인 정보, 매각물건명세서 비고 등)
+        rights_raw = row.get("rights_list")
+        rights_list = []
+        if rights_raw:
+            try:
+                rights_list = json.loads(rights_raw) if isinstance(rights_raw, str) else rights_raw
+            except Exception:
+                rights_list = []
+
+        special_raw = row.get("special_rights")
+        special_rights = []
+        if special_raw:
+            try:
+                special_rights = json.loads(special_raw) if isinstance(special_raw, str) else special_raw
+            except Exception:
+                special_rights = []
+
+        raw_court_data = {
+            "rights_list": rights_list if isinstance(rights_list, list) else [],
+            "remarks": row.get("remarks") or "",
+            "special_rights": special_rights if isinstance(special_rights, list) else [],
+            "tenant_registration_date": row.get("tenant_registration_date") or "",
+            "tenant_deposit": row.get("tenant_deposit") or 0,
+            "tenant_deposit_str": format_krw(row.get("tenant_deposit") or 0),
+            "is_payout_requested": bool(row.get("is_payout_requested")),
+            "court_name": row.get("court_name") or "",
+            "legal_div_no": row.get("legal_div_no") or "",
+            "failed_count": failed_count,
+            "auction_date": auction_date_str,
+        }
+
         item = {
             "case_number": case_no,
             "headline": headline,
@@ -244,6 +292,8 @@ def generate_feed(limit: int = 100) -> list[dict]:
             "lat": lat,
             "lng": lng,
             "photo_url": photo_url,
+            "photos": photos_list,
+            "raw_court_data": raw_court_data,
             "court_name": row.get("court_name") or ""
         }
         feed_items.append(item)

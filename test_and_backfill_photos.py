@@ -151,15 +151,15 @@ async def fetch_photos_for_feed():
                 dma = (res.get("data") or {}).get("dma_result") or {}
                 pic_list = dma.get("csPicLst") or []
 
-                photo_saved = False
+                photos = []
                 photo_rel_url = ""
 
                 if pic_list and isinstance(pic_list, list):
-                    for p_item in pic_list:
+                    for p_item in pic_list[:10]:
                         if not isinstance(p_item, dict):
                             continue
                         b64_str = (p_item.get("picFile") or "").strip()
-                        p_seq = str(p_item.get("cortAuctnPicSeq") or "1")
+                        p_seq = str(p_item.get("cortAuctnPicSeq") or len(photos) + 1)
 
                         if b64_str and len(b64_str) > 100:
                             clean_cs = re.sub(r'[^0-9a-zA-Z가-힣]', '_', case_no)
@@ -175,24 +175,27 @@ async def fetch_photos_for_feed():
                                 with open(path2, "wb") as f2:
                                     f2.write(img_bytes)
 
-                                photo_rel_url = f"/photos/{filename}"
-                                photo_saved = True
-                                break
+                                saved_path = f"/photos/{filename}"
+                                photos.append(saved_path)
+                                if not photo_rel_url:
+                                    photo_rel_url = saved_path
                             except Exception as e_dec:
                                 pass
                         elif p_item.get("picFileUrl") and p_item.get("picTitlNm"):
-                            photo_rel_url = f"https://www.courtauction.go.kr{p_item['picFileUrl']}{p_item['picTitlNm']}"
-                            photo_saved = True
-                            break
+                            ext_url = f"https://www.courtauction.go.kr{p_item['picFileUrl']}{p_item['picTitlNm']}"
+                            photos.append(ext_url)
+                            if not photo_rel_url:
+                                photo_rel_url = ext_url
 
-                if photo_saved and photo_rel_url:
+                if photos:
+                    photos_json = json.dumps(photos, ensure_ascii=False)
                     cursor.execute(
-                        "UPDATE auction_items SET photo_url = ? WHERE case_number = ?",
-                        (photo_rel_url, case_no)
+                        "UPDATE auction_items SET photo_url = ?, photos = ? WHERE case_number = ?",
+                        (photo_rel_url, photos_json, case_no)
                     )
                     conn.commit()
                     success_count += 1
-                    print(f"✅ 사진 확보 완료 ({photo_rel_url})")
+                    print(f"✅ 사진 확보 완료 ({len(photos)}장, 메인: {photo_rel_url})")
                 else:
                     failed_count += 1
                     print("⚠️ 사진 없음 (API에 미등록/미제공)")
