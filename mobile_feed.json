@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-27 17:58:40",
+  "generated_at": "2026-11-27 18:56:42",
   "total_count": 145,
   "green_count": 32,
   "yellow_count": 46,
@@ -9,7 +9,7 @@
   "items": [
     {
       "case_number": "2023타경71728",
-      "headline": "진접읍 빌라가 반값? 감정가보다 38.8억 싼 이유",
+      "headline": "경기 남양주시 진접읍 빌라가 반값? 감정가보다 38.8억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 3882870000,
@@ -25,7 +25,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 남양주시 진접읍",
+        "📍 경기 남양주시 진접읍",
         "보증금 2억"
       ],
       "min_bid": 2027130000,
@@ -38,7 +38,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 남양주시 진접읍 장현천로 186 1층101호 (라포레힐)",
-      "short_location": "남양주시 진접읍",
+      "short_location": "경기 남양주시 진접읍",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261209",
@@ -168,7 +168,7 @@
     },
     {
       "case_number": "2024타경109310",
-      "headline": "호계동 아파트, 감정가보다 3.5억 싼데 인수금 0원",
+      "headline": "경기 안양시 동안구 호계동 아파트, 감정가보다 3.5억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 352800000,
@@ -184,7 +184,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 안양시 동안구 호계동",
+        "📍 경기 안양시 동안구 호계동",
         "보증금 6,272만"
       ],
       "min_bid": 627200000,
@@ -197,7 +197,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "경기도 안양시 동안구 경수대로 430 113동 3층302호 (호계동,호계이-편한세상아파트)",
-      "short_location": "안양시 동안구 호계동",
+      "short_location": "경기 안양시 동안구 호계동",
       "floor": 3,
       "failed_count": 2,
       "auction_date": "20261201",
@@ -302,7 +302,7 @@
     },
     {
       "case_number": "2023타경59626",
-      "headline": "마장동 빌라 -36% 급락! 고수가 노리는 이유",
+      "headline": "서울 성동구 마장동 빌라 -36% 급락! 고수가 노리는 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 243720000,
@@ -318,7 +318,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 성동구 마장동",
+        "📍 서울 성동구 마장동",
         "보증금 4,332만"
       ],
       "min_bid": 433280000,
@@ -331,7 +331,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 성동구 마장로44길 19 지1층비101호 (마장동,마장동청계아르테미스)",
-      "short_location": "성동구 마장동",
+      "short_location": "서울 성동구 마장동",
       "floor": -1,
       "failed_count": 2,
       "auction_date": "20261207",
@@ -461,7 +461,7 @@
     },
     {
       "case_number": "2022타경6191",
-      "headline": "와동동 아파트, 감정가보다 1.6억 싼데 인수금 0원",
+      "headline": "경기 파주시 와동동 아파트, 감정가보다 1.6억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 164700000,
@@ -477,7 +477,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 파주시 와동동",
+        "📍 경기 파주시 와동동",
         "보증금 3,843만"
       ],
       "min_bid": 384300000,
@@ -490,7 +490,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "경기도 파주시 가람로 70 409동 13층1301호 (와동동,가람마을4단지한양수자인)",
-      "short_location": "파주시 와동동",
+      "short_location": "경기 파주시 와동동",
       "floor": 13,
       "failed_count": 1,
       "auction_date": "20261208",
@@ -595,7 +595,7 @@
     },
     {
       "case_number": "2025타경1543",
-      "headline": "안양동 25평 빌라, 감정가보다 7,620만 저렴하게",
+      "headline": "경기 안양시 만안구 안양동 25평 빌라, 감정가보다 7,620만 저렴하게",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 76200000,
@@ -611,7 +611,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 안양시 만안구 안양동",
+        "📍 경기 안양시 만안구 안양동",
         "보증금 3,048만"
       ],
       "min_bid": 304800000,
@@ -624,7 +624,7 @@
       "usage": "빌라",
       "area_pyeong": 25.2,
       "location": "경기도 안양시 만안구 안양동 517-12 제나시티 4층402호",
-      "short_location": "안양시 만안구 안양동",
+      "short_location": "경기 안양시 만안구 안양동",
       "floor": 4,
       "failed_count": 1,
       "auction_date": "20261201",
@@ -721,7 +721,7 @@
     },
     {
       "case_number": "2022타경121060",
-      "headline": "신정동 빌라, 감정가보다 0원 저렴하게",
+      "headline": "서울 양천구 신정동 빌라, 신건 첫 입찰 (2.5억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -737,7 +737,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 양천구 신정동",
+        "📍 서울 양천구 신정동",
         "보증금 2,530만"
       ],
       "min_bid": 253000000,
@@ -750,7 +750,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 양천구 목동로11길 45 제5층 제501호 (신정동, 아인스빌1)",
-      "short_location": "양천구 신정동",
+      "short_location": "서울 양천구 신정동",
       "floor": 5,
       "failed_count": 0,
       "auction_date": "20261201",
@@ -842,7 +842,7 @@
     },
     {
       "case_number": "2025타경1697",
-      "headline": "임차인 0명 · 안양동 빌라, 3억에 깔끔하게 시작",
+      "headline": "임차인 0명 · 경기 안양시 만안구 안양동 빌라, 3억에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 0,
@@ -858,7 +858,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 안양시 만안구 안양동",
+        "📍 경기 안양시 만안구 안양동",
         "보증금 3,040만"
       ],
       "min_bid": 304000000,
@@ -871,7 +871,7 @@
       "usage": "빌라",
       "area_pyeong": 20.9,
       "location": "경기도 안양시 만안구 안양동 518-1 부성파인스위트 6층602호",
-      "short_location": "안양시 만안구 안양동",
+      "short_location": "경기 안양시 만안구 안양동",
       "floor": 6,
       "failed_count": 0,
       "auction_date": "20261201",
@@ -959,7 +959,7 @@
     },
     {
       "case_number": "2025타경1888",
-      "headline": "임차인 0명 · 별양동 빌라, 9.6억에 깔끔하게 시작",
+      "headline": "임차인 0명 · 경기 과천시 별양동 빌라, 9.6억에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 0,
@@ -975,7 +975,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 과천시 별양동",
+        "📍 경기 과천시 별양동",
         "보증금 9,600만"
       ],
       "min_bid": 960000000,
@@ -988,7 +988,7 @@
       "usage": "빌라",
       "area_pyeong": 33.1,
       "location": "경기도 과천시 별양동 47-5 3층301호",
-      "short_location": "과천시 별양동",
+      "short_location": "경기 과천시 별양동",
       "floor": 3,
       "failed_count": 0,
       "auction_date": "20261201",
@@ -1086,7 +1086,7 @@
     },
     {
       "case_number": "2023타경5380",
-      "headline": "회기동 빌라가 반값? 감정가보다 19.5억 싼 이유",
+      "headline": "서울 동대문구 회기동 빌라가 반값? 감정가보다 19.5억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 1949728000,
@@ -1102,7 +1102,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 동대문구 회기동",
+        "📍 서울 동대문구 회기동",
         "보증금 9,502만"
       ],
       "min_bid": 950272000,
@@ -1115,7 +1115,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 동대문구 회기로 163 지1층비01호",
-      "short_location": "동대문구 회기동",
+      "short_location": "서울 동대문구 회기동",
       "floor": -1,
       "failed_count": 10,
       "auction_date": "20261201",
@@ -1254,7 +1254,7 @@
     },
     {
       "case_number": "2023타경127584",
-      "headline": "가산동 빌라가 반값? 감정가보다 2.2억 싼 이유",
+      "headline": "서울 금천구 가산동 빌라가 반값? 감정가보다 2.2억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 220774000,
@@ -1270,7 +1270,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 금천구 가산동",
+        "📍 서울 금천구 가산동",
         "보증금 342만"
       ],
       "min_bid": 34226000,
@@ -1283,7 +1283,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 금천구 가산디지털2로 169-41 제2층 제203호 (가산동, 이지크라운)",
-      "short_location": "금천구 가산동",
+      "short_location": "서울 금천구 가산동",
       "floor": 2,
       "failed_count": 9,
       "auction_date": "20261204",
@@ -1418,7 +1418,7 @@
     },
     {
       "case_number": "2025타경100859",
-      "headline": "학의동 빌라가 반값? 감정가보다 3.2억 싼 이유",
+      "headline": "경기 의왕시 학의동 빌라가 반값? 감정가보다 3.2억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 320697000,
@@ -1434,7 +1434,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 의왕시 학의동",
+        "📍 경기 의왕시 학의동",
         "보증금 1,563만"
       ],
       "min_bid": 156303000,
@@ -1447,7 +1447,7 @@
       "usage": "빌라",
       "area_pyeong": 20.6,
       "location": "경기도 의왕시 학의동 113 다원씨앤아이 에이동 1층101호",
-      "short_location": "의왕시 학의동",
+      "short_location": "경기 의왕시 학의동",
       "floor": 1,
       "failed_count": 8,
       "auction_date": "20261201",
@@ -1571,7 +1571,7 @@
     },
     {
       "case_number": "2025타경100969",
-      "headline": "도마교동 빌라가 반값? 감정가보다 7.6억 싼 이유",
+      "headline": "경기 군포시 도마교동 빌라가 반값? 감정가보다 7.6억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 764996000,
@@ -1587,7 +1587,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 군포시 도마교동",
+        "📍 경기 군포시 도마교동",
         "보증금 2,030만"
       ],
       "min_bid": 203004000,
@@ -1600,7 +1600,7 @@
       "usage": "빌라",
       "area_pyeong": 16.0,
       "location": "경기도 군포시 도마교동 478 군포송정풍산리치안 1층에이112호",
-      "short_location": "군포시 도마교동",
+      "short_location": "경기 군포시 도마교동",
       "floor": 1,
       "failed_count": 7,
       "auction_date": "20261201",
@@ -1720,7 +1720,7 @@
     },
     {
       "case_number": "2023타경1210",
-      "headline": "상봉동 빌라, 감정가보다 2,960만 저렴하게",
+      "headline": "서울 중랑구 상봉동 빌라, 감정가보다 2,960만 저렴하게",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 29600000,
@@ -1736,7 +1736,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 중랑구 상봉동",
+        "📍 서울 중랑구 상봉동",
         "보증금 1,184만"
       ],
       "min_bid": 118400000,
@@ -1749,7 +1749,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 중랑구 중랑천로10길 87-14 3층301호 (상봉동,힐하우스)",
-      "short_location": "중랑구 상봉동",
+      "short_location": "서울 중랑구 상봉동",
       "floor": 3,
       "failed_count": 7,
       "auction_date": "20261208",
@@ -1872,7 +1872,7 @@
     },
     {
       "case_number": "2023타경61278",
-      "headline": "36% 떨어진 성내동 빌라, 1.3억대 노려볼까?",
+      "headline": "36% 떨어진 서울 강동구 성내동 빌라, 1.3억대 노려볼까?",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 73080000,
@@ -1888,7 +1888,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 강동구 성내동",
+        "📍 서울 강동구 성내동",
         "보증금 1,299만"
       ],
       "min_bid": 129920000,
@@ -1901,7 +1901,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 강동구 성내로 64 2층206호 (성내동,에스아이팰리스센트럴성내)",
-      "short_location": "강동구 성내동",
+      "short_location": "서울 강동구 성내동",
       "floor": 2,
       "failed_count": 6,
       "auction_date": "20261130",
@@ -2030,7 +2030,7 @@
     },
     {
       "case_number": "2022타경59047",
-      "headline": "정자동 빌라가 반값? 감정가보다 3.7억 싼 이유",
+      "headline": "경기 성남시 분당구 정자동 빌라가 반값? 감정가보다 3.7억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 369705000,
@@ -2046,7 +2046,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 성남시 분당구 정자동",
+        "📍 경기 성남시 분당구 정자동",
         "보증금 492만"
       ],
       "min_bid": 49295000,
@@ -2059,7 +2059,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 성남시 분당구 불정로 112 1층에이123호 (정자동,피더하우스)",
-      "short_location": "성남시 분당구 정자동",
+      "short_location": "경기 성남시 분당구 정자동",
       "floor": 1,
       "failed_count": 6,
       "auction_date": "20261207",
@@ -2189,7 +2189,7 @@
     },
     {
       "case_number": "2023타경4462",
-      "headline": "창동 빌라가 반값? 감정가보다 6,494만 싼 이유",
+      "headline": "서울 도봉구 창동 빌라가 반값? 감정가보다 6,494만 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 64944000,
@@ -2205,7 +2205,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 도봉구 창동",
+        "📍 서울 도봉구 창동",
         "보증금 450만"
       ],
       "min_bid": 45056000,
@@ -2218,7 +2218,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 도봉구 도봉로110아길 57-14 4층401호",
-      "short_location": "도봉구 창동",
+      "short_location": "서울 도봉구 창동",
       "floor": 4,
       "failed_count": 4,
       "auction_date": "20261201",
@@ -2357,7 +2357,7 @@
     },
     {
       "case_number": "2024타경1596",
-      "headline": "연희동 아파트가 반값? 감정가보다 1.3억 싼 이유",
+      "headline": "서울 서대문구 연희동 아파트가 반값? 감정가보다 1.3억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 129888000,
@@ -2373,7 +2373,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 서대문구 연희동",
+        "📍 서울 서대문구 연희동",
         "보증금 901만"
       ],
       "min_bid": 90112000,
@@ -2386,7 +2386,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "서울특별시 서대문구 연희로10길 79-20 지2층비201호 (연희동,스카이뷰)",
-      "short_location": "서대문구 연희동",
+      "short_location": "서울 서대문구 연희동",
       "floor": -2,
       "failed_count": 4,
       "auction_date": "20261208",
@@ -2516,7 +2516,7 @@
     },
     {
       "case_number": "2024타경3418",
-      "headline": "구로동 아파트가 반값? 감정가보다 8.2억 싼 이유",
+      "headline": "서울 구로구 구로동 아파트가 반값? 감정가보다 8.2억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 821255000,
@@ -2532,7 +2532,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 구로구 구로동",
+        "📍 서울 구로구 구로동",
         "보증금 8,616만"
       ],
       "min_bid": 861645000,
@@ -2545,7 +2545,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "서울특별시 구로구 구로중앙로 134 제지하1층 제비1가009호 (구로동, 신구로자이 나인스에비뉴)",
-      "short_location": "구로구 구로동",
+      "short_location": "서울 구로구 구로동",
       "floor": -1,
       "failed_count": 3,
       "auction_date": "20261201",
@@ -2676,7 +2676,7 @@
     },
     {
       "case_number": "2023타경19",
-      "headline": "상계동 빌라, 감정가보다 0원 저렴하게",
+      "headline": "서울 노원구 상계동 빌라, 신건 첫 입찰 (2.1억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -2692,7 +2692,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 노원구 상계동",
+        "📍 서울 노원구 상계동",
         "보증금 2,120만"
       ],
       "min_bid": 212000000,
@@ -2705,7 +2705,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 노원구 노해로 494 지하1층5-1호",
-      "short_location": "노원구 상계동",
+      "short_location": "서울 노원구 상계동",
       "floor": -1,
       "failed_count": 0,
       "auction_date": "20261201",
@@ -2800,7 +2800,7 @@
     },
     {
       "case_number": "2025타경51951",
-      "headline": "삼평동 빌라가 반값? 감정가보다 2.4억 싼 이유",
+      "headline": "경기 성남시 분당구 삼평동 빌라가 반값? 감정가보다 2.4억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 236470000,
@@ -2816,7 +2816,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 성남시 분당구 삼평동",
+        "📍 경기 성남시 분당구 삼평동",
         "보증금 315만"
       ],
       "min_bid": 31530000,
@@ -2829,7 +2829,7 @@
       "usage": "빌라",
       "area_pyeong": 332.7,
       "location": "경기도 성남시 분당구 삼평동 713 천석미래로주건축물제1동 4층425호",
-      "short_location": "성남시 분당구 삼평동",
+      "short_location": "경기 성남시 분당구 삼평동",
       "floor": 4,
       "failed_count": 6,
       "auction_date": "20261026",
@@ -2954,7 +2954,7 @@
     },
     {
       "case_number": "2024타경1699",
-      "headline": "동선동1가 빌라가 반값? 감정가보다 2.9억 싼 이유",
+      "headline": "서울 성북구 동선동1가 빌라가 반값? 감정가보다 2.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 294964000,
@@ -2970,7 +2970,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 성북구 동선동1가",
+        "📍 서울 성북구 동선동1가",
         "보증금 2,046만"
       ],
       "min_bid": 204636000,
@@ -2983,7 +2983,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 성북구 동소문로20나길 47 지하2층비207호 (동선동1가,코아루센타시아)",
-      "short_location": "성북구 동선동1가",
+      "short_location": "서울 성북구 동선동1가",
       "floor": -2,
       "failed_count": 4,
       "auction_date": "20261124",
@@ -3115,7 +3115,7 @@
     },
     {
       "case_number": "2024타경2920",
-      "headline": "동선동1가 빌라가 반값? 감정가보다 9,092만 싼 이유",
+      "headline": "서울 성북구 동선동1가 빌라가 반값? 감정가보다 9,092만 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 90922000,
@@ -3131,7 +3131,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 성북구 동선동1가",
+        "📍 서울 성북구 동선동1가",
         "보증금 630만"
       ],
       "min_bid": 63078000,
@@ -3144,7 +3144,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 성북구 동소문로20나길 47 지하2층비208호 (동선동1가,코아루센타시아)",
-      "short_location": "성북구 동선동1가",
+      "short_location": "서울 성북구 동선동1가",
       "floor": -2,
       "failed_count": 4,
       "auction_date": "20261124",
@@ -3264,7 +3264,7 @@
     },
     {
       "case_number": "2025타경52919",
-      "headline": "성남동 빌라가 반값? 감정가보다 6.6억 싼 이유",
+      "headline": "경기 성남시 중원구 성남동 빌라가 반값? 감정가보다 6.6억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 663000000,
@@ -3280,7 +3280,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 성남시 중원구 성남동",
+        "📍 경기 성남시 중원구 성남동",
         "보증금 6,370만"
       ],
       "min_bid": 637000000,
@@ -3293,7 +3293,7 @@
       "usage": "빌라",
       "area_pyeong": 467.1,
       "location": "경기도 성남시 중원구 성남동 4933 성남아리스타 1층 130호",
-      "short_location": "성남시 중원구 성남동",
+      "short_location": "경기 성남시 중원구 성남동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261026",
@@ -3401,7 +3401,7 @@
     },
     {
       "case_number": "2025타경52824",
-      "headline": "성남동 467평 빌라, 지금 9.1억에 나왔다 (3.9억 할인)",
+      "headline": "경기 성남시 중원구 성남동 467평 빌라, 지금 9.1억에 나왔다 (3.9억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 390000000,
@@ -3417,7 +3417,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 성남시 중원구 성남동",
+        "📍 경기 성남시 중원구 성남동",
         "보증금 9,100만"
       ],
       "min_bid": 910000000,
@@ -3430,7 +3430,7 @@
       "usage": "빌라",
       "area_pyeong": 467.1,
       "location": "경기도 성남시 중원구 성남동 4933 성남아리스타 1층123호",
-      "short_location": "성남시 중원구 성남동",
+      "short_location": "경기 성남시 중원구 성남동",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "20261026",
@@ -3528,7 +3528,7 @@
     },
     {
       "case_number": "2026타경115",
-      "headline": "고등동 13평 빌라, 지금 7.6억에 나왔다 (3.2억 할인)",
+      "headline": "경기 성남시 수정구 고등동 13평 빌라, 지금 7.6억에 나왔다 (3.2억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 324600000,
@@ -3544,7 +3544,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 성남시 수정구 고등동",
+        "📍 경기 성남시 수정구 고등동",
         "보증금 7,574만"
       ],
       "min_bid": 757400000,
@@ -3557,7 +3557,7 @@
       "usage": "빌라",
       "area_pyeong": 12.7,
       "location": "경기도 성남시 수정구 고등동 593 더판교이룸 2층202호",
-      "short_location": "성남시 수정구 고등동",
+      "short_location": "경기 성남시 수정구 고등동",
       "floor": 2,
       "failed_count": 1,
       "auction_date": "20261026",
@@ -3656,7 +3656,7 @@
     },
     {
       "case_number": "2023타경80356",
-      "headline": "야당동 빌라, 감정가보다 2억 싼데 인수금 0원",
+      "headline": "경기 파주시 야당동 빌라, 감정가보다 2억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 202200000,
@@ -3672,7 +3672,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 파주시 야당동",
+        "📍 경기 파주시 야당동",
         "보증금 4,718만"
       ],
       "min_bid": 471800000,
@@ -3685,7 +3685,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 파주시 미래로 422 108동 7층701호 (야당동,한빛마을1단지한라비발디센트럴파크)",
-      "short_location": "파주시 야당동",
+      "short_location": "경기 파주시 야당동",
       "floor": 7,
       "failed_count": 1,
       "auction_date": "20261110",
@@ -3787,7 +3787,7 @@
     },
     {
       "case_number": "2023타경101582",
-      "headline": "구로동 빌라가 반값? 감정가보다 7,084만 싼 이유",
+      "headline": "서울 구로구 구로동 빌라가 반값? 감정가보다 7,084만 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 70848000,
@@ -3803,7 +3803,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 구로구 구로동",
+        "📍 서울 구로구 구로동",
         "보증금 491만"
       ],
       "min_bid": 49152000,
@@ -3816,7 +3816,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 구로구 가마산로26길 5 제9층 제903호 (구로동, 로제리움2차)",
-      "short_location": "구로구 구로동",
+      "short_location": "서울 구로구 구로동",
       "floor": 9,
       "failed_count": 4,
       "auction_date": "20261119",
@@ -3945,7 +3945,7 @@
     },
     {
       "case_number": "2024타경3528",
-      "headline": "신당동 빌라가 반값? 감정가보다 1.4억 싼 이유",
+      "headline": "서울 중구 신당동 빌라가 반값? 감정가보다 1.4억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 137616000,
@@ -3961,7 +3961,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 중구 신당동",
+        "📍 서울 중구 신당동",
         "보증금 1,443만"
       ],
       "min_bid": 144384000,
@@ -3974,7 +3974,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 중구 청계천로 334 2층나-36호",
-      "short_location": "중구 신당동",
+      "short_location": "서울 중구 신당동",
       "floor": 2,
       "failed_count": 3,
       "auction_date": "20261028",
@@ -4098,7 +4098,7 @@
     },
     {
       "case_number": "2024타경105103",
-      "headline": "경기도 안양시 빌라, 감정가보다 0원 저렴하게",
+      "headline": "경기 안양시 동안구 비산동 빌라, 신건 첫 입찰 (3.2억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -4114,7 +4114,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 경기도 안양시",
+        "📍 경기 안양시 동안구 비산동",
         "보증금 3,230만"
       ],
       "min_bid": 323000000,
@@ -4127,7 +4127,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 안양시 동안구 경수대로 947 2층211호 (비산동,비산화성파크드림)",
-      "short_location": "경기도 안양시",
+      "short_location": "경기 안양시 동안구 비산동",
       "floor": 2,
       "failed_count": 1,
       "auction_date": "",
@@ -4201,7 +4201,7 @@
     },
     {
       "case_number": "2023타경6041",
-      "headline": "경기도 안산시 빌라, 감정가보다 0원 저렴하게",
+      "headline": "경기 안산시 단원구 선부동 빌라, 신건 첫 입찰 (1.6억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -4217,7 +4217,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 경기도 안산시",
+        "📍 경기 안산시 단원구 선부동",
         "보증금 1,580만"
       ],
       "min_bid": 158000000,
@@ -4230,7 +4230,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 안산시 단원구 화정천서로2길 5 3층301호 (선부동,도원스위트빌3차)",
-      "short_location": "경기도 안산시",
+      "short_location": "경기 안산시 단원구 선부동",
       "floor": 3,
       "failed_count": 1,
       "auction_date": "",
@@ -4304,7 +4304,7 @@
     },
     {
       "case_number": "2023타경106702",
-      "headline": "임차인 0명 · 중계동 아파트, 15억에 깔끔하게 시작",
+      "headline": "임차인 0명 · 서울 노원구 중계동 아파트, 15억에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 0,
@@ -4320,7 +4320,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 노원구 중계동",
+        "📍 서울 노원구 중계동",
         "보증금 1.5억"
       ],
       "min_bid": 1500000000,
@@ -4333,7 +4333,7 @@
       "usage": "아파트",
       "area_pyeong": 40.8,
       "location": "서울특별시 노원구 중계로 195 108동 11층1103호 (중계동,동진,신안아파트)",
-      "short_location": "노원구 중계동",
+      "short_location": "서울 노원구 중계동",
       "floor": 11,
       "failed_count": 1,
       "auction_date": "20261103",
@@ -4422,7 +4422,7 @@
     },
     {
       "case_number": "2024타경108231",
-      "headline": "하계동 아파트, 감정가보다 2억 싼데 인수금 0원",
+      "headline": "서울 노원구 하계동 아파트, 감정가보다 2억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 198000000,
@@ -4438,7 +4438,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 노원구 하계동",
+        "📍 서울 노원구 하계동",
         "보증금 7,920만"
       ],
       "min_bid": 792000000,
@@ -4451,7 +4451,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "서울특별시 노원구 한글비석로 151 5동 6층608호 (하계동,한신.동성아파트)",
-      "short_location": "노원구 하계동",
+      "short_location": "서울 노원구 하계동",
       "floor": 6,
       "failed_count": 1,
       "auction_date": "20261110",
@@ -4544,7 +4544,7 @@
     },
     {
       "case_number": "2023타경116126",
-      "headline": "임차인 0명 · 내발산동 빌라, 8,000만에 깔끔하게 시작",
+      "headline": "임차인 0명 · 서울 강서구 내발산동 빌라, 8,000만에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 20000000,
@@ -4560,7 +4560,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 강서구 내발산동",
+        "📍 서울 강서구 내발산동",
         "보증금 800만"
       ],
       "min_bid": 80000000,
@@ -4573,7 +4573,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 강서구 강서로47라길 19-5 제지하층 제4호",
-      "short_location": "강서구 내발산동",
+      "short_location": "서울 강서구 내발산동",
       "floor": -1,
       "failed_count": 1,
       "auction_date": "20261118",
@@ -4671,7 +4671,7 @@
     },
     {
       "case_number": "2023타경117444",
-      "headline": "평창동 빌라, 감정가보다 1.3억 싼데 인수금 0원",
+      "headline": "서울 종로구 평창동 빌라, 감정가보다 1.3억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 130000000,
@@ -4687,7 +4687,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 종로구 평창동",
+        "📍 서울 종로구 평창동",
         "보증금 5,200만"
       ],
       "min_bid": 520000000,
@@ -4700,7 +4700,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 종로구 평창1길 7-3 4층402호",
-      "short_location": "종로구 평창동",
+      "short_location": "서울 종로구 평창동",
       "floor": 4,
       "failed_count": 1,
       "auction_date": "20261126",
@@ -4784,7 +4784,7 @@
     },
     {
       "case_number": "2023타경5663",
-      "headline": "임차인 0명 · 회기동 빌라, 15.5억에 깔끔하게 시작",
+      "headline": "임차인 0명 · 서울 동대문구 회기동 빌라, 15.5억에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 0,
@@ -4800,7 +4800,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 동대문구 회기동",
+        "📍 서울 동대문구 회기동",
         "보증금 1.6억"
       ],
       "min_bid": 1551758000,
@@ -4813,7 +4813,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 동대문구 회기로 163 제4층 제지상4층호",
-      "short_location": "동대문구 회기동",
+      "short_location": "서울 동대문구 회기동",
       "floor": 4,
       "failed_count": 0,
       "auction_date": "20261103",
@@ -4932,7 +4932,7 @@
     },
     {
       "case_number": "2021타경2442",
-      "headline": "임차인 0명 · 송파동 빌라, 5.8억에 깔끔하게 시작",
+      "headline": "임차인 0명 · 서울 송파구 송파동 빌라, 5.8억에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 0,
@@ -4948,7 +4948,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 송파구 송파동",
+        "📍 서울 송파구 송파동",
         "보증금 5,750만"
       ],
       "min_bid": 575000000,
@@ -4961,7 +4961,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 송파구 백제고분로42길 14-19 4층402호",
-      "short_location": "송파구 송파동",
+      "short_location": "서울 송파구 송파동",
       "floor": 4,
       "failed_count": 0,
       "auction_date": "20261123",
@@ -5041,7 +5041,7 @@
     },
     {
       "case_number": "2023타경115973",
-      "headline": "장안동 아파트, 감정가보다 0원 저렴하게",
+      "headline": "서울 동대문구 장안동 아파트, 신건 첫 입찰 (12.3억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -5057,7 +5057,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 동대문구 장안동",
+        "📍 서울 동대문구 장안동",
         "보증금 1.2억"
       ],
       "min_bid": 1227000000,
@@ -5070,7 +5070,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "서울특별시 동대문구 장안벚꽃로 167 202동 19층1901호 (장안동,래미안장안2차아파트)",
-      "short_location": "동대문구 장안동",
+      "short_location": "서울 동대문구 장안동",
       "floor": 19,
       "failed_count": 0,
       "auction_date": "20261124",
@@ -5150,7 +5150,7 @@
     },
     {
       "case_number": "2023타경120378",
-      "headline": "임차인 0명 · 목동 빌라, 3.4억에 깔끔하게 시작",
+      "headline": "임차인 0명 · 서울 양천구 목동 빌라, 3.4억에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 0,
@@ -5166,7 +5166,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 양천구 목동",
+        "📍 서울 양천구 목동",
         "보증금 3,380만"
       ],
       "min_bid": 338000000,
@@ -5179,7 +5179,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 양천구 목동중앙남로3길 23-6 제4층 제401호",
-      "short_location": "양천구 목동",
+      "short_location": "서울 양천구 목동",
       "floor": 4,
       "failed_count": 0,
       "auction_date": "20261126",
@@ -5282,7 +5282,7 @@
     },
     {
       "case_number": "2023타경104819",
-      "headline": "독산동 빌라가 반값? 감정가보다 2.1억 싼 이유",
+      "headline": "서울 금천구 독산동 빌라가 반값? 감정가보다 2.1억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 212982400,
@@ -5298,7 +5298,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 금천구 독산동",
+        "📍 서울 금천구 독산동",
         "보증금 330만"
       ],
       "min_bid": 33017600,
@@ -5311,7 +5311,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 금천구 시흥대로150길 11-9 제2층 제202호 (독산동, 엠에스 빌)",
-      "short_location": "금천구 독산동",
+      "short_location": "서울 금천구 독산동",
       "floor": 2,
       "failed_count": 24,
       "auction_date": "20261126",
@@ -5431,7 +5431,7 @@
     },
     {
       "case_number": "2023타경102448",
-      "headline": "방화동 아파트가 반값? 감정가보다 1.5억 싼 이유",
+      "headline": "서울 강서구 방화동 아파트가 반값? 감정가보다 1.5억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 150304000,
@@ -5447,7 +5447,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 강서구 방화동",
+        "📍 서울 강서구 방화동",
         "보증금 1,576만"
       ],
       "min_bid": 157696000,
@@ -5460,7 +5460,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "서울특별시 강서구 방화동로14길 12 제103동 제4층 제402호 (방화동, 리치펠리스)",
-      "short_location": "강서구 방화동",
+      "short_location": "서울 강서구 방화동",
       "floor": 4,
       "failed_count": 14,
       "auction_date": "20261117",
@@ -5599,7 +5599,7 @@
     },
     {
       "case_number": "2024타경50369",
-      "headline": "대조동 빌라가 반값? 감정가보다 3.3억 싼 이유",
+      "headline": "서울 은평구 대조동 빌라가 반값? 감정가보다 3.3억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 329549000,
@@ -5615,7 +5615,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 은평구 대조동",
+        "📍 서울 은평구 대조동",
         "보증금 874만"
       ],
       "min_bid": 87451000,
@@ -5628,7 +5628,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 은평구 역말로9길 24-26 3층303호 (대조동,대고샤인빌)",
-      "short_location": "은평구 대조동",
+      "short_location": "서울 은평구 대조동",
       "floor": 3,
       "failed_count": 13,
       "auction_date": "20261117",
@@ -5753,7 +5753,7 @@
     },
     {
       "case_number": "2022타경55849",
-      "headline": "성내동 빌라, 지금 1.9억에 나왔다 (1억 할인)",
+      "headline": "서울 강동구 성내동 빌라, 지금 1.9억에 나왔다 (1억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 104400000,
@@ -5769,7 +5769,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 강동구 성내동",
+        "📍 서울 강동구 성내동",
         "보증금 1,856만"
       ],
       "min_bid": 185600000,
@@ -5782,7 +5782,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 강동구 성내로6다길 89 2층202호 (성내동,금강블루빌)",
-      "short_location": "강동구 성내동",
+      "short_location": "서울 강동구 성내동",
       "floor": 2,
       "failed_count": 10,
       "auction_date": "20261102",
@@ -5900,7 +5900,7 @@
     },
     {
       "case_number": "2023타경3265",
-      "headline": "홍익동 빌라가 반값? 감정가보다 2.2억 싼 이유",
+      "headline": "서울 성동구 홍익동 빌라가 반값? 감정가보다 2.2억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 221640000,
@@ -5916,7 +5916,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 성동구 홍익동",
+        "📍 서울 성동구 홍익동",
         "보증금 343만"
       ],
       "min_bid": 34360000,
@@ -5929,7 +5929,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 성동구 무학로8길 14 2층201호 (홍익동,애드하우징)",
-      "short_location": "성동구 홍익동",
+      "short_location": "서울 성동구 홍익동",
       "floor": 2,
       "failed_count": 9,
       "auction_date": "20261123",
@@ -6059,7 +6059,7 @@
     },
     {
       "case_number": "2024타경54958",
-      "headline": "구산동 빌라가 반값? 감정가보다 2.1억 싼 이유",
+      "headline": "서울 은평구 구산동 빌라가 반값? 감정가보다 2.1억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 207845000,
@@ -6075,7 +6075,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 은평구 구산동",
+        "📍 서울 은평구 구산동",
         "보증금 551만"
       ],
       "min_bid": 55155000,
@@ -6088,7 +6088,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 은평구 연서로11길 25 2층201호 (구산동,카리스글로리아)",
-      "short_location": "은평구 구산동",
+      "short_location": "서울 은평구 구산동",
       "floor": 2,
       "failed_count": 7,
       "auction_date": "20261110",
@@ -6217,7 +6217,7 @@
     },
     {
       "case_number": "2024타경2612",
-      "headline": "구산동 빌라가 반값? 감정가보다 1.5억 싼 이유",
+      "headline": "서울 은평구 구산동 빌라가 반값? 감정가보다 1.5억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 146202000,
@@ -6233,7 +6233,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 은평구 구산동",
+        "📍 서울 은평구 구산동",
         "보증금 387만"
       ],
       "min_bid": 38798000,
@@ -6246,7 +6246,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 은평구 연서로15길 28 2층202호 (구산동,가온리즈빌)",
-      "short_location": "은평구 구산동",
+      "short_location": "서울 은평구 구산동",
       "floor": 2,
       "failed_count": 7,
       "auction_date": "20261117",
@@ -6364,7 +6364,7 @@
     },
     {
       "case_number": "2023타경5165",
-      "headline": "독산동 빌라가 반값? 감정가보다 2.7억 싼 이유",
+      "headline": "서울 금천구 독산동 빌라가 반값? 감정가보다 2.7억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 273006000,
@@ -6380,7 +6380,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 금천구 독산동",
+        "📍 서울 금천구 독산동",
         "보증금 969만"
       ],
       "min_bid": 96994000,
@@ -6393,7 +6393,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 금천구 문성로 48 제103동 제4층 제401호 (독산동, 라온하우스)",
-      "short_location": "금천구 독산동",
+      "short_location": "서울 금천구 독산동",
       "floor": 4,
       "failed_count": 6,
       "auction_date": "20261112",
@@ -6518,7 +6518,7 @@
     },
     {
       "case_number": "2024타경108163",
-      "headline": "정릉동 빌라, 감정가보다 0원 저렴하게",
+      "headline": "서울 성북구 정릉동 빌라, 신건 첫 입찰 (3.4억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -6534,7 +6534,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 성북구 정릉동",
+        "📍 서울 성북구 정릉동",
         "보증금 3,350만"
       ],
       "min_bid": 335000000,
@@ -6547,7 +6547,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 성북구 보국문로8나길 3 제2층 제202호 (정릉동,대성아트빌153)",
-      "short_location": "성북구 정릉동",
+      "short_location": "서울 성북구 정릉동",
       "floor": 2,
       "failed_count": 5,
       "auction_date": "20261110",
@@ -6677,7 +6677,7 @@
     },
     {
       "case_number": "2024타경794",
-      "headline": "금곡동 빌라, 감정가보다 1,243만 저렴하게",
+      "headline": "경기 수원시 권선구 금곡동 빌라, 감정가보다 1,243만 저렴하게",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 12430000,
@@ -6693,7 +6693,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 수원시 권선구 금곡동",
+        "📍 경기 수원시 권선구 금곡동",
         "보증금 1,850만"
       ],
       "min_bid": 185000000,
@@ -6706,7 +6706,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 수원시 권선구 금곡로196번길 15 7층710호 (금곡동,커낼파크)",
-      "short_location": "수원시 권선구 금곡동",
+      "short_location": "경기 수원시 권선구 금곡동",
       "floor": 7,
       "failed_count": 4,
       "auction_date": "20261102",
@@ -6831,7 +6831,7 @@
     },
     {
       "case_number": "2024타경5253",
-      "headline": "지축동 빌라가 반값? 감정가보다 4억 싼 이유",
+      "headline": "경기 고양시 덕양구 지축동 빌라가 반값? 감정가보다 4억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 395908000,
@@ -6847,7 +6847,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 고양시 덕양구 지축동",
+        "📍 경기 고양시 덕양구 지축동",
         "보증금 1,250만"
       ],
       "min_bid": 125092000,
@@ -6860,7 +6860,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 고양시 덕양구 지축로 70 2층210호 (지축동,지축푸리마타워)",
-      "short_location": "고양시 덕양구 지축동",
+      "short_location": "경기 고양시 덕양구 지축동",
       "floor": 2,
       "failed_count": 4,
       "auction_date": "20261104",
@@ -6984,7 +6984,7 @@
     },
     {
       "case_number": "2023타경57385",
-      "headline": "중곡동 오피스텔가 반값? 감정가보다 1.9억 싼 이유",
+      "headline": "서울 광진구 중곡동 오피스텔가 반값? 감정가보다 1.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 185386000,
@@ -7000,7 +7000,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 광진구 중곡동",
+        "📍 서울 광진구 중곡동",
         "보증금 1,286만"
       ],
       "min_bid": 128614000,
@@ -7013,7 +7013,7 @@
       "usage": "오피스텔",
       "area_pyeong": 0.0,
       "location": "서울특별시 광진구 능동로37길 9 9층901호 (중곡동,평강오피스텔)",
-      "short_location": "광진구 중곡동",
+      "short_location": "서울 광진구 중곡동",
       "floor": 9,
       "failed_count": 4,
       "auction_date": "20261116",
@@ -7128,7 +7128,7 @@
     },
     {
       "case_number": "2024타경60434",
-      "headline": "구산동 빌라가 반값? 감정가보다 1.9억 싼 이유",
+      "headline": "서울 은평구 구산동 빌라가 반값? 감정가보다 1.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 189518000,
@@ -7144,7 +7144,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 은평구 구산동",
+        "📍 서울 은평구 구산동",
         "보증금 1,314만"
       ],
       "min_bid": 131482000,
@@ -7157,7 +7157,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 은평구 갈현로16길 14-4 비동 2층201호 (구산동,벨에어하우스)",
-      "short_location": "은평구 구산동",
+      "short_location": "서울 은평구 구산동",
       "floor": 2,
       "failed_count": 4,
       "auction_date": "20261117",
@@ -7294,7 +7294,7 @@
     },
     {
       "case_number": "2025타경3082",
-      "headline": "36% 떨어진 양재동 빌라, 1.5억대 노려볼까?",
+      "headline": "36% 떨어진 서울 서초구 양재동 빌라, 1.5억대 노려볼까?",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 85320000,
@@ -7310,7 +7310,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 서초구 양재동",
+        "📍 서울 서초구 양재동",
         "보증금 1,516만"
       ],
       "min_bid": 151680000,
@@ -7323,7 +7323,7 @@
       "usage": "빌라",
       "area_pyeong": 2.7,
       "location": "서울특별시 서초구 양재동 215 하이브랜드 1층리빙관1층145호",
-      "short_location": "서초구 양재동",
+      "short_location": "서울 서초구 양재동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261028",
@@ -7436,7 +7436,7 @@
     },
     {
       "case_number": "2024타경461",
-      "headline": "36% 떨어진 중곡동 오피스텔, 1.7억대 노려볼까?",
+      "headline": "36% 떨어진 서울 광진구 중곡동 오피스텔, 1.7억대 노려볼까?",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 97560000,
@@ -7452,7 +7452,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 광진구 중곡동",
+        "📍 서울 광진구 중곡동",
         "보증금 1,734만"
       ],
       "min_bid": 173440000,
@@ -7465,7 +7465,7 @@
       "usage": "오피스텔",
       "area_pyeong": 0.0,
       "location": "서울특별시 광진구 능동로37길 9 9층905호 (중곡동,평강오피스텔)",
-      "short_location": "광진구 중곡동",
+      "short_location": "서울 광진구 중곡동",
       "floor": 9,
       "failed_count": 2,
       "auction_date": "20261116",
@@ -7558,7 +7558,7 @@
     },
     {
       "case_number": "2025타경3860",
-      "headline": "신림동 17평 아파트, 감정가보다 5,100만 저렴하게",
+      "headline": "서울 관악구 신림동 17평 아파트, 감정가보다 5,100만 저렴하게",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 51000000,
@@ -7574,7 +7574,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 관악구 신림동",
+        "📍 서울 관악구 신림동",
         "보증금 2,040만"
       ],
       "min_bid": 204000000,
@@ -7587,7 +7587,7 @@
       "usage": "아파트",
       "area_pyeong": 17.1,
       "location": "서울특별시 관악구 신림동 244 관악아파트 3동 3층306호",
-      "short_location": "관악구 신림동",
+      "short_location": "서울 관악구 신림동",
       "floor": 3,
       "failed_count": 1,
       "auction_date": "20261028",
@@ -7700,7 +7700,7 @@
     },
     {
       "case_number": "2023타경4575",
-      "headline": "목동 18평 빌라, 감정가보다 0원 저렴하게",
+      "headline": "서울 양천구 목동 18평 빌라, 신건 첫 입찰 (2.6억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -7716,7 +7716,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 양천구 목동",
+        "📍 서울 양천구 목동",
         "보증금 2,650만"
       ],
       "min_bid": 265000000,
@@ -7729,7 +7729,7 @@
       "usage": "빌라",
       "area_pyeong": 17.8,
       "location": "서울특별시 양천구 목동중앙서로6길 38 제3층 제302호",
-      "short_location": "양천구 목동",
+      "short_location": "서울 양천구 목동",
       "floor": 3,
       "failed_count": 0,
       "auction_date": "20261119",
@@ -7813,7 +7813,7 @@
     },
     {
       "case_number": "2025타경168",
-      "headline": "당동 아파트가 반값? 감정가보다 2.9억 싼 이유",
+      "headline": "경기 군포시 당동 아파트가 반값? 감정가보다 2.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 289674000,
@@ -7829,7 +7829,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 군포시 당동",
+        "📍 경기 군포시 당동",
         "보증금 133만"
       ],
       "min_bid": 13326000,
@@ -7842,7 +7842,7 @@
       "usage": "아파트",
       "area_pyeong": 18.0,
       "location": "경기도 군포시 당동 923 대흥아파트 5층505호",
-      "short_location": "군포시 당동",
+      "short_location": "경기 군포시 당동",
       "floor": 5,
       "failed_count": 14,
       "auction_date": "20261201",
@@ -7958,7 +7958,7 @@
     },
     {
       "case_number": "2024타경110679",
-      "headline": "안양동 오피스텔가 반값? 감정가보다 2.7억 싼 이유",
+      "headline": "경기 안양시 만안구 안양동 오피스텔가 반값? 감정가보다 2.7억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 273112000,
@@ -7974,7 +7974,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 안양시 만안구 안양동",
+        "📍 경기 안양시 만안구 안양동",
         "보증금 158만"
       ],
       "min_bid": 15888000,
@@ -7987,7 +7987,7 @@
       "usage": "오피스텔",
       "area_pyeong": 0.0,
       "location": "경기도 안양시 만안구 안양로369번길 36 2층202호 (안양동,아트리움)",
-      "short_location": "안양시 만안구 안양동",
+      "short_location": "경기 안양시 만안구 안양동",
       "floor": 2,
       "failed_count": 13,
       "auction_date": "20261201",
@@ -8103,7 +8103,7 @@
     },
     {
       "case_number": "2023타경122848",
-      "headline": "화곡동 빌라가 반값? 감정가보다 2.8억 싼 이유",
+      "headline": "서울 강서구 화곡동 빌라가 반값? 감정가보다 2.8억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 276730000,
@@ -8119,7 +8119,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 강서구 화곡동",
+        "📍 서울 강서구 화곡동",
         "보증금 204만"
       ],
       "min_bid": 20420000,
@@ -8132,7 +8132,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 강서구 곰달래로49길 96 제5층 제501호 (화곡동, 더플레이스)",
-      "short_location": "강서구 화곡동",
+      "short_location": "서울 강서구 화곡동",
       "floor": 5,
       "failed_count": 12,
       "auction_date": "20261209",
@@ -8258,7 +8258,7 @@
     },
     {
       "case_number": "2025타경2820",
-      "headline": "창곡동 빌라가 반값? 감정가보다 6.8억 싼 이유",
+      "headline": "경기 성남시 수정구 창곡동 빌라가 반값? 감정가보다 6.8억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 681630000,
@@ -8274,7 +8274,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 성남시 수정구 창곡동",
+        "📍 경기 성남시 수정구 창곡동",
         "보증금 2,153만"
       ],
       "min_bid": 215370000,
@@ -8287,7 +8287,7 @@
       "usage": "빌라",
       "area_pyeong": 393.2,
       "location": "경기도 성남시 수정구 창곡동 595 더퍼스트메디타워 1층106호",
-      "short_location": "성남시 수정구 창곡동",
+      "short_location": "경기 성남시 수정구 창곡동",
       "floor": 1,
       "failed_count": 4,
       "auction_date": "20261026",
@@ -8415,7 +8415,7 @@
     },
     {
       "case_number": "2023타경5042",
-      "headline": "마곡동 상가가 반값? 감정가보다 3억 싼 이유",
+      "headline": "서울 강서구 마곡동 상가가 반값? 감정가보다 3억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 295200000,
@@ -8431,7 +8431,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 강서구 마곡동",
+        "📍 서울 강서구 마곡동",
         "보증금 2,048만"
       ],
       "min_bid": 204800000,
@@ -8444,7 +8444,7 @@
       "usage": "상가",
       "area_pyeong": 0.0,
       "location": "서울특별시 강서구 마곡중앙8로5길 63 제2층 제206호 (마곡동, 마곡디엠프라자1차)",
-      "short_location": "강서구 마곡동",
+      "short_location": "서울 강서구 마곡동",
       "floor": 2,
       "failed_count": 4,
       "auction_date": "20261124",
@@ -8569,7 +8569,7 @@
     },
     {
       "case_number": "2025타경625",
-      "headline": "호계동 상가가 반값? 시세보다 4.3억 싼 이유",
+      "headline": "경기 안양시 동안구 호계동 상가가 반값? 시세보다 4.3억 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 428978787,
@@ -8585,7 +8585,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 안양시 동안구 호계동",
+        "📍 경기 안양시 동안구 호계동",
         "보증금 2,211만"
       ],
       "min_bid": 221184000,
@@ -8598,7 +8598,7 @@
       "usage": "상가",
       "area_pyeong": 13.3,
       "location": "경기도 안양시 동안구 호계동 555-42 안양에스케이브이1센터 1층125호",
-      "short_location": "안양시 동안구 호계동",
+      "short_location": "경기 안양시 동안구 호계동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261027",
@@ -8712,7 +8712,7 @@
     },
     {
       "case_number": "2022타경1487",
-      "headline": "화도읍 빌라가 반값? 감정가보다 9,723만 싼 이유",
+      "headline": "경기 남양주시 화도읍 빌라가 반값? 감정가보다 9,723만 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 97236000,
@@ -8728,7 +8728,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 남양주시 화도읍",
+        "📍 경기 남양주시 화도읍",
         "보증금 507만"
       ],
       "min_bid": 50764000,
@@ -8741,7 +8741,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 남양주시 화도읍 묵현로76번길 2 1층101호 (로얄캐슬 비)",
-      "short_location": "남양주시 화도읍",
+      "short_location": "경기 남양주시 화도읍",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261104",
@@ -8862,7 +8862,7 @@
     },
     {
       "case_number": "2023타경7719",
-      "headline": "상지석동 빌라가 반값? 감정가보다 2.3억 싼 이유",
+      "headline": "경기 파주시 상지석동 빌라가 반값? 감정가보다 2.3억 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 231920000,
@@ -8878,7 +8878,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 파주시 상지석동",
+        "📍 경기 파주시 상지석동",
         "보증금 1,210만"
       ],
       "min_bid": 121080000,
@@ -8891,7 +8891,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 파주시 하우고개길 404-1 107동 2층201호 (상지석동,더딜라이트)",
-      "short_location": "파주시 상지석동",
+      "short_location": "경기 파주시 상지석동",
       "floor": 2,
       "failed_count": 3,
       "auction_date": "20261111",
@@ -8998,7 +8998,7 @@
     },
     {
       "case_number": "2025타경63300",
-      "headline": "고양동 빌라가 반값? 감정가보다 2억 싼 이유",
+      "headline": "경기 고양시 덕양구 고양동 빌라가 반값? 감정가보다 2억 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 204000000,
@@ -9014,7 +9014,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 고양시 덕양구 고양동",
+        "📍 경기 고양시 덕양구 고양동",
         "보증금 1,960만"
       ],
       "min_bid": 196000000,
@@ -9027,7 +9027,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 고양시 덕양구 푸른마을로 56 504동 17층1704호 (고양동,푸른마을5단지)",
-      "short_location": "고양시 덕양구 고양동",
+      "short_location": "경기 고양시 덕양구 고양동",
       "floor": 17,
       "failed_count": 2,
       "auction_date": "20261105",
@@ -9134,7 +9134,7 @@
     },
     {
       "case_number": "2023타경5918",
-      "headline": "와동 빌라가 반값? 감정가보다 9,282만 싼 이유",
+      "headline": "경기 안산시 단원구 와동 빌라가 반값? 감정가보다 9,282만 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 92820000,
@@ -9150,7 +9150,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 안산시 단원구 와동",
+        "📍 경기 안산시 단원구 와동",
         "보증금 891만"
       ],
       "min_bid": 89180000,
@@ -9163,7 +9163,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 안산시 단원구 보배4길 48 2층201호",
-      "short_location": "안산시 단원구 와동",
+      "short_location": "경기 안산시 단원구 와동",
       "floor": 2,
       "failed_count": 2,
       "auction_date": "20261112",
@@ -9259,7 +9259,7 @@
     },
     {
       "case_number": "2023타경1541",
-      "headline": "선부동 아파트, 감정가보다 1.3억 싼데 인수금 0원",
+      "headline": "경기 안산시 단원구 선부동 아파트, 감정가보다 1.3억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 132000000,
@@ -9275,7 +9275,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 안산시 단원구 선부동",
+        "📍 경기 안산시 단원구 선부동",
         "보증금 3,080만"
       ],
       "min_bid": 308000000,
@@ -9288,7 +9288,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "경기도 안산시 단원구 석수로 138 109동 34층3402호 (선부동,안산메트로타운푸르지오힐스테이트)",
-      "short_location": "안산시 단원구 선부동",
+      "short_location": "경기 안산시 단원구 선부동",
       "floor": 34,
       "failed_count": 1,
       "auction_date": "20261118",
@@ -9376,7 +9376,7 @@
     },
     {
       "case_number": "2026타경60768",
-      "headline": "야당동 아파트, 감정가보다 1.2억 싼데 인수금 0원",
+      "headline": "경기 파주시 야당동 아파트, 감정가보다 1.2억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 119400000,
@@ -9392,7 +9392,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 파주시 야당동",
+        "📍 경기 파주시 야당동",
         "보증금 2,786만"
       ],
       "min_bid": 278600000,
@@ -9405,7 +9405,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "경기도 파주시 와석순환로 61 716동 12층1204호 (야당동,한빛마을7단지)",
-      "short_location": "파주시 야당동",
+      "short_location": "경기 파주시 야당동",
       "floor": 12,
       "failed_count": 1,
       "auction_date": "20261125",
@@ -9502,7 +9502,7 @@
     },
     {
       "case_number": "2024타경1535",
-      "headline": "임차인 0명 · 다산동 아파트, 8.3억에 깔끔하게 시작",
+      "headline": "임차인 0명 · 경기 남양주시 다산동 아파트, 8.3억에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 0,
@@ -9518,7 +9518,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 남양주시 다산동",
+        "📍 경기 남양주시 다산동",
         "보증금 8,300만"
       ],
       "min_bid": 830000000,
@@ -9531,7 +9531,7 @@
       "usage": "아파트",
       "area_pyeong": 0.0,
       "location": "경기도 남양주시 다산중앙로82번길 15 5111동 23층2301호 (다산동,이편한세상 다산)",
-      "short_location": "남양주시 다산동",
+      "short_location": "경기 남양주시 다산동",
       "floor": 23,
       "failed_count": 0,
       "auction_date": "20261117",
@@ -9618,7 +9618,7 @@
     },
     {
       "case_number": "2023타경4780",
-      "headline": "임차인 0명 · 다산동 빌라, 7.5억에 깔끔하게 시작",
+      "headline": "임차인 0명 · 경기 남양주시 다산동 빌라, 7.5억에 깔끔하게 시작",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 0,
@@ -9634,7 +9634,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 남양주시 다산동",
+        "📍 경기 남양주시 다산동",
         "보증금 7,500만"
       ],
       "min_bid": 750000000,
@@ -9647,7 +9647,7 @@
       "usage": "빌라",
       "area_pyeong": 24.9,
       "location": "경기도 남양주시 다산순환로 300 2101동 4층 404호 (다산동,다산반도유보라메이플타운)",
-      "short_location": "남양주시 다산동",
+      "short_location": "경기 남양주시 다산동",
       "floor": 4,
       "failed_count": 0,
       "auction_date": "20261112",
@@ -9727,7 +9727,7 @@
     },
     {
       "case_number": "2023타경343",
-      "headline": "마포동 빌라가 반값? 감정가보다 4.9억 싼 이유",
+      "headline": "서울 마포구 마포동 빌라가 반값? 감정가보다 4.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 492651000,
@@ -9743,7 +9743,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 마포구 마포동",
+        "📍 서울 마포구 마포동",
         "보증금 113만"
       ],
       "min_bid": 11349000,
@@ -9756,7 +9756,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 마포구 마포대로4가길 56 101동 2층에이201호 (마포동,오성드림빌)",
-      "short_location": "마포구 마포동",
+      "short_location": "서울 마포구 마포동",
       "floor": 2,
       "failed_count": 17,
       "auction_date": "20261103",
@@ -9877,7 +9877,7 @@
     },
     {
       "case_number": "2024타경1542",
-      "headline": "마곡동 빌라가 반값? 감정가보다 9.2억 싼 이유",
+      "headline": "서울 강서구 마곡동 빌라가 반값? 감정가보다 9.2억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 917729280,
@@ -9893,7 +9893,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 강서구 마곡동",
+        "📍 서울 강서구 마곡동",
         "보증금 1,422만"
       ],
       "min_bid": 142270720,
@@ -9906,7 +9906,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 강서구 강서로 433 제1층 제127호 (마곡동, 마곡오드카운티2차)",
-      "short_location": "강서구 마곡동",
+      "short_location": "서울 강서구 마곡동",
       "floor": 1,
       "failed_count": 14,
       "auction_date": "20261028",
@@ -10041,7 +10041,7 @@
     },
     {
       "case_number": "2024타경116987",
-      "headline": "시흥동 빌라가 반값? 감정가보다 2.2억 싼 이유",
+      "headline": "서울 금천구 시흥동 빌라가 반값? 감정가보다 2.2억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 224664564,
@@ -10057,7 +10057,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 금천구 시흥동",
+        "📍 서울 금천구 시흥동",
         "보증금 103만"
       ],
       "min_bid": 10335436,
@@ -10070,7 +10070,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 금천구 독산로22길 64 제4층 제403호 (시흥동, 다음빌라)",
-      "short_location": "금천구 시흥동",
+      "short_location": "서울 금천구 시흥동",
       "floor": 4,
       "failed_count": 14,
       "auction_date": "20261028",
@@ -10196,7 +10196,7 @@
     },
     {
       "case_number": "2024타경4117",
-      "headline": "도봉동 빌라가 반값? 감정가보다 1.9억 싼 이유",
+      "headline": "서울 도봉구 도봉동 빌라가 반값? 감정가보다 1.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 185224000,
@@ -10212,7 +10212,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 도봉구 도봉동",
+        "📍 서울 도봉구 도봉동",
         "보증금 107만"
       ],
       "min_bid": 10776000,
@@ -10225,7 +10225,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 도봉구 마들로 696 3층303호 (도봉동,다이아포레)",
-      "short_location": "도봉구 도봉동",
+      "short_location": "서울 도봉구 도봉동",
       "floor": 3,
       "failed_count": 13,
       "auction_date": "20261110",
@@ -10345,7 +10345,7 @@
     },
     {
       "case_number": "2024타경111138",
-      "headline": "쌍문동 빌라가 반값? 감정가보다 2.1억 싼 이유",
+      "headline": "서울 도봉구 쌍문동 빌라가 반값? 감정가보다 2.1억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 214521000,
@@ -10361,7 +10361,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 도봉구 쌍문동",
+        "📍 서울 도봉구 쌍문동",
         "보증금 124만"
       ],
       "min_bid": 12479000,
@@ -10374,7 +10374,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 도봉구 노해로 201-9 4층402호",
-      "short_location": "도봉구 쌍문동",
+      "short_location": "서울 도봉구 쌍문동",
       "floor": 4,
       "failed_count": 13,
       "auction_date": "20261110",
@@ -10494,7 +10494,7 @@
     },
     {
       "case_number": "2024타경115802",
-      "headline": "상봉동 빌라가 반값? 감정가보다 2.7억 싼 이유",
+      "headline": "서울 중랑구 상봉동 빌라가 반값? 감정가보다 2.7억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 269140000,
@@ -10510,7 +10510,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 중랑구 상봉동",
+        "📍 서울 중랑구 상봉동",
         "보증금 198만"
       ],
       "min_bid": 19860000,
@@ -10523,7 +10523,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 중랑구 봉우재로37가길 11 4층401호 (상봉동,상봉동원데자뷰2차)",
-      "short_location": "중랑구 상봉동",
+      "short_location": "서울 중랑구 상봉동",
       "floor": 4,
       "failed_count": 12,
       "auction_date": "20261110",
@@ -10643,7 +10643,7 @@
     },
     {
       "case_number": "2024타경2303",
-      "headline": "안양동 빌라가 반값? 감정가보다 1.9억 싼 이유",
+      "headline": "경기 안양시 만안구 안양동 빌라가 반값? 감정가보다 1.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 192875000,
@@ -10659,7 +10659,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 안양시 만안구 안양동",
+        "📍 경기 안양시 만안구 안양동",
         "보증금 181만"
       ],
       "min_bid": 18125000,
@@ -10672,7 +10672,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 안양시 만안구 안양로343번길 18-1 3층304호 (안양동,미담채)",
-      "short_location": "안양시 만안구 안양동",
+      "short_location": "경기 안양시 만안구 안양동",
       "floor": 3,
       "failed_count": 11,
       "auction_date": "20261110",
@@ -10787,7 +10787,7 @@
     },
     {
       "case_number": "2024타경4091",
-      "headline": "신월동 빌라가 반값? 감정가보다 2.6억 싼 이유",
+      "headline": "서울 양천구 신월동 빌라가 반값? 감정가보다 2.6억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 257969000,
@@ -10803,7 +10803,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 양천구 신월동",
+        "📍 서울 양천구 신월동",
         "보증금 310만"
       ],
       "min_bid": 31031000,
@@ -10816,7 +10816,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 양천구 남부순환로31길 45 제6층 제602호 (신월동, 헤렌하우스)",
-      "short_location": "양천구 신월동",
+      "short_location": "서울 양천구 신월동",
       "floor": 6,
       "failed_count": 10,
       "auction_date": "20261028",
@@ -10955,7 +10955,7 @@
     },
     {
       "case_number": "2023타경5885",
-      "headline": "상봉동 빌라가 반값? 감정가보다 2.7억 싼 이유",
+      "headline": "서울 중랑구 상봉동 빌라가 반값? 감정가보다 2.7억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 266056000,
@@ -10971,7 +10971,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 중랑구 상봉동",
+        "📍 서울 중랑구 상봉동",
         "보증금 320만"
       ],
       "min_bid": 32004000,
@@ -10984,7 +10984,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 중랑구 상봉중앙로6가길 6 4층401호 (상봉동,어반힐상봉)",
-      "short_location": "중랑구 상봉동",
+      "short_location": "서울 중랑구 상봉동",
       "floor": 4,
       "failed_count": 10,
       "auction_date": "20261124",
@@ -11104,7 +11104,7 @@
     },
     {
       "case_number": "2022타경54440",
-      "headline": "천호동 빌라가 반값? 감정가보다 3.2억 싼 이유",
+      "headline": "서울 강동구 천호동 빌라가 반값? 감정가보다 3.2억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 319310000,
@@ -11120,7 +11120,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 강동구 천호동",
+        "📍 서울 강동구 천호동",
         "보증금 146만"
       ],
       "min_bid": 14690000,
@@ -11133,7 +11133,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "서울특별시 강동구 성안로25길 21 3층303호 (천호동,성우스타팰리스)",
-      "short_location": "강동구 천호동",
+      "short_location": "서울 강동구 천호동",
       "floor": 3,
       "failed_count": 3,
       "auction_date": "20261109",
@@ -11254,7 +11254,7 @@
     },
     {
       "case_number": "2023타경60281",
-      "headline": "선부동 빌라가 반값? 감정가보다 4억 싼 이유",
+      "headline": "경기 안산시 단원구 선부동 빌라가 반값? 감정가보다 4억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 395514000,
@@ -11270,7 +11270,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 안산시 단원구 선부동",
+        "📍 경기 안산시 단원구 선부동",
         "보증금 2,064만"
       ],
       "min_bid": 206486000,
@@ -11283,7 +11283,7 @@
       "usage": "빌라",
       "area_pyeong": 0.0,
       "location": "경기도 안산시 단원구 화정천서로2길 13 2층201호 (선부동,도원스위트빌2)",
-      "short_location": "안산시 단원구 선부동",
+      "short_location": "경기 안산시 단원구 선부동",
       "floor": 2,
       "failed_count": 3,
       "auction_date": "20261117",
@@ -11385,7 +11385,7 @@
     },
     {
       "case_number": "2023타경74754",
-      "headline": "신북면 2257평 아파트, 감정가보다 0원 저렴하게",
+      "headline": "경기 포천시 신북면 2257평 아파트, 신건 첫 입찰 (7,009만)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -11401,7 +11401,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 포천시 신북면",
+        "📍 경기 포천시 신북면",
         "보증금 700만"
       ],
       "min_bid": 70097000,
@@ -11414,7 +11414,7 @@
       "usage": "아파트",
       "area_pyeong": 2257.0,
       "location": "경기도 포천시 신북면 삼성당리 101-1",
-      "short_location": "포천시 신북면",
+      "short_location": "경기 포천시 신북면",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261124",
@@ -11554,7 +11554,7 @@
     },
     {
       "case_number": "2024타경4336",
-      "headline": "구로동 상가, 지금 7.6억에 나왔다 (4.3억 할인)",
+      "headline": "서울 구로구 구로동 상가, 지금 7.6억에 나왔다 (4.3억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 429840000,
@@ -11570,7 +11570,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 구로구 구로동",
+        "📍 서울 구로구 구로동",
         "보증금 7,641만"
       ],
       "min_bid": 764160000,
@@ -11583,7 +11583,7 @@
       "usage": "상가",
       "area_pyeong": 0.0,
       "location": "서울특별시 구로구 디지털로31길 19 제8층 제807호 (구로동, 에이스테크노타워2)",
-      "short_location": "구로구 구로동",
+      "short_location": "서울 구로구 구로동",
       "floor": 8,
       "failed_count": 2,
       "auction_date": "20261028",
@@ -11688,7 +11688,7 @@
     },
     {
       "case_number": "2024타경1072",
-      "headline": "신당동 889평 상가, 감정가보다 5,500만 저렴하게",
+      "headline": "서울 중구 신당동 889평 상가, 감정가보다 5,500만 저렴하게",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 55000000,
@@ -11704,7 +11704,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 중구 신당동",
+        "📍 서울 중구 신당동",
         "보증금 2,200만"
       ],
       "min_bid": 220000000,
@@ -11717,7 +11717,7 @@
       "usage": "상가",
       "area_pyeong": 889.0,
       "location": "서울특별시 중구 마장로1길 21 지하1층16호 (신당동,광희시장)",
-      "short_location": "중구 신당동",
+      "short_location": "서울 중구 신당동",
       "floor": -1,
       "failed_count": 1,
       "auction_date": "20261126",
@@ -11821,7 +11821,7 @@
     },
     {
       "case_number": "2023타경61539",
-      "headline": "응암동 토지가 반값? 감정가보다 5.4억 싼 이유",
+      "headline": "서울 은평구 응암동 토지가 반값? 감정가보다 5.4억 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 536693000,
@@ -11837,7 +11837,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 은평구 응암동",
+        "📍 서울 은평구 응암동",
         "보증금 3,723만"
       ],
       "min_bid": 372341000,
@@ -11850,7 +11850,7 @@
       "usage": "토지",
       "area_pyeong": 52.9,
       "location": "서울특별시 은평구 응암동 227-25",
-      "short_location": "은평구 응암동",
+      "short_location": "서울 은평구 응암동",
       "floor": 1,
       "failed_count": 4,
       "auction_date": "20261208",
@@ -11961,7 +11961,7 @@
     },
     {
       "case_number": "2023타경6518",
-      "headline": "탄현면 토지가 반값? 감정가보다 3.9억 싼 이유",
+      "headline": "경기 파주시 탄현면 토지가 반값? 감정가보다 3.9억 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 393505720,
@@ -11977,7 +11977,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 파주시 탄현면",
+        "📍 경기 파주시 탄현면",
         "보증금 3,780만"
       ],
       "min_bid": 378074000,
@@ -11990,7 +11990,7 @@
       "usage": "토지",
       "area_pyeong": 91.9,
       "location": "경기도 파주시 탄현면 법흥리 1750-8",
-      "short_location": "파주시 탄현면",
+      "short_location": "경기 파주시 탄현면",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261208",
@@ -12092,7 +12092,7 @@
     },
     {
       "case_number": "2023타경2619",
-      "headline": "보문동7가 28평 토지, 감정가보다 0원 저렴하게",
+      "headline": "서울 성북구 보문동7가 28평 토지, 신건 첫 입찰 (6.2억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -12108,7 +12108,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 성북구 보문동7가",
+        "📍 서울 성북구 보문동7가",
         "보증금 6,218만"
       ],
       "min_bid": 621805800,
@@ -12121,7 +12121,7 @@
       "usage": "토지",
       "area_pyeong": 28.4,
       "location": "서울특별시 성북구 보문동7가 50",
-      "short_location": "성북구 보문동7가",
+      "short_location": "서울 성북구 보문동7가",
       "floor": 1,
       "failed_count": 0,
       "auction_date": "20261201",
@@ -12211,7 +12211,7 @@
     },
     {
       "case_number": "2018타경4771",
-      "headline": "동천동 34167평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 용인시 수지구 동천동 34167평 토지, 신건 첫 입찰 (144억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -12227,7 +12227,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 용인시 수지구 동천동",
+        "📍 경기 용인시 수지구 동천동",
         "보증금 14.4억"
       ],
       "min_bid": 14401592000,
@@ -12240,7 +12240,7 @@
       "usage": "토지",
       "area_pyeong": 34166.8,
       "location": "경기도 용인시 수지구 동천동 457-3",
-      "short_location": "용인시 수지구 동천동",
+      "short_location": "경기 용인시 수지구 동천동",
       "floor": 1,
       "failed_count": 8,
       "auction_date": "20261202",
@@ -12389,7 +12389,7 @@
     },
     {
       "case_number": "2023타경594",
-      "headline": "거여동 토지가 반값? 감정가보다 52억 싼 이유",
+      "headline": "서울 송파구 거여동 토지가 반값? 감정가보다 52억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 5202834360,
@@ -12405,7 +12405,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 송파구 거여동",
+        "📍 서울 송파구 거여동",
         "보증금 5.5억"
       ],
       "min_bid": 5458712000,
@@ -12418,7 +12418,7 @@
       "usage": "토지",
       "area_pyeong": 145.5,
       "location": "서울특별시 송파구 거여동 178-117",
-      "short_location": "송파구 거여동",
+      "short_location": "서울 송파구 거여동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261130",
@@ -12546,7 +12546,7 @@
     },
     {
       "case_number": "2023타경877",
-      "headline": "거여동 토지가 반값? 시세보다 10.3억 싼 이유",
+      "headline": "서울 송파구 거여동 토지가 반값? 시세보다 10.3억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 1029056581,
@@ -12562,7 +12562,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 송파구 거여동",
+        "📍 서울 송파구 거여동",
         "보증금 1.8억"
       ],
       "min_bid": 1792376000,
@@ -12575,7 +12575,7 @@
       "usage": "토지",
       "area_pyeong": 87.6,
       "location": "서울특별시 송파구 거여동 24-11",
-      "short_location": "송파구 거여동",
+      "short_location": "서울 송파구 거여동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261207",
@@ -12703,7 +12703,7 @@
     },
     {
       "case_number": "2023타경106499",
-      "headline": "봉천동 토지가 반값? 감정가보다 4.5억 싼 이유",
+      "headline": "서울 관악구 봉천동 토지가 반값? 감정가보다 4.5억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 448783770,
@@ -12719,7 +12719,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 4,708만"
       ],
       "min_bid": 470855000,
@@ -12732,7 +12732,7 @@
       "usage": "토지",
       "area_pyeong": 33.9,
       "location": "서울특별시 관악구 봉천동 65-3",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261209",
@@ -12834,7 +12834,7 @@
     },
     {
       "case_number": "2022타경80158",
-      "headline": "금오동 토지가 반값? 감정가보다 1.7억 싼 이유",
+      "headline": "경기 의정부시 금오동 토지가 반값? 감정가보다 1.7억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 165749000,
@@ -12850,7 +12850,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 의정부시 금오동",
+        "📍 경기 의정부시 금오동",
         "보증금 1,592만"
       ],
       "min_bid": 159249000,
@@ -12863,7 +12863,7 @@
       "usage": "토지",
       "area_pyeong": 36.6,
       "location": "경기도 의정부시 금오동 280-10",
-      "short_location": "의정부시 금오동",
+      "short_location": "경기 의정부시 금오동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261202",
@@ -12965,7 +12965,7 @@
     },
     {
       "case_number": "2023타경2957",
-      "headline": "백석읍 토지 -30% 급락! 고수가 노리는 이유",
+      "headline": "경기 양주시 백석읍 토지 -30% 급락! 고수가 노리는 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 505441960,
@@ -12981,7 +12981,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 양주시 백석읍",
+        "📍 경기 양주시 백석읍",
         "보증금 1.2억"
       ],
       "min_bid": 1179365000,
@@ -12994,7 +12994,7 @@
       "usage": "토지",
       "area_pyeong": 880.3,
       "location": "경기도 양주시 백석읍 홍죽리 486-1",
-      "short_location": "양주시 백석읍",
+      "short_location": "경기 양주시 백석읍",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261202",
@@ -13115,7 +13115,7 @@
     },
     {
       "case_number": "2022타경43888",
-      "headline": "포승읍 210평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 평택시 포승읍 210평 토지, 신건 첫 입찰 (6.1억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -13131,7 +13131,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 평택시 포승읍",
+        "📍 경기 평택시 포승읍",
         "보증금 6,097만"
       ],
       "min_bid": 609719000,
@@ -13144,7 +13144,7 @@
       "usage": "토지",
       "area_pyeong": 209.9,
       "location": "경기도 평택시 포승읍 방림리 53-15",
-      "short_location": "평택시 포승읍",
+      "short_location": "경기 평택시 포승읍",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261207",
@@ -13252,7 +13252,7 @@
     },
     {
       "case_number": "2023타경109238",
-      "headline": "봉천동 54평 토지, 지금 9.9억에 나왔다 (5.6억 할인)",
+      "headline": "서울 관악구 봉천동 54평 토지, 지금 9.9억에 나왔다 (5.6억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 557733830,
@@ -13268,7 +13268,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 9,915만"
       ],
       "min_bid": 991527000,
@@ -13281,7 +13281,7 @@
       "usage": "토지",
       "area_pyeong": 54.1,
       "location": "서울특별시 관악구 봉천동 96-14",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261210",
@@ -13378,7 +13378,7 @@
     },
     {
       "case_number": "2023타경109474",
-      "headline": "봉천동 44평 토지, 지금 7.9억에 나왔다 (4.4억 할인)",
+      "headline": "서울 관악구 봉천동 44평 토지, 지금 7.9억에 나왔다 (4.4억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 443399580,
@@ -13394,7 +13394,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 7,882만"
       ],
       "min_bid": 788266000,
@@ -13407,7 +13407,7 @@
       "usage": "토지",
       "area_pyeong": 43.9,
       "location": "서울특별시 관악구 봉천동 66-195",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261210",
@@ -13504,7 +13504,7 @@
     },
     {
       "case_number": "2024타경107468",
-      "headline": "석수동 197평 토지, 감정가보다 670만 저렴하게",
+      "headline": "경기 안양시 만안구 석수동 197평 토지, 감정가보다 670만 저렴하게",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 6708000,
@@ -13520,7 +13520,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 안양시 만안구 석수동",
+        "📍 경기 안양시 만안구 석수동",
         "보증금 268만"
       ],
       "min_bid": 26832000,
@@ -13533,7 +13533,7 @@
       "usage": "토지",
       "area_pyeong": 197.0,
       "location": "경기도 안양시 만안구 석수동 324-9",
-      "short_location": "안양시 만안구 석수동",
+      "short_location": "경기 안양시 만안구 석수동",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "20261201",
@@ -13632,7 +13632,7 @@
     },
     {
       "case_number": "2023타경106642",
-      "headline": "봉천동 27평 토지, 감정가보다 0원 저렴하게",
+      "headline": "서울 관악구 봉천동 27평 토지, 신건 첫 입찰 (7.5억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -13648,7 +13648,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 7,533만"
       ],
       "min_bid": 753342000,
@@ -13661,7 +13661,7 @@
       "usage": "토지",
       "area_pyeong": 26.9,
       "location": "서울특별시 관악구 봉천동 66-48",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 0,
       "auction_date": "20261208",
@@ -13744,7 +13744,7 @@
     },
     {
       "case_number": "2023타경109641",
-      "headline": "봉천동 31평 토지, 감정가보다 0원 저렴하게",
+      "headline": "서울 관악구 봉천동 31평 토지, 신건 첫 입찰 (9.4억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -13760,7 +13760,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 9,350만"
       ],
       "min_bid": 935072400,
@@ -13773,7 +13773,7 @@
       "usage": "토지",
       "area_pyeong": 30.9,
       "location": "서울특별시 관악구 봉천동 66-171",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 0,
       "auction_date": "20261208",
@@ -13852,7 +13852,7 @@
     },
     {
       "case_number": "2023타경6836",
-      "headline": "일동면 토지 -30% 급락! 고수가 노리는 이유",
+      "headline": "경기 포천시 일동면 토지 -30% 급락! 고수가 노리는 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 258013500,
@@ -13868,7 +13868,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 포천시 일동면",
+        "📍 경기 포천시 일동면",
         "보증금 6,020만"
       ],
       "min_bid": 602030000,
@@ -13881,7 +13881,7 @@
       "usage": "토지",
       "area_pyeong": 1161.9,
       "location": "경기도 포천시 일동면 유동리 296-5",
-      "short_location": "포천시 일동면",
+      "short_location": "경기 포천시 일동면",
       "floor": 1,
       "failed_count": 4,
       "auction_date": "20261104",
@@ -14015,7 +14015,7 @@
     },
     {
       "case_number": "2024타경884",
-      "headline": "시흥동 토지가 반값? 감정가보다 4.1억 싼 이유",
+      "headline": "서울 금천구 시흥동 토지가 반값? 감정가보다 4.1억 싼 이유",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 405429680,
@@ -14031,7 +14031,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 금천구 시흥동",
+        "📍 서울 금천구 시흥동",
         "보증금 4,253만"
       ],
       "min_bid": 425370000,
@@ -14044,7 +14044,7 @@
       "usage": "토지",
       "area_pyeong": 36.0,
       "location": "서울특별시 금천구 시흥동 237-43",
-      "short_location": "금천구 시흥동",
+      "short_location": "서울 금천구 시흥동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261112",
@@ -14146,7 +14146,7 @@
     },
     {
       "case_number": "2023타경5748",
-      "headline": "쌍문동 토지가 반값? 감정가보다 6.5억 싼 이유",
+      "headline": "서울 도봉구 쌍문동 토지가 반값? 감정가보다 6.5억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 645488400,
@@ -14162,7 +14162,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 도봉구 쌍문동",
+        "📍 서울 도봉구 쌍문동",
         "보증금 6,772만"
       ],
       "min_bid": 677234000,
@@ -14175,7 +14175,7 @@
       "usage": "토지",
       "area_pyeong": 50.5,
       "location": "서울특별시 도봉구 쌍문동 26-103",
-      "short_location": "도봉구 쌍문동",
+      "short_location": "서울 도봉구 쌍문동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261124",
@@ -14290,7 +14290,7 @@
     },
     {
       "case_number": "2025타경102407",
-      "headline": "신림동 41평 토지, 지금 12.8억에 나왔다 (7.2억 할인)",
+      "headline": "서울 관악구 신림동 41평 토지, 지금 12.8억에 나왔다 (7.2억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 717206620,
@@ -14306,7 +14306,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 관악구 신림동",
+        "📍 서울 관악구 신림동",
         "보증금 1.3억"
       ],
       "min_bid": 1275033800,
@@ -14319,7 +14319,7 @@
       "usage": "토지",
       "area_pyeong": 41.1,
       "location": "서울특별시 관악구 신림동 87-13",
-      "short_location": "관악구 신림동",
+      "short_location": "서울 관악구 신림동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261028",
@@ -14431,7 +14431,7 @@
     },
     {
       "case_number": "2024타경5164",
-      "headline": "원천동 토지가 반값? 감정가보다 13.2억 싼 이유",
+      "headline": "경기 수원시 영통구 원천동 토지가 반값? 감정가보다 13.2억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 1323891880,
@@ -14447,7 +14447,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 수원시 영통구 원천동",
+        "📍 경기 수원시 영통구 원천동",
         "보증금 1.3억"
       ],
       "min_bid": 1271975000,
@@ -14460,7 +14460,7 @@
       "usage": "토지",
       "area_pyeong": 101.0,
       "location": "경기도 수원시 영통구 원천동 406-7",
-      "short_location": "수원시 영통구 원천동",
+      "short_location": "경기 수원시 영통구 원천동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261104",
@@ -14569,7 +14569,7 @@
     },
     {
       "case_number": "2024타경195",
-      "headline": "사근동 토지 -36% 급락! 고수가 노리는 이유",
+      "headline": "서울 성동구 사근동 토지 -36% 급락! 고수가 노리는 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 280883800,
@@ -14585,7 +14585,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 성동구 사근동",
+        "📍 서울 성동구 사근동",
         "보증금 4,993만"
       ],
       "min_bid": 499346000,
@@ -14598,7 +14598,7 @@
       "usage": "토지",
       "area_pyeong": 78.6,
       "location": "서울특별시 성동구 사근동 291-25",
-      "short_location": "성동구 사근동",
+      "short_location": "서울 성동구 사근동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261109",
@@ -14705,7 +14705,7 @@
     },
     {
       "case_number": "2023타경110580",
-      "headline": "봉천동 30평 토지, 감정가보다 2.9억 싼데 인수금 0원",
+      "headline": "서울 관악구 봉천동 30평 토지, 감정가보다 2.9억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 286902000,
@@ -14721,7 +14721,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 5,100만"
       ],
       "min_bid": 510048000,
@@ -14734,7 +14734,7 @@
       "usage": "토지",
       "area_pyeong": 29.9,
       "location": "서울특별시 관악구 봉천동 66-92",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261110",
@@ -14827,7 +14827,7 @@
     },
     {
       "case_number": "2024타경1275",
-      "headline": "원효로4가 54평 토지, 감정가보다 11.3억 싼데 인수금 0원",
+      "headline": "서울 용산구 원효로4가 54평 토지, 감정가보다 11.3억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 1134832000,
@@ -14843,7 +14843,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 용산구 원효로4가",
+        "📍 서울 용산구 원효로4가",
         "보증금 2억"
       ],
       "min_bid": 2017478000,
@@ -14856,7 +14856,7 @@
       "usage": "토지",
       "area_pyeong": 54.0,
       "location": "서울특별시 용산구 원효로4가 66-1",
-      "short_location": "용산구 원효로4가",
+      "short_location": "서울 용산구 원효로4가",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261110",
@@ -14953,7 +14953,7 @@
     },
     {
       "case_number": "2023타경10879",
-      "headline": "세교동 토지가 반값? 감정가보다 3.5억 싼 이유",
+      "headline": "경기 오산시 세교동 토지가 반값? 감정가보다 3.5억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 346775020,
@@ -14969,7 +14969,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 오산시 세교동",
+        "📍 경기 오산시 세교동",
         "보증금 3,331만"
       ],
       "min_bid": 333174000,
@@ -14982,7 +14982,7 @@
       "usage": "토지",
       "area_pyeong": 559.0,
       "location": "경기도 오산시 세교동 528-123",
-      "short_location": "오산시 세교동",
+      "short_location": "경기 오산시 세교동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261117",
@@ -15094,7 +15094,7 @@
     },
     {
       "case_number": "2024타경60151",
-      "headline": "노고산동 45평 토지, 시세보다 26.8억 싼데 인수금 0원",
+      "headline": "서울 마포구 노고산동 45평 토지, 시세보다 26.8억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 2682312238,
@@ -15110,7 +15110,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 마포구 노고산동",
+        "📍 서울 마포구 노고산동",
         "보증금 1.6억"
       ],
       "min_bid": 1586678000,
@@ -15123,7 +15123,7 @@
       "usage": "토지",
       "area_pyeong": 44.7,
       "location": "서울특별시 마포구 신촌로22길 27-3",
-      "short_location": "마포구 노고산동",
+      "short_location": "서울 마포구 노고산동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261117",
@@ -15228,7 +15228,7 @@
     },
     {
       "case_number": "2023타경106314",
-      "headline": "봉천동 30평 토지, 감정가보다 2.9억 싼데 인수금 0원",
+      "headline": "서울 관악구 봉천동 30평 토지, 감정가보다 2.9억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 292837070,
@@ -15244,7 +15244,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 5,206만"
       ],
       "min_bid": 520603000,
@@ -15257,7 +15257,7 @@
       "usage": "토지",
       "area_pyeong": 29.9,
       "location": "서울특별시 관악구 봉천동 65-30",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261119",
@@ -15350,7 +15350,7 @@
     },
     {
       "case_number": "2023타경108730",
-      "headline": "봉천동 36평 토지, 감정가보다 3.4억 싼데 인수금 0원",
+      "headline": "서울 관악구 봉천동 36평 토지, 감정가보다 3.4억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 342720000,
@@ -15366,7 +15366,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 6,092만"
       ],
       "min_bid": 609280000,
@@ -15379,7 +15379,7 @@
       "usage": "토지",
       "area_pyeong": 36.0,
       "location": "서울특별시 관악구 봉천동 66-98",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261119",
@@ -15472,7 +15472,7 @@
     },
     {
       "case_number": "2023타경56078",
-      "headline": "가락동 35평 토지, 시세보다 4.4억 싼데 인수금 0원",
+      "headline": "서울 송파구 가락동 35평 토지, 시세보다 4.4억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 444021779,
@@ -15488,7 +15488,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 송파구 가락동",
+        "📍 서울 송파구 가락동",
         "보증금 9,397만"
       ],
       "min_bid": 939739000,
@@ -15501,7 +15501,7 @@
       "usage": "토지",
       "area_pyeong": 34.9,
       "location": "서울특별시 송파구 가락동 34-37",
-      "short_location": "송파구 가락동",
+      "short_location": "서울 송파구 가락동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261123",
@@ -15614,7 +15614,7 @@
     },
     {
       "case_number": "2023타경73785",
-      "headline": "파주읍 787평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 파주시 파주읍 787평 토지, 신건 첫 입찰 (2.9억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -15630,7 +15630,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 파주시 파주읍",
+        "📍 경기 파주시 파주읍",
         "보증금 2,863만"
       ],
       "min_bid": 286335972,
@@ -15643,7 +15643,7 @@
       "usage": "토지",
       "area_pyeong": 787.4,
       "location": "경기도 파주시 파주읍 봉서리 242-31",
-      "short_location": "파주시 파주읍",
+      "short_location": "경기 파주시 파주읍",
       "floor": 1,
       "failed_count": 4,
       "auction_date": "20261117",
@@ -15769,7 +15769,7 @@
     },
     {
       "case_number": "2025타경102754",
-      "headline": "봉천동 토지가 반값? 감정가보다 16.9억 싼 이유",
+      "headline": "서울 관악구 봉천동 토지가 반값? 감정가보다 16.9억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 1694735900,
@@ -15785,7 +15785,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 1.8억"
       ],
       "min_bid": 1778085000,
@@ -15798,7 +15798,7 @@
       "usage": "토지",
       "area_pyeong": 81.1,
       "location": "서울특별시 관악구 봉천동 41-89",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261028",
@@ -15918,7 +15918,7 @@
     },
     {
       "case_number": "2023타경50559",
-      "headline": "능평동 260평 토지, 감정가보다 9,676만 저렴하게",
+      "headline": "경기 광주시 능평동 260평 토지, 감정가보다 9,676만 저렴하게",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 96767116,
@@ -15934,7 +15934,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 광주시 능평동",
+        "📍 경기 광주시 능평동",
         "보증금 4,288만"
       ],
       "min_bid": 428859000,
@@ -15947,7 +15947,7 @@
       "usage": "토지",
       "area_pyeong": 259.5,
       "location": "경기도 광주시 능평동 613-2",
-      "short_location": "광주시 능평동",
+      "short_location": "경기 광주시 능평동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261123",
@@ -16081,7 +16081,7 @@
     },
     {
       "case_number": "2023타경57857",
-      "headline": "퇴촌면 71평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 광주시 퇴촌면 71평 토지, 신건 첫 입찰 (2억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -16097,7 +16097,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 광주시 퇴촌면",
+        "📍 경기 광주시 퇴촌면",
         "보증금 2,042만"
       ],
       "min_bid": 204231000,
@@ -16110,7 +16110,7 @@
       "usage": "토지",
       "area_pyeong": 70.8,
       "location": "경기도 광주시 퇴촌면 관음리 445-29",
-      "short_location": "광주시 퇴촌면",
+      "short_location": "경기 광주시 퇴촌면",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261123",
@@ -16229,7 +16229,7 @@
     },
     {
       "case_number": "2019타경8486",
-      "headline": "양평읍 1005평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 양평군 양평읍 1005평 토지, 신건 첫 입찰 (129.5억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -16245,7 +16245,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 양평군 양평읍",
+        "📍 경기 양평군 양평읍",
         "보증금 12.9억"
       ],
       "min_bid": 12945488000,
@@ -16258,7 +16258,7 @@
       "usage": "토지",
       "area_pyeong": 1005.2,
       "location": "경기도 양평군 양평읍 공흥리 441-1",
-      "short_location": "양평군 양평읍",
+      "short_location": "경기 양평군 양평읍",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261104",
@@ -16381,7 +16381,7 @@
     },
     {
       "case_number": "2022타경35600",
-      "headline": "경기도 이천시 1524평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 이천시 송정동 1524평 토지, 신건 첫 입찰 (13.5억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -16397,7 +16397,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 경기도 이천시",
+        "📍 경기 이천시 송정동",
         "보증금 1.4억"
       ],
       "min_bid": 1352719000,
@@ -16410,7 +16410,7 @@
       "usage": "토지",
       "area_pyeong": 1523.7,
       "location": "경기도 이천시 송정동 49-5",
-      "short_location": "경기도 이천시",
+      "short_location": "경기 이천시 송정동",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "",
@@ -16484,7 +16484,7 @@
     },
     {
       "case_number": "2024타경107598",
-      "headline": "경기도 군포시 토지가 반값? 감정가보다 1.2억 싼 이유",
+      "headline": "경기 군포시 산본동 토지가 반값? 감정가보다 1.2억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 123682000,
@@ -16500,7 +16500,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 경기도 군포시",
+        "📍 경기 군포시 산본동",
         "보증금 602만"
       ],
       "min_bid": 60281000,
@@ -16513,7 +16513,7 @@
       "usage": "토지",
       "area_pyeong": 1050.0,
       "location": "경기도 군포시 산본동 산105",
-      "short_location": "경기도 군포시",
+      "short_location": "경기 군포시 산본동",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "",
@@ -16587,7 +16587,7 @@
     },
     {
       "case_number": "2025타경102596",
-      "headline": "창신동 95평 토지, 지금 70.8억에 나왔다 (17.7억 할인)",
+      "headline": "서울 종로구 창신동 95평 토지, 지금 70.8억에 나왔다 (17.7억 할인)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 1769554000,
@@ -16603,7 +16603,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 종로구 창신동",
+        "📍 서울 종로구 창신동",
         "보증금 7.1억"
       ],
       "min_bid": 7078216000,
@@ -16616,7 +16616,7 @@
       "usage": "토지",
       "area_pyeong": 95.2,
       "location": "서울특별시 종로구 창신동 463-1",
-      "short_location": "종로구 창신동",
+      "short_location": "서울 종로구 창신동",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "20261028",
@@ -16724,7 +16724,7 @@
     },
     {
       "case_number": "2023타경104875",
-      "headline": "봉천동 29평 토지, 감정가보다 1.6억 싼데 인수금 0원",
+      "headline": "서울 관악구 봉천동 29평 토지, 감정가보다 1.6억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 156672000,
@@ -16740,7 +16740,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 6,266만"
       ],
       "min_bid": 626688000,
@@ -16753,7 +16753,7 @@
       "usage": "토지",
       "area_pyeong": 29.0,
       "location": "서울특별시 관악구 봉천동 66-8",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "20261126",
@@ -16837,7 +16837,7 @@
     },
     {
       "case_number": "2023타경108556",
-      "headline": "봉천동 31평 토지, 감정가보다 1.8억 싼데 인수금 0원",
+      "headline": "서울 관악구 봉천동 31평 토지, 감정가보다 1.8억 싼데 인수금 0원",
       "safety_grade": "GREEN",
       "difficulty": "BEGINNER",
       "gap_amount": 181560000,
@@ -16853,7 +16853,7 @@
       ],
       "card_tags": [
         "초급 · 인수금 0원",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 7,262만"
       ],
       "min_bid": 726240000,
@@ -16866,7 +16866,7 @@
       "usage": "토지",
       "area_pyeong": 30.9,
       "location": "서울특별시 관악구 봉천동 66-175",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "20261126",
@@ -16950,7 +16950,7 @@
     },
     {
       "case_number": "2024타경2032",
-      "headline": "대조동 42평 토지, 감정가보다 0원 저렴하게",
+      "headline": "서울 은평구 대조동 42평 토지, 신건 첫 입찰 (22.1억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -16966,7 +16966,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 은평구 대조동",
+        "📍 서울 은평구 대조동",
         "보증금 2.2억"
       ],
       "min_bid": 2205106500,
@@ -16979,7 +16979,7 @@
       "usage": "토지",
       "area_pyeong": 41.9,
       "location": "서울특별시 은평구 대조동 222-11",
-      "short_location": "은평구 대조동",
+      "short_location": "서울 은평구 대조동",
       "floor": 1,
       "failed_count": 0,
       "auction_date": "20261117",
@@ -17068,7 +17068,7 @@
     },
     {
       "case_number": "2023타경10565",
-      "headline": "탑동 82평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 수원시 권선구 탑동 82평 토지, 신건 첫 입찰 (8.5억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -17084,7 +17084,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 수원시 권선구 탑동",
+        "📍 경기 수원시 권선구 탑동",
         "보증금 8,533만"
       ],
       "min_bid": 853370080,
@@ -17097,7 +17097,7 @@
       "usage": "토지",
       "area_pyeong": 81.8,
       "location": "경기도 수원시 권선구 탑동 809-4",
-      "short_location": "수원시 권선구 탑동",
+      "short_location": "경기 수원시 권선구 탑동",
       "floor": 1,
       "failed_count": 0,
       "auction_date": "20261118",
@@ -17198,7 +17198,7 @@
     },
     {
       "case_number": "2023타경113519",
-      "headline": "우이동 토지가 반값? 감정가보다 6.1억 싼 이유",
+      "headline": "서울 강북구 우이동 토지가 반값? 감정가보다 6.1억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 614095000,
@@ -17214,7 +17214,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 강북구 우이동",
+        "📍 서울 강북구 우이동",
         "보증금 1,629만"
       ],
       "min_bid": 162961000,
@@ -17227,7 +17227,7 @@
       "usage": "토지",
       "area_pyeong": 1126.2,
       "location": "서울특별시 강북구 우이동 산80",
-      "short_location": "강북구 우이동",
+      "short_location": "서울 강북구 우이동",
       "floor": 1,
       "failed_count": 9,
       "auction_date": "20261103",
@@ -17348,7 +17348,7 @@
     },
     {
       "case_number": "2024타경1508",
-      "headline": "학의동 7360평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 의왕시 학의동 7360평 토지, 신건 첫 입찰 (37억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -17364,7 +17364,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 의왕시 학의동",
+        "📍 경기 의왕시 학의동",
         "보증금 3.7억"
       ],
       "min_bid": 3698312000,
@@ -17377,7 +17377,7 @@
       "usage": "토지",
       "area_pyeong": 7360.1,
       "location": "경기도 의왕시 학의동 산20",
-      "short_location": "의왕시 학의동",
+      "short_location": "경기 의왕시 학의동",
       "floor": 1,
       "failed_count": 8,
       "auction_date": "20261110",
@@ -17502,7 +17502,7 @@
     },
     {
       "case_number": "2022타경82420",
-      "headline": "내촌면 토지가 반값? 감정가보다 24.3억 싼 이유",
+      "headline": "경기 포천시 내촌면 토지가 반값? 감정가보다 24.3억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 2429762000,
@@ -17518,7 +17518,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 포천시 내촌면",
+        "📍 경기 포천시 내촌면",
         "보증금 3,239만"
       ],
       "min_bid": 323974000,
@@ -17531,7 +17531,7 @@
       "usage": "토지",
       "area_pyeong": 704.8,
       "location": "경기도 포천시 내촌면 금강로 2714-30",
-      "short_location": "포천시 내촌면",
+      "short_location": "경기 포천시 내촌면",
       "floor": 1,
       "failed_count": 8,
       "auction_date": "20261117",
@@ -17679,7 +17679,7 @@
     },
     {
       "case_number": "2023타경86924",
-      "headline": "남면 토지가 반값? 감정가보다 17.7억 싼 이유",
+      "headline": "경기 양주시 남면 토지가 반값? 감정가보다 17.7억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 1771260750,
@@ -17695,7 +17695,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 양주시 남면",
+        "📍 경기 양주시 남면",
         "보증금 3,578만"
       ],
       "min_bid": 357838000,
@@ -17708,7 +17708,7 @@
       "usage": "토지",
       "area_pyeong": 1612.6,
       "location": "경기도 양주시 남면 구암리 137-1",
-      "short_location": "양주시 남면",
+      "short_location": "경기 양주시 남면",
       "floor": 1,
       "failed_count": 7,
       "auction_date": "20261028",
@@ -17849,7 +17849,7 @@
     },
     {
       "case_number": "2024타경3960",
-      "headline": "신갈동 1평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 용인시 기흥구 신갈동 1평 토지, 신건 첫 입찰 (3.5억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -17865,7 +17865,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 용인시 기흥구 신갈동",
+        "📍 경기 용인시 기흥구 신갈동",
         "보증금 3,455만"
       ],
       "min_bid": 345515300,
@@ -17878,7 +17878,7 @@
       "usage": "토지",
       "area_pyeong": 0.9,
       "location": "경기도 용인시 기흥구 상미로50번길 8",
-      "short_location": "용인시 기흥구 신갈동",
+      "short_location": "경기 용인시 기흥구 신갈동",
       "floor": 1,
       "failed_count": 7,
       "auction_date": "20261109",
@@ -17999,7 +17999,7 @@
     },
     {
       "case_number": "2023타경73924",
-      "headline": "모현읍 2568평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 용인시 처인구 모현읍 2568평 토지, 신건 첫 입찰 (7,630만)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -18015,7 +18015,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 용인시 처인구 모현읍",
+        "📍 경기 용인시 처인구 모현읍",
         "보증금 763만"
       ],
       "min_bid": 76307999,
@@ -18028,7 +18028,7 @@
       "usage": "토지",
       "area_pyeong": 2568.2,
       "location": "경기도 용인시 처인구 모현읍 오산리 376-3",
-      "short_location": "용인시 처인구 모현읍",
+      "short_location": "경기 용인시 처인구 모현읍",
       "floor": 1,
       "failed_count": 7,
       "auction_date": "20261111",
@@ -18148,7 +18148,7 @@
     },
     {
       "case_number": "2023타경4568",
-      "headline": "설악면 토지가 반값? 감정가보다 18.2억 싼 이유",
+      "headline": "경기 가평군 설악면 토지가 반값? 감정가보다 18.2억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 1815214600,
@@ -18164,7 +18164,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 가평군 설악면",
+        "📍 경기 가평군 설악면",
         "보증금 2,420만"
       ],
       "min_bid": 242033000,
@@ -18177,7 +18177,7 @@
       "usage": "토지",
       "area_pyeong": 7700.7,
       "location": "경기도 가평군 설악면 회곡리 388-27",
-      "short_location": "가평군 설악면",
+      "short_location": "경기 가평군 설악면",
       "floor": 1,
       "failed_count": 6,
       "auction_date": "20261112",
@@ -18316,7 +18316,7 @@
     },
     {
       "case_number": "2023타경5226",
-      "headline": "가평읍 토지가 반값? 감정가보다 72.2억 싼 이유",
+      "headline": "경기 가평군 가평읍 토지가 반값? 감정가보다 72.2억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 7220752000,
@@ -18332,7 +18332,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 가평군 가평읍",
+        "📍 경기 가평군 가평읍",
         "보증금 9,627만"
       ],
       "min_bid": 962786000,
@@ -18345,7 +18345,7 @@
       "usage": "토지",
       "area_pyeong": 3240.1,
       "location": "경기도 가평군 가평읍 달전리 산83-2",
-      "short_location": "가평군 가평읍",
+      "short_location": "경기 가평군 가평읍",
       "floor": 1,
       "failed_count": 6,
       "auction_date": "20261112",
@@ -18475,7 +18475,7 @@
     },
     {
       "case_number": "2022타경110060",
-      "headline": "개봉동 67평 토지, 지금 10.4억에 나왔다 (2.6억 할인)",
+      "headline": "서울 구로구 개봉동 67평 토지, 지금 10.4억에 나왔다 (2.6억 할인)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 260628000,
@@ -18491,7 +18491,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 구로구 개봉동",
+        "📍 서울 구로구 개봉동",
         "보증금 1억"
       ],
       "min_bid": 1042512000,
@@ -18504,7 +18504,7 @@
       "usage": "토지",
       "area_pyeong": 67.2,
       "location": "서울특별시 구로구 개봉동 63-46",
-      "short_location": "구로구 개봉동",
+      "short_location": "서울 구로구 개봉동",
       "floor": 1,
       "failed_count": 6,
       "auction_date": "20261125",
@@ -18629,7 +18629,7 @@
     },
     {
       "case_number": "2023타경83059",
-      "headline": "청평면 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 가평군 청평면 토지, 신건 첫 입찰 (3억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -18645,7 +18645,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 가평군 청평면",
+        "📍 경기 가평군 청평면",
         "보증금 2,987만"
       ],
       "min_bid": 298707200,
@@ -18658,7 +18658,7 @@
       "usage": "토지",
       "area_pyeong": 0.0,
       "location": "경기도 가평군 청평면 큰갈월로 209-32",
-      "short_location": "가평군 청평면",
+      "short_location": "경기 가평군 청평면",
       "floor": 1,
       "failed_count": 5,
       "auction_date": "20261117",
@@ -18784,7 +18784,7 @@
     },
     {
       "case_number": "2023타경110870",
-      "headline": "남창동 토지가 반값? 감정가보다 4.3억 싼 이유",
+      "headline": "서울 중구 남창동 토지가 반값? 감정가보다 4.3억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 425088000,
@@ -18800,7 +18800,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 중구 남창동",
+        "📍 서울 중구 남창동",
         "보증금 2,949만"
       ],
       "min_bid": 294912000,
@@ -18813,7 +18813,7 @@
       "usage": "토지",
       "area_pyeong": 25.0,
       "location": "서울특별시 중구 남창동 31-27",
-      "short_location": "중구 남창동",
+      "short_location": "서울 중구 남창동",
       "floor": 1,
       "failed_count": 4,
       "auction_date": "20261105",
@@ -18956,7 +18956,7 @@
     },
     {
       "case_number": "2023타경63382",
-      "headline": "중산동 156평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 고양시 일산동구 중산동 156평 토지, 신건 첫 입찰 (6억)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 0,
@@ -18972,7 +18972,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 고양시 일산동구 중산동",
+        "📍 경기 고양시 일산동구 중산동",
         "보증금 5,997만"
       ],
       "min_bid": 599720000,
@@ -18985,7 +18985,7 @@
       "usage": "토지",
       "area_pyeong": 156.4,
       "location": "경기도 고양시 일산동구 중산동 27-2",
-      "short_location": "고양시 일산동구 중산동",
+      "short_location": "경기 고양시 일산동구 중산동",
       "floor": 1,
       "failed_count": 4,
       "auction_date": "20261124",
@@ -19099,7 +19099,7 @@
     },
     {
       "case_number": "2025타경102485",
-      "headline": "부암동 토지가 반값? 감정가보다 28.9억 싼 이유",
+      "headline": "서울 종로구 부암동 토지가 반값? 감정가보다 28.9억 싼 이유",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 2891243000,
@@ -19115,7 +19115,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 종로구 부암동",
+        "📍 서울 종로구 부암동",
         "보증금 3억"
       ],
       "min_bid": 3033435000,
@@ -19128,7 +19128,7 @@
       "usage": "토지",
       "area_pyeong": 260.5,
       "location": "서울특별시 종로구 부암동 302-2",
-      "short_location": "종로구 부암동",
+      "short_location": "서울 종로구 부암동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261028",
@@ -19237,7 +19237,7 @@
     },
     {
       "case_number": "2023타경75323",
-      "headline": "탄현면 1694평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 파주시 탄현면 1694평 토지, 신건 첫 입찰 (1.2억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -19253,7 +19253,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 파주시 탄현면",
+        "📍 경기 파주시 탄현면",
         "보증금 1,234만"
       ],
       "min_bid": 123481011,
@@ -19266,7 +19266,7 @@
       "usage": "토지",
       "area_pyeong": 1693.7,
       "location": "경기도 파주시 탄현면 축현리 386-5",
-      "short_location": "파주시 탄현면",
+      "short_location": "경기 파주시 탄현면",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261104",
@@ -19386,7 +19386,7 @@
     },
     {
       "case_number": "2023타경51257",
-      "headline": "거여동 토지가 반값? 감정가보다 38.1억 싼 이유",
+      "headline": "서울 송파구 거여동 토지가 반값? 감정가보다 38.1억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 3813971600,
@@ -19402,7 +19402,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 송파구 거여동",
+        "📍 서울 송파구 거여동",
         "보증금 4억"
       ],
       "min_bid": 4001544000,
@@ -19415,7 +19415,7 @@
       "usage": "토지",
       "area_pyeong": 110.5,
       "location": "서울특별시 송파구 거여동 20",
-      "short_location": "송파구 거여동",
+      "short_location": "서울 송파구 거여동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261109",
@@ -19533,7 +19533,7 @@
     },
     {
       "case_number": "2023타경61393",
-      "headline": "합정동 54평 토지, 지금 30.3억에 나왔다 (14.9억 할인)",
+      "headline": "서울 마포구 합정동 54평 토지, 지금 30.3억에 나왔다 (14.9억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 1485647521,
@@ -19549,7 +19549,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 마포구 합정동",
+        "📍 서울 마포구 합정동",
         "보증금 3억"
       ],
       "min_bid": 3029147960,
@@ -19562,7 +19562,7 @@
       "usage": "토지",
       "area_pyeong": 54.1,
       "location": "서울특별시 마포구 합정동 198-28",
-      "short_location": "마포구 합정동",
+      "short_location": "서울 마포구 합정동",
       "floor": 1,
       "failed_count": 3,
       "auction_date": "20261110",
@@ -19684,7 +19684,7 @@
     },
     {
       "case_number": "2024타경2407",
-      "headline": "목동동 토지가 반값? 감정가보다 4.2억 싼 이유",
+      "headline": "경기 파주시 목동동 토지가 반값? 감정가보다 4.2억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 422640000,
@@ -19700,7 +19700,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 파주시 목동동",
+        "📍 경기 파주시 목동동",
         "보증금 523만"
       ],
       "min_bid": 52360000,
@@ -19713,7 +19713,7 @@
       "usage": "토지",
       "area_pyeong": 80.2,
       "location": "경기도 파주시 목동동 754-3",
-      "short_location": "파주시 목동동",
+      "short_location": "경기 파주시 목동동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261104",
@@ -19825,7 +19825,7 @@
     },
     {
       "case_number": "2024타경103107",
-      "headline": "호계동 기타가 반값? 시세보다 15.9억 싼 이유",
+      "headline": "경기 안양시 동안구 호계동 기타가 반값? 시세보다 15.9억 싼 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 1594094000,
@@ -19841,7 +19841,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 안양시 동안구 호계동",
+        "📍 경기 안양시 동안구 호계동",
         "보증금 7,194만"
       ],
       "min_bid": 719406000,
@@ -19854,7 +19854,7 @@
       "usage": "기타",
       "area_pyeong": 103.3,
       "location": "경기도 안양시 동안구 호계동 966-34",
-      "short_location": "안양시 동안구 호계동",
+      "short_location": "경기 안양시 동안구 호계동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261110",
@@ -19973,7 +19973,7 @@
     },
     {
       "case_number": "2023타경116182",
-      "headline": "봉천동 토지 -36% 급락! 고수가 노리는 이유",
+      "headline": "서울 관악구 봉천동 토지 -36% 급락! 고수가 노리는 이유",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 456468450,
@@ -19989,7 +19989,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 8,115만"
       ],
       "min_bid": 811501000,
@@ -20002,7 +20002,7 @@
       "usage": "토지",
       "area_pyeong": 41.2,
       "location": "서울특별시 관악구 봉천동 1671-26",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 2,
       "auction_date": "20261119",
@@ -20095,7 +20095,7 @@
     },
     {
       "case_number": "2023타경5535",
-      "headline": "갈현동 297평 토지, 감정가보다 0원 저렴하게",
+      "headline": "경기 성남시 중원구 갈현동 297평 토지, 신건 첫 입찰 (19.5억)",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 0,
@@ -20111,7 +20111,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 성남시 중원구 갈현동",
+        "📍 경기 성남시 중원구 갈현동",
         "보증금 1.9억"
       ],
       "min_bid": 1946960000,
@@ -20124,7 +20124,7 @@
       "usage": "토지",
       "area_pyeong": 296.8,
       "location": "경기도 성남시 중원구 갈현동 290-4",
-      "short_location": "성남시 중원구 갈현동",
+      "short_location": "경기 성남시 중원구 갈현동",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "20261102",
@@ -20242,7 +20242,7 @@
     },
     {
       "case_number": "2023타경110719",
-      "headline": "봉천동 31평 토지, 지금 6.6억에 나왔다 (1.7억 할인)",
+      "headline": "서울 관악구 봉천동 31평 토지, 지금 6.6억에 나왔다 (1.7억 할인)",
       "safety_grade": "YELLOW",
       "difficulty": "INTERMEDIATE",
       "gap_amount": 165390490,
@@ -20258,7 +20258,7 @@
       ],
       "card_tags": [
         "중급 · 권리 체크",
-        "📍 관악구 봉천동",
+        "📍 서울 관악구 봉천동",
         "보증금 6,615만"
       ],
       "min_bid": 661562000,
@@ -20271,7 +20271,7 @@
       "usage": "토지",
       "area_pyeong": 30.9,
       "location": "서울특별시 관악구 봉천동 65-29",
-      "short_location": "관악구 봉천동",
+      "short_location": "서울 관악구 봉천동",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "20261105",
@@ -20359,7 +20359,7 @@
     },
     {
       "case_number": "2023타경5787",
-      "headline": "필동3가 15평 토지, 감정가보다 4,614만 저렴하게",
+      "headline": "서울 중구 필동3가 15평 토지, 감정가보다 4,614만 저렴하게",
       "safety_grade": "RED",
       "difficulty": "ADVANCED",
       "gap_amount": 46147000,
@@ -20375,7 +20375,7 @@
       ],
       "card_tags": [
         "고수 · 하이리턴",
-        "📍 중구 필동3가",
+        "📍 서울 중구 필동3가",
         "보증금 1,845만"
       ],
       "min_bid": 184589000,
@@ -20388,7 +20388,7 @@
       "usage": "토지",
       "area_pyeong": 15.3,
       "location": "서울특별시 중구 필동3가 20-31",
-      "short_location": "중구 필동3가",
+      "short_location": "서울 중구 필동3가",
       "floor": 1,
       "failed_count": 1,
       "auction_date": "20261112",

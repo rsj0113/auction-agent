@@ -58,6 +58,70 @@ def format_krw_short(val: int) -> str:
     return f"{man:,}만"
 
 
+def build_full_region_label(location: str, sgg: str, emd: str) -> str:
+    """
+    '서울 성동구 마장동', '경기 파주시 와동동', '인천 부평구 부평동' 등
+    시/도 + 시/군/구 + 동/읍/면이 명확히 보이도록 정규화.
+    """
+    loc = (location or "").strip()
+    sgg_c = (sgg or "").strip()
+    emd_c = (emd or "").strip()
+
+    sido_map = {
+        "서울특별시": "서울", "서울시": "서울", "서울": "서울",
+        "경기도": "경기", "경기": "경기",
+        "인천광역시": "인천", "인천시": "인천", "인천": "인천",
+        "부산광역시": "부산", "대구광역시": "대구", "대전광역시": "대전",
+        "광주광역시": "광주", "울산광역시": "울산", "세종특별자치시": "세종",
+        "강원특별자치도": "강원", "강원도": "강원",
+        "충청북도": "충북", "충청남도": "충남",
+        "전북특별자치도": "전북", "전라북도": "전북", "전라남도": "전남",
+        "경상북도": "경북", "경상남도": "경남", "제주특별자치도": "제주",
+    }
+
+    tokens = loc.split()
+    sido = ""
+    if tokens:
+        sido = sido_map.get(tokens[0], "")
+        if not sido:
+            for full_k, short_v in sido_map.items():
+                if loc.startswith(full_k):
+                    sido = short_v
+                    break
+
+    # sgg가 비어있으면 location 토큰에서 보완
+    if not sgg_c and len(tokens) >= 2:
+        sgg_c = tokens[1]
+        if len(tokens) >= 3 and tokens[2].endswith("구") and not sgg_c.endswith("구"):
+            sgg_c = f"{sgg_c} {tokens[2]}"
+
+    # emd가 비어있으면 괄호 내 동/읍/면 또는 토큰에서 보완
+    if not emd_c:
+        m_paren = re.search(r"\(([가-힣0-9]+(?:동|읍|면|가))", loc)
+        if m_paren:
+            emd_c = m_paren.group(1)
+        else:
+            for tk in tokens[2:5]:
+                if re.match(r"^[가-힣0-9]+(동|읍|면|리)$", tk):
+                    emd_c = tk
+                    break
+
+    parts = []
+    if sido:
+        parts.append(sido)
+    if sgg_c:
+        # '경기 안양시 동안구' -> 중복 sido 제거
+        sgg_clean = re.sub(r"^(서울특별시|경기도|인천광역시|서울|경기|인천)\s*", "", sgg_c).strip()
+        if sgg_clean and sgg_clean not in parts:
+            parts.append(sgg_clean)
+    if emd_c and emd_c not in " ".join(parts):
+        parts.append(emd_c)
+
+    if parts:
+        return " ".join(parts)
+    return " ".join(tokens[:3]) if tokens else "수도권"
+
+
 def normalize_location_key(location: str) -> str:
     """동일 주소/호수 중복 제거용 정규화 키 생성 (연희동 3건, 회기동 4건 등 중복 방지)"""
     if not location:
@@ -457,8 +521,8 @@ def generate_feed(limit: int = 500) -> list[dict]:
 
         usage_label = normalize_usage(raw_usage, location)
 
-        # 지역 짧은 명칭
-        short_loc = f"{sgg} {emd}".strip() if sgg or emd else (" ".join(location.split()[:2]) if location else "수도권")
+        # 지역 명확 표기 (시/도 + 시/군/구 + 동/읍/면, 예: '서울 성동구 마장동', '경기 파주시 와동동')
+        short_loc = build_full_region_label(location, sgg, emd)
 
         # 등기부 권리 내역 및 말소기준권리 파싱
         rights_raw = row.get("rights_list")
@@ -503,8 +567,8 @@ def generate_feed(limit: int = 500) -> list[dict]:
         min_short = format_krw_short(min_bid)
         discount_pct = round((1 - min_bid / appraisal) * 100) if appraisal > 0 else 0
 
-        # 스레드식 후킹 카피
-        hook_loc = emd if emd else (sgg.split()[-1] if sgg else short_loc)
+        # 스레드식 후킹 카피 (동 이름만 단독 표기하지 않고 시/도 + 시/군/구 + 동 전체 표기)
+        hook_loc = short_loc
         pyeong_short = f"{int(round(pyeong))}평 " if pyeong > 0 else ""
 
         if discount_pct >= 45:
@@ -519,8 +583,10 @@ def generate_feed(limit: int = 500) -> list[dict]:
             headline = f"{discount_pct}% 떨어진 {hook_loc} {usage_label}, {min_short}대 노려볼까?"
         elif safety_grade == "GREEN":
             headline = f"임차인 0명 · {hook_loc} {usage_label}, {min_short}에 깔끔하게 시작"
-        else:
+        elif gap > 0:
             headline = f"{hook_loc} {pyeong_short}{usage_label}, {ref_short}보다 {gap_short} 저렴하게"
+        else:
+            headline = f"{hook_loc} {pyeong_short}{usage_label}, 신건 첫 입찰 ({min_short})"
 
         right_icon = "🟢" if safety_grade == "GREEN" else ("🟡" if safety_grade == "YELLOW" else "🔴")
         bullet_right = f"{right_icon} {right_summary}"

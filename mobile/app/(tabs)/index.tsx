@@ -4,9 +4,9 @@ import {
   View,
   Text,
   FlatList,
+  ScrollView,
   TouchableOpacity,
   Image,
-  SafeAreaView,
   Platform,
   Modal,
   Pressable,
@@ -14,6 +14,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { FeedItem } from '../../types/feed';
