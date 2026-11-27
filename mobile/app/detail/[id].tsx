@@ -15,6 +15,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { FeedItem, TenantRecord } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
+import { formatDDayLabel } from '../../utils/formatDDay';
 
 const feedData = require('../../assets/mobile_feed.json');
 
@@ -347,7 +348,7 @@ export default function DetailScreen() {
             </View>
 
             <View style={styles.dDayWrap}>
-              <Text style={styles.dDayText}>{item.d_day}</Text>
+              <Text style={styles.dDayText}>{formatDDayLabel(item.d_day)}</Text>
             </View>
 
             {photos.length > 1 && (
