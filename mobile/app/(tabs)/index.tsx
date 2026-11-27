@@ -57,24 +57,80 @@ const VIEW_MODE_OPTIONS: {
 }[] = [
   {
     mode: 'card',
-    icon: '🃏',
-    title: '카드형으로 떠먹기',
-    desc: '큰 사진과 핵심 숫자만 한 장씩 슥슥 넘겨보기',
+    icon: '✨',
+    title: '오늘의 추천',
+    desc: '실사진·초급·할인율 우수 매물 TOP 12만 룩북으로 떠먹기',
     badge: '추천',
   },
   {
     mode: 'list',
     icon: '📋',
-    title: '리스트로 한눈에',
-    desc: '여러 경매 물건을 세로 목록으로 빠르게 비교하기',
+    title: '전체 탐색',
+    desc: '전체 매물을 난이도·금액·지역 필터로 한눈에 비교하기',
   },
   {
     mode: 'map',
     icon: '🗺️',
-    title: '지도로 동네 찾기',
-    desc: '지도 위 가격 핀으로 관심 동네 물건 탐색하기',
+    title: '동네 지도',
+    desc: '지도 위 가격 핀으로 관심 동네 경매 물건 찾기',
   },
 ];
+
+// '오늘의 추천' TOP 12 큐레이션 점수 산출 (실사진 · 초급 · 주거용 · 할인율 · AI점수)
+function buildCuratedTopItems(allItems: FeedItem[], targetCount = 12): FeedItem[] {
+  const scored = allItems.map((item) => {
+    let score = 0;
+    const p = item.photo_url || '';
+    const isCourtPhoto = p.includes('/photos/') && !p.includes('_sv.jpg');
+    const isStreetView = p.includes('_sv.jpg');
+
+    if (isCourtPhoto) score += 45;
+    else if (isStreetView) score += 25;
+
+    if (item.safety_grade === 'GREEN') score += 38;
+    else if (item.safety_grade === 'YELLOW') score += 16;
+    else score += 5;
+
+    if (item.usage === '아파트' || item.usage === '오피스텔') score += 18;
+    else if (item.usage === '빌라') score += 12;
+    else if (item.usage === '상가') score += 6;
+
+    score += Math.min(item.discount_pct || 0, 50) * 0.6;
+    score += (item.ai_analysis?.score || 0) * 0.2;
+
+    if (item.min_bid >= 100_000_000 && item.min_bid <= 700_000_000) score += 8;
+
+    return { item, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+
+  // 지역 편중 방지를 위해 같은 시군구 최대 3건까지만 우선 선택
+  const picked: FeedItem[] = [];
+  const regionCounts: Record<string, number> = {};
+
+  for (const { item } of scored) {
+    const regionKey = (item.short_location || '').split(' ').slice(0, 2).join(' ');
+    const cnt = regionCounts[regionKey] || 0;
+    if (cnt >= 3) continue;
+    picked.push(item);
+    regionCounts[regionKey] = cnt + 1;
+    if (picked.length >= targetCount) break;
+  }
+
+  // 혹시 부족하면 남은 상위 매물로 채움
+  if (picked.length < targetCount) {
+    const pickedIds = new Set(picked.map((i) => i.case_number));
+    for (const { item } of scored) {
+      if (!pickedIds.has(item.case_number)) {
+        picked.push(item);
+        if (picked.length >= targetCount) break;
+      }
+    }
+  }
+
+  return picked;
+}
 
 export default function FeedScreen() {
   const router = useRouter();
@@ -94,6 +150,9 @@ export default function FeedScreen() {
   const mapRef = useRef<any>(null);
 
   const items: FeedItem[] = feedData.items || [];
+
+  // '오늘의 추천' 엄선 TOP 12 큐레이션
+  const curatedItems = useMemo(() => buildCuratedTopItems(items, 12), [items]);
 
   // AsyncStorage에서 저장된 보기 모드 확인 (없으면 첫 진입 온보딩 표시)
   useEffect(() => {
@@ -115,13 +174,17 @@ export default function FeedScreen() {
     })();
   }, []);
 
-  // 보기 모드 선택 및 영구 저장
   const handleSelectViewMode = async (mode: ViewMode) => {
     setViewMode(mode);
     setShowOnboarding(false);
     setMenuVisible(false);
     setActiveCardIndex(0);
     setSelectedMapItem(null);
+    if (cardListRef.current) {
+      try {
+        cardListRef.current.scrollToOffset({ offset: 0, animated: false });
+      } catch (e) {}
+    }
     try {
       await AsyncStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
     } catch (err) {
@@ -129,7 +192,7 @@ export default function FeedScreen() {
     }
   };
 
-  // 필터링 적용된 매물 목록 (3가지 뷰 모두 공통 연동)
+  // '전체 탐색' & '동네 지도'용 필터링 적용 목록 (145건 전체 대상)
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
       if (activeFilter === 'beginner' && item.safety_grade !== 'GREEN') return false;
@@ -145,13 +208,7 @@ export default function FeedScreen() {
 
   const handleFilterChange = (type: FilterType) => {
     setActiveFilter(type);
-    setActiveCardIndex(0);
     setSelectedMapItem(null);
-    if (cardListRef.current) {
-      try {
-        cardListRef.current.scrollToOffset({ offset: 0, animated: false });
-      } catch (e) {}
-    }
   };
 
   const renderBadge = (grade: string, compact = false) => {
@@ -177,7 +234,7 @@ export default function FeedScreen() {
   };
 
   // ──────────────────────────────────────────
-  // 1. 리스트형 렌더러
+  // 1. '전체 탐색' (리스트형 — 145건 전체)
   // ──────────────────────────────────────────
   const renderListItem = ({ item }: { item: FeedItem }) => {
     const fav = isFavorite(item.case_number);
@@ -199,7 +256,9 @@ export default function FeedScreen() {
             onPress={() => toggleFavorite(item)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Text style={{ fontSize: 20 }}>{fav ? '⭐' : '☆'}</Text>
+            <Text style={[styles.heartIcon, fav && styles.heartIconActive]}>
+              {fav ? '♥' : '♡'}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -229,8 +288,10 @@ export default function FeedScreen() {
           </View>
 
           <View style={styles.footerRow}>
-            <Text style={styles.footerText}>{item.short_location} · {item.usage}</Text>
-            <Text style={styles.detailLink}>자세히 떠먹기 ›</Text>
+            <Text style={styles.footerText}>
+              {item.short_location} · {item.usage}
+            </Text>
+            <Text style={styles.detailLink}>자세히 보기 →</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -238,143 +299,182 @@ export default function FeedScreen() {
   };
 
   // ──────────────────────────────────────────
-  // 2. 카드형 (토스·인스타 카드뉴스 심플 UI)
+  // 2. '오늘의 추천' — 에디토리얼 룩북형 (TOP 12, 피크 레이아웃)
   // ──────────────────────────────────────────
-  const onCardScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const CARD_GAP = 14;
+  const LOOKBOOK_LEFT_INSET = winWidth > 500 ? Math.max(24, Math.floor((winWidth - 380) / 2) - 24) : 20;
+  // 오른쪽 가장자리에 다음 카드가 살짝(약 24~32px) 삐죽 보이도록 폭 계산
+  const lookbookCardWidth = winWidth > 500 ? 360 : Math.max(280, winWidth - 58);
+  const snapInterval = lookbookCardWidth + CARD_GAP;
+
+  // 상하 헤더·탭바·네비바에 절대 안 씹히도록 사진 높이 반응형 계산
+  const lookbookAvailHeight = Math.max(420, winHeight - 195);
+  const lookbookPhotoHeight = Math.max(175, Math.min(lookbookAvailHeight * 0.45, 255));
+
+  const onLookbookScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetX = e.nativeEvent.contentOffset.x;
-    const idx = Math.round(offsetX / winWidth);
-    if (idx !== activeCardIndex && idx >= 0 && idx < filteredItems.length) {
+    const idx = Math.round(offsetX / snapInterval);
+    if (idx !== activeCardIndex && idx >= 0 && idx < curatedItems.length) {
       setActiveCardIndex(idx);
     }
   };
 
-  const goToCardIndex = (nextIdx: number) => {
-    if (nextIdx < 0 || nextIdx >= filteredItems.length) return;
+  const goToLookbookIndex = (nextIdx: number) => {
+    if (nextIdx < 0 || nextIdx >= curatedItems.length) return;
     setActiveCardIndex(nextIdx);
     if (cardListRef.current) {
       try {
-        cardListRef.current.scrollToOffset({ offset: nextIdx * winWidth, animated: true });
+        cardListRef.current.scrollToOffset({ offset: nextIdx * snapInterval, animated: true });
       } catch (e) {}
     }
   };
 
-  const cardMaxWidth = Math.min(winWidth - 32, 430);
-  // 헤더·필터·하단 네비·탭바 높이를 제외한 가용 높이에 맞춰 사진 높이를 계산해 상단 씹힘 방지
-  const availableCardAreaHeight = Math.max(360, winHeight - 245);
-  const cardPhotoHeight = Math.max(145, Math.min(availableCardAreaHeight - 250, 245));
-
-  const renderCardItem = ({ item }: { item: FeedItem }) => {
+  const renderLookbookItem = ({ item, index }: { item: FeedItem; index: number }) => {
     const fav = isFavorite(item.case_number);
     const gapShort = item.gap_short_str || item.gap_amount_str;
-    const tags =
-      item.card_tags && item.card_tags.length > 0
-        ? item.card_tags.slice(0, 3)
-        : [
-            item.safety_grade === 'GREEN'
-              ? '초급 · 인수금 0원'
-              : item.safety_grade === 'YELLOW'
-              ? '중급 · 권리 체크'
-              : '고수 · 하이리턴',
-            `📍 ${item.short_location}`,
-            `보증금 ${item.deposit_required_str}`,
-          ];
+    const diffShort =
+      item.safety_grade === 'GREEN'
+        ? '🟢 초급'
+        : item.safety_grade === 'YELLOW'
+        ? '🟡 중급'
+        : '🔴 고수';
+    const shortSgg = (item.short_location || '').split(' ').slice(0, 2).join(' ');
+
+    const pastelTags: { label: string; tone: 'sage' | 'sand' | 'rose' }[] = [
+      {
+        label:
+          item.safety_grade === 'GREEN'
+            ? '추가 인수금 0원'
+            : item.safety_grade === 'YELLOW'
+            ? '세입자·관리비 체크'
+            : '고수용 하이리턴',
+        tone: item.safety_grade === 'GREEN' ? 'sage' : item.safety_grade === 'RED' ? 'rose' : 'sand',
+      },
+      { label: `보증금 ${item.deposit_required_str}`, tone: 'sand' },
+      { label: item.d_day, tone: 'sand' },
+    ];
 
     return (
-      <ScrollView
-        style={{ width: winWidth, flex: 1 }}
-        contentContainerStyle={styles.storyPageScrollContent}
-        showsVerticalScrollIndicator={false}
-        bounces={false}
+      <View
+        style={[
+          styles.lookbookItemWrap,
+          {
+            width: lookbookCardWidth,
+            marginRight: index === curatedItems.length - 1 ? 0 : CARD_GAP,
+          },
+        ]}
       >
-        <View style={[styles.storyCard, { width: cardMaxWidth }]}>
-          {/* 상단 큰 실물 사진 */}
-          <View style={[styles.storyPhotoWrap, { height: cardPhotoHeight }]}>
-            <Image source={{ uri: item.photo_url }} style={styles.storyPhoto} resizeMode="cover" />
+        <ScrollView
+          contentContainerStyle={styles.lookbookCardScrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          {/* 카드 전체 터치 없음 — 오직 하단 '자세히 보기 →' 버튼만 상세 이동 (스와이프 오작동 방지) */}
+          <View style={styles.lookbookCard}>
+            {/* 상단 절반: 둥근 모서리 실물 사진 + 좌상단 알약 + 우상단 ♡ 찜 */}
+            <View style={styles.lookbookPhotoOuter}>
+              <View style={[styles.lookbookPhotoWrap, { height: lookbookPhotoHeight }]}>
+                <Image
+                  source={{ uri: item.photo_url }}
+                  style={styles.lookbookPhoto}
+                  resizeMode="cover"
+                />
 
-            {/* 좌상단 난이도 배지 */}
-            <View style={styles.storyTopLeft}>{renderBadge(item.safety_grade, true)}</View>
+                {/* 좌상단 난이도/지역 알약 */}
+                <View style={styles.lookbookTopPill}>
+                  <Text style={styles.lookbookTopPillText}>
+                    {diffShort} · {shortSgg}
+                  </Text>
+                </View>
 
-            {/* 우상단 찜 버튼 */}
-            <TouchableOpacity
-              style={styles.storyFavBtn}
-              onPress={() => toggleFavorite(item)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Text style={{ fontSize: 20 }}>{fav ? '⭐' : '☆'}</Text>
-            </TouchableOpacity>
-
-            {/* 좌하단 D-Day */}
-            <View style={styles.storyBottomLeft}>
-              <Text style={styles.storyDDayText}>{item.d_day}</Text>
-            </View>
-          </View>
-
-          {/* 하단 여백 넉넉한 심플 핵심 영역 */}
-          <View style={styles.storyBody}>
-            {/* 굵은 한 줄 훅 */}
-            <Text style={styles.storyHook} numberOfLines={2}>
-              {item.headline}
-            </Text>
-
-            {/* 시선 꽂히는 큰 숫자 (최저가 + 시세차익) */}
-            <View style={styles.storyPriceBlock}>
-              <Text style={styles.storyBigPrice}>{item.min_bid_str}</Text>
-              <View style={styles.storyGapRow}>
-                {item.discount_pct > 0 && (
-                  <View style={styles.storyPctPill}>
-                    <Text style={styles.storyPctText}>-{item.discount_pct}%</Text>
-                  </View>
-                )}
-                {item.gap_amount > 0 && (
-                  <View style={styles.storyGapPill}>
-                    <Text style={styles.storyGapText}>
-                      {item.ref_price_name === '최근 실거래가' ? '시세' : '감정가'}보다 {gapShort} 저렴
-                    </Text>
-                  </View>
-                )}
+                {/* 우상단 ♡ 찜 버튼 */}
+                <TouchableOpacity
+                  style={styles.lookbookHeartBtn}
+                  onPress={() => toggleFavorite(item)}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.lookbookHeartText, fav && styles.lookbookHeartActive]}>
+                    {fav ? '♥' : '♡'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
 
-            {/* 핵심 배지 2~3개만 깔끔하게 */}
-            <View style={styles.storyTagsRow}>
-              {tags.map((tag, idx) => (
-                <View
-                  key={idx}
-                  style={[
-                    styles.storyTagPill,
-                    idx === 0 && item.safety_grade === 'GREEN' && styles.storyTagPillGreen,
-                    idx === 0 && item.safety_grade === 'RED' && styles.storyTagPillRed,
-                  ]}
-                >
-                  <Text
+            {/* 하단 절반: 넉넉한 여백의 에디토리얼 타이포 & 정보 */}
+            <View style={styles.lookbookBody}>
+              {/* 카테고리 | 지역 구분선 */}
+              <View style={styles.lookbookKickerRow}>
+                <Text style={styles.lookbookKickerCat}>{item.usage}</Text>
+                <Text style={styles.lookbookKickerDivider}>|</Text>
+                <Text style={styles.lookbookKickerLoc} numberOfLines={1}>
+                  {item.short_location}
+                </Text>
+              </View>
+
+              {/* 감성적이고 굵은 다크 차콜 타이틀 */}
+              <Text style={styles.lookbookTitle} numberOfLines={2}>
+                {item.headline}
+              </Text>
+
+              {/* 큼직한 최저가 숫자 + 감정가 대비 할인 */}
+              <View style={styles.lookbookPriceBlock}>
+                <Text style={styles.lookbookBigPrice}>{item.min_bid_str}</Text>
+                <View style={styles.lookbookDiscountRow}>
+                  {item.discount_pct > 0 ? (
+                    <Text style={styles.lookbookDiscountAccent}>
+                      감정가 대비 -{item.discount_pct}%
+                    </Text>
+                  ) : (
+                    <Text style={styles.lookbookDiscountMuted}>감정가 신건</Text>
+                  )}
+                  {item.gap_amount > 0 && (
+                    <Text style={styles.lookbookGapMuted}>· {gapShort} 저렴</Text>
+                  )}
+                </View>
+              </View>
+
+              {/* 은은한 파스텔 태그 2~3개 */}
+              <View style={styles.lookbookTagsRow}>
+                {pastelTags.map((t, tIdx) => (
+                  <View
+                    key={tIdx}
                     style={[
-                      styles.storyTagText,
-                      idx === 0 && item.safety_grade === 'GREEN' && styles.storyTagTextGreen,
-                      idx === 0 && item.safety_grade === 'RED' && styles.storyTagTextRed,
+                      styles.pastelTag,
+                      t.tone === 'sage' && styles.pastelTagSage,
+                      t.tone === 'rose' && styles.pastelTagRose,
                     ]}
                   >
-                    {tag}
-                  </Text>
-                </View>
-              ))}
-            </View>
+                    <Text
+                      style={[
+                        styles.pastelTagText,
+                        t.tone === 'sage' && styles.pastelTagTextSage,
+                        t.tone === 'rose' && styles.pastelTagTextRose,
+                      ]}
+                    >
+                      {t.label}
+                    </Text>
+                  </View>
+                ))}
+              </View>
 
-            {/* 토스 스타일 CTA 버튼 (이 버튼을 눌렀을 때만 상세로 이동) */}
-            <TouchableOpacity
-              style={styles.storyCtaBtn}
-              activeOpacity={0.85}
-              onPress={() => router.push(`/detail/${encodeURIComponent(item.case_number)}`)}
-            >
-              <Text style={styles.storyCtaText}>자세히 떠먹기 →</Text>
-            </TouchableOpacity>
+              {/* 검은 알약형 '자세히 보기 →' 버튼 (오직 이 버튼만 상세 화면 이동) */}
+              <TouchableOpacity
+                style={styles.lookbookCtaBtn}
+                activeOpacity={0.85}
+                onPress={() => router.push(`/detail/${encodeURIComponent(item.case_number)}`)}
+              >
+                <Text style={styles.lookbookCtaText}>자세히 보기 →</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     );
   };
 
   // ──────────────────────────────────────────
-  // 3. 지도형 렌더러
+  // 3. '동네 지도' (지도형)
   // ──────────────────────────────────────────
   const mapItems = useMemo(() => {
     return filteredItems.filter(
@@ -387,9 +487,9 @@ export default function FeedScreen() {
       return (
         <View style={styles.webMapFallback}>
           <Text style={{ fontSize: 40, marginBottom: 12 }}>🗺️</Text>
-          <Text style={styles.webMapTitle}>지도 보기는 모바일 앱에서 최적화돼요</Text>
+          <Text style={styles.webMapTitle}>동네 지도는 모바일 앱에서 최적화돼요</Text>
           <Text style={styles.webMapSubtitle}>
-            웹 브라우저에서는 카드형이나 리스트형으로 바로 떠먹어 보세요!{'\n'}
+            웹 브라우저에서는 오늘의 추천이나 전체 탐색으로 바로 확인해 보세요!{'\n'}
             (현재 조건 지도 매물: {mapItems.length}건)
           </Text>
           <View style={styles.webMapActionRow}>
@@ -397,13 +497,13 @@ export default function FeedScreen() {
               style={styles.webSwitchPrimaryBtn}
               onPress={() => handleSelectViewMode('card')}
             >
-              <Text style={styles.webSwitchPrimaryText}>🃏 카드로 떠먹기</Text>
+              <Text style={styles.webSwitchPrimaryText}>✨ 오늘의 추천</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.webSwitchSecondaryBtn}
               onPress={() => handleSelectViewMode('list')}
             >
-              <Text style={styles.webSwitchSecondaryText}>📋 리스트로 보기</Text>
+              <Text style={styles.webSwitchSecondaryText}>📋 전체 탐색</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -477,7 +577,7 @@ export default function FeedScreen() {
                     <Text style={styles.mapCardDiscount}>-{selectedMapItem.discount_pct}%</Text>
                   )}
                 </View>
-                <Text style={styles.mapCardHint}>자세히 떠먹기 ›</Text>
+                <Text style={styles.mapCardHint}>자세히 보기 →</Text>
               </View>
               <TouchableOpacity
                 style={styles.mapCardCloseBtn}
@@ -494,7 +594,7 @@ export default function FeedScreen() {
   };
 
   // ──────────────────────────────────────────
-  // 4. 첫 진입 보기 모드 선택 화면 (저장값 없을 때)
+  // 4. 첫 진입 보기 선택 화면 (오늘의 추천 / 전체 탐색 / 동네 지도)
   // ──────────────────────────────────────────
   if (isModeLoaded && showOnboarding) {
     return (
@@ -506,7 +606,7 @@ export default function FeedScreen() {
           </View>
 
           <View style={styles.onboardingTitleBox}>
-            <Text style={styles.onboardingHeadline}>어떤 방식으로 볼까요?</Text>
+            <Text style={styles.onboardingHeadline}>어떻게 둘러볼까요?</Text>
             <Text style={styles.onboardingHint}>
               언제든 우측 상단 ☰ 메뉴에서 바꿀 수 있어요
             </Text>
@@ -524,7 +624,7 @@ export default function FeedScreen() {
                 onPress={() => handleSelectViewMode(opt.mode)}
               >
                 <View style={styles.onboardingIconWrap}>
-                  <Text style={{ fontSize: 28 }}>{opt.icon}</Text>
+                  <Text style={{ fontSize: 26 }}>{opt.icon}</Text>
                 </View>
                 <View style={styles.onboardingTextWrap}>
                   <View style={styles.onboardingRowTitle}>
@@ -546,69 +646,76 @@ export default function FeedScreen() {
     );
   }
 
+  const isLookbook = viewMode === 'card';
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* 1. 브랜드 헤더 ("이지경매" / 부제 "경매 물건 떠먹기") + 우측 ☰ 메뉴 */}
-      <View style={styles.brandHeader}>
+    <SafeAreaView
+      style={[styles.container, isLookbook && styles.containerEditorial]}
+      edges={['top']}
+    >
+      {/* 1. 미니멀 브랜드 헤더 (이지경매 / 경매 물건 떠먹기 + 우측 ☰) */}
+      <View style={[styles.brandHeader, isLookbook && styles.brandHeaderEditorial]}>
         <View style={styles.brandTitleWrap}>
           <Text style={styles.brandTitle}>이지경매</Text>
           <Text style={styles.brandSubtitle}>경매 물건 떠먹기</Text>
         </View>
 
         <View style={styles.headerRight}>
-          {viewMode === 'card' && filteredItems.length > 0 && (
-            <View style={styles.cardCounterPill}>
-              <Text style={styles.cardCounterText}>
-                {activeCardIndex + 1} / {filteredItems.length}
+          {isLookbook && curatedItems.length > 0 && (
+            <View style={styles.lookbookCounterPill}>
+              <Text style={styles.lookbookCounterText}>
+                {activeCardIndex + 1} / {curatedItems.length}
               </Text>
             </View>
           )}
           <TouchableOpacity
-            style={styles.menuButton}
+            style={[styles.menuButton, isLookbook && styles.menuButtonEditorial]}
             onPress={() => setMenuVisible(true)}
             activeOpacity={0.75}
-            accessibilityLabel="보기 모드 메뉴 열기"
+            accessibilityLabel="메뉴 열기"
           >
             <Text style={styles.menuButtonIcon}>☰</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* 2. 상단 칩 필터 바 (리스트 · 카드 · 지도 3개 뷰 모두 연동) */}
-      <View style={styles.filterBar}>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterList}
-          data={[
-            { type: 'all', label: '전체' },
-            { type: 'beginner', label: '🟢 초급' },
-            { type: 'intermediate', label: '🟡 중급' },
-            { type: 'advanced', label: '🔴 고수' },
-            { type: 'budget_small', label: '3억 이하' },
-            { type: 'budget_mid', label: '3억~6억' },
-            { type: 'seoul', label: '서울' },
-            { type: 'gyeonggi', label: '경기·인천' },
-          ]}
-          keyExtractor={(i) => i.type}
-          renderItem={({ item }) => {
-            const isSelected = activeFilter === item.type;
-            return (
-              <TouchableOpacity
-                style={[styles.chip, isSelected && styles.chipActive]}
-                onPress={() => handleFilterChange(item.type as FilterType)}
-                activeOpacity={0.7}
-              >
-                <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      </View>
+      {/* 2. 상단 필터 바 ('전체 탐색' & '동네 지도'에서 145건 전체 필터링) */}
+      {!isLookbook && (
+        <View style={styles.filterBar}>
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterList}
+            data={[
+              { type: 'all', label: `전체 ${items.length}` },
+              { type: 'beginner', label: '🟢 초급' },
+              { type: 'intermediate', label: '🟡 중급' },
+              { type: 'advanced', label: '🔴 고수' },
+              { type: 'budget_small', label: '3억 이하' },
+              { type: 'budget_mid', label: '3억~6억' },
+              { type: 'seoul', label: '서울' },
+              { type: 'gyeonggi', label: '경기·인천' },
+            ]}
+            keyExtractor={(i) => i.type}
+            renderItem={({ item }) => {
+              const isSelected = activeFilter === item.type;
+              return (
+                <TouchableOpacity
+                  style={[styles.chip, isSelected && styles.chipActive]}
+                  onPress={() => handleFilterChange(item.type as FilterType)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </View>
+      )}
 
-      {/* 3. 메인 콘텐츠 (선택된 보기 모드에 따라 렌더링) */}
+      {/* 3. 메인 뷰 */}
       {viewMode === 'list' && (
         <FlatList
           data={filteredItems}
@@ -626,58 +733,74 @@ export default function FeedScreen() {
       )}
 
       {viewMode === 'card' && (
-        <View style={styles.cardModeWrap}>
+        <View style={styles.lookbookWrap}>
+          {/* 에디토리얼 큐레이션 서브 헤더 */}
+          <View style={styles.lookbookSubHeader}>
+            <Text style={styles.lookbookSubTitle}>TODAY&apos;S CURATION · 오늘의 추천</Text>
+            <TouchableOpacity onPress={() => handleSelectViewMode('list')} activeOpacity={0.7}>
+              <Text style={styles.lookbookViewAllLink}>전체 {items.length}건 ›</Text>
+            </TouchableOpacity>
+          </View>
+
           <FlatList
             ref={cardListRef}
-            data={filteredItems}
+            data={curatedItems}
             horizontal
-            pagingEnabled
             showsHorizontalScrollIndicator={false}
-            onScroll={onCardScroll}
+            snapToInterval={snapInterval}
+            snapToAlignment="start"
+            decelerationRate="fast"
+            disableIntervalMomentum={true}
+            onScroll={onLookbookScroll}
             scrollEventThrottle={16}
             keyExtractor={(item) => item.case_number}
-            renderItem={renderCardItem}
-            style={styles.cardSwipeContainer}
-            ListEmptyComponent={
-              <View style={[styles.emptyContainer, { width: winWidth }]}>
-                <Text style={{ fontSize: 40, marginBottom: 12 }}>🔍</Text>
-                <Text style={styles.emptyText}>조건에 맞는 경매 물건이 아직 없어요.</Text>
-              </View>
-            }
+            renderItem={renderLookbookItem}
+            contentContainerStyle={{
+              paddingLeft: LOOKBOOK_LEFT_INSET,
+              paddingRight: Math.max(20, winWidth - lookbookCardWidth - LOOKBOOK_LEFT_INSET),
+            }}
+            style={styles.lookbookList}
           />
 
-          {/* 하단 스와이프 보조 네비게이션 (모바일 스와이프 + 웹 클릭 호환) */}
-          {filteredItems.length > 1 && (
-            <View style={styles.cardNavBar}>
+          {/* 하단 컴팩트 룩북 컨트롤 */}
+          {curatedItems.length > 1 && (
+            <View style={styles.lookbookNavBar}>
               <TouchableOpacity
-                style={[styles.cardNavBtn, activeCardIndex === 0 && styles.cardNavBtnDisabled]}
-                onPress={() => goToCardIndex(activeCardIndex - 1)}
+                style={[styles.lookbookNavBtn, activeCardIndex === 0 && styles.lookbookNavBtnDisabled]}
+                onPress={() => goToLookbookIndex(activeCardIndex - 1)}
                 disabled={activeCardIndex === 0}
               >
                 <Text
                   style={[
-                    styles.cardNavBtnText,
-                    activeCardIndex === 0 && styles.cardNavBtnTextDisabled,
+                    styles.lookbookNavBtnText,
+                    activeCardIndex === 0 && styles.lookbookNavBtnTextDisabled,
                   ]}
                 >
                   ‹ 이전
                 </Text>
               </TouchableOpacity>
 
-              <Text style={styles.cardNavHint}>좌우로 넘겨서 떠먹기</Text>
+              <View style={styles.dotsRow}>
+                {curatedItems.map((_, idx) => (
+                  <View
+                    key={idx}
+                    style={[styles.dot, idx === activeCardIndex && styles.dotActive]}
+                  />
+                ))}
+              </View>
 
               <TouchableOpacity
                 style={[
-                  styles.cardNavBtn,
-                  activeCardIndex >= filteredItems.length - 1 && styles.cardNavBtnDisabled,
+                  styles.lookbookNavBtn,
+                  activeCardIndex >= curatedItems.length - 1 && styles.lookbookNavBtnDisabled,
                 ]}
-                onPress={() => goToCardIndex(activeCardIndex + 1)}
-                disabled={activeCardIndex >= filteredItems.length - 1}
+                onPress={() => goToLookbookIndex(activeCardIndex + 1)}
+                disabled={activeCardIndex >= curatedItems.length - 1}
               >
                 <Text
                   style={[
-                    styles.cardNavBtnText,
-                    activeCardIndex >= filteredItems.length - 1 && styles.cardNavBtnTextDisabled,
+                    styles.lookbookNavBtnText,
+                    activeCardIndex >= curatedItems.length - 1 && styles.lookbookNavBtnTextDisabled,
                   ]}
                 >
                   다음 ›
@@ -690,7 +813,7 @@ export default function FeedScreen() {
 
       {viewMode === 'map' && renderMapView()}
 
-      {/* 4. 우측 상단 ☰ 삼선 메뉴 → 보기 방식 전환 바텀시트 모달 */}
+      {/* 4. 우측 상단 ☰ 메뉴 → 바텀시트 (오늘의 추천 / 전체 탐색 / 동네 지도) */}
       <Modal
         visible={menuVisible}
         transparent
@@ -702,8 +825,8 @@ export default function FeedScreen() {
             <View style={styles.sheetHandle} />
             <View style={styles.sheetHeader}>
               <View>
-                <Text style={styles.sheetTitle}>보기 방식 바꾸기</Text>
-                <Text style={styles.sheetSub}>선택한 방식은 다음에도 기억해 둬요</Text>
+                <Text style={styles.sheetTitle}>메뉴 전환</Text>
+                <Text style={styles.sheetSub}>원하는 탐색 방식을 골라 보세요</Text>
               </View>
               <TouchableOpacity
                 style={styles.sheetCloseBtn}
@@ -727,10 +850,7 @@ export default function FeedScreen() {
                     <View style={{ flex: 1 }}>
                       <View style={styles.onboardingRowTitle}>
                         <Text
-                          style={[
-                            styles.sheetOptTitle,
-                            active && styles.sheetOptTitleActive,
-                          ]}
+                          style={[styles.sheetOptTitle, active && styles.sheetOptTitleActive]}
                         >
                           {opt.title}
                         </Text>
@@ -758,6 +878,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
+  containerEditorial: {
+    backgroundColor: '#FAF8F5',
+  },
 
   // ── 브랜드 헤더 ──
   brandHeader: {
@@ -769,37 +892,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  brandHeaderEditorial: {
+    backgroundColor: '#FAF8F5',
+  },
   brandTitleWrap: {
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 8,
   },
   brandTitle: {
-    fontSize: 22,
+    fontSize: 21,
     fontWeight: '900',
-    color: '#0f172a',
+    color: '#1C1917',
     letterSpacing: -0.5,
   },
   brandSubtitle: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '600',
-    color: '#64748b',
+    color: '#78716C',
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  cardCounterPill: {
-    backgroundColor: '#f1f5f9',
-    paddingHorizontal: 10,
+  lookbookCounterPill: {
+    backgroundColor: '#EFECE6',
+    paddingHorizontal: 11,
     paddingVertical: 5,
-    borderRadius: 12,
+    borderRadius: 999,
   },
-  cardCounterText: {
+  lookbookCounterText: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#334155',
+    color: '#44403C',
   },
   menuButton: {
     width: 38,
@@ -809,17 +935,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  menuButtonEditorial: {
+    backgroundColor: '#EFECE6',
+  },
   menuButtonIcon: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: '700',
-    color: '#0f172a',
+    color: '#1C1917',
     lineHeight: 22,
   },
 
   // ── 첫 진입 온보딩 화면 ──
   onboardingContainer: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FAF8F5',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -836,13 +965,13 @@ const styles = StyleSheet.create({
   onboardingBrandTitle: {
     fontSize: 26,
     fontWeight: '900',
-    color: '#2563eb',
+    color: '#1C1917',
     letterSpacing: -0.6,
   },
   onboardingBrandSub: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#64748b',
+    color: '#78716C',
   },
   onboardingTitleBox: {
     gap: 6,
@@ -850,12 +979,12 @@ const styles = StyleSheet.create({
   onboardingHeadline: {
     fontSize: 26,
     fontWeight: '900',
-    color: '#0f172a',
+    color: '#1C1917',
     letterSpacing: -0.5,
   },
   onboardingHint: {
     fontSize: 14,
-    color: '#64748b',
+    color: '#78716C',
   },
   onboardingOptions: {
     gap: 14,
@@ -865,27 +994,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 14,
     padding: 18,
-    borderRadius: 20,
-    backgroundColor: '#f8fafc',
-    borderWidth: 1.5,
-    borderColor: '#e2e8f0',
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E7E5E4',
+    shadowColor: '#292524',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 2,
   },
   onboardingCardBtnFeatured: {
-    backgroundColor: '#eff6ff',
-    borderColor: '#93c5fd',
+    borderColor: '#1C1917',
+    borderWidth: 1.5,
   },
   onboardingIconWrap: {
-    width: 50,
-    height: 50,
+    width: 48,
+    height: 48,
     borderRadius: 16,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FAF8F5',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 1,
   },
   onboardingTextWrap: {
     flex: 1,
@@ -899,41 +1028,41 @@ const styles = StyleSheet.create({
   onboardingOptTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#0f172a',
+    color: '#1C1917',
   },
   onboardingOptDesc: {
     fontSize: 13,
-    color: '#475569',
+    color: '#57534E',
     lineHeight: 18,
   },
   recommendPill: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#1C1917',
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 8,
+    borderRadius: 999,
   },
   recommendPillText: {
-    color: '#ffffff',
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '800',
   },
   onboardingArrow: {
     fontSize: 22,
-    color: '#94a3b8',
+    color: '#A8A29E',
     fontWeight: '600',
   },
 
   // ── 우측 상단 ☰ 메뉴 바텀시트 ──
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
+    backgroundColor: 'rgba(28, 25, 23, 0.45)',
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
   bottomSheet: {
     width: '100%',
     maxWidth: 480,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingHorizontal: 22,
@@ -945,7 +1074,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#cbd5e1',
+    backgroundColor: '#D6D3D1',
     alignSelf: 'center',
     marginBottom: 4,
   },
@@ -957,24 +1086,24 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 19,
     fontWeight: '900',
-    color: '#0f172a',
+    color: '#1C1917',
   },
   sheetSub: {
     fontSize: 13,
-    color: '#64748b',
+    color: '#78716C',
     marginTop: 2,
   },
   sheetCloseBtn: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#F5F5F4',
     alignItems: 'center',
     justifyContent: 'center',
   },
   sheetCloseText: {
     fontSize: 15,
-    color: '#475569',
+    color: '#57534E',
     fontWeight: '700',
   },
   sheetOptions: {
@@ -986,40 +1115,40 @@ const styles = StyleSheet.create({
     gap: 14,
     padding: 16,
     borderRadius: 18,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#FAF8F5',
     borderWidth: 1.5,
-    borderColor: '#e2e8f0',
+    borderColor: '#E7E5E4',
   },
   sheetOptionCardActive: {
-    backgroundColor: '#eff6ff',
-    borderColor: '#2563eb',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#1C1917',
   },
   sheetOptTitle: {
     fontSize: 15,
     fontWeight: '800',
-    color: '#0f172a',
+    color: '#1C1917',
   },
   sheetOptTitleActive: {
-    color: '#1d4ed8',
+    color: '#1C1917',
   },
   sheetOptDesc: {
     fontSize: 12.5,
-    color: '#64748b',
+    color: '#78716C',
     marginTop: 2,
   },
   activeCheckPill: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#1C1917',
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 10,
+    borderRadius: 999,
   },
   activeCheckText: {
-    color: '#ffffff',
+    color: '#FFFFFF',
     fontSize: 11.5,
     fontWeight: '800',
   },
 
-  // ── 상단 칩 필터 ──
+  // ── 상단 칩 필터 (전체 탐색 & 동네 지도) ──
   filterBar: {
     backgroundColor: '#ffffff',
     paddingVertical: 8,
@@ -1037,7 +1166,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f5f9',
   },
   chipActive: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#1C1917',
   },
   chipText: {
     fontSize: 13,
@@ -1049,7 +1178,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  // ── 1. 리스트형 스타일 ──
+  // ── 1. 전체 탐색 (리스트형) ──
   listContent: {
     padding: 16,
     gap: 16,
@@ -1084,7 +1213,7 @@ const styles = StyleSheet.create({
   listHeadline: {
     fontSize: 17,
     fontWeight: '800',
-    color: '#0f172a',
+    color: '#1C1917',
     lineHeight: 24,
   },
 
@@ -1133,7 +1262,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 12,
     left: 12,
-    backgroundColor: 'rgba(15, 23, 42, 0.78)',
+    backgroundColor: 'rgba(28, 25, 23, 0.78)',
     paddingHorizontal: 9,
     paddingVertical: 4,
     borderRadius: 8,
@@ -1154,6 +1283,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  heartIcon: {
+    fontSize: 19,
+    color: '#57534E',
+  },
+  heartIconActive: {
+    color: '#E11D48',
+  },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -1166,36 +1302,34 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 12,
-    color: '#64748b',
+    color: '#78716C',
     fontWeight: '600',
   },
   priceValue: {
     fontSize: 21,
     fontWeight: '900',
-    color: '#1d4ed8',
+    color: '#1C1917',
   },
   discountBadge: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#F5F0E8',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#bfdbfe',
   },
   discountText: {
-    color: '#1d4ed8',
+    color: '#B45309',
     fontSize: 13,
     fontWeight: '800',
   },
   bulletContainer: {
     gap: 5,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#FAF8F5',
     padding: 12,
     borderRadius: 14,
   },
   bulletText: {
     fontSize: 13,
-    color: '#334155',
+    color: '#44403C',
     lineHeight: 19,
   },
   footerRow: {
@@ -1206,212 +1340,273 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: '#78716C',
     fontWeight: '600',
   },
   detailLink: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#2563eb',
+    color: '#1C1917',
   },
 
-  // ── 2. 카드형 (토스·인스타 카드뉴스 심플 리디자인) ──
-  cardModeWrap: {
+  // ── 2. '오늘의 추천' — 에디토리얼 룩북형 ──
+  lookbookWrap: {
     flex: 1,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#FAF8F5',
   },
-  cardSwipeContainer: {
-    flex: 1,
-  },
-  storyPageScrollContent: {
-    flexGrow: 1,
+  lookbookSubHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 22,
+    paddingTop: 4,
+    paddingBottom: 6,
+  },
+  lookbookSubTitle: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#78716C',
+    letterSpacing: 0.8,
+  },
+  lookbookViewAllLink: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: '#44403C',
+  },
+  lookbookList: {
+    flex: 1,
+  },
+  lookbookItemWrap: {
+    flex: 1,
+  },
+  lookbookCardScrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 14,
+    paddingTop: 6,
     paddingBottom: 12,
   },
-  storyCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 26,
-    overflow: 'hidden',
-    shadowColor: '#0f172a',
-    shadowOffset: { width: 0, height: 8 },
+  lookbookCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 28,
+    shadowColor: '#292524',
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.08,
-    shadowRadius: 18,
+    shadowRadius: 24,
     elevation: 5,
+    borderWidth: 1,
+    borderColor: '#F0ECE4',
   },
-  storyPhotoWrap: {
+  lookbookPhotoOuter: {
+    padding: 10,
+    paddingBottom: 0,
+  },
+  lookbookPhotoWrap: {
     width: '100%',
+    borderRadius: 20,
+    overflow: 'hidden',
     position: 'relative',
-    backgroundColor: '#cbd5e1',
+    backgroundColor: '#E7E5E4',
   },
-  storyPhoto: {
+  lookbookPhoto: {
     width: '100%',
     height: '100%',
   },
-  storyTopLeft: {
+  lookbookTopPill: {
     position: 'absolute',
-    top: 14,
-    left: 14,
+    top: 12,
+    left: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.93)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
-  storyFavBtn: {
+  lookbookTopPillText: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#1C1917',
+  },
+  lookbookHeartBtn: {
     position: 'absolute',
     top: 12,
     right: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.94)',
     width: 38,
     height: 38,
     borderRadius: 19,
+    backgroundColor: 'rgba(255, 255, 255, 0.93)',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
   },
-  storyBottomLeft: {
-    position: 'absolute',
-    bottom: 12,
-    left: 14,
-    backgroundColor: 'rgba(15, 23, 42, 0.78)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
+  lookbookHeartText: {
+    fontSize: 20,
+    color: '#44403C',
+    lineHeight: 22,
   },
-  storyDDayText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '800',
+  lookbookHeartActive: {
+    color: '#E11D48',
   },
-  storyBody: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 16,
+  lookbookBody: {
+    paddingHorizontal: 22,
+    paddingTop: 18,
+    paddingBottom: 20,
     gap: 12,
   },
-  storyHook: {
+  lookbookKickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+  lookbookKickerCat: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#44403C',
+  },
+  lookbookKickerDivider: {
+    fontSize: 11,
+    color: '#D6D3D1',
+  },
+  lookbookKickerLoc: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#78716C',
+    flex: 1,
+    minWidth: 0,
+  },
+  lookbookTitle: {
     fontSize: 19,
-    fontWeight: '900',
-    color: '#0f172a',
+    fontWeight: '800',
+    color: '#1C1917',
     lineHeight: 26,
     letterSpacing: -0.4,
   },
-  storyPriceBlock: {
-    gap: 6,
+  lookbookPriceBlock: {
+    gap: 4,
+    paddingTop: 2,
   },
-  storyBigPrice: {
+  lookbookBigPrice: {
     fontSize: 27,
     fontWeight: '900',
-    color: '#111827',
-    letterSpacing: -0.7,
+    color: '#1C1917',
+    letterSpacing: -0.8,
   },
-  storyGapRow: {
+  lookbookDiscountRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 7,
-  },
-  storyPctPill: {
-    backgroundColor: '#2563eb',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-  },
-  storyPctText: {
-    color: '#ffffff',
-    fontSize: 12.5,
-    fontWeight: '900',
-  },
-  storyGapPill: {
-    backgroundColor: '#ecfdf5',
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-    borderRadius: 8,
-  },
-  storyGapText: {
-    color: '#047857',
-    fontSize: 12.5,
-    fontWeight: '800',
-  },
-  storyTagsRow: {
-    flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
   },
-  storyTagPill: {
-    backgroundColor: '#f1f5f9',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
+  lookbookDiscountAccent: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#0F766E',
   },
-  storyTagPillGreen: {
-    backgroundColor: '#ecfdf5',
-  },
-  storyTagPillRed: {
-    backgroundColor: '#fef2f2',
-  },
-  storyTagText: {
-    fontSize: 12,
+  lookbookDiscountMuted: {
+    fontSize: 13,
     fontWeight: '700',
-    color: '#334155',
+    color: '#78716C',
   },
-  storyTagTextGreen: {
-    color: '#047857',
+  lookbookGapMuted: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#57534E',
   },
-  storyTagTextRed: {
-    color: '#b91c1c',
+  lookbookTagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 7,
+    paddingTop: 2,
   },
-  storyCtaBtn: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 13,
-    borderRadius: 15,
+  pastelTag: {
+    backgroundColor: '#F5F0E8',
+    paddingHorizontal: 11,
+    paddingVertical: 5,
+    borderRadius: 999,
+  },
+  pastelTagSage: {
+    backgroundColor: '#EAF4EE',
+  },
+  pastelTagRose: {
+    backgroundColor: '#FCEEEB',
+  },
+  pastelTagText: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#57534E',
+  },
+  pastelTagTextSage: {
+    color: '#166534',
+  },
+  pastelTagTextRose: {
+    color: '#9F1239',
+  },
+  lookbookCtaBtn: {
+    backgroundColor: '#1C1917',
+    borderRadius: 999,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 2,
+    marginTop: 4,
   },
-  storyCtaText: {
-    color: '#ffffff',
-    fontSize: 15,
+  lookbookCtaText: {
+    color: '#FFFFFF',
+    fontSize: 14.5,
     fontWeight: '800',
+    letterSpacing: 0.2,
   },
-  cardNavBar: {
+  lookbookNavBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingBottom: 12,
+    paddingHorizontal: 22,
+    paddingBottom: 10,
     paddingTop: 2,
     maxWidth: 460,
     width: '100%',
     alignSelf: 'center',
   },
-  cardNavBtn: {
+  lookbookNavBtn: {
     paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 12,
-    backgroundColor: '#ffffff',
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: '#E7E5E4',
   },
-  cardNavBtnDisabled: {
-    opacity: 0.4,
+  lookbookNavBtnDisabled: {
+    opacity: 0.35,
   },
-  cardNavBtnText: {
-    fontSize: 13,
+  lookbookNavBtnText: {
+    fontSize: 12.5,
     fontWeight: '800',
-    color: '#0f172a',
+    color: '#1C1917',
   },
-  cardNavBtnTextDisabled: {
-    color: '#94a3b8',
+  lookbookNavBtnTextDisabled: {
+    color: '#A8A29E',
   },
-  cardNavHint: {
-    fontSize: 12,
-    color: '#64748b',
-    fontWeight: '600',
+  dotsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#D6D3D1',
+  },
+  dotActive: {
+    width: 16,
+    backgroundColor: '#1C1917',
   },
 
-  // ── 3. 지도형 스타일 ──
+  // ── 3. 동네 지도 (지도형) ──
   mapContainer: {
     flex: 1,
     position: 'relative',
@@ -1437,8 +1632,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   customMarkerSelected: {
-    borderColor: '#2563eb',
-    backgroundColor: '#eff6ff',
+    borderColor: '#1C1917',
+    backgroundColor: '#FAF8F5',
     transform: [{ scale: 1.08 }],
   },
   markerDot: {
@@ -1449,7 +1644,7 @@ const styles = StyleSheet.create({
   markerText: {
     fontSize: 11.5,
     fontWeight: '900',
-    color: '#0f172a',
+    color: '#1C1917',
   },
   mapFloatingCardWrap: {
     position: 'absolute',
@@ -1489,13 +1684,13 @@ const styles = StyleSheet.create({
   },
   mapCardDDay: {
     fontSize: 11,
-    color: '#64748b',
+    color: '#78716C',
     fontWeight: '700',
   },
   mapCardHeadline: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#0f172a',
+    color: '#1C1917',
   },
   mapCardPriceRow: {
     flexDirection: 'row',
@@ -1505,17 +1700,17 @@ const styles = StyleSheet.create({
   mapCardPrice: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#1d4ed8',
+    color: '#1C1917',
   },
   mapCardDiscount: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#dc2626',
+    color: '#0F766E',
   },
   mapCardHint: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#2563eb',
+    fontWeight: '800',
+    color: '#1C1917',
   },
   mapCardCloseBtn: {
     alignSelf: 'flex-start',
@@ -1532,17 +1727,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
+    backgroundColor: '#FAF8F5',
   },
   webMapTitle: {
     fontSize: 18,
     fontWeight: '900',
-    color: '#0f172a',
+    color: '#1C1917',
     marginBottom: 8,
     textAlign: 'center',
   },
   webMapSubtitle: {
     fontSize: 13.5,
-    color: '#64748b',
+    color: '#78716C',
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 22,
@@ -1552,10 +1748,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   webSwitchPrimaryBtn: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#1C1917',
     paddingHorizontal: 18,
     paddingVertical: 11,
-    borderRadius: 14,
+    borderRadius: 999,
   },
   webSwitchPrimaryText: {
     color: '#ffffff',
@@ -1566,12 +1762,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     paddingHorizontal: 18,
     paddingVertical: 11,
-    borderRadius: 14,
+    borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#cbd5e1',
+    borderColor: '#D6D3D1',
   },
   webSwitchSecondaryText: {
-    color: '#334155',
+    color: '#1C1917',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -1584,7 +1780,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 15,
-    color: '#64748b',
+    color: '#78716C',
     fontWeight: '600',
   },
 });
