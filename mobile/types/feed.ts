@@ -24,10 +24,26 @@ export interface SpecialRightObject {
   desc?: string;
 }
 
+export interface TenantRecord {
+  name: string;
+  room: string;
+  move_in_date: string;
+  deposit: number;
+  deposit_str: string;
+  monthly_rent?: string;
+  fixed_date?: string;
+  is_payout_requested: boolean;
+  seniority: 'SENIOR' | 'JUNIOR' | 'UNKNOWN';
+}
+
 export interface RawCourtData {
   rights_list: RawCourtRight[] | string;
   remarks: string;
   special_rights: Array<string | SpecialRightObject> | string;
+  tenants_list?: TenantRecord[];
+  senior_assumed_deposit?: number;
+  senior_assumed_deposit_str?: string;
+  senior_unknown_count?: number;
   tenant_registration_date?: string;
   tenant_deposit?: number;
   tenant_deposit_str?: string;
@@ -59,6 +75,7 @@ export interface AIAnalysis {
   malso_right?: MalsoRight | null;
   assumed_deposit: number;
   assumed_deposit_str: string;
+  senior_unknown_count?: number;
 }
 
 export interface BidHistoryItem {
@@ -124,6 +141,8 @@ export interface FeedItem {
   lng?: number | null;
   photo_url: string;
   photos?: string[];
+  photo_source?: 'court' | 'streetview' | 'stock';
+  photo_source_label?: string;
   ai_analysis?: AIAnalysis;
   bid_history?: BidHistoryItem[];
   rental_estimate?: RentalEstimate | null;

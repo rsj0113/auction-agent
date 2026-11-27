@@ -7,12 +7,13 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
+  Linking,
   useWindowDimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { FeedItem } from '../../types/feed';
+import { FeedItem, TenantRecord } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
 
 const feedData = require('../../assets/mobile_feed.json');
@@ -143,6 +144,25 @@ function parseRemarkSections(rawRemarks?: string): RemarkSection[] {
   return sections.length > 0 ? sections : [{ heading: '매각물건명세서 원문', body: text }];
 }
 
+function getBangGongje(location: string, usage: string): { amount: number; regionLabel: string } {
+  const isNonResidential = usage === '상가' || usage === '토지';
+  if (isNonResidential) {
+    return { amount: 0, regionLabel: '비주거(방공제 미적용)' };
+  }
+  const loc = location || '';
+  if (loc.includes('서울')) {
+    return { amount: 55_000_000, regionLabel: '서울 5,500만원' };
+  }
+  const metroOvercrowded = [
+    '인천', '성남', '분당', '수원', '용인', '안양', '과천', '광명', '의왕', '군포',
+    '부천', '시흥', '고양', '일산', '하남', '구리', '남양주', '의정부', '화성', '김포', '파주', '경기',
+  ];
+  if (metroOvercrowded.some((kw) => loc.includes(kw))) {
+    return { amount: 48_000_000, regionLabel: '경기·인천 과밀억제 4,800만원' };
+  }
+  return { amount: 28_000_000, regionLabel: '기타 지역 2,800만원' };
+}
+
 export default function DetailScreen() {
   const router = useRouter();
   const { width: winWidth } = useWindowDimensions();
@@ -151,7 +171,10 @@ export default function DetailScreen() {
 
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [loanPreset, setLoanPreset] = useState<LoanPreset>('normal');
+  const [mciExempt, setMciExempt] = useState(false);
   const [isRawExpanded, setIsRawExpanded] = useState(false);
+  const [showAllTenants, setShowAllTenants] = useState(false);
+  const [isFullRawJsonOpen, setIsFullRawJsonOpen] = useState(false);
 
   const photoScrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
 
@@ -161,12 +184,13 @@ export default function DetailScreen() {
 
   const galleryWidth = Math.min(winWidth, 640);
 
-  // 필요 자기자본 시뮬레이션 계산 (현행 경락잔금대출/주담대 규제 참고)
+  // 필요 자기자본 시뮬레이션 계산 (현행 경락잔금대출/주담대 규제 + 방공제 차감/면제 반영)
   const equityCalc = useMemo(() => {
     if (!item) return null;
     const isNonResidential = item.usage === '상가' || item.usage === '토지';
     const basePrice = item.min_bid; // 최저가 낙찰 가정 시뮬레이션
     const appraisalBase = Math.min(basePrice, item.appraisal || basePrice);
+    const bangInfo = getBangGongje(item.location, item.usage);
 
     let ltv = isNonResidential ? 0.6 : 0.7;
     let maxCap = Infinity;
@@ -179,14 +203,25 @@ export default function DetailScreen() {
       maxCap = isNonResidential ? Infinity : 600_000_000;
       presetDesc = isNonResidential
         ? '비주거 물건은 생애최초 특례 미적용 (일반 LTV 60% 기준)'
-        : '생애최초 주택구입 특례 LTV 80% (최대 한도 6억원 캡)';
+        : '생애최초 주택구입 특례 LTV 80% (최대 6억 캡 · MCG 방공제 면제)';
     } else if (loanPreset === 'conservative') {
       ltv = 0.5;
-      presetDesc = '규제지역·다주택·방공제 감안 보수적 LTV 50% 기준';
+      presetDesc = '규제지역·다주택 감안 보수적 LTV 50% 기준';
     }
 
-    const rawLoan = Math.floor(appraisalBase * ltv);
-    const estLoan = Math.min(rawLoan, maxCap);
+    // 방공제(소액임차보증금) 실제 차감 여부: 생애최초 특례 또는 MCI 가입 시 면제
+    const isBangExempt = isNonResidential || loanPreset === 'first_home' || mciExempt;
+    const appliedBangGongje = isBangExempt ? 0 : bangInfo.amount;
+    const bangStatusLabel = isNonResidential
+      ? '비주거 미적용'
+      : loanPreset === 'first_home'
+      ? '생애최초 특례 면제 (0원)'
+      : mciExempt
+      ? 'MCI 보증보험 면제 (0원)'
+      : `${bangInfo.regionLabel} 차감`;
+
+    const rawLoan = Math.min(Math.floor(appraisalBase * ltv), maxCap);
+    const estLoan = Math.max(0, rawLoan - appliedBangGongje);
     const pureEquity = Math.max(0, basePrice - estLoan);
 
     // 취득세·등기비·명도 예비비 추산
@@ -196,15 +231,21 @@ export default function DetailScreen() {
     const totalCashNeeded = pureEquity + extraCost + assumedDeposit;
 
     return {
+      isNonResidential,
       ltvPct: Math.round(ltv * 100),
       presetDesc,
+      rawLoan,
+      bangInfo,
+      appliedBangGongje,
+      isBangExempt,
+      bangStatusLabel,
       estLoan,
       pureEquity,
       extraCost,
       assumedDeposit,
       totalCashNeeded,
     };
-  }, [item, loanPreset]);
+  }, [item, loanPreset, mciExempt]);
 
   if (!item || !equityCalc) {
     return (
@@ -292,6 +333,18 @@ export default function DetailScreen() {
             </ScrollView>
 
             <View style={styles.badgeWrap}>{renderDifficultyBadge(item.safety_grade)}</View>
+
+            {/* 우상단 사진 출처 배지 (법원 감정평가서 N장 / 거리뷰 / 참고 이미지) */}
+            <View style={styles.photoSourceWrap}>
+              <Text style={styles.photoSourceText}>
+                {item.photo_source_label ||
+                  (photos.some((p) => p.includes('/photos/') && !p.includes('_sv.jpg'))
+                    ? `🏛️ 법원 감정평가서 ${photos.length}장`
+                    : photos.some((p) => p.includes('_sv.jpg'))
+                    ? '🌐 거리뷰'
+                    : '🖼️ 참고 이미지')}
+              </Text>
+            </View>
 
             <View style={styles.dDayWrap}>
               <Text style={styles.dDayText}>{item.d_day}</Text>
@@ -415,6 +468,27 @@ export default function DetailScreen() {
 
               <Text style={styles.presetDescText}>📌 {equityCalc.presetDesc}</Text>
 
+              {/* 방공제 면제(MCI 보증보험) 토글 — 주거용 & 일반/보수적 LTV일 때 */}
+              {!equityCalc.isNonResidential && loanPreset !== 'first_home' && (
+                <TouchableOpacity
+                  style={[styles.mciToggleRow, mciExempt && styles.mciToggleRowActive]}
+                  onPress={() => setMciExempt(!mciExempt)}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.mciCheckBox, mciExempt && styles.mciCheckBoxActive]}>
+                    <Text style={styles.mciCheckMark}>{mciExempt ? '✓' : ''}</Text>
+                  </View>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={styles.mciToggleTitle}>
+                      MCI·MCG 보증보험 가입 (방공제 {formatKrw(equityCalc.bangInfo.amount)} 면제)
+                    </Text>
+                    <Text style={styles.mciToggleSub}>
+                      미가입 시 {equityCalc.bangInfo.regionLabel}이 대출 한도에서 자동 차감됩니다
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+
               {/* 총 필요 현금 하이라이트 */}
               <View style={styles.totalCashHighlight}>
                 <Text style={styles.totalCashLabel}>실제 필요한 총 현금 (자기자본+비용)</Text>
@@ -424,7 +498,23 @@ export default function DetailScreen() {
               {/* 세부 내역 행 */}
               <View style={styles.calcRows}>
                 <View style={styles.calcRow}>
-                  <Text style={styles.calcKey}>예상 경락잔금대출 ({equityCalc.ltvPct}%)</Text>
+                  <Text style={styles.calcKey}>기본 LTV 한도 ({equityCalc.ltvPct}%)</Text>
+                  <Text style={styles.calcVal}>{formatKrw(equityCalc.rawLoan)}</Text>
+                </View>
+                <View style={styles.calcRow}>
+                  <Text style={styles.calcKey}>소액임차보증금(방공제)</Text>
+                  <Text
+                    style={
+                      equityCalc.appliedBangGongje > 0 ? styles.calcValRed : styles.calcValGreen
+                    }
+                  >
+                    {equityCalc.appliedBangGongje > 0
+                      ? `- ${formatKrw(equityCalc.appliedBangGongje)} (${equityCalc.bangInfo.regionLabel.split(' ')[0]})`
+                      : equityCalc.bangStatusLabel}
+                  </Text>
+                </View>
+                <View style={styles.calcRow}>
+                  <Text style={styles.calcKey}>실제 예상 경락잔금대출</Text>
                   <Text style={styles.calcValBlue}>- {formatKrw(equityCalc.estLoan)}</Text>
                 </View>
                 <View style={styles.calcRow}>
@@ -455,7 +545,7 @@ export default function DetailScreen() {
               </View>
 
               <Text style={styles.disclaimerText}>
-                ※ 실제 대출 한도는 DSR·소액임차인 방공제·규제지역·개인 신용도에 따라 달라질 수 있는 참고 시뮬레이션입니다.
+                ※ 현행 지역별 방공제(서울 5,500만 · 경기/인천 과밀억제 4,800만 · 기타 2,800만)를 반영한 참고 시뮬레이션이며, 실제 대출 한도는 DSR·은행별 MCI 취급 여부·개인 신용도에 따라 달라질 수 있습니다.
               </Text>
             </View>
 
@@ -737,37 +827,138 @@ export default function DetailScreen() {
                       )}
                     </View>
 
-                    {/* 현황조사서 임차인 상세 */}
-                    <View style={styles.rawSection}>
-                      <Text style={styles.rawSectionTitle}>🏠 현황조사서 임차인 현황</Text>
-                      <View style={styles.rawTenantBox}>
-                        <View style={styles.rawTenantRow}>
-                          <Text style={styles.rawTenantKey}>전입일자</Text>
-                          <Text style={styles.rawTenantVal}>
-                            {rawData?.tenant_registration_date || '전입 세대 미상/없음'}
+                    {/* 현황조사서 임차인 상세 (선순위 인수 보증금 vs 전체 조사된 임차인 현황 명확 구분) */}
+                    {(() => {
+                      const tenantsList: TenantRecord[] = Array.isArray(rawData?.tenants_list)
+                        ? rawData.tenants_list
+                        : [];
+                      const seniorDep = rawData?.senior_assumed_deposit || ai?.assumed_deposit || 0;
+                      const seniorUnknownCnt = rawData?.senior_unknown_count || ai?.senior_unknown_count || 0;
+                      const visibleTenants = showAllTenants ? tenantsList : tenantsList.slice(0, 10);
+
+                      return (
+                        <View style={styles.rawSection}>
+                          <Text style={styles.rawSectionTitle}>
+                            🏠 현황조사서 임차인 현황 ({tenantsList.length}명)
                           </Text>
-                        </View>
-                        <View style={styles.rawTenantRow}>
-                          <Text style={styles.rawTenantKey}>보증금</Text>
-                          <Text style={styles.rawTenantVal}>
-                            {rawData?.tenant_deposit && rawData.tenant_deposit > 0
-                              ? rawData.tenant_deposit_str
-                              : '0원 (확인된 보증금 없음)'}
-                          </Text>
-                        </View>
-                        <View style={[styles.rawTenantRow, styles.rawTenantRowLast]}>
-                          <Text style={styles.rawTenantKey}>배당요구 신청</Text>
-                          <Text
+
+                          {/* A. 선순위 인수 보증금 요약 박스 */}
+                          <View
                             style={[
-                              styles.rawTenantVal,
-                              rawData?.is_payout_requested ? styles.payoutYes : styles.payoutNo,
+                              styles.seniorSummaryBox,
+                              (seniorDep > 0 || seniorUnknownCnt > 0) && styles.seniorSummaryBoxWarn,
                             ]}
                           >
-                            {rawData?.is_payout_requested ? '신청 완료 (배당요구함)' : '신청 내역 없음'}
-                          </Text>
+                            <Text style={styles.seniorSummaryLabel}>선순위 인수 예상 보증금</Text>
+                            <Text
+                              style={[
+                                styles.seniorSummaryVal,
+                                (seniorDep > 0 || seniorUnknownCnt > 0) && styles.seniorSummaryValWarn,
+                              ]}
+                            >
+                              {seniorDep > 0
+                                ? `${formatKrw(seniorDep)}${
+                                    seniorUnknownCnt > 0 ? ` + 미상 ${seniorUnknownCnt}명` : ''
+                                  }`
+                                : seniorUnknownCnt > 0
+                                ? `선순위 임차인 ${seniorUnknownCnt}명 보증금 미상 (인수 위험 확인 필수)`
+                                : '0원 (확인된 선순위 인수 보증금 없음)'}
+                            </Text>
+                          </View>
+
+                          {/* B. 전체 조사된 임차인 목록 */}
+                          {tenantsList.length > 0 ? (
+                            <View style={styles.tenantsCardsList}>
+                              {visibleTenants.map((t, tIdx) => (
+                                <View key={tIdx} style={styles.tenantItemCard}>
+                                  <View style={styles.tenantItemHeader}>
+                                    <Text style={styles.tenantItemName}>
+                                      {t.name}
+                                      {t.room ? ` · ${t.room}` : ''}
+                                    </Text>
+                                    <View
+                                      style={[
+                                        styles.seniorityPill,
+                                        t.seniority === 'SENIOR'
+                                          ? styles.seniorityPillRed
+                                          : t.seniority === 'JUNIOR'
+                                          ? styles.seniorityPillGreen
+                                          : styles.seniorityPillGray,
+                                      ]}
+                                    >
+                                      <Text
+                                        style={[
+                                          styles.seniorityPillText,
+                                          t.seniority === 'SENIOR'
+                                            ? styles.seniorityTextRed
+                                            : t.seniority === 'JUNIOR'
+                                            ? styles.seniorityTextGreen
+                                            : styles.seniorityTextGray,
+                                        ]}
+                                      >
+                                        {t.seniority === 'SENIOR'
+                                          ? '선순위 주의'
+                                          : t.seniority === 'JUNIOR'
+                                          ? '후순위 소멸'
+                                          : '대항력 미상'}
+                                      </Text>
+                                    </View>
+                                  </View>
+
+                                  <View style={styles.tenantMetaGrid}>
+                                    <Text style={styles.tenantMetaLine}>
+                                      <Text style={styles.rawRightKey}>전입일: </Text>
+                                      <Text style={styles.rawRightVal}>{t.move_in_date || '미상'}</Text>
+                                      {'  |  '}
+                                      <Text style={styles.rawRightKey}>보증금: </Text>
+                                      <Text style={styles.rawRightVal}>{t.deposit_str || '미상'}</Text>
+                                    </Text>
+                                    <Text style={styles.tenantMetaLine}>
+                                      {t.monthly_rent ? (
+                                        <>
+                                          <Text style={styles.rawRightKey}>월세: </Text>
+                                          <Text style={styles.rawRightVal}>{t.monthly_rent}</Text>
+                                          {'  |  '}
+                                        </>
+                                      ) : undefined}
+                                      <Text style={styles.rawRightKey}>확정일: </Text>
+                                      <Text style={styles.rawRightVal}>{t.fixed_date || '미상'}</Text>
+                                      {'  |  '}
+                                      <Text style={styles.rawRightKey}>배당요구: </Text>
+                                      <Text
+                                        style={t.is_payout_requested ? styles.payoutYes : styles.payoutNo}
+                                      >
+                                        {t.is_payout_requested ? '신청함' : '없음'}
+                                      </Text>
+                                    </Text>
+                                  </View>
+                                </View>
+                              ))}
+
+                              {tenantsList.length > 10 && (
+                                <TouchableOpacity
+                                  style={styles.showMoreTenantsBtn}
+                                  onPress={() => setShowAllTenants(!showAllTenants)}
+                                  activeOpacity={0.8}
+                                >
+                                  <Text style={styles.showMoreTenantsText}>
+                                    {showAllTenants
+                                      ? '임차인 목록 접기 ▲'
+                                      : `+ 나머지 ${tenantsList.length - 10}명 모두 보기 (총 ${tenantsList.length}명)`}
+                                  </Text>
+                                </TouchableOpacity>
+                              )}
+                            </View>
+                          ) : (
+                            <View style={styles.rawTenantBox}>
+                              <Text style={styles.rawEmptyText}>
+                                현황조사서상 조사된 임차인이 없습니다 (소유자 점유 또는 공실 추정).
+                              </Text>
+                            </View>
+                          )}
                         </View>
-                      </View>
-                    </View>
+                      );
+                    })()}
 
                     {/* 특수권리 및 주의 조건 카드 */}
                     {parsedSpecials.length > 0 && (
@@ -809,6 +1000,53 @@ export default function DetailScreen() {
                           </Text>
                         </View>
                       )}
+                    </View>
+
+                    {/* 더블체크용: 법원 원문 전체 보기 (Raw JSON/텍스트) + 대법원 바로가기 */}
+                    <View style={styles.doubleCheckBox}>
+                      <TouchableOpacity
+                        style={styles.rawJsonToggleBtn}
+                        onPress={() => setIsFullRawJsonOpen(!isFullRawJsonOpen)}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={styles.rawJsonToggleText}>
+                          📄 법원 원문 전체 보기 (Raw JSON/텍스트) {isFullRawJsonOpen ? '▲' : '▼'}
+                        </Text>
+                      </TouchableOpacity>
+
+                      {isFullRawJsonOpen && (
+                        <ScrollView
+                          style={styles.rawJsonScrollBox}
+                          nestedScrollEnabled={true}
+                          showsVerticalScrollIndicator={true}
+                        >
+                          <Text style={styles.rawJsonCodeText} selectable={true}>
+                            {JSON.stringify(
+                              {
+                                case_number: item.case_number,
+                                court_name: item.court_name,
+                                auction_date: item.auction_date,
+                                raw_court_data: rawData,
+                              },
+                              null,
+                              2
+                            )}
+                          </Text>
+                        </ScrollView>
+                      )}
+
+                      <TouchableOpacity
+                        style={styles.courtLinkBtn}
+                        activeOpacity={0.85}
+                        onPress={() => Linking.openURL('https://www.courtauction.go.kr')}
+                      >
+                        <Text style={styles.courtLinkBtnText}>
+                          🏛️ 대한민국 법원 경매정보(courtauction.go.kr) 바로가기 ↗
+                        </Text>
+                        <Text style={styles.courtLinkSubText}>
+                          사건번호 {item.case_number} 직접 더블체크
+                        </Text>
+                      </TouchableOpacity>
                     </View>
 
                     <Text style={styles.rawDisclaimer}>
@@ -907,8 +1145,22 @@ const styles = StyleSheet.create({
   },
   badgeWrap: {
     position: 'absolute',
-    top: 16,
-    left: 16,
+    top: 14,
+    left: 14,
+  },
+  photoSourceWrap: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    backgroundColor: 'rgba(15, 23, 42, 0.78)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+  },
+  photoSourceText: {
+    color: '#ffffff',
+    fontSize: 11.5,
+    fontWeight: '800',
   },
   badge: {
     paddingHorizontal: 12,
@@ -1149,6 +1401,49 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#475569',
     fontWeight: '600',
+  },
+  mciToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+  },
+  mciToggleRowActive: {
+    backgroundColor: '#eff6ff',
+    borderColor: '#2563eb',
+  },
+  mciCheckBox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: '#94a3b8',
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mciCheckBoxActive: {
+    backgroundColor: '#2563eb',
+    borderColor: '#2563eb',
+  },
+  mciCheckMark: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  mciToggleTitle: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: '#0f172a',
+  },
+  mciToggleSub: {
+    fontSize: 11,
+    color: '#64748b',
+    marginTop: 2,
   },
   totalCashHighlight: {
     backgroundColor: '#0f172a',

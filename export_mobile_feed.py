@@ -191,6 +191,168 @@ def extract_malso_right(rights_list: list) -> dict | None:
     }
 
 
+def _parse_date_yyyymmdd(date_str: str) -> str:
+    """'2018년 9월 12일', '2019.07.03', '2017-11-30' 등을 'YYYYMMDD'로 정규화"""
+    if not date_str:
+        return ""
+    s = str(date_str).strip()
+    m_kr = re.search(r"(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일", s)
+    if m_kr:
+        return f"{int(m_kr.group(1)):04d}{int(m_kr.group(2)):02d}{int(m_kr.group(3)):02d}"
+    m_sep = re.search(r"(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})", s)
+    if m_sep:
+        return f"{int(m_sep.group(1)):04d}{int(m_sep.group(2)):02d}{int(m_sep.group(3)):02d}"
+    digits = re.sub(r"[^0-9]", "", s)
+    return digits[:8] if len(digits) >= 8 else ""
+
+
+def _parse_krw_amount(val) -> int:
+    """숫자 또는 '205,000,000원', '5,000만원' 등을 원 단위 정수로 파싱 (미상이면 0)"""
+    if isinstance(val, (int, float)):
+        return int(val) if val > 0 else 0
+    if not val:
+        return 0
+    s = str(val).strip()
+    if not s or "미상" in s or "없음" in s:
+        return 0
+    # 억/만 표기 처리
+    eok_m = re.search(r"(\d+)\s*억", s)
+    man_m = re.search(r"([\d,]+)\s*만", s)
+    if eok_m or man_m:
+        total = 0
+        if eok_m:
+            total += int(eok_m.group(1)) * 100_000_000
+        if man_m:
+            total += int(man_m.group(1).replace(",", "")) * 10_000
+        return total
+    digits = re.sub(r"[^0-9]", "", s)
+    return int(digits) if digits else 0
+
+
+def extract_all_tenants(
+    ai_report: dict,
+    remarks: str,
+    row: dict,
+    malso_right: dict | None,
+) -> tuple[list[dict], int, int]:
+    """
+    ai_report.tenants + remarks 내 [임차인 현황] + 단일 DB 컬럼을 모두 병합 파싱해
+    전체 임차인 목록(전입일·보증금·배당요구·선순위 여부)을 빠짐없이 추출한다.
+    반환: (tenants_list, senior_assumed_deposit, senior_unknown_count)
+    """
+    malso_ymd = _parse_date_yyyymmdd(malso_right.get("date", "") if malso_right else "")
+    raw_entries: list[dict] = []
+    seen_keys: set[tuple] = set()
+
+    def add_entry(name: str, room: str, move_in: str, dep_raw, rent_raw, fixed: str, payout: bool):
+        n_clean = (name or "").strip() or "임차인"
+        r_clean = (room or "").strip()
+        m_clean = (move_in or "").strip() or "미상"
+        dep_int = _parse_krw_amount(dep_raw)
+        dep_str = format_krw(dep_int) if dep_int > 0 else (str(dep_raw).strip() if dep_raw and "미상" not in str(dep_raw) else "미상")
+        if dep_str in ("", "0", "0원"):
+            dep_str = "미상"
+        rent_str = ""
+        if rent_raw and str(rent_raw).strip() not in ("", "0", "미상", "없음"):
+            rent_int = _parse_krw_amount(rent_raw)
+            rent_str = format_krw(rent_int) if rent_int >= 10_000 else str(rent_raw).strip()
+
+        key = (n_clean, r_clean, _parse_date_yyyymmdd(m_clean) or m_clean)
+        if key in seen_keys:
+            return
+        seen_keys.add(key)
+
+        move_ymd = _parse_date_yyyymmdd(m_clean)
+        if not move_ymd or "미전입" in m_clean or "미상" in m_clean:
+            seniority = "UNKNOWN"
+        elif malso_ymd:
+            seniority = "SENIOR" if move_ymd < malso_ymd else "JUNIOR"
+        else:
+            seniority = "UNKNOWN"
+
+        raw_entries.append({
+            "name": n_clean,
+            "room": r_clean,
+            "move_in_date": m_clean,
+            "deposit": dep_int,
+            "deposit_str": dep_str,
+            "monthly_rent": rent_str,
+            "fixed_date": (fixed or "").strip() or "미상",
+            "is_payout_requested": bool(payout),
+            "seniority": seniority,
+        })
+
+    # 1순위: ai_report_json["tenants"]
+    ai_tenants = ai_report.get("tenants") if isinstance(ai_report, dict) else None
+    if isinstance(ai_tenants, list):
+        for t in ai_tenants:
+            if not isinstance(t, dict):
+                continue
+            add_entry(
+                name=str(t.get("name") or ""),
+                room=str(t.get("room") or ""),
+                move_in=str(t.get("move_in_date") or ""),
+                dep_raw=t.get("deposit"),
+                rent_raw=t.get("monthly_rent"),
+                fixed=str(t.get("fixed_date") or ""),
+                payout=bool(t.get("is_payout_requested")),
+            )
+
+    # 2순위: remarks 내 [임차인 현황] 텍스트 파싱 보완
+    if remarks and "[임차인 현황]" in remarks:
+        after = remarks.split("[임차인 현황]", 1)[1]
+        next_sec = re.search(r"\n\[[^\]]+\]", after)
+        section_text = after[:next_sec.start()] if next_sec else after
+        for line in section_text.splitlines():
+            line = line.strip()
+            if not line.startswith("-"):
+                continue
+            # 예: - 김진이: 전입 2020.12.08, 보증금 미상, 확정 미상, 배당요구 없음 (1층101호)
+            m = re.match(r"^-\s*([^:]+):\s*(.*)$", line)
+            if not m:
+                continue
+            t_name = m.group(1).strip()
+            rest = m.group(2).strip()
+            room_m = re.search(r"\(([^)]*)\)\s*$", rest)
+            t_room = room_m.group(1).strip() if room_m else ""
+            if room_m:
+                rest = rest[:room_m.start()].strip()
+
+            mi_m = re.search(r"전입\s*([^,]+)", rest)
+            dp_m = re.search(r"보증금\s*([^,]+)", rest)
+            fx_m = re.search(r"확정\s*([^,]+)", rest)
+            py_m = re.search(r"배당요구\s*([^,(]+)", rest)
+            t_mi = mi_m.group(1).strip() if mi_m else "미상"
+            t_dp = dp_m.group(1).strip() if dp_m else "미상"
+            t_fx = fx_m.group(1).strip() if fx_m else "미상"
+            t_py_txt = py_m.group(1).strip() if py_m else ""
+            t_py = bool(t_py_txt and ("없음" not in t_py_txt and "미요구" not in t_py_txt))
+            add_entry(t_name, t_room, t_mi, t_dp, "", t_fx, t_py)
+
+    # 3순위: 위 둘 다 없을 때만 단일 DB 컬럼 폴백
+    if not raw_entries:
+        col_date = (row.get("tenant_registration_date") or "").strip()
+        col_dep = int(row.get("tenant_deposit") or 0)
+        col_payout = bool(row.get("is_payout_requested"))
+        if col_date or col_dep > 0 or col_payout:
+            add_entry("조사된 임차인", "", col_date or "미상", col_dep if col_dep > 0 else "미상", "", "미상", col_payout)
+
+    # 선순위 인수 보증금 합계 및 보증금 미상 선순위 임차인 카운트
+    senior_assumed_deposit = 0
+    senior_unknown_count = 0
+    for t in raw_entries:
+        if t["seniority"] == "SENIOR":
+            if not t["is_payout_requested"]:
+                if t["deposit"] > 0:
+                    senior_assumed_deposit += t["deposit"]
+                else:
+                    senior_unknown_count += 1
+            elif t["deposit"] == 0:
+                senior_unknown_count += 1
+
+    return raw_entries, senior_assumed_deposit, senior_unknown_count
+
+
 def determine_difficulty(row: dict, malso_right: dict | None) -> tuple[str, str, str, int]:
     """
     난이도 3단계 재분류:
@@ -639,6 +801,19 @@ def generate_feed(limit: int = 500) -> list[dict]:
         if not photos_list and photo_url:
             photos_list = [photo_url]
 
+        # 상단 사진 출처 판정 (법원 감정평가서 N장 / 거리뷰 / 참고 이미지)
+        has_court_photos = any(("/photos/" in p and "_sv.jpg" not in p) or "courtauction.go.kr" in p for p in photos_list)
+        has_streetview = any("_sv.jpg" in p for p in photos_list)
+        if has_court_photos:
+            photo_source = "court"
+            photo_source_label = f"🏛️ 법원 감정평가서 {len(photos_list)}장"
+        elif has_streetview:
+            photo_source = "streetview"
+            photo_source_label = "🌐 거리뷰"
+        else:
+            photo_source = "stock"
+            photo_source_label = "🖼️ 참고 이미지"
+
         # AI 권리분석 리포트 파싱 (기존 대시보드 알짜 기능 이식)
         ai_json_raw = row.get("ai_report_json")
         ai_report = {}
@@ -649,6 +824,15 @@ def generate_feed(limit: int = 500) -> list[dict]:
                     ai_report = {}
             except Exception:
                 ai_report = {}
+
+        # 전체 임차인 목록 파싱 (ai_report.tenants + remarks[임차인 현황] + 단일 컬럼 통합)
+        tenants_list, senior_assumed_dep, senior_unknown_cnt = extract_all_tenants(
+            ai_report=ai_report,
+            remarks=row.get("remarks") or "",
+            row=row,
+            malso_right=malso_right,
+        )
+        effective_assumed_deposit = max(assumed_deposit, senior_assumed_dep)
 
         ai_analysis = {
             "score": int(row.get("ai_score") or ai_report.get("score") or 0),
@@ -662,8 +846,9 @@ def generate_feed(limit: int = 500) -> list[dict]:
             "retained_rights": ai_report.get("retained_rights") if isinstance(ai_report.get("retained_rights"), list) else [],
             "analysis_detail": str(ai_report.get("analysis_detail") or ""),
             "malso_right": malso_right,
-            "assumed_deposit": assumed_deposit,
-            "assumed_deposit_str": format_krw(assumed_deposit),
+            "assumed_deposit": effective_assumed_deposit,
+            "assumed_deposit_str": format_krw(effective_assumed_deposit),
+            "senior_unknown_count": senior_unknown_cnt,
         }
 
         # 유찰/매각 기일 히스토리
@@ -701,6 +886,10 @@ def generate_feed(limit: int = 500) -> list[dict]:
             "rights_list": rights_list,
             "remarks": row.get("remarks") or "",
             "special_rights": special_rights,
+            "tenants_list": tenants_list,
+            "senior_assumed_deposit": effective_assumed_deposit,
+            "senior_assumed_deposit_str": format_krw(effective_assumed_deposit),
+            "senior_unknown_count": senior_unknown_cnt,
             "tenant_registration_date": row.get("tenant_registration_date") or "",
             "tenant_deposit": int(row.get("tenant_deposit") or 0),
             "tenant_deposit_str": format_krw(int(row.get("tenant_deposit") or 0)),
@@ -747,6 +936,8 @@ def generate_feed(limit: int = 500) -> list[dict]:
             "lng": lng,
             "photo_url": photo_url,
             "photos": photos_list,
+            "photo_source": photo_source,
+            "photo_source_label": photo_source_label,
             "ai_analysis": ai_analysis,
             "bid_history": bid_history,
             "rental_estimate": rental_estimate,
