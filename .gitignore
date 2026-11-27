@@ -19,6 +19,12 @@ logs/.hermes_cursor
 # Aider
 .aider*
 
+# Node modules
+node_modules/
+mobile/node_modules/
+.expo/
+mobile/.expo/
+
 # 에이전트 inbox (처리된 태스크 제외, 빈 폴더 구조는 유지)
 agent_inbox/hermes/done/
 agent_inbox/aider/done/
