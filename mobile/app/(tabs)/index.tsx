@@ -286,11 +286,7 @@ export default function FeedScreen() {
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
-        <TouchableOpacity
-          style={[styles.storyCard, { width: cardMaxWidth }]}
-          activeOpacity={0.96}
-          onPress={() => router.push(`/detail/${encodeURIComponent(item.case_number)}`)}
-        >
+        <View style={[styles.storyCard, { width: cardMaxWidth }]}>
           {/* 상단 큰 실물 사진 */}
           <View style={[styles.storyPhotoWrap, { height: cardPhotoHeight }]}>
             <Image source={{ uri: item.photo_url }} style={styles.storyPhoto} resizeMode="cover" />
@@ -363,7 +359,7 @@ export default function FeedScreen() {
               ))}
             </View>
 
-            {/* 토스 스타일 CTA 버튼 */}
+            {/* 토스 스타일 CTA 버튼 (이 버튼을 눌렀을 때만 상세로 이동) */}
             <TouchableOpacity
               style={styles.storyCtaBtn}
               activeOpacity={0.85}
@@ -372,7 +368,7 @@ export default function FeedScreen() {
               <Text style={styles.storyCtaText}>자세히 떠먹기 →</Text>
             </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </View>
       </ScrollView>
     );
   };

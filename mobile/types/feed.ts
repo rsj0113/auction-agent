@@ -4,6 +4,7 @@ export type DifficultyLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 export interface RawCourtRight {
   type?: string;
   name?: string;
+  date?: string;
   right_holder?: string;
   registration_date?: string;
   claim_amount?: number | string;
@@ -13,10 +14,20 @@ export interface RawCourtRight {
   [key: string]: any;
 }
 
+export interface SpecialRightObject {
+  id?: string;
+  name?: string;
+  short?: string;
+  badge_color?: string;
+  risk_level?: string;
+  icon?: string;
+  desc?: string;
+}
+
 export interface RawCourtData {
-  rights_list: RawCourtRight[];
+  rights_list: RawCourtRight[] | string;
   remarks: string;
-  special_rights: string[];
+  special_rights: Array<string | SpecialRightObject> | string;
   tenant_registration_date?: string;
   tenant_deposit?: number;
   tenant_deposit_str?: string;

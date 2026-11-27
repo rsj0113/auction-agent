@@ -29,6 +29,120 @@ function formatKrw(val: number): string {
   return `${man.toLocaleString()}만원`;
 }
 
+function safeParseArray(input: unknown): any[] {
+  if (!input) return [];
+  if (Array.isArray(input)) return input;
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if (!trimmed) return [];
+    if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        return Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
+      } catch {
+        return [trimmed];
+      }
+    }
+    return [trimmed];
+  }
+  if (typeof input === 'object') return [input];
+  return [];
+}
+
+interface NormalizedRight {
+  title: string;
+  date: string;
+  holder: string;
+  claimStr: string;
+  isStandard: boolean;
+  remarks: string;
+}
+
+function normalizeRightsList(input: unknown, malsoDate?: string): NormalizedRight[] {
+  const arr = safeParseArray(input);
+  return arr
+    .map((entry) => {
+      if (typeof entry === 'string') {
+        return {
+          title: entry,
+          date: '',
+          holder: '',
+          claimStr: '',
+          isStandard: false,
+          remarks: '',
+        };
+      }
+      if (!entry || typeof entry !== 'object') return null;
+      const r = entry as Record<string, any>;
+      const title = String(r.type || r.name || r.right_name || '등기 권리').trim();
+      const date = String(r.date || r.registration_date || r.reg_date || '').trim();
+      const holder = String(r.right_holder || r.holder || '').trim();
+      let claimStr = '';
+      if (typeof r.claim_amount === 'number' && r.claim_amount > 0) {
+        claimStr = formatKrw(r.claim_amount);
+      } else if (typeof r.claim_amount === 'string' && r.claim_amount.trim()) {
+        claimStr = r.claim_amount.trim();
+      }
+      const normD = date.replace(/[^0-9]/g, '');
+      const normM = (malsoDate || '').replace(/[^0-9]/g, '');
+      const isStandard = Boolean(r.is_standard_right) || (Boolean(normD) && Boolean(normM) && normD === normM);
+      const remarks = typeof r.remarks === 'string' ? r.remarks.trim() : '';
+      return { title, date, holder, claimStr, isStandard, remarks };
+    })
+    .filter((x): x is NormalizedRight => x !== null && Boolean(x.title));
+}
+
+interface NormalizedSpecialRight {
+  icon: string;
+  title: string;
+  desc: string;
+  riskLevel: string;
+}
+
+function normalizeSpecialRights(input: unknown): NormalizedSpecialRight[] {
+  const arr = safeParseArray(input);
+  return arr
+    .map((entry) => {
+      if (typeof entry === 'string') {
+        return { icon: '⚠️', title: entry.trim(), desc: '', riskLevel: 'HIGH' };
+      }
+      if (!entry || typeof entry !== 'object') return null;
+      const obj = entry as Record<string, any>;
+      const title = String(obj.name || obj.short || obj.id || '특수권리 주의').trim();
+      const icon = String(obj.icon || '⚠️').trim();
+      const desc = String(obj.desc || obj.description || '').trim();
+      const riskLevel = String(obj.risk_level || 'HIGH').toUpperCase();
+      return { icon, title, desc, riskLevel };
+    })
+    .filter((x): x is NormalizedSpecialRight => x !== null && Boolean(x.title));
+}
+
+interface RemarkSection {
+  heading: string;
+  body: string;
+}
+
+function parseRemarkSections(rawRemarks?: string): RemarkSection[] {
+  const text = (rawRemarks || '').trim();
+  if (!text) return [];
+  const regex = /\[([^\]]+)\]/g;
+  const matches = [...text.matchAll(regex)];
+  if (matches.length === 0) {
+    return [{ heading: '매각물건명세서 원문', body: text }];
+  }
+  const sections: RemarkSection[] = [];
+  for (let i = 0; i < matches.length; i++) {
+    const heading = matches[i][1].trim();
+    const start = (matches[i].index ?? 0) + matches[i][0].length;
+    const end = i + 1 < matches.length ? (matches[i + 1].index ?? text.length) : text.length;
+    const body = text.slice(start, end).trim();
+    if (body) {
+      sections.push({ heading, body });
+    }
+  }
+  return sections.length > 0 ? sections : [{ heading: '매각물건명세서 원문', body: text }];
+}
+
 export default function DetailScreen() {
   const router = useRouter();
   const { width: winWidth } = useWindowDimensions();
@@ -553,7 +667,7 @@ export default function DetailScreen() {
               >
                 <View style={styles.accordionTitleRow}>
                   <Text style={styles.accordionIcon}>📋</Text>
-                  <View>
+                  <View style={styles.accordionTitleTextWrap}>
                     <Text style={styles.accordionTitle}>법원 원본 데이터 투명 공개</Text>
                     <Text style={styles.accordionSubtitle}>
                       {isRawExpanded ? '터치하여 접기' : '등기부 · 현황조사서 · 명세서 비고 원문 보기'}
@@ -563,112 +677,146 @@ export default function DetailScreen() {
                 <Text style={styles.accordionArrow}>{isRawExpanded ? '▲' : '▼'}</Text>
               </TouchableOpacity>
 
-              {isRawExpanded && (
-                <View style={styles.accordionBody}>
-                  {/* 등기부 권리 내역 전체 */}
-                  <View style={styles.rawSection}>
-                    <Text style={styles.rawSectionTitle}>📑 등기부 권리 내역 (갑구/을구)</Text>
-                    {rawData?.rights_list && rawData.rights_list.length > 0 ? (
-                      <View style={styles.rawRightsTable}>
-                        {rawData.rights_list.map((r, rIdx) => (
-                          <View key={rIdx} style={styles.rawRightItem}>
-                            <View style={styles.rawRightHeader}>
-                              <View style={styles.rawRightBadge}>
-                                <Text style={styles.rawRightBadgeText}>
-                                  {r.type || r.name || '권리'}
-                                </Text>
+              {isRawExpanded && (() => {
+                const parsedRights = normalizeRightsList(rawData?.rights_list, ai?.malso_right?.date);
+                const parsedSpecials = normalizeSpecialRights(rawData?.special_rights);
+                const parsedRemarks = parseRemarkSections(rawData?.remarks);
+
+                return (
+                  <View style={styles.accordionBody}>
+                    {/* 등기부 권리 내역 전체 */}
+                    <View style={styles.rawSection}>
+                      <Text style={styles.rawSectionTitle}>📑 등기부 권리 내역 (갑구/을구)</Text>
+                      {parsedRights.length > 0 ? (
+                        <View style={styles.rawRightsTable}>
+                          {parsedRights.map((r, rIdx) => (
+                            <View
+                              key={rIdx}
+                              style={[
+                                styles.rawRightItem,
+                                rIdx === parsedRights.length - 1 && styles.rawRightItemLast,
+                              ]}
+                            >
+                              <View style={styles.rawRightHeader}>
+                                <View style={styles.rawRightBadgeWrap}>
+                                  <View style={styles.rawRightBadge}>
+                                    <Text style={styles.rawRightBadgeText}>{r.title}</Text>
+                                  </View>
+                                  {r.isStandard && (
+                                    <View style={styles.standardRightTag}>
+                                      <Text style={styles.standardRightTagText}>말소기준권리</Text>
+                                    </View>
+                                  )}
+                                </View>
+                                <Text style={styles.rawRightDate}>{r.date || '일자 미상'}</Text>
                               </View>
-                              {r.is_standard_right && (
-                                <View style={styles.standardRightTag}>
-                                  <Text style={styles.standardRightTagText}>말소기준권리</Text>
+                              {(r.holder || r.claimStr || r.remarks) && (
+                                <View style={styles.rawRightDetails}>
+                                  {r.holder ? (
+                                    <Text style={styles.rawRightRow}>
+                                      <Text style={styles.rawRightKey}>권리자: </Text>
+                                      <Text style={styles.rawRightVal}>{r.holder}</Text>
+                                    </Text>
+                                  ) : undefined}
+                                  {r.claimStr ? (
+                                    <Text style={styles.rawRightRow}>
+                                      <Text style={styles.rawRightKey}>채권액: </Text>
+                                      <Text style={styles.rawRightVal}>{r.claimStr}</Text>
+                                    </Text>
+                                  ) : undefined}
+                                  {r.remarks ? (
+                                    <Text style={styles.rawRightRemarks}>{r.remarks}</Text>
+                                  ) : undefined}
                                 </View>
                               )}
-                              <Text style={styles.rawRightDate}>{r.registration_date || '-'}</Text>
                             </View>
-                            <View style={styles.rawRightDetails}>
-                              <Text style={styles.rawRightRow}>
-                                <Text style={styles.rawRightKey}>권리자: </Text>
-                                <Text style={styles.rawRightVal}>{r.right_holder || '미상'}</Text>
-                              </Text>
-                              {r.claim_amount ? (
-                                <Text style={styles.rawRightRow}>
-                                  <Text style={styles.rawRightKey}>채권액: </Text>
-                                  <Text style={styles.rawRightVal}>
-                                    {typeof r.claim_amount === 'number'
-                                      ? `${(r.claim_amount / 10000).toLocaleString()}만원`
-                                      : r.claim_amount}
-                                  </Text>
+                          ))}
+                        </View>
+                      ) : (
+                        <Text style={styles.rawEmptyText}>등록된 등기부 권리 내역이 없습니다.</Text>
+                      )}
+                    </View>
+
+                    {/* 현황조사서 임차인 상세 */}
+                    <View style={styles.rawSection}>
+                      <Text style={styles.rawSectionTitle}>🏠 현황조사서 임차인 현황</Text>
+                      <View style={styles.rawTenantBox}>
+                        <View style={styles.rawTenantRow}>
+                          <Text style={styles.rawTenantKey}>전입일자</Text>
+                          <Text style={styles.rawTenantVal}>
+                            {rawData?.tenant_registration_date || '전입 세대 미상/없음'}
+                          </Text>
+                        </View>
+                        <View style={styles.rawTenantRow}>
+                          <Text style={styles.rawTenantKey}>보증금</Text>
+                          <Text style={styles.rawTenantVal}>
+                            {rawData?.tenant_deposit && rawData.tenant_deposit > 0
+                              ? rawData.tenant_deposit_str
+                              : '0원 (확인된 보증금 없음)'}
+                          </Text>
+                        </View>
+                        <View style={[styles.rawTenantRow, styles.rawTenantRowLast]}>
+                          <Text style={styles.rawTenantKey}>배당요구 신청</Text>
+                          <Text
+                            style={[
+                              styles.rawTenantVal,
+                              rawData?.is_payout_requested ? styles.payoutYes : styles.payoutNo,
+                            ]}
+                          >
+                            {rawData?.is_payout_requested ? '신청 완료 (배당요구함)' : '신청 내역 없음'}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* 특수권리 및 주의 조건 카드 */}
+                    {parsedSpecials.length > 0 && (
+                      <View style={styles.rawSection}>
+                        <Text style={styles.rawSectionTitle}>⚠️ 감지된 특수권리 · 매각조건</Text>
+                        <View style={styles.specialCardsList}>
+                          {parsedSpecials.map((sp, spIdx) => (
+                            <View key={spIdx} style={styles.specialCard}>
+                              <View style={styles.specialCardHeader}>
+                                <Text style={styles.specialCardTitle}>
+                                  {sp.icon} {sp.title}
                                 </Text>
-                              ) : undefined}
-                              {r.remarks ? (
-                                <Text style={styles.rawRightRemarks}>{r.remarks}</Text>
+                              </View>
+                              {sp.desc ? (
+                                <Text style={styles.specialCardDesc}>{sp.desc}</Text>
                               ) : undefined}
                             </View>
-                          </View>
-                        ))}
-                      </View>
-                    ) : (
-                      <Text style={styles.rawEmptyText}>등록된 등기부 권리 내역이 없습니다.</Text>
-                    )}
-                  </View>
-
-                  {/* 현황조사서 임차인 상세 */}
-                  <View style={styles.rawSection}>
-                    <Text style={styles.rawSectionTitle}>🏠 현황조사서 임차인 현황</Text>
-                    <View style={styles.rawTenantBox}>
-                      <View style={styles.rawTenantRow}>
-                        <Text style={styles.rawTenantKey}>전입일자</Text>
-                        <Text style={styles.rawTenantVal}>
-                          {rawData?.tenant_registration_date || '전입 세대 미상/없음'}
-                        </Text>
-                      </View>
-                      <View style={styles.rawTenantRow}>
-                        <Text style={styles.rawTenantKey}>보증금</Text>
-                        <Text style={styles.rawTenantVal}>
-                          {rawData?.tenant_deposit && rawData.tenant_deposit > 0
-                            ? rawData.tenant_deposit_str
-                            : '0원 (확인된 보증금 없음)'}
-                        </Text>
-                      </View>
-                      <View style={styles.rawTenantRow}>
-                        <Text style={styles.rawTenantKey}>배당요구 신청</Text>
-                        <Text
-                          style={[
-                            styles.rawTenantVal,
-                            rawData?.is_payout_requested ? styles.payoutYes : styles.payoutNo,
-                          ]}
-                        >
-                          {rawData?.is_payout_requested ? '신청 완료 (배당요구함)' : '신청 내역 없음'}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-
-                  {/* 매각물건명세서 비고 & 특수조건 */}
-                  <View style={styles.rawSection}>
-                    <Text style={styles.rawSectionTitle}>📝 매각물건명세서 비고 및 특수조건</Text>
-                    {rawData?.special_rights && rawData.special_rights.length > 0 && (
-                      <View style={styles.specialTagsRow}>
-                        {rawData.special_rights.map((tag, tIdx) => (
-                          <View key={tIdx} style={styles.specialTagPill}>
-                            <Text style={styles.specialTagText}>⚠️ {tag}</Text>
-                          </View>
-                        ))}
+                          ))}
+                        </View>
                       </View>
                     )}
-                    <View style={styles.remarksBox}>
-                      <Text style={styles.remarksText}>
-                        {rawData?.remarks?.trim() ||
-                          '법원 매각물건명세서상 특별한 비고 기재사항이 없습니다.'}
-                      </Text>
-                    </View>
-                  </View>
 
-                  <Text style={styles.rawDisclaimer}>
-                    ※ 본 정보는 대한민국 법원경매정보(courtauction.go.kr)에서 수집된 공식 장부 원본입니다.
-                  </Text>
-                </View>
-              )}
+                    {/* 매각물건명세서 비고 원문 (섹션별 카드) */}
+                    <View style={styles.rawSection}>
+                      <Text style={styles.rawSectionTitle}>📝 매각물건명세서 비고 원문</Text>
+                      {parsedRemarks.length > 0 ? (
+                        <View style={styles.remarksList}>
+                          {parsedRemarks.map((sec, sIdx) => (
+                            <View key={sIdx} style={styles.remarkSectionCard}>
+                              <Text style={styles.remarkSectionHeading}>{sec.heading}</Text>
+                              <Text style={styles.remarksText}>{sec.body}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      ) : (
+                        <View style={styles.remarksBox}>
+                          <Text style={styles.remarksText}>
+                            법원 매각물건명세서상 특별한 비고 기재사항이 없습니다.
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+
+                    <Text style={styles.rawDisclaimer}>
+                      ※ 본 정보는 대한민국 법원경매정보(courtauction.go.kr)에서 수집된 공식 장부 원본입니다.
+                    </Text>
+                  </View>
+                );
+              })()}
             </View>
 
             {/* 법원 및 사건 메타 정보 */}
@@ -1363,11 +1511,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 18,
     backgroundColor: '#f8fafc',
+    gap: 12,
   },
   accordionTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    flex: 1,
+    minWidth: 0,
+  },
+  accordionTitleTextWrap: {
+    flex: 1,
+    minWidth: 0,
   },
   accordionIcon: {
     fontSize: 20,
@@ -1381,6 +1536,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748b',
     marginTop: 2,
+    flexShrink: 1,
   },
   accordionArrow: {
     fontSize: 14,
@@ -1388,13 +1544,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   accordionBody: {
-    padding: 18,
+    padding: 16,
     gap: 18,
     borderTopWidth: 1,
     borderTopColor: '#f1f5f9',
   },
   rawSection: {
     gap: 8,
+    minWidth: 0,
   },
   rawSectionTitle: {
     fontSize: 13.5,
@@ -1412,29 +1569,43 @@ const styles = StyleSheet.create({
   rawRightItem: {
     borderBottomWidth: 1,
     borderBottomColor: '#e2e8f0',
-    paddingBottom: 8,
-    gap: 4,
+    paddingBottom: 10,
+    gap: 6,
+  },
+  rawRightItemLast: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
   },
   rawRightHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
     gap: 8,
+  },
+  rawRightBadgeWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 6,
+    flexShrink: 1,
+    minWidth: 0,
   },
   rawRightBadge: {
     backgroundColor: '#e0e7ff',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 6,
   },
   rawRightBadgeText: {
-    fontSize: 11,
+    fontSize: 11.5,
     fontWeight: '800',
     color: '#3730a3',
   },
   standardRightTag: {
     backgroundColor: '#fee2e2',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
     borderRadius: 6,
   },
   standardRightTagText: {
@@ -1443,17 +1614,19 @@ const styles = StyleSheet.create({
     color: '#991b1b',
   },
   rawRightDate: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#64748b',
-    fontWeight: '600',
-    marginLeft: 'auto',
+    fontWeight: '700',
   },
   rawRightDetails: {
-    gap: 2,
-    paddingLeft: 4,
+    gap: 3,
+    paddingLeft: 2,
+    minWidth: 0,
   },
   rawRightRow: {
-    fontSize: 12,
+    fontSize: 12.5,
+    lineHeight: 18,
+    flexShrink: 1,
   },
   rawRightKey: {
     color: '#64748b',
@@ -1464,40 +1637,54 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   rawRightRemarks: {
-    fontSize: 11,
+    fontSize: 11.5,
     color: '#475569',
     backgroundColor: '#f1f5f9',
-    padding: 4,
-    borderRadius: 4,
+    padding: 6,
+    borderRadius: 6,
     marginTop: 2,
+    lineHeight: 17,
+    flexShrink: 1,
   },
   rawEmptyText: {
-    fontSize: 12,
+    fontSize: 12.5,
     color: '#94a3b8',
     padding: 10,
   },
   rawTenantBox: {
     backgroundColor: '#f8fafc',
     borderRadius: 12,
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderWidth: 1,
     borderColor: '#e2e8f0',
-    gap: 6,
   },
   rawTenantRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingVertical: 7,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  rawTenantRowLast: {
+    borderBottomWidth: 0,
   },
   rawTenantKey: {
     fontSize: 12.5,
     color: '#64748b',
     fontWeight: '600',
+    flexShrink: 0,
   },
   rawTenantVal: {
     fontSize: 13,
     color: '#0f172a',
     fontWeight: '700',
+    flex: 1,
+    minWidth: 0,
+    textAlign: 'right',
+    flexShrink: 1,
   },
   payoutYes: {
     color: '#16a34a',
@@ -1505,24 +1692,49 @@ const styles = StyleSheet.create({
   payoutNo: {
     color: '#64748b',
   },
-  specialTagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginBottom: 6,
+  specialCardsList: {
+    gap: 8,
   },
-  specialTagPill: {
+  specialCard: {
     backgroundColor: '#fef2f2',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: 12,
+    padding: 12,
     borderWidth: 1,
     borderColor: '#fecaca',
+    gap: 4,
   },
-  specialTagText: {
-    color: '#b91c1c',
-    fontSize: 11,
+  specialCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  specialCardTitle: {
+    color: '#991b1b',
+    fontSize: 13,
     fontWeight: '800',
+    flexShrink: 1,
+  },
+  specialCardDesc: {
+    color: '#7f1d1d',
+    fontSize: 12,
+    lineHeight: 18,
+    flexShrink: 1,
+  },
+  remarksList: {
+    gap: 8,
+  },
+  remarkSectionCard: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    gap: 5,
+  },
+  remarkSectionHeading: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#1d4ed8',
   },
   remarksBox: {
     backgroundColor: '#f8fafc',
@@ -1532,14 +1744,15 @@ const styles = StyleSheet.create({
     borderColor: '#e2e8f0',
   },
   remarksText: {
-    fontSize: 12,
+    fontSize: 12.5,
     color: '#334155',
-    lineHeight: 18,
+    lineHeight: 19,
+    flexShrink: 1,
   },
   rawDisclaimer: {
     fontSize: 11,
     color: '#94a3b8',
-    lineHeight: 15,
+    lineHeight: 16,
   },
 
   metaCard: {
