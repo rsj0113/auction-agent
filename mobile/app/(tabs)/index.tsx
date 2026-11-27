@@ -34,7 +34,15 @@ if (Platform.OS !== 'web') {
 
 const feedData = require('../../assets/mobile_feed.json');
 
-type FilterType = 'all' | 'clean' | 'budget_small' | 'budget_mid' | 'seoul' | 'gyeonggi';
+type FilterType =
+  | 'all'
+  | 'beginner'
+  | 'intermediate'
+  | 'advanced'
+  | 'budget_small'
+  | 'budget_mid'
+  | 'seoul'
+  | 'gyeonggi';
 type ViewMode = 'list' | 'card' | 'map';
 
 const VIEW_MODE_STORAGE_KEY = 'easy_auction_view_mode';
@@ -123,7 +131,9 @@ export default function FeedScreen() {
   // 필터링 적용된 매물 목록 (3가지 뷰 모두 공통 연동)
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      if (activeFilter === 'clean' && item.safety_grade !== 'GREEN') return false;
+      if (activeFilter === 'beginner' && item.safety_grade !== 'GREEN') return false;
+      if (activeFilter === 'intermediate' && item.safety_grade !== 'YELLOW') return false;
+      if (activeFilter === 'advanced' && item.safety_grade !== 'RED') return false;
       if (activeFilter === 'budget_small' && item.min_bid > 300_000_000) return false;
       if (activeFilter === 'budget_mid' && (item.min_bid <= 300_000_000 || item.min_bid > 600_000_000)) return false;
       if (activeFilter === 'seoul' && !item.location.includes('서울')) return false;
@@ -147,20 +157,20 @@ export default function FeedScreen() {
     if (grade === 'GREEN') {
       return (
         <View style={[styles.badge, styles.badgeGreen]}>
-          <Text style={styles.badgeTextGreen}>{compact ? '🟢 안심' : '🟢 안심 · 인수금 0원'}</Text>
+          <Text style={styles.badgeTextGreen}>{compact ? '🟢 초급' : '🟢 초급 · 권리 심플'}</Text>
         </View>
       );
     }
     if (grade === 'YELLOW') {
       return (
         <View style={[styles.badge, styles.badgeYellow]}>
-          <Text style={styles.badgeTextYellow}>{compact ? '🟡 확인' : '🟡 세입자 확인'}</Text>
+          <Text style={styles.badgeTextYellow}>{compact ? '🟡 중급' : '🟡 중급 · 권리 체크'}</Text>
         </View>
       );
     }
     return (
       <View style={[styles.badge, styles.badgeRed]}>
-        <Text style={styles.badgeTextRed}>{compact ? '🔴 주의' : '🔴 특수조건 주의'}</Text>
+        <Text style={styles.badgeTextRed}>{compact ? '🔴 고수' : '🔴 고수 · 하이리턴'}</Text>
       </View>
     );
   };
@@ -568,7 +578,9 @@ export default function FeedScreen() {
           contentContainerStyle={styles.filterList}
           data={[
             { type: 'all', label: '전체' },
-            { type: 'clean', label: '🟢 안심만' },
+            { type: 'beginner', label: '🟢 초급' },
+            { type: 'intermediate', label: '🟡 중급' },
+            { type: 'advanced', label: '🔴 고수' },
             { type: 'budget_small', label: '3억 이하' },
             { type: 'budget_mid', label: '3억~6억' },
             { type: 'seoul', label: '서울' },

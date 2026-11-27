@@ -1,4 +1,5 @@
 export type SafetyGrade = 'GREEN' | 'YELLOW' | 'RED';
+export type DifficultyLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
 export interface RawCourtRight {
   type?: string;
@@ -26,14 +27,71 @@ export interface RawCourtData {
   auction_date?: string;
 }
 
+export interface MalsoRight {
+  name: string;
+  date: string;
+  right_holder?: string;
+  claim_amount?: number | string;
+}
+
+export interface AIAnalysis {
+  score: number;
+  grade: string;
+  verdict: string;
+  suggested_bid: string;
+  expected_yield: string;
+  key_points: string[];
+  risks: string[];
+  extinguished_rights: string[];
+  retained_rights: string[];
+  analysis_detail: string;
+  malso_right?: MalsoRight | null;
+  assumed_deposit: number;
+  assumed_deposit_str: string;
+}
+
+export interface BidHistoryItem {
+  round: number;
+  price: number;
+  price_str: string;
+  ratio_pct: number;
+  status: string;
+  is_current: boolean;
+  date: string;
+}
+
+export interface RentalEstimate {
+  est_deposit: number;
+  est_deposit_str: string;
+  est_monthly_rent: number;
+  est_monthly_rent_str: string;
+  est_jeonse: number;
+  est_jeonse_str: string;
+  annual_yield_pct: number;
+  gap_invest_cash: number;
+  gap_invest_cash_str: string;
+  sample_count: number;
+  source_label: string;
+}
+
+export interface AreaWinningStats {
+  region_label: string;
+  sample_count: number;
+  avg_winning_rate: number;
+  avg_bidder_count: number;
+}
+
 export interface FeedItem {
   case_number: string;
   headline: string;
   safety_grade: SafetyGrade;
+  difficulty?: DifficultyLevel;
   gap_amount: number;
   gap_amount_str: string;
   gap_short_str?: string;
   ref_price_name: string;
+  market_price?: number;
+  market_price_str?: string;
   summary_bullets: string[];
   card_tags?: string[];
   min_bid: number;
@@ -55,6 +113,10 @@ export interface FeedItem {
   lng?: number | null;
   photo_url: string;
   photos?: string[];
+  ai_analysis?: AIAnalysis;
+  bid_history?: BidHistoryItem[];
+  rental_estimate?: RentalEstimate | null;
+  area_winning_stats?: AreaWinningStats | null;
   raw_court_data?: RawCourtData;
   court_name: string;
 }
@@ -65,5 +127,7 @@ export interface MobileFeedData {
   green_count: number;
   yellow_count: number;
   red_count: number;
+  rental_matched_count?: number;
+  area_stats_matched_count?: number;
   items: FeedItem[];
 }

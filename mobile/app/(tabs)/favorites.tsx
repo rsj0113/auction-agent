@@ -38,7 +38,7 @@ export default function FavoritesScreen() {
               ]}
             >
               <Text style={styles.badgeText}>
-                {item.safety_grade === 'GREEN' ? '🟢 안심' : item.safety_grade === 'YELLOW' ? '🟡 주의' : '🔴 위험'}
+                {item.safety_grade === 'GREEN' ? '🟢 초급' : item.safety_grade === 'YELLOW' ? '🟡 중급' : '🔴 고수'}
               </Text>
             </View>
             <Text style={styles.dDay}>{item.d_day}</Text>

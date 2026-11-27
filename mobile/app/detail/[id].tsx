@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,7 +7,7 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
-  Dimensions,
+  useWindowDimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
@@ -16,21 +16,83 @@ import { FeedItem } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
 
 const feedData = require('../../assets/mobile_feed.json');
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+type LoanPreset = 'normal' | 'first_home' | 'conservative';
+
+function formatKrw(val: number): string {
+  if (!val || val <= 0) return '0원';
+  const rounded = Math.round(val / 10_000) * 10_000;
+  const eok = Math.floor(rounded / 100_000_000);
+  const man = Math.floor((rounded % 100_000_000) / 10_000);
+  if (eok > 0 && man > 0) return `${eok}억 ${man.toLocaleString()}만원`;
+  if (eok > 0) return `${eok}억원`;
+  return `${man.toLocaleString()}만원`;
+}
 
 export default function DetailScreen() {
   const router = useRouter();
+  const { width: winWidth } = useWindowDimensions();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { isFavorite, toggleFavorite } = useFavorites();
-  
+
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+  const [loanPreset, setLoanPreset] = useState<LoanPreset>('normal');
   const [isRawExpanded, setIsRawExpanded] = useState(false);
+
+  const photoScrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
 
   const caseNumber = decodeURIComponent(id || '');
   const items: FeedItem[] = feedData.items || [];
   const item = items.find((i) => i.case_number === caseNumber);
 
-  if (!item) {
+  const galleryWidth = Math.min(winWidth, 640);
+
+  // 필요 자기자본 시뮬레이션 계산 (현행 경락잔금대출/주담대 규제 참고)
+  const equityCalc = useMemo(() => {
+    if (!item) return null;
+    const isNonResidential = item.usage === '상가' || item.usage === '토지';
+    const basePrice = item.min_bid; // 최저가 낙찰 가정 시뮬레이션
+    const appraisalBase = Math.min(basePrice, item.appraisal || basePrice);
+
+    let ltv = isNonResidential ? 0.6 : 0.7;
+    let maxCap = Infinity;
+    let presetDesc = isNonResidential
+      ? '비주거(상가·토지) 일반 경락잔금 LTV 60% 참고 기준'
+      : '일반 무주택·1주택 주담대/경락잔금 LTV 70% 참고 기준';
+
+    if (loanPreset === 'first_home') {
+      ltv = isNonResidential ? 0.6 : 0.8;
+      maxCap = isNonResidential ? Infinity : 600_000_000;
+      presetDesc = isNonResidential
+        ? '비주거 물건은 생애최초 특례 미적용 (일반 LTV 60% 기준)'
+        : '생애최초 주택구입 특례 LTV 80% (최대 한도 6억원 캡)';
+    } else if (loanPreset === 'conservative') {
+      ltv = 0.5;
+      presetDesc = '규제지역·다주택·방공제 감안 보수적 LTV 50% 기준';
+    }
+
+    const rawLoan = Math.floor(appraisalBase * ltv);
+    const estLoan = Math.min(rawLoan, maxCap);
+    const pureEquity = Math.max(0, basePrice - estLoan);
+
+    // 취득세·등기비·명도 예비비 추산
+    const taxRate = isNonResidential ? 0.046 : basePrice <= 600_000_000 ? 0.013 : 0.025;
+    const extraCost = Math.round((basePrice * taxRate + 2_000_000) / 100_000) * 100_000;
+    const assumedDeposit = item.ai_analysis?.assumed_deposit || 0;
+    const totalCashNeeded = pureEquity + extraCost + assumedDeposit;
+
+    return {
+      ltvPct: Math.round(ltv * 100),
+      presetDesc,
+      estLoan,
+      pureEquity,
+      extraCost,
+      assumedDeposit,
+      totalCashNeeded,
+    };
+  }, [item, loanPreset]);
+
+  if (!item || !equityCalc) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centerBox}>
@@ -44,295 +106,604 @@ export default function DetailScreen() {
   }
 
   const fav = isFavorite(item.case_number);
-  const photos = (item.photos && item.photos.length > 0) ? item.photos : [item.photo_url];
+  const photos = item.photos && item.photos.length > 0 ? item.photos : [item.photo_url];
   const rawData = item.raw_court_data;
+  const ai = item.ai_analysis;
+  const rental = item.rental_estimate;
+  const areaStats = item.area_winning_stats;
+  const bidHistory = item.bid_history || [];
 
   const onPhotoScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetX = e.nativeEvent.contentOffset.x;
-    const nextIdx = Math.round(offsetX / SCREEN_WIDTH);
+    const nextIdx = Math.round(offsetX / galleryWidth);
     if (nextIdx !== activePhotoIdx && nextIdx >= 0 && nextIdx < photos.length) {
       setActivePhotoIdx(nextIdx);
     }
   };
 
-  const renderBadge = (grade: string) => {
+  const jumpPhoto = (nextIdx: number) => {
+    if (nextIdx < 0 || nextIdx >= photos.length) return;
+    setActivePhotoIdx(nextIdx);
+    photoScrollRef.current?.scrollTo({ x: nextIdx * galleryWidth, animated: true });
+  };
+
+  const renderDifficultyBadge = (grade: string) => {
     if (grade === 'GREEN') {
       return (
         <View style={[styles.badge, styles.badgeGreen]}>
-          <Text style={styles.badgeTextGreen}>🟢 안심 (인수 권리 0원)</Text>
+          <Text style={styles.badgeTextGreen}>🟢 초급 · 권리 심플 (인수 0원)</Text>
         </View>
       );
     }
     if (grade === 'YELLOW') {
       return (
         <View style={[styles.badge, styles.badgeYellow]}>
-          <Text style={styles.badgeTextYellow}>🟡 임차인 권리 확인 필요</Text>
+          <Text style={styles.badgeTextYellow}>🟡 중급 · 권리 체크 필요</Text>
         </View>
       );
     }
     return (
       <View style={[styles.badge, styles.badgeRed]}>
-        <Text style={styles.badgeTextRed}>🔴 권리 위험 주의 매물</Text>
+        <Text style={styles.badgeTextRed}>🔴 고수 · 복잡 권리 / 하이리턴</Text>
       </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* 상단 다중 사진 좌우 스와이프 갤러리 */}
-        <View style={styles.galleryBox}>
-          <ScrollView
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={onPhotoScroll}
-            scrollEventThrottle={16}
-            style={styles.galleryScroll}
-          >
-            {photos.map((pUrl, idx) => (
-              <Image
-                key={idx}
-                source={{ uri: pUrl }}
-                style={styles.galleryImage}
-                resizeMode="cover"
-              />
-            ))}
-          </ScrollView>
-
-          {/* 좌측 상단 안전등급 뱃지 */}
-          <View style={styles.badgeWrap}>{renderBadge(item.safety_grade)}</View>
-
-          {/* 좌측 하단 D-Day */}
-          <View style={styles.dDayWrap}>
-            <Text style={styles.dDayText}>{item.d_day}</Text>
-          </View>
-
-          {/* 우측 하단 사진 카운터 */}
-          {photos.length > 1 && (
-            <View style={styles.photoCountWrap}>
-              <Text style={styles.photoCountText}>
-                📷 {activePhotoIdx + 1} / {photos.length}
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* 핵심 브리핑 본문 */}
-        <View style={styles.contentWrap}>
-          <Text style={styles.headlineText}>{item.headline}</Text>
-          <Text style={styles.locationText}>{item.location}</Text>
-
-          {/* 1. 가격 & 시세 갭 하이라이트 박스 */}
-          <View style={styles.highlightCard}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>💰 가격 분석 (10초 요약)</Text>
-              <View style={styles.discountPill}>
-                <Text style={styles.discountPillText}>-{item.discount_pct}%</Text>
-              </View>
-            </View>
-
-            <View style={styles.statGrid}>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>최저 입찰가</Text>
-                <Text style={styles.statValueLarge}>{item.min_bid_str}</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>감정 평가액</Text>
-                <Text style={styles.statValue}>{item.appraisal_str}</Text>
-              </View>
-            </View>
-
-            <View style={styles.gapBanner}>
-              <Text style={styles.gapBannerText}>
-                {item.ref_price_name} 대비 약{' '}
-                <Text style={styles.gapBold}>{item.gap_amount_str}</Text> 저렴하게 시작합니다.
-              </Text>
-            </View>
-          </View>
-
-          {/* 2. 최소 필요 자금 계산기 */}
-          <View style={styles.highlightCard}>
-            <Text style={styles.cardTitle}>💵 최소 준비 자금</Text>
-            <View style={styles.cashRow}>
-              <Text style={styles.cashLabel}>입찰 당일 보증금 (10%)</Text>
-              <Text style={styles.cashValue}>{item.deposit_required_str}</Text>
-            </View>
-            <Text style={styles.cashTip}>
-              * 당일 수표 1장으로 은행에서 발급받아 법원에 제출하면 됩니다.
-            </Text>
-          </View>
-
-          {/* 3. 초보자를 위한 3줄 안심 권리 요약 */}
-          <View style={styles.highlightCard}>
-            <Text style={styles.cardTitle}>🛡️ 쉬운 권리 브리핑 3줄</Text>
-            <View style={styles.bulletList}>
-              {item.summary_bullets.map((b, idx) => (
-                <View key={idx} style={styles.bulletItem}>
-                  <Text style={styles.bulletNumber}>{idx + 1}</Text>
-                  <Text style={styles.bulletContent}>{b}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          {/* 4. 법원 원문 데이터 접이식(아코디언) 섹션 */}
-          <View style={styles.accordionCard}>
-            <TouchableOpacity
-              style={styles.accordionHeader}
-              onPress={() => setIsRawExpanded(!isRawExpanded)}
-              activeOpacity={0.7}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.pageInner}>
+          {/* 1. 상단 감정평가서 다중 사진 좌우 스와이프 갤러리 */}
+          <View style={[styles.galleryBox, { width: galleryWidth }]}>
+            <ScrollView
+              ref={photoScrollRef}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={onPhotoScroll}
+              scrollEventThrottle={16}
+              style={styles.galleryScroll}
             >
-              <View style={styles.accordionTitleRow}>
-                <Text style={styles.accordionIcon}>📋</Text>
-                <View>
-                  <Text style={styles.accordionTitle}>법원 원본 데이터 투명 공개</Text>
-                  <Text style={styles.accordionSubtitle}>
-                    {isRawExpanded ? '터치하여 접기' : '대법원 공적장부 원문 근거 확인'}
+              {photos.map((pUrl, idx) => (
+                <Image
+                  key={idx}
+                  source={{ uri: pUrl }}
+                  style={[styles.galleryImage, { width: galleryWidth }]}
+                  resizeMode="cover"
+                />
+              ))}
+            </ScrollView>
+
+            <View style={styles.badgeWrap}>{renderDifficultyBadge(item.safety_grade)}</View>
+
+            <View style={styles.dDayWrap}>
+              <Text style={styles.dDayText}>{item.d_day}</Text>
+            </View>
+
+            {photos.length > 1 && (
+              <>
+                {activePhotoIdx > 0 && (
+                  <TouchableOpacity
+                    style={[styles.photoArrowBtn, styles.photoArrowLeft]}
+                    onPress={() => jumpPhoto(activePhotoIdx - 1)}
+                  >
+                    <Text style={styles.photoArrowText}>‹</Text>
+                  </TouchableOpacity>
+                )}
+                {activePhotoIdx < photos.length - 1 && (
+                  <TouchableOpacity
+                    style={[styles.photoArrowBtn, styles.photoArrowRight]}
+                    onPress={() => jumpPhoto(activePhotoIdx + 1)}
+                  >
+                    <Text style={styles.photoArrowText}>›</Text>
+                  </TouchableOpacity>
+                )}
+                <View style={styles.photoCountWrap}>
+                  <Text style={styles.photoCountText}>
+                    📷 {activePhotoIdx + 1} / {photos.length}
                   </Text>
                 </View>
+              </>
+            )}
+          </View>
+
+          <View style={styles.contentWrap}>
+            {/* 핵심 헤드라인 & 주소 */}
+            <View style={styles.titleSection}>
+              <Text style={styles.headlineText}>{item.headline}</Text>
+              <Text style={styles.locationText}>
+                {item.location} · {item.usage}
+                {item.area_pyeong > 0 ? ` · ${item.area_pyeong}평` : ''}
+              </Text>
+            </View>
+
+            {/* 2. 가격 & 시세 대비 할인율 + 인근 낙찰 통계 */}
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>💰 가격 · 시세 할인 분석</Text>
+                {item.discount_pct > 0 && (
+                  <View style={styles.discountPill}>
+                    <Text style={styles.discountPillText}>감정가 대비 -{item.discount_pct}%</Text>
+                  </View>
+                )}
               </View>
-              <Text style={styles.accordionArrow}>{isRawExpanded ? '▲' : '▼'}</Text>
-            </TouchableOpacity>
 
-            {isRawExpanded && (
-              <View style={styles.accordionBody}>
-                {/* 등기부 권리 내역 전체 */}
-                <View style={styles.rawSection}>
-                  <Text style={styles.rawSectionTitle}>📑 등기부 권리 내역 (갑구/을구)</Text>
-                  {rawData?.rights_list && rawData.rights_list.length > 0 ? (
-                    <View style={styles.rawRightsTable}>
-                      {rawData.rights_list.map((r, rIdx) => (
-                        <View key={rIdx} style={styles.rawRightItem}>
-                          <View style={styles.rawRightHeader}>
-                            <View style={styles.rawRightBadge}>
-                              <Text style={styles.rawRightBadgeText}>
-                                {r.type || r.name || '권리'}
-                              </Text>
-                            </View>
-                            {r.is_standard_right && (
-                              <View style={styles.standardRightTag}>
-                                <Text style={styles.standardRightTagText}>말소기준권리</Text>
-                              </View>
-                            )}
-                            <Text style={styles.rawRightDate}>{r.registration_date || '-'}</Text>
-                          </View>
-                          <View style={styles.rawRightDetails}>
-                            <Text style={styles.rawRightRow}>
-                              <Text style={styles.rawRightKey}>권리자: </Text>
-                              <Text style={styles.rawRightVal}>{r.right_holder || '미상'}</Text>
-                            </Text>
-                            {r.claim_amount && (
-                              <Text style={styles.rawRightRow}>
-                                <Text style={styles.rawRightKey}>채권액: </Text>
-                                <Text style={styles.rawRightVal}>
-                                  {typeof r.claim_amount === 'number'
-                                    ? `${(r.claim_amount / 10000).toLocaleString()}만원`
-                                    : r.claim_amount}
-                                </Text>
-                              </Text>
-                            )}
-                            {r.remarks && (
-                              <Text style={styles.rawRightRemarks}>{r.remarks}</Text>
-                            )}
-                          </View>
-                        </View>
-                      ))}
-                    </View>
-                  ) : (
-                    <Text style={styles.rawEmptyText}>등록된 등기부 권리 내역이 없습니다.</Text>
-                  )}
+              <View style={styles.statGrid}>
+                <View style={styles.statItem}>
+                  <Text style={styles.statLabel}>최저 입찰가</Text>
+                  <Text style={styles.statValueLarge}>{item.min_bid_str}</Text>
                 </View>
+                <View style={styles.statItem}>
+                  <Text style={styles.statLabel}>감정 평가액</Text>
+                  <Text style={styles.statValue}>{item.appraisal_str}</Text>
+                </View>
+                {item.market_price && item.market_price > 0 ? (
+                  <View style={styles.statItem}>
+                    <Text style={styles.statLabel}>최근 실거래</Text>
+                    <Text style={styles.statValue}>{item.market_price_str}</Text>
+                  </View>
+                ) : undefined}
+              </View>
 
-                {/* 현황조사서 임차인 상세 */}
-                <View style={styles.rawSection}>
-                  <Text style={styles.rawSectionTitle}>🏠 현황조사서 임차인 현황</Text>
-                  <View style={styles.rawTenantBox}>
-                    <View style={styles.rawTenantRow}>
-                      <Text style={styles.rawTenantKey}>전입일자</Text>
-                      <Text style={styles.rawTenantVal}>
-                        {rawData?.tenant_registration_date || '전입 세대 미상/없음'}
+              <View style={styles.gapBanner}>
+                <Text style={styles.gapBannerText}>
+                  {item.ref_price_name} 대비 약{' '}
+                  <Text style={styles.gapBold}>{item.gap_amount_str}</Text> 저렴하게 시작합니다.
+                </Text>
+              </View>
+
+              {areaStats && (
+                <View style={styles.areaStatBanner}>
+                  <Text style={styles.areaStatText}>
+                    🏆 인근 {areaStats.region_label} 최근 낙찰 {areaStats.sample_count}건 평균:{' '}
+                    <Text style={styles.areaStatBold}>
+                      낙찰가율 {areaStats.avg_winning_rate}% · 경쟁률 {areaStats.avg_bidder_count}명
+                    </Text>
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* 3. 필요 자기자본(현금) 계산기 (대출 규제 시뮬레이션) */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>🧮 필요 자기자본(현금) 계산기</Text>
+              <Text style={styles.cardSubCaption}>
+                최저가({item.min_bid_str}) 낙찰 가정 · 대출 조건을 눌러 비교해 보세요
+              </Text>
+
+              {/* 대출 조건 프리셋 3단 탭 */}
+              <View style={styles.presetRow}>
+                {(
+                  [
+                    { key: 'normal', label: '일반 LTV 70%' },
+                    { key: 'first_home', label: '생애최초 80%' },
+                    { key: 'conservative', label: '보수적 50%' },
+                  ] as { key: LoanPreset; label: string }[]
+                ).map((p) => {
+                  const active = loanPreset === p.key;
+                  return (
+                    <TouchableOpacity
+                      key={p.key}
+                      style={[styles.presetBtn, active && styles.presetBtnActive]}
+                      onPress={() => setLoanPreset(p.key)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[styles.presetBtnText, active && styles.presetBtnTextActive]}>
+                        {p.label}
                       </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              <Text style={styles.presetDescText}>📌 {equityCalc.presetDesc}</Text>
+
+              {/* 총 필요 현금 하이라이트 */}
+              <View style={styles.totalCashHighlight}>
+                <Text style={styles.totalCashLabel}>실제 필요한 총 현금 (자기자본+비용)</Text>
+                <Text style={styles.totalCashValue}>{formatKrw(equityCalc.totalCashNeeded)}</Text>
+              </View>
+
+              {/* 세부 내역 행 */}
+              <View style={styles.calcRows}>
+                <View style={styles.calcRow}>
+                  <Text style={styles.calcKey}>예상 경락잔금대출 ({equityCalc.ltvPct}%)</Text>
+                  <Text style={styles.calcValBlue}>- {formatKrw(equityCalc.estLoan)}</Text>
+                </View>
+                <View style={styles.calcRow}>
+                  <Text style={styles.calcKey}>순수 자기자본 (잔금 현금)</Text>
+                  <Text style={styles.calcVal}>{formatKrw(equityCalc.pureEquity)}</Text>
+                </View>
+                <View style={styles.calcRow}>
+                  <Text style={styles.calcKey}>취득세·등기·명도 부대비용 (추산)</Text>
+                  <Text style={styles.calcVal}>+ {formatKrw(equityCalc.extraCost)}</Text>
+                </View>
+                <View style={styles.calcRow}>
+                  <Text style={styles.calcKey}>낙찰자 인수 보증금</Text>
+                  <Text
+                    style={[
+                      styles.calcVal,
+                      equityCalc.assumedDeposit > 0 ? styles.calcValRed : styles.calcValGreen,
+                    ]}
+                  >
+                    {equityCalc.assumedDeposit > 0
+                      ? `+ ${formatKrw(equityCalc.assumedDeposit)} (주의)`
+                      : '0원 (인수 없음)'}
+                  </Text>
+                </View>
+                <View style={[styles.calcRow, styles.calcRowLast]}>
+                  <Text style={styles.calcKey}>입찰 당일 보증금 (10%, 수표)</Text>
+                  <Text style={styles.calcValBold}>{item.deposit_required_str}</Text>
+                </View>
+              </View>
+
+              <Text style={styles.disclaimerText}>
+                ※ 실제 대출 한도는 DSR·소액임차인 방공제·규제지역·개인 신용도에 따라 달라질 수 있는 참고 시뮬레이션입니다.
+              </Text>
+            </View>
+
+            {/* 4. 인근 전월세 시세 & 예상 수익률 */}
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>📊 인근 전·월세 시세 & 예상 수익률</Text>
+                {rental && (
+                  <View style={styles.yieldPill}>
+                    <Text style={styles.yieldPillText}>연 {rental.annual_yield_pct}%</Text>
+                  </View>
+                )}
+              </View>
+
+              {rental ? (
+                <>
+                  <Text style={styles.rentalSourceText}>
+                    데이터 근거: {rental.source_label} ({rental.sample_count}건 기준)
+                  </Text>
+
+                  <View style={styles.rentalGrid}>
+                    <View style={styles.rentalBox}>
+                      <Text style={styles.rentalLabel}>예상 보증금</Text>
+                      <Text style={styles.rentalVal}>{rental.est_deposit_str}</Text>
                     </View>
-                    <View style={styles.rawTenantRow}>
-                      <Text style={styles.rawTenantKey}>보증금</Text>
-                      <Text style={styles.rawTenantVal}>
-                        {rawData?.tenant_deposit && rawData.tenant_deposit > 0
-                          ? rawData.tenant_deposit_str
-                          : '0원 (확인된 보증금 없음)'}
-                      </Text>
-                    </View>
-                    <View style={styles.rawTenantRow}>
-                      <Text style={styles.rawTenantKey}>배당요구 신청</Text>
-                      <Text
-                        style={[
-                          styles.rawTenantVal,
-                          rawData?.is_payout_requested ? styles.payoutYes : styles.payoutNo,
-                        ]}
-                      >
-                        {rawData?.is_payout_requested ? '신청 완료 (배당요구함)' : '신청 내역 없음'}
-                      </Text>
+                    <View style={styles.rentalBox}>
+                      <Text style={styles.rentalLabel}>예상 월세</Text>
+                      <Text style={styles.rentalValBlue}>{rental.est_monthly_rent_str}</Text>
                     </View>
                   </View>
-                </View>
 
-                {/* 매각물건명세서 비고 & 특수조건 */}
-                <View style={styles.rawSection}>
-                  <Text style={styles.rawSectionTitle}>📝 매각물건명세서 비고 및 특수조건</Text>
-                  {rawData?.special_rights && rawData.special_rights.length > 0 && (
-                    <View style={styles.specialTagsRow}>
-                      {rawData.special_rights.map((tag, tIdx) => (
-                        <View key={tIdx} style={styles.specialTagPill}>
-                          <Text style={styles.specialTagText}>⚠️ {tag}</Text>
-                        </View>
-                      ))}
+                  {rental.est_jeonse > 0 && (
+                    <View style={styles.gapInvestBox}>
+                      <View style={styles.calcRow}>
+                        <Text style={styles.calcKey}>추정 전세가 (전환율 5.5% 참고)</Text>
+                        <Text style={styles.calcVal}>{rental.est_jeonse_str}</Text>
+                      </View>
+                      <View style={[styles.calcRow, styles.calcRowLast]}>
+                        <Text style={styles.calcKey}>전세 갭투자 예상 필요금</Text>
+                        <Text style={styles.calcValBlue}>{rental.gap_invest_cash_str}</Text>
+                      </View>
                     </View>
                   )}
-                  <View style={styles.remarksBox}>
-                    <Text style={styles.remarksText}>
-                      {rawData?.remarks?.trim() || '법원 매각물건명세서상 특별한 비고 기재사항이 없습니다.'}
+                </>
+              ) : (
+                <View style={styles.noRentalBox}>
+                  <Text style={styles.noRentalTitle}>인근 전·월세 시세 추정 불가</Text>
+                  <Text style={styles.noRentalDesc}>
+                    현재 DB(네이버 부동산·현황조사서)에 이 물건과 동일 용도·유사 평형의 검증된 임대 표본이 부족해 수익률을 억지로 추정하지 않았습니다. 입찰 전 인근 부동산 시세를 직접 확인해 주세요.
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* 5. AI 권리분석 리포트 & 말소기준권리 (기존 대시보드 알짜 기능 이식) */}
+            {ai && (
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>🤖 AI 권리분석 리포트</Text>
+                  {ai.score > 0 && (
+                    <View style={styles.aiScorePill}>
+                      <Text style={styles.aiScoreText}>
+                        {ai.score}점 · {ai.grade || '분석완료'}등급
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                {ai.verdict ? (
+                  <View style={styles.verdictBox}>
+                    <Text style={styles.verdictText}>{ai.verdict}</Text>
+                  </View>
+                ) : undefined}
+
+                {/* 말소기준권리 & 추천 입찰가 */}
+                <View style={styles.malsoGrid}>
+                  <View style={styles.malsoCard}>
+                    <Text style={styles.malsoLabel}>말소기준권리</Text>
+                    <Text style={styles.malsoVal}>
+                      {ai.malso_right
+                        ? `${ai.malso_right.name}\n(${ai.malso_right.date})`
+                        : '등기부 원문 확인'}
+                    </Text>
+                  </View>
+                  <View style={styles.malsoCard}>
+                    <Text style={styles.malsoLabel}>AI 참고 입찰가</Text>
+                    <Text style={styles.malsoValBlue}>
+                      {ai.suggested_bid || item.min_bid_str}
                     </Text>
                   </View>
                 </View>
 
-                {/* 데이터 출처 고지 */}
-                <Text style={styles.rawDisclaimer}>
-                  ※ 본 정보는 대한민국 법원경매정보(courtauction.go.kr)에서 수집된 공식 장부 원본입니다.
-                </Text>
+                {/* 소멸 권리 vs 인수 권리 */}
+                {(ai.extinguished_rights.length > 0 || ai.retained_rights.length > 0) && (
+                  <View style={styles.rightsCompareBox}>
+                    <View style={styles.rightsCompareRow}>
+                      <Text style={styles.rightsCompareTagGreen}>소멸</Text>
+                      <Text style={styles.rightsCompareText}>
+                        {ai.extinguished_rights.join(', ') || '말소기준권리 이하 소멸'}
+                      </Text>
+                    </View>
+                    <View style={styles.rightsCompareRow}>
+                      <Text
+                        style={
+                          ai.retained_rights.length > 0 && ai.retained_rights[0] !== '없음'
+                            ? styles.rightsCompareTagRed
+                            : styles.rightsCompareTagGray
+                        }
+                      >
+                        인수
+                      </Text>
+                      <Text style={styles.rightsCompareText}>
+                        {ai.retained_rights.join(', ') || '없음'}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
+                {/* 핵심 포인트 & 리스크 */}
+                {ai.key_points.length > 0 && (
+                  <View style={styles.pointBlock}>
+                    <Text style={styles.pointBlockTitle}>✅ 핵심 투자 포인트</Text>
+                    {ai.key_points.map((pt, idx) => (
+                      <Text key={idx} style={styles.pointText}>
+                        • {pt}
+                      </Text>
+                    ))}
+                  </View>
+                )}
+                {ai.risks.length > 0 && (
+                  <View style={styles.pointBlock}>
+                    <Text style={styles.pointBlockTitle}>⚠️ 체크해야 할 리스크</Text>
+                    {ai.risks.map((rk, idx) => (
+                      <Text key={idx} style={styles.riskText}>
+                        • {rk}
+                      </Text>
+                    ))}
+                  </View>
+                )}
               </View>
             )}
-          </View>
 
-          {/* 5. 법원 및 입찰 안내 메타 정보 */}
-          <View style={styles.metaCard}>
-            <Text style={styles.metaRow}>
-              <Text style={styles.metaKey}>관할 법원: </Text>
-              <Text style={styles.metaVal}>{item.court_name || '수도권 관할 법원'}</Text>
-            </Text>
-            <Text style={styles.metaRow}>
-              <Text style={styles.metaKey}>사건 번호: </Text>
-              <Text style={styles.metaVal}>{item.case_number}</Text>
-            </Text>
-            <Text style={styles.metaRow}>
-              <Text style={styles.metaKey}>입찰 기일: </Text>
-              <Text style={styles.metaVal}>{item.auction_date || '일정 확인 필요'}</Text>
-            </Text>
+            {/* 6. 매각 기일(유찰) 히스토리 타임라인 */}
+            {bidHistory.length > 0 && (
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>📉 매각 기일 · 유찰 히스토리</Text>
+                  <Text style={styles.historySubTag}>유찰 {item.failed_count}회</Text>
+                </View>
+
+                <View style={styles.timelineList}>
+                  {bidHistory.map((h, idx) => (
+                    <View
+                      key={idx}
+                      style={[
+                        styles.timelineRow,
+                        h.is_current && styles.timelineRowCurrent,
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.timelineRoundBadge,
+                          h.is_current && styles.timelineRoundBadgeCurrent,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.timelineRoundText,
+                            h.is_current && styles.timelineRoundTextCurrent,
+                          ]}
+                        >
+                          {h.round}차
+                        </Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text
+                          style={[
+                            styles.timelinePrice,
+                            h.is_current && styles.timelinePriceCurrent,
+                          ]}
+                        >
+                          {h.price_str}
+                        </Text>
+                        <Text style={styles.timelineDate}>{h.date}</Text>
+                      </View>
+                      <View style={styles.timelineRight}>
+                        <Text style={styles.timelineRatio}>{h.ratio_pct}%</Text>
+                        <Text
+                          style={[
+                            styles.timelineStatus,
+                            h.is_current && styles.timelineStatusCurrent,
+                          ]}
+                        >
+                          {h.status}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* 7. 법원 원본 데이터 투명 공개 아코디언 */}
+            <View style={styles.accordionCard}>
+              <TouchableOpacity
+                style={styles.accordionHeader}
+                onPress={() => setIsRawExpanded(!isRawExpanded)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.accordionTitleRow}>
+                  <Text style={styles.accordionIcon}>📋</Text>
+                  <View>
+                    <Text style={styles.accordionTitle}>법원 원본 데이터 투명 공개</Text>
+                    <Text style={styles.accordionSubtitle}>
+                      {isRawExpanded ? '터치하여 접기' : '등기부 · 현황조사서 · 명세서 비고 원문 보기'}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.accordionArrow}>{isRawExpanded ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {isRawExpanded && (
+                <View style={styles.accordionBody}>
+                  {/* 등기부 권리 내역 전체 */}
+                  <View style={styles.rawSection}>
+                    <Text style={styles.rawSectionTitle}>📑 등기부 권리 내역 (갑구/을구)</Text>
+                    {rawData?.rights_list && rawData.rights_list.length > 0 ? (
+                      <View style={styles.rawRightsTable}>
+                        {rawData.rights_list.map((r, rIdx) => (
+                          <View key={rIdx} style={styles.rawRightItem}>
+                            <View style={styles.rawRightHeader}>
+                              <View style={styles.rawRightBadge}>
+                                <Text style={styles.rawRightBadgeText}>
+                                  {r.type || r.name || '권리'}
+                                </Text>
+                              </View>
+                              {r.is_standard_right && (
+                                <View style={styles.standardRightTag}>
+                                  <Text style={styles.standardRightTagText}>말소기준권리</Text>
+                                </View>
+                              )}
+                              <Text style={styles.rawRightDate}>{r.registration_date || '-'}</Text>
+                            </View>
+                            <View style={styles.rawRightDetails}>
+                              <Text style={styles.rawRightRow}>
+                                <Text style={styles.rawRightKey}>권리자: </Text>
+                                <Text style={styles.rawRightVal}>{r.right_holder || '미상'}</Text>
+                              </Text>
+                              {r.claim_amount ? (
+                                <Text style={styles.rawRightRow}>
+                                  <Text style={styles.rawRightKey}>채권액: </Text>
+                                  <Text style={styles.rawRightVal}>
+                                    {typeof r.claim_amount === 'number'
+                                      ? `${(r.claim_amount / 10000).toLocaleString()}만원`
+                                      : r.claim_amount}
+                                  </Text>
+                                </Text>
+                              ) : undefined}
+                              {r.remarks ? (
+                                <Text style={styles.rawRightRemarks}>{r.remarks}</Text>
+                              ) : undefined}
+                            </View>
+                          </View>
+                        ))}
+                      </View>
+                    ) : (
+                      <Text style={styles.rawEmptyText}>등록된 등기부 권리 내역이 없습니다.</Text>
+                    )}
+                  </View>
+
+                  {/* 현황조사서 임차인 상세 */}
+                  <View style={styles.rawSection}>
+                    <Text style={styles.rawSectionTitle}>🏠 현황조사서 임차인 현황</Text>
+                    <View style={styles.rawTenantBox}>
+                      <View style={styles.rawTenantRow}>
+                        <Text style={styles.rawTenantKey}>전입일자</Text>
+                        <Text style={styles.rawTenantVal}>
+                          {rawData?.tenant_registration_date || '전입 세대 미상/없음'}
+                        </Text>
+                      </View>
+                      <View style={styles.rawTenantRow}>
+                        <Text style={styles.rawTenantKey}>보증금</Text>
+                        <Text style={styles.rawTenantVal}>
+                          {rawData?.tenant_deposit && rawData.tenant_deposit > 0
+                            ? rawData.tenant_deposit_str
+                            : '0원 (확인된 보증금 없음)'}
+                        </Text>
+                      </View>
+                      <View style={styles.rawTenantRow}>
+                        <Text style={styles.rawTenantKey}>배당요구 신청</Text>
+                        <Text
+                          style={[
+                            styles.rawTenantVal,
+                            rawData?.is_payout_requested ? styles.payoutYes : styles.payoutNo,
+                          ]}
+                        >
+                          {rawData?.is_payout_requested ? '신청 완료 (배당요구함)' : '신청 내역 없음'}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* 매각물건명세서 비고 & 특수조건 */}
+                  <View style={styles.rawSection}>
+                    <Text style={styles.rawSectionTitle}>📝 매각물건명세서 비고 및 특수조건</Text>
+                    {rawData?.special_rights && rawData.special_rights.length > 0 && (
+                      <View style={styles.specialTagsRow}>
+                        {rawData.special_rights.map((tag, tIdx) => (
+                          <View key={tIdx} style={styles.specialTagPill}>
+                            <Text style={styles.specialTagText}>⚠️ {tag}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                    <View style={styles.remarksBox}>
+                      <Text style={styles.remarksText}>
+                        {rawData?.remarks?.trim() ||
+                          '법원 매각물건명세서상 특별한 비고 기재사항이 없습니다.'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.rawDisclaimer}>
+                    ※ 본 정보는 대한민국 법원경매정보(courtauction.go.kr)에서 수집된 공식 장부 원본입니다.
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* 법원 및 사건 메타 정보 */}
+            <View style={styles.metaCard}>
+              <Text style={styles.metaRow}>
+                <Text style={styles.metaKey}>관할 법원: </Text>
+                <Text style={styles.metaVal}>{item.court_name || '수도권 관할 법원'}</Text>
+              </Text>
+              <Text style={styles.metaRow}>
+                <Text style={styles.metaKey}>사건 번호: </Text>
+                <Text style={styles.metaVal}>{item.case_number}</Text>
+              </Text>
+              <Text style={styles.metaRow}>
+                <Text style={styles.metaKey}>입찰 기일: </Text>
+                <Text style={styles.metaVal}>{item.auction_date || '일정 확인 필요'}</Text>
+              </Text>
+            </View>
           </View>
         </View>
       </ScrollView>
 
       {/* 하단 고정 찜 액션 바 */}
       <View style={styles.bottomBar}>
-        <TouchableOpacity
-          style={[styles.favActionBtn, fav && styles.favActionBtnActive]}
-          onPress={() => toggleFavorite(item)}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.favActionIcon}>{fav ? '⭐' : '☆'}</Text>
-          <Text style={[styles.favActionText, fav && styles.favActionTextActive]}>
-            {fav ? '관심 매물 등록됨' : '관심 매물로 찜하기'}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.bottomBarInner}>
+          <TouchableOpacity
+            style={[styles.favActionBtn, fav && styles.favActionBtnActive]}
+            onPress={() => toggleFavorite(item)}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.favActionIcon}>{fav ? '⭐' : '☆'}</Text>
+            <Text style={[styles.favActionText, fav && styles.favActionTextActive]}>
+              {fav ? '관심 매물 등록됨' : '관심 매물로 찜하기'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -345,6 +716,11 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 100,
+    alignItems: 'center',
+  },
+  pageInner: {
+    width: '100%',
+    maxWidth: 640,
   },
   centerBox: {
     flex: 1,
@@ -367,9 +743,10 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '700',
   },
+
+  // 1. 사진 갤러리
   galleryBox: {
-    width: '100%',
-    height: 250,
+    height: 270,
     position: 'relative',
     backgroundColor: '#0f172a',
   },
@@ -378,8 +755,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   galleryImage: {
-    width: SCREEN_WIDTH,
-    height: 250,
+    height: 270,
   },
   badgeWrap: {
     position: 'absolute',
@@ -392,33 +768,33 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   badgeGreen: {
-    backgroundColor: '#ecfdf5',
+    backgroundColor: 'rgba(236, 253, 245, 0.96)',
     borderWidth: 1,
     borderColor: '#a7f3d0',
   },
   badgeTextGreen: {
     color: '#047857',
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '800',
   },
   badgeYellow: {
-    backgroundColor: '#fefce8',
+    backgroundColor: 'rgba(254, 252, 232, 0.96)',
     borderWidth: 1,
     borderColor: '#fef08a',
   },
   badgeTextYellow: {
     color: '#a16207',
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '800',
   },
   badgeRed: {
-    backgroundColor: '#fef2f2',
+    backgroundColor: 'rgba(254, 242, 242, 0.96)',
     borderWidth: 1,
     borderColor: '#fecaca',
   },
   badgeTextRed: {
     color: '#b91c1c',
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '800',
   },
   dDayWrap: {
@@ -439,7 +815,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 16,
     right: 16,
-    backgroundColor: 'rgba(15, 23, 42, 0.75)',
+    backgroundColor: 'rgba(15, 23, 42, 0.78)',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -449,24 +825,54 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
+  photoArrowBtn: {
+    position: 'absolute',
+    top: '50%',
+    marginTop: -18,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(15, 23, 42, 0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoArrowLeft: {
+    left: 12,
+  },
+  photoArrowRight: {
+    right: 12,
+  },
+  photoArrowText: {
+    color: '#ffffff',
+    fontSize: 22,
+    fontWeight: '800',
+    lineHeight: 24,
+  },
+
   contentWrap: {
-    padding: 20,
+    padding: 18,
     gap: 16,
   },
+  titleSection: {
+    gap: 6,
+  },
   headlineText: {
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: '900',
     color: '#0f172a',
-    lineHeight: 28,
+    lineHeight: 29,
+    letterSpacing: -0.3,
   },
   locationText: {
     fontSize: 13,
     color: '#64748b',
-    marginTop: -8,
+    lineHeight: 18,
   },
-  highlightCard: {
+
+  // 공통 카드
+  card: {
     backgroundColor: '#ffffff',
-    borderRadius: 20,
+    borderRadius: 22,
     padding: 18,
     borderWidth: 1,
     borderColor: '#e2e8f0',
@@ -476,15 +882,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 8,
   },
   cardTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#1e293b',
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#0f172a',
   },
+  cardSubCaption: {
+    fontSize: 12.5,
+    color: '#64748b',
+    marginTop: -6,
+  },
+
+  // 2. 가격 요약
   discountPill: {
     backgroundColor: '#eff6ff',
-    paddingHorizontal: 8,
+    paddingHorizontal: 9,
     paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
@@ -492,16 +906,17 @@ const styles = StyleSheet.create({
   },
   discountPillText: {
     color: '#1d4ed8',
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '800',
   },
   statGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'baseline',
-    gap: 24,
+    gap: 20,
   },
   statItem: {
-    gap: 4,
+    gap: 3,
   },
   statLabel: {
     fontSize: 12,
@@ -509,7 +924,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   statValueLarge: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: '900',
     color: '#1d4ed8',
   },
@@ -534,59 +949,410 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#15803d',
   },
-  cashRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+  areaStatBanner: {
+    backgroundColor: '#eff6ff',
+    padding: 11,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#dbeafe',
   },
-  cashLabel: {
-    fontSize: 14,
+  areaStatText: {
+    fontSize: 12.5,
+    color: '#1e40af',
+    lineHeight: 18,
+  },
+  areaStatBold: {
+    fontWeight: '900',
+    color: '#1d4ed8',
+  },
+
+  // 3. 필요 자기자본 계산기
+  presetRow: {
+    flexDirection: 'row',
+    backgroundColor: '#f1f5f9',
+    borderRadius: 12,
+    padding: 3,
+    gap: 4,
+  },
+  presetBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 9,
+    alignItems: 'center',
+  },
+  presetBtnActive: {
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  presetBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#64748b',
+  },
+  presetBtnTextActive: {
+    color: '#0f172a',
+    fontWeight: '900',
+  },
+  presetDescText: {
+    fontSize: 12,
     color: '#475569',
     fontWeight: '600',
   },
-  cashValue: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#0f172a',
+  totalCashHighlight: {
+    backgroundColor: '#0f172a',
+    borderRadius: 16,
+    padding: 16,
+    gap: 4,
   },
-  cashTip: {
+  totalCashLabel: {
     fontSize: 12,
+    color: '#94a3b8',
+    fontWeight: '600',
+  },
+  totalCashValue: {
+    fontSize: 26,
+    fontWeight: '900',
+    color: '#ffffff',
+    letterSpacing: -0.5,
+  },
+  calcRows: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  calcRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  calcRowLast: {
+    borderBottomWidth: 0,
+  },
+  calcKey: {
+    fontSize: 13,
+    color: '#475569',
+    fontWeight: '600',
+  },
+  calcVal: {
+    fontSize: 13.5,
+    color: '#0f172a',
+    fontWeight: '800',
+  },
+  calcValBold: {
+    fontSize: 14,
+    color: '#0f172a',
+    fontWeight: '900',
+  },
+  calcValBlue: {
+    fontSize: 13.5,
+    color: '#2563eb',
+    fontWeight: '800',
+  },
+  calcValGreen: {
+    fontSize: 13.5,
+    color: '#047857',
+    fontWeight: '800',
+  },
+  calcValRed: {
+    fontSize: 13.5,
+    color: '#dc2626',
+    fontWeight: '900',
+  },
+  disclaimerText: {
+    fontSize: 11.5,
     color: '#94a3b8',
     lineHeight: 16,
   },
-  bulletList: {
-    gap: 10,
+
+  // 4. 전월세 & 수익률
+  yieldPill: {
+    backgroundColor: '#ecfdf5',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#a7f3d0',
   },
-  bulletItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
+  yieldPillText: {
+    color: '#047857',
+    fontSize: 13,
+    fontWeight: '900',
   },
-  bulletNumber: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: '#eff6ff',
-    color: '#2563eb',
-    textAlign: 'center',
-    lineHeight: 22,
+  rentalSourceText: {
     fontSize: 12,
+    color: '#64748b',
+    marginTop: -4,
+  },
+  rentalGrid: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  rentalBox: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    gap: 4,
+  },
+  rentalLabel: {
+    fontSize: 12,
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  rentalVal: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: '#0f172a',
+  },
+  rentalValBlue: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: '#1d4ed8',
+  },
+  gapInvestBox: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  noRentalBox: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    gap: 6,
+  },
+  noRentalTitle: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: '#475569',
+  },
+  noRentalDesc: {
+    fontSize: 12.5,
+    color: '#64748b',
+    lineHeight: 18,
+  },
+
+  // 5. AI 권리분석 리포트
+  aiScorePill: {
+    backgroundColor: '#eef2ff',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#c7d2fe',
+  },
+  aiScoreText: {
+    color: '#3730a3',
+    fontSize: 12.5,
+    fontWeight: '900',
+  },
+  verdictBox: {
+    backgroundColor: '#f8fafc',
+    padding: 12,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2563eb',
+  },
+  verdictText: {
+    fontSize: 13,
+    color: '#1e293b',
+    lineHeight: 19,
+    fontWeight: '600',
+  },
+  malsoGrid: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  malsoCard: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    gap: 4,
+  },
+  malsoLabel: {
+    fontSize: 11.5,
+    color: '#64748b',
+    fontWeight: '700',
+  },
+  malsoVal: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#0f172a',
+    lineHeight: 18,
+  },
+  malsoValBlue: {
+    fontSize: 13.5,
+    fontWeight: '900',
+    color: '#1d4ed8',
+    lineHeight: 18,
+  },
+  rightsCompareBox: {
+    gap: 8,
+    backgroundColor: '#f8fafc',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  rightsCompareRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  rightsCompareTagGreen: {
+    backgroundColor: '#dcfce7',
+    color: '#166534',
+    fontSize: 11,
+    fontWeight: '800',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  rightsCompareTagRed: {
+    backgroundColor: '#fee2e2',
+    color: '#991b1b',
+    fontSize: 11,
+    fontWeight: '800',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  rightsCompareTagGray: {
+    backgroundColor: '#e2e8f0',
+    color: '#475569',
+    fontSize: 11,
+    fontWeight: '800',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  rightsCompareText: {
+    flex: 1,
+    fontSize: 12.5,
+    color: '#334155',
+    fontWeight: '600',
+  },
+  pointBlock: {
+    gap: 4,
+  },
+  pointBlockTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#1e293b',
+  },
+  pointText: {
+    fontSize: 12.5,
+    color: '#334155',
+    lineHeight: 18,
+  },
+  riskText: {
+    fontSize: 12.5,
+    color: '#b45309',
+    lineHeight: 18,
+  },
+
+  // 6. 유찰 히스토리 타임라인
+  historySubTag: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: '#2563eb',
+  },
+  timelineList: {
+    gap: 8,
+  },
+  timelineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  timelineRowCurrent: {
+    backgroundColor: '#eff6ff',
+    borderColor: '#93c5fd',
+  },
+  timelineRoundBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: '#e2e8f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timelineRoundBadgeCurrent: {
+    backgroundColor: '#2563eb',
+  },
+  timelineRoundText: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: '#475569',
+  },
+  timelineRoundTextCurrent: {
+    color: '#ffffff',
+  },
+  timelinePrice: {
+    fontSize: 14.5,
+    fontWeight: '800',
+    color: '#334155',
+  },
+  timelinePriceCurrent: {
+    color: '#1d4ed8',
+    fontSize: 15.5,
+    fontWeight: '900',
+  },
+  timelineDate: {
+    fontSize: 11.5,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  timelineRight: {
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  timelineRatio: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#0f172a',
+  },
+  timelineStatus: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#94a3b8',
+  },
+  timelineStatusCurrent: {
+    color: '#2563eb',
     fontWeight: '800',
   },
-  bulletContent: {
-    flex: 1,
-    fontSize: 13.5,
-    color: '#334155',
-    lineHeight: 20,
-    fontWeight: '500',
-  },
-  /* 접이식 법원 원문 데이터 스타일 */
+
+  // 7. 법원 원문 아코디언
   accordionCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 20,
+    borderRadius: 22,
     borderWidth: 1,
     borderColor: '#e2e8f0',
     overflow: 'hidden',
@@ -775,6 +1541,7 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     lineHeight: 15,
   },
+
   metaCard: {
     backgroundColor: '#f8fafc',
     borderRadius: 16,
@@ -794,15 +1561,22 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     fontWeight: '700',
   },
+
+  // 하단 고정 바
   bottomBar: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     backgroundColor: '#ffffff',
-    padding: 16,
+    padding: 14,
     borderTopWidth: 1,
     borderTopColor: '#f1f5f9',
+    alignItems: 'center',
+  },
+  bottomBarInner: {
+    width: '100%',
+    maxWidth: 640,
   },
   favActionBtn: {
     backgroundColor: '#2563eb',
