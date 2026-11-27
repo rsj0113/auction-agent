@@ -2049,6 +2049,154 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     lineHeight: 16,
   },
+  seniorSummaryBox: {
+    backgroundColor: '#ecfdf5',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#a7f3d0',
+    gap: 4,
+  },
+  seniorSummaryBoxWarn: {
+    backgroundColor: '#fef2f2',
+    borderColor: '#fecaca',
+  },
+  seniorSummaryLabel: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#475569',
+  },
+  seniorSummaryVal: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#047857',
+  },
+  seniorSummaryValWarn: {
+    color: '#b91c1c',
+  },
+  tenantsCardsList: {
+    gap: 8,
+  },
+  tenantItemCard: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 11,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    gap: 6,
+  },
+  tenantItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  tenantItemName: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#0f172a',
+    flexShrink: 1,
+  },
+  seniorityPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  seniorityPillRed: {
+    backgroundColor: '#fee2e2',
+  },
+  seniorityPillGreen: {
+    backgroundColor: '#dcfce7',
+  },
+  seniorityPillGray: {
+    backgroundColor: '#e2e8f0',
+  },
+  seniorityPillText: {
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  seniorityTextRed: {
+    color: '#991b1b',
+  },
+  seniorityTextGreen: {
+    color: '#166534',
+  },
+  seniorityTextGray: {
+    color: '#475569',
+  },
+  tenantMetaGrid: {
+    gap: 3,
+  },
+  tenantMetaLine: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#334155',
+    flexShrink: 1,
+  },
+  showMoreTenantsBtn: {
+    backgroundColor: '#eff6ff',
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#bfdbfe',
+  },
+  showMoreTenantsText: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: '#1d4ed8',
+  },
+  doubleCheckBox: {
+    gap: 10,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: '#e2e8f0',
+  },
+  rawJsonToggleBtn: {
+    backgroundColor: '#f1f5f9',
+    paddingVertical: 11,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+  },
+  rawJsonToggleText: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: '#334155',
+  },
+  rawJsonScrollBox: {
+    maxHeight: 240,
+    backgroundColor: '#0f172a',
+    borderRadius: 12,
+    padding: 12,
+  },
+  rawJsonCodeText: {
+    fontSize: 11,
+    color: '#e2e8f0',
+    fontFamily: 'monospace',
+    lineHeight: 16,
+  },
+  courtLinkBtn: {
+    backgroundColor: '#1e293b',
+    paddingVertical: 13,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    alignItems: 'center',
+    gap: 3,
+  },
+  courtLinkBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#ffffff',
+  },
+  courtLinkSubText: {
+    fontSize: 11,
+    color: '#cbd5e1',
+    fontWeight: '600',
+  },
 
   metaCard: {
     backgroundColor: '#f8fafc',
