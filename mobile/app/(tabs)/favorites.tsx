@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { FeedItem } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
+import { formatDDayLabel } from '../../utils/formatDDay';
 
 export default function FavoritesScreen() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function FavoritesScreen() {
                 {item.safety_grade === 'GREEN' ? '🟢 초급' : item.safety_grade === 'YELLOW' ? '🟡 중급' : '🔴 고수'}
               </Text>
             </View>
-            <Text style={styles.dDay}>{item.d_day}</Text>
+            <Text style={styles.dDay}>{formatDDayLabel(item.d_day)}</Text>
           </View>
 
           <Text style={styles.headline} numberOfLines={1}>

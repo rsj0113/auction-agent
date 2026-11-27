@@ -20,6 +20,7 @@ import { useRouter } from 'expo-router';
 import { FeedItem } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
 import WebAuctionMap from '../../components/WebAuctionMap';
+import { formatDDayLabel } from '../../utils/formatDDay';
 
 // react-native-maps는 네이티브 전용이므로 웹 환경에서는 조건부 로드
 let MapView: any = null;
@@ -101,6 +102,10 @@ function buildCuratedTopItems(allItems: FeedItem[], targetCount = 12): FeedItem[
     score += (item.ai_analysis?.score || 0) * 0.2;
 
     if (item.min_bid >= 100_000_000 && item.min_bid <= 700_000_000) score += 8;
+
+    // 다가오는 실매각 기일(오늘 마감 / 마감 N일 전) 매물을 오늘의 추천에 최우선 노출
+    const dLabel = formatDDayLabel(item.d_day);
+    if (dLabel === '오늘 마감' || dLabel.startsWith('마감 ')) score += 45;
 
     return { item, score };
   });
@@ -267,7 +272,7 @@ export default function FeedScreen() {
           <Image source={{ uri: item.photo_url }} style={styles.listImage} resizeMode="cover" />
           <View style={styles.badgeContainer}>{renderBadge(item.safety_grade)}</View>
           <View style={styles.dDayContainer}>
-            <Text style={styles.dDayText}>{item.d_day}</Text>
+            <Text style={styles.dDayText}>{formatDDayLabel(item.d_day)}</Text>
           </View>
           <TouchableOpacity
             style={styles.favButton}
@@ -369,7 +374,7 @@ export default function FeedScreen() {
         tone: item.safety_grade === 'GREEN' ? 'sage' : item.safety_grade === 'RED' ? 'rose' : 'sand',
       },
       { label: `보증금 ${item.deposit_required_str}`, tone: 'sand' },
-      { label: item.d_day, tone: 'sand' },
+      { label: formatDDayLabel(item.d_day), tone: 'sand' },
     ];
 
     return (
@@ -595,7 +600,7 @@ export default function FeedScreen() {
                 <View style={styles.mapCardBadgeRow}>
                   {renderBadge(selectedMapItem.safety_grade, true)}
                   <Text style={styles.mapCardDDay}>
-                    {selectedMapItem.usage} · {selectedMapItem.d_day}
+                    {selectedMapItem.usage} · {formatDDayLabel(selectedMapItem.d_day)}
                   </Text>
                 </View>
                 <Text style={styles.mapCardHeadline} numberOfLines={1}>

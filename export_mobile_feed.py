@@ -147,11 +147,11 @@ def calculate_d_day(auction_date_str: str) -> str:
         diff = (target_date - today).days
 
         if diff == 0:
-            return "D-Day (오늘)"
+            return "오늘 마감"
         elif diff > 0:
-            return f"D-{diff}"
+            return f"마감 {diff}일 전"
         else:
-            return f"{abs(diff)}일 전 마감"
+            return "차기 기일 대기"
     except Exception:
         return "기일 미정"
 
