@@ -16,6 +16,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { FeedItem, TenantRecord } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
 import { formatDDayLabel } from '../../utils/formatDDay';
+import { getSourceBadgeMeta, isOnbidItem, isOnbidLease } from '../../utils/sourceBadge';
 
 const feedData = require('../../assets/mobile_feed.json');
 
@@ -262,6 +263,10 @@ export default function DetailScreen() {
   }
 
   const fav = isFavorite(item.case_number);
+  const sourceMeta = getSourceBadgeMeta(item);
+  const isLease = isOnbidLease(item);
+  const isOnbid = isOnbidItem(item);
+  const onbid = item.onbid_info;
   const photos = item.photos && item.photos.length > 0 ? item.photos : [item.photo_url];
   const rawData = item.raw_court_data;
   const ai = item.ai_analysis;
@@ -333,7 +338,25 @@ export default function DetailScreen() {
               ))}
             </ScrollView>
 
-            <View style={styles.badgeWrap}>{renderDifficultyBadge(item.safety_grade)}</View>
+            <View style={styles.badgeWrap}>
+              <View
+                style={[
+                  styles.sourceBadgeDetail,
+                  { backgroundColor: sourceMeta.bg, borderColor: sourceMeta.border },
+                ]}
+              >
+                <Text style={[styles.sourceBadgeDetailText, { color: sourceMeta.text }]}>
+                  {sourceMeta.label}
+                </Text>
+              </View>
+              {isLease ? (
+                <View style={[styles.badge, styles.badgeGreen]}>
+                  <Text style={styles.badgeTextGreen}>🔑 공공임대 · {onbid?.prpt_div || '공유재산'}</Text>
+                </View>
+              ) : (
+                renderDifficultyBadge(item.safety_grade)
+              )}
+            </View>
 
             {/* 우상단 사진 출처 배지 (법원 감정평가서 N장 / 거리뷰 / 참고 이미지) */}
             <View style={styles.photoSourceWrap}>
@@ -388,6 +411,98 @@ export default function DetailScreen() {
               </Text>
             </View>
 
+            {isLease ? (
+              <>
+                {/* 공매 임대 전용 핵심 임대 조건 카드 (감정가·최저입찰가·안전마진·매매 수익률 미적용) */}
+                <View style={styles.card}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.cardTitle}>🔑 공공임대(대부) 핵심 조건</Text>
+                    <View style={styles.leasePill}>
+                      <Text style={styles.leasePillText}>{onbid?.bid_status || '입찰진행중'}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.statGrid}>
+                    <View style={styles.statItem}>
+                      <Text style={styles.statLabel}>예정 사용료 (연/기간)</Text>
+                      <Text style={styles.statValueLarge}>
+                        {onbid?.annual_fee_str || item.min_bid_str}
+                      </Text>
+                    </View>
+                    <View style={styles.statItem}>
+                      <Text style={styles.statLabel}>월 환산 참고 사용료</Text>
+                      <Text style={[styles.statValue, { color: '#047857' }]}>
+                        {onbid?.est_monthly_fee_str ? `약 ${onbid.est_monthly_fee_str}/월` : '공고 확인'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.calcTable}>
+                    <View style={styles.calcRow}>
+                      <Text style={styles.calcKey}>보증금 / 입찰보증금</Text>
+                      <Text style={styles.calcVal}>
+                        {onbid?.deposit_note || '입찰보증금 5~10% (온비드 공고 확인)'}
+                      </Text>
+                    </View>
+                    <View style={styles.calcRow}>
+                      <Text style={styles.calcKey}>계약·임대(대부) 기간</Text>
+                      <Text style={styles.calcVal}>
+                        {onbid?.lease_period_note || '사용수익허가/대부 (통상 1~5년 · 공고문 확인)'}
+                      </Text>
+                    </View>
+                    <View style={styles.calcRow}>
+                      <Text style={styles.calcKey}>공고기관 · 재산구분</Text>
+                      <Text style={styles.calcVal}>
+                        {onbid?.reg_org_nm || item.court_name} · {onbid?.prpt_div || '공유재산'}
+                      </Text>
+                    </View>
+                    <View style={styles.calcRow}>
+                      <Text style={styles.calcKey}>입찰 기간</Text>
+                      <Text style={styles.calcVal}>
+                        {onbid?.bid_start_date && onbid?.bid_end_date
+                          ? `${onbid.bid_start_date} ~ ${onbid.bid_end_date}`
+                          : item.auction_date || '공고 확인'}
+                      </Text>
+                    </View>
+                    {(onbid?.bld_area_m2 || onbid?.land_area_m2) ? (
+                      <View style={[styles.calcRow, styles.calcRowLast]}>
+                        <Text style={styles.calcKey}>면적 (건물 / 토지)</Text>
+                        <Text style={styles.calcVal}>
+                          {onbid.bld_area_m2 ? `건물 ${onbid.bld_area_m2}㎡` : ''}
+                          {onbid.bld_area_m2 && onbid.land_area_m2 ? ' · ' : ''}
+                          {onbid.land_area_m2 ? `토지 ${onbid.land_area_m2}㎡` : ''}
+                        </Text>
+                      </View>
+                    ) : undefined}
+                  </View>
+
+                  <View style={styles.leaseNoticeBox}>
+                    <Text style={styles.leaseNoticeText}>
+                      ℹ️ 본 물건은 소유권 이전(매매)이 아닌 공공기관 임대(대부·사용수익허가) 공매입니다.
+                      매매 전제 계산기(자기자본 LTV·방공제·매매 수익률)는 적용되지 않으며, 실제 계약기간·보증금·부가세·업종 제한은 온비드 원문 공고문을 확인하세요.
+                    </Text>
+                  </View>
+                </View>
+
+                {/* 온비드 원문 바로가기 */}
+                <View style={styles.card}>
+                  <Text style={styles.cardTitle}>🏛️ 온비드 공고 원문 확인</Text>
+                  <TouchableOpacity
+                    style={styles.courtLinkBtn}
+                    activeOpacity={0.85}
+                    onPress={() => Linking.openURL(onbid?.detail_url || 'https://www.onbid.co.kr')}
+                  >
+                    <Text style={styles.courtLinkBtnText}>
+                      🏛️ 캠코 온비드(onbid.co.kr) 공고 바로가기 ↗
+                    </Text>
+                    <Text style={styles.courtLinkSubText}>
+                      물건관리번호 {onbid?.cltr_no || item.case_number} 직접 더블체크
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <>
             {/* 2. 가격 & 시세 대비 할인율 + 인근 낙찰 통계 */}
             <View style={styles.card}>
               <View style={styles.cardHeader}>
@@ -405,7 +520,7 @@ export default function DetailScreen() {
                   <Text style={styles.statValueLarge}>{item.min_bid_str}</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Text style={styles.statLabel}>감정 평가액</Text>
+                  <Text style={styles.statLabel}>{isOnbid ? '감정/예정가' : '감정 평가액'}</Text>
                   <Text style={styles.statValue}>{item.appraisal_str}</Text>
                 </View>
                 {item.market_price && item.market_price > 0 ? (
@@ -416,12 +531,23 @@ export default function DetailScreen() {
                 ) : undefined}
               </View>
 
-              <View style={styles.gapBanner}>
-                <Text style={styles.gapBannerText}>
-                  {item.ref_price_name} 대비 약{' '}
-                  <Text style={styles.gapBold}>{item.gap_amount_str}</Text> 저렴하게 시작합니다.
-                </Text>
-              </View>
+              {item.gap_amount > 0 && (
+                <View style={styles.gapBanner}>
+                  <Text style={styles.gapBannerText}>
+                    {item.ref_price_name} 대비 약{' '}
+                    <Text style={styles.gapBold}>{item.gap_amount_str}</Text> 저렴하게 시작합니다.
+                  </Text>
+                </View>
+              )}
+
+              {isOnbid && onbid && (
+                <View style={styles.areaStatBanner}>
+                  <Text style={styles.areaStatText}>
+                    🏛️ 온비드 공고기관: <Text style={styles.areaStatBold}>{onbid.reg_org_nm} ({onbid.prpt_div})</Text>
+                    {'\n'}📅 입찰기간: {onbid.bid_start_date} ~ {onbid.bid_end_date}
+                  </Text>
+                </View>
+              )}
 
               {areaStats && (
                 <View style={styles.areaStatBanner}>
@@ -750,6 +876,27 @@ export default function DetailScreen() {
             )}
 
             {/* 7. 법원 원본 데이터 투명 공개 아코디언 */}
+            {/* 7. 법원 원본 데이터 (경매) vs 온비드 원문 공고 바로가기 (공매 매각) */}
+            {isOnbid ? (
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>🏛️ 온비드 공매 원문 더블체크</Text>
+                <Text style={styles.cardSubCaption}>
+                  입찰 전 온비드 원문 공고문에서 배분요구 종기·명도·임차인·미납세금 조건을 꼭 확인하세요.
+                </Text>
+                <TouchableOpacity
+                  style={[styles.courtLinkBtn, { marginTop: 10 }]}
+                  activeOpacity={0.85}
+                  onPress={() => Linking.openURL(onbid?.detail_url || 'https://www.onbid.co.kr')}
+                >
+                  <Text style={styles.courtLinkBtnText}>
+                    🏛️ 캠코 온비드(onbid.co.kr) 공고 바로가기 ↗
+                  </Text>
+                  <Text style={styles.courtLinkSubText}>
+                    물건관리번호 {onbid?.cltr_no || item.case_number} 직접 더블체크
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
             <View style={styles.accordionCard}>
               <TouchableOpacity
                 style={styles.accordionHeader}
@@ -1057,20 +1204,23 @@ export default function DetailScreen() {
                 );
               })()}
             </View>
+            )}
+              </>
+            )}
 
-            {/* 법원 및 사건 메타 정보 */}
+            {/* 관할 기관 및 사건/물건 메타 정보 */}
             <View style={styles.metaCard}>
               <Text style={styles.metaRow}>
-                <Text style={styles.metaKey}>관할 법원: </Text>
-                <Text style={styles.metaVal}>{item.court_name || '수도권 관할 법원'}</Text>
+                <Text style={styles.metaKey}>{isOnbid ? '공고 기관: ' : '관할 법원: '}</Text>
+                <Text style={styles.metaVal}>{item.court_name || (isOnbid ? '캠코 온비드' : '수도권 관할 법원')}</Text>
               </Text>
               <Text style={styles.metaRow}>
-                <Text style={styles.metaKey}>사건 번호: </Text>
-                <Text style={styles.metaVal}>{item.case_number}</Text>
+                <Text style={styles.metaKey}>{isOnbid ? '물건 번호: ' : '사건 번호: '}</Text>
+                <Text style={styles.metaVal}>{onbid?.cltr_no || item.case_number}</Text>
               </Text>
               <Text style={styles.metaRow}>
-                <Text style={styles.metaKey}>입찰 기일: </Text>
-                <Text style={styles.metaVal}>{item.auction_date || '일정 확인 필요'}</Text>
+                <Text style={styles.metaKey}>{isOnbid ? '입찰 마감: ' : '입찰 기일: '}</Text>
+                <Text style={styles.metaVal}>{onbid?.bid_end_date || item.auction_date || '일정 확인 필요'}</Text>
               </Text>
             </View>
           </View>
@@ -1148,6 +1298,56 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 14,
     left: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 6,
+    maxWidth: '64%',
+  },
+  sourceBadgeDetail: {
+    paddingHorizontal: 9,
+    paddingVertical: 4.5,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  sourceBadgeDetailText: {
+    fontSize: 11.5,
+    fontWeight: '900',
+  },
+  leasePill: {
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  leasePillText: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#047857',
+  },
+  calcTable: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    marginTop: 10,
+  },
+  leaseNoticeBox: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+    marginTop: 10,
+  },
+  leaseNoticeText: {
+    fontSize: 12.5,
+    lineHeight: 18.5,
+    color: '#166534',
   },
   photoSourceWrap: {
     position: 'absolute',

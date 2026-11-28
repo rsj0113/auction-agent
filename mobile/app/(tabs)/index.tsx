@@ -21,6 +21,7 @@ import { FeedItem } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
 import WebAuctionMap from '../../components/WebAuctionMap';
 import { formatDDayLabel } from '../../utils/formatDDay';
+import { getSourceBadgeMeta, getSourceType, isOnbidLease } from '../../utils/sourceBadge';
 
 // react-native-maps는 네이티브 전용이므로 웹 환경에서는 조건부 로드
 let MapView: any = null;
@@ -46,6 +47,7 @@ type FilterType =
   | 'budget_mid'
   | 'seoul'
   | 'gyeonggi';
+type SourceFilterType = 'sale_all' | 'auction' | 'onbid_sale' | 'onbid_lease';
 type UsageFilterType = 'all' | '아파트' | '빌라' | '오피스텔' | '상가' | '토지';
 type ViewMode = 'list' | 'card' | 'map';
 type InfoModalType = 'notice' | 'guide' | null;
@@ -99,9 +101,10 @@ const VIEW_MODE_OPTIONS: {
   },
 ];
 
-// '오늘의 추천' TOP 12 큐레이션 점수 산출 (실사진 · 초급 · 주거용 · 할인율 · AI점수)
+// '오늘의 추천' TOP 12 큐레이션 점수 산출 (매각 전용: 법원경매 + 공매 매각 · 임대 제외)
 function buildCuratedTopItems(allItems: FeedItem[], targetCount = 12): FeedItem[] {
-  const scored = allItems.map((item) => {
+  const saleOnly = allItems.filter((item) => !isOnbidLease(item));
+  const scored = saleOnly.map((item) => {
     let score = 0;
     const p = item.photo_url || '';
     const isCourtPhoto = p.includes('/photos/') && !p.includes('_sv.jpg');
@@ -171,6 +174,7 @@ export default function FeedScreen() {
   const [infoModal, setInfoModal] = useState<InfoModalType>(null);
   const [weather, setWeather] = useState<WeatherState | null>(null);
 
+  const [activeSourceFilter, setActiveSourceFilter] = useState<SourceFilterType>('sale_all');
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [activeUsageFilter, setActiveUsageFilter] = useState<UsageFilterType>('all');
   const [activeCardIndex, setActiveCardIndex] = useState(0);
@@ -269,29 +273,80 @@ export default function FeedScreen() {
     }
   };
 
-  // 용도별 매물 건수 집계 (용도 필터 칩 배지용)
-  const usageCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: items.length };
+  // 거래유형(구분)별 건수 집계
+  const sourceCounts = useMemo(() => {
+    let auction = 0;
+    let onbidSale = 0;
+    let onbidLease = 0;
     for (const it of items) {
+      const st = getSourceType(it);
+      if (st === 'onbid_sale') onbidSale += 1;
+      else if (st === 'onbid_lease') onbidLease += 1;
+      else auction += 1;
+    }
+    return {
+      sale_all: auction + onbidSale,
+      auction,
+      onbid_sale: onbidSale,
+      onbid_lease: onbidLease,
+    };
+  }, [items]);
+
+  // 선택된 구분(매각 전체 / 경매 / 공매 매각 / 공매 임대) 기준 1차 목록
+  const sourceScopedItems = useMemo(() => {
+    return items.filter((item) => {
+      const st = getSourceType(item);
+      if (activeSourceFilter === 'sale_all') return st !== 'onbid_lease';
+      if (activeSourceFilter === 'auction') return st === 'auction';
+      if (activeSourceFilter === 'onbid_sale') return st === 'onbid_sale';
+      if (activeSourceFilter === 'onbid_lease') return st === 'onbid_lease';
+      return true;
+    });
+  }, [items, activeSourceFilter]);
+
+  // 용도별 매물 건수 집계 (현재 선택된 거래유형 기준)
+  const usageCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: sourceScopedItems.length };
+    for (const it of sourceScopedItems) {
       counts[it.usage] = (counts[it.usage] || 0) + 1;
     }
     return counts;
-  }, [items]);
+  }, [sourceScopedItems]);
 
-  // '전체 탐색' & '동네 지도'용 필터링 적용 목록 (용도 + 난이도/금액/지역 교차 필터)
+  // '전체 탐색' & '동네 지도'용 필터링 적용 목록 (구분 + 용도 + 난이도/가격대/지역 교차 필터)
+  // 주의: 매매 가격대 필터('3억 이하', '3억~6억')는 법원경매 + 공매 매각에만 적용하고 공매 임대는 자동 제외!
   const filteredItems = useMemo(() => {
-    return items.filter((item) => {
+    const isPriceFilter = activeFilter === 'budget_small' || activeFilter === 'budget_mid';
+    return sourceScopedItems.filter((item) => {
+      if (isPriceFilter && isOnbidLease(item)) return false;
       if (activeUsageFilter !== 'all' && item.usage !== activeUsageFilter) return false;
-      if (activeFilter === 'beginner' && item.safety_grade !== 'GREEN') return false;
-      if (activeFilter === 'intermediate' && item.safety_grade !== 'YELLOW') return false;
-      if (activeFilter === 'advanced' && item.safety_grade !== 'RED') return false;
+      if (activeFilter === 'beginner' && (isOnbidLease(item) || item.safety_grade !== 'GREEN')) return false;
+      if (activeFilter === 'intermediate' && (isOnbidLease(item) || item.safety_grade !== 'YELLOW')) return false;
+      if (activeFilter === 'advanced' && (isOnbidLease(item) || item.safety_grade !== 'RED')) return false;
       if (activeFilter === 'budget_small' && item.min_bid > 300_000_000) return false;
       if (activeFilter === 'budget_mid' && (item.min_bid <= 300_000_000 || item.min_bid > 600_000_000)) return false;
       if (activeFilter === 'seoul' && !item.location.includes('서울')) return false;
       if (activeFilter === 'gyeonggi' && !item.location.includes('경기') && !item.location.includes('인천')) return false;
       return true;
     });
-  }, [items, activeFilter, activeUsageFilter]);
+  }, [sourceScopedItems, activeFilter, activeUsageFilter]);
+
+  const handleSourceFilterChange = (src: SourceFilterType) => {
+    setActiveSourceFilter(src);
+    setActiveUsageFilter('all');
+    // 공매(임대) 선택 시 매매 전용 가격대/난이도 필터는 자동 초기화
+    if (
+      src === 'onbid_lease' &&
+      (activeFilter === 'budget_small' ||
+        activeFilter === 'budget_mid' ||
+        activeFilter === 'beginner' ||
+        activeFilter === 'intermediate' ||
+        activeFilter === 'advanced')
+    ) {
+      setActiveFilter('all');
+    }
+    setSelectedMapItem(null);
+  };
 
   const handleFilterChange = (type: FilterType) => {
     setActiveFilter(type);
@@ -325,11 +380,27 @@ export default function FeedScreen() {
     );
   };
 
+  const renderSourceBadge = (item: FeedItem) => {
+    const meta = getSourceBadgeMeta(item);
+    return (
+      <View
+        style={[
+          styles.sourcePill,
+          { backgroundColor: meta.bg, borderColor: meta.border },
+        ]}
+      >
+        <Text style={[styles.sourcePillText, { color: meta.text }]}>{meta.label}</Text>
+      </View>
+    );
+  };
+
   // ──────────────────────────────────────────
-  // 1. '전체 탐색' (리스트형 — 145건 전체)
+  // 1. '전체 탐색' (리스트형 — 법원경매 + 공매 매각 / 공매 임대)
   // ──────────────────────────────────────────
   const renderListItem = ({ item }: { item: FeedItem }) => {
     const fav = isFavorite(item.case_number);
+    const lease = isOnbidLease(item);
+    const leaseMonthly = item.onbid_info?.est_monthly_fee_str;
 
     return (
       <TouchableOpacity
@@ -339,7 +410,16 @@ export default function FeedScreen() {
       >
         <View style={styles.listImageWrap}>
           <Image source={{ uri: item.photo_url }} style={styles.listImage} resizeMode="cover" />
-          <View style={styles.badgeContainer}>{renderBadge(item.safety_grade)}</View>
+          <View style={styles.badgeContainer}>
+            {renderSourceBadge(item)}
+            {lease ? (
+              <View style={[styles.badge, styles.badgeLease]}>
+                <Text style={styles.badgeTextLease}>🔑 공공임대</Text>
+              </View>
+            ) : (
+              renderBadge(item.safety_grade, true)
+            )}
+          </View>
           <View style={styles.dDayContainer}>
             <Text style={styles.dDayText}>{formatDDayLabel(item.d_day)}</Text>
           </View>
@@ -359,17 +439,31 @@ export default function FeedScreen() {
             {item.headline}
           </Text>
 
-          <View style={styles.priceRow}>
-            <View style={styles.priceLeft}>
-              <Text style={styles.priceLabel}>최저가</Text>
-              <Text style={styles.priceValue}>{item.min_bid_str}</Text>
-            </View>
-            {item.discount_pct > 0 && (
-              <View style={styles.discountBadge}>
-                <Text style={styles.discountText}>-{item.discount_pct}%</Text>
+          {lease ? (
+            <View style={styles.priceRow}>
+              <View style={styles.priceLeft}>
+                <Text style={styles.priceLabel}>예정 사용료(연/기간)</Text>
+                <Text style={styles.priceValue}>{item.onbid_info?.annual_fee_str || item.min_bid_str}</Text>
               </View>
-            )}
-          </View>
+              {leaseMonthly ? (
+                <View style={styles.leaseMonthlyBadge}>
+                  <Text style={styles.leaseMonthlyText}>월 환산 약 {leaseMonthly}</Text>
+                </View>
+              ) : undefined}
+            </View>
+          ) : (
+            <View style={styles.priceRow}>
+              <View style={styles.priceLeft}>
+                <Text style={styles.priceLabel}>최저가</Text>
+                <Text style={styles.priceValue}>{item.min_bid_str}</Text>
+              </View>
+              {item.discount_pct > 0 && (
+                <View style={styles.discountBadge}>
+                  <Text style={styles.discountText}>-{item.discount_pct}%</Text>
+                </View>
+              )}
+            </View>
+          )}
 
           <View style={styles.bulletContainer}>
             {item.summary_bullets.map((bullet, idx) => (
@@ -380,7 +474,7 @@ export default function FeedScreen() {
           </View>
 
           <View style={styles.footerRow}>
-            <Text style={styles.footerText}>
+            <Text style={styles.footerText} numberOfLines={1}>
               {item.short_location} · {item.usage}
             </Text>
             <Text style={styles.detailLink}>자세히 보기 →</Text>
@@ -495,8 +589,9 @@ export default function FeedScreen() {
 
             {/* 하단 절반: 넉넉한 여백의 에디토리얼 타이포 & 정보 */}
             <View style={styles.lookbookBody}>
-              {/* 카테고리 | 지역 구분선 */}
+              {/* 구분 배지([경매]/[공매 · 매각]/[공매 · 임대]) + 카테고리 | 지역 구분선 */}
               <View style={styles.lookbookKickerRow}>
+                {renderSourceBadge(item)}
                 <Text style={styles.lookbookKickerCat}>{item.usage}</Text>
                 <Text style={styles.lookbookKickerDivider}>|</Text>
                 <Text style={styles.lookbookKickerLoc} numberOfLines={1}>
@@ -667,8 +762,9 @@ export default function FeedScreen() {
               />
               <View style={styles.mapCardDetails}>
                 <View style={styles.mapCardBadgeRow}>
-                  {renderBadge(selectedMapItem.safety_grade, true)}
-                  <Text style={styles.mapCardDDay}>
+                  {renderSourceBadge(selectedMapItem)}
+                  {!isOnbidLease(selectedMapItem) && renderBadge(selectedMapItem.safety_grade, true)}
+                  <Text style={styles.mapCardDDay} numberOfLines={1}>
                     {selectedMapItem.usage} · {formatDDayLabel(selectedMapItem.d_day)}
                   </Text>
                 </View>
@@ -676,9 +772,24 @@ export default function FeedScreen() {
                   {selectedMapItem.headline}
                 </Text>
                 <View style={styles.mapCardPriceRow}>
-                  <Text style={styles.mapCardPrice}>{selectedMapItem.min_bid_str}</Text>
-                  {selectedMapItem.discount_pct > 0 && (
-                    <Text style={styles.mapCardDiscount}>-{selectedMapItem.discount_pct}%</Text>
+                  {isOnbidLease(selectedMapItem) ? (
+                    <>
+                      <Text style={styles.mapCardPrice}>
+                        연 {selectedMapItem.onbid_info?.annual_fee_str || selectedMapItem.min_bid_str}
+                      </Text>
+                      {selectedMapItem.onbid_info?.est_monthly_fee_str ? (
+                        <Text style={styles.mapCardLeaseTag}>
+                          월 약 {selectedMapItem.onbid_info.est_monthly_fee_str}
+                        </Text>
+                      ) : undefined}
+                    </>
+                  ) : (
+                    <>
+                      <Text style={styles.mapCardPrice}>{selectedMapItem.min_bid_str}</Text>
+                      {selectedMapItem.discount_pct > 0 && (
+                        <Text style={styles.mapCardDiscount}>-{selectedMapItem.discount_pct}%</Text>
+                      )}
+                    </>
                   )}
                 </View>
                 <Text style={styles.mapCardHint}>자세히 보기 →</Text>
@@ -797,10 +908,47 @@ export default function FeedScreen() {
         </View>
       </View>
 
-      {/* 2. 상단 필터 바 ('전체 탐색' & '동네 지도'에서 용도 + 난이도/금액/지역 교차 필터링) */}
+      {/* 2. 상단 필터 바 ('전체 탐색' & '동네 지도': 구분 + 용도 + 조건 교차 필터링) */}
       {!isLookbook && (
         <View style={styles.filterBar}>
-          {/* 1행: 용도 필터 칩 (전체 | 아파트 | 빌라 | 오피스텔 | 상가 | 토지) */}
+          {/* 1행: 거래유형 구분 탭 (기본: 경매+공매 매각 / 법원경매 / 공매(매각) / 공매(임대)) */}
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterList}
+            data={[
+              { type: 'sale_all', label: `매각 전체 ${sourceCounts.sale_all}` },
+              { type: 'auction', label: `법원경매 ${sourceCounts.auction}` },
+              { type: 'onbid_sale', label: `공매(매각) ${sourceCounts.onbid_sale}` },
+              { type: 'onbid_lease', label: `공매(임대) ${sourceCounts.onbid_lease}` },
+            ]}
+            keyExtractor={(i) => i.type}
+            renderItem={({ item }) => {
+              const isSelected = activeSourceFilter === item.type;
+              const isLeaseChip = item.type === 'onbid_lease';
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.sourceTabChip,
+                    isSelected && (isLeaseChip ? styles.sourceTabChipLeaseActive : styles.sourceTabChipActive),
+                  ]}
+                  onPress={() => handleSourceFilterChange(item.type as SourceFilterType)}
+                  activeOpacity={0.75}
+                >
+                  <Text
+                    style={[
+                      styles.sourceTabChipText,
+                      isSelected && styles.sourceTabChipTextActive,
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+
+          {/* 2행: 용도 필터 칩 (전체 | 아파트 | 빌라 | 오피스텔 | 상가 | 토지) */}
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -830,21 +978,29 @@ export default function FeedScreen() {
             }}
           />
 
-          {/* 2행: 난이도 · 금액 · 지역 필터 칩 */}
+          {/* 3행: 난이도 · 매매 가격대(임대 모드 제외) · 지역 필터 칩 */}
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={[styles.filterList, styles.filterListSecondary]}
-            data={[
-              { type: 'all', label: `전체 조건 (${filteredItems.length}건)` },
-              { type: 'beginner', label: '🟢 초급' },
-              { type: 'intermediate', label: '🟡 중급' },
-              { type: 'advanced', label: '🔴 고수' },
-              { type: 'budget_small', label: '3억 이하' },
-              { type: 'budget_mid', label: '3억~6억' },
-              { type: 'seoul', label: '서울' },
-              { type: 'gyeonggi', label: '경기·인천' },
-            ]}
+            data={
+              activeSourceFilter === 'onbid_lease'
+                ? [
+                    { type: 'all', label: `임대 전체 (${filteredItems.length}건)` },
+                    { type: 'seoul', label: '서울' },
+                    { type: 'gyeonggi', label: '경기·인천' },
+                  ]
+                : [
+                    { type: 'all', label: `전체 조건 (${filteredItems.length}건)` },
+                    { type: 'beginner', label: '🟢 초급' },
+                    { type: 'intermediate', label: '🟡 중급' },
+                    { type: 'advanced', label: '🔴 고수' },
+                    { type: 'budget_small', label: '3억 이하' },
+                    { type: 'budget_mid', label: '3억~6억' },
+                    { type: 'seoul', label: '서울' },
+                    { type: 'gyeonggi', label: '경기·인천' },
+                  ]
+            }
             keyExtractor={(i) => i.type}
             renderItem={({ item }) => {
               const isSelected = activeFilter === item.type;
@@ -1660,7 +1816,7 @@ const styles = StyleSheet.create({
     paddingBottom: 9,
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
-    gap: 7,
+    gap: 6,
   },
   filterList: {
     paddingHorizontal: 16,
@@ -1668,6 +1824,73 @@ const styles = StyleSheet.create({
   },
   filterListSecondary: {
     paddingTop: 1,
+  },
+  sourceTabChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 5.5,
+    borderRadius: 10,
+    backgroundColor: '#F5F5F4',
+    borderWidth: 1,
+    borderColor: '#E7E5E4',
+  },
+  sourceTabChipActive: {
+    backgroundColor: '#1C1917',
+    borderColor: '#1C1917',
+  },
+  sourceTabChipLeaseActive: {
+    backgroundColor: '#047857',
+    borderColor: '#047857',
+  },
+  sourceTabChipText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#57534E',
+  },
+  sourceTabChipTextActive: {
+    color: '#FFFFFF',
+  },
+  sourcePill: {
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 7,
+    borderWidth: 1,
+    flexShrink: 0,
+  },
+  sourcePillText: {
+    fontSize: 10.5,
+    fontWeight: '800',
+  },
+  badgeLease: {
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+  },
+  badgeTextLease: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#047857',
+  },
+  leaseMonthlyBadge: {
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+  },
+  leaseMonthlyText: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#047857',
+  },
+  mapCardLeaseTag: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#047857',
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
   },
   usageChip: {
     paddingHorizontal: 13,
@@ -1753,6 +1976,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   badge: {
     paddingHorizontal: 10,

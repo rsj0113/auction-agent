@@ -12,12 +12,16 @@ import { useRouter } from 'expo-router';
 import { FeedItem } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
 import { formatDDayLabel } from '../../utils/formatDDay';
+import { getSourceBadgeMeta, isOnbidLease } from '../../utils/sourceBadge';
 
 export default function FavoritesScreen() {
   const router = useRouter();
   const { favorites, toggleFavorite } = useFavorites();
 
   const renderItem = ({ item }: { item: FeedItem }) => {
+    const sourceMeta = getSourceBadgeMeta(item);
+    const lease = isOnbidLease(item);
+
     return (
       <TouchableOpacity
         style={styles.card}
@@ -28,19 +32,31 @@ export default function FavoritesScreen() {
 
         <View style={styles.infoBox}>
           <View style={styles.topRow}>
-            <View
-              style={[
-                styles.badge,
-                item.safety_grade === 'GREEN'
-                  ? styles.badgeGreen
-                  : item.safety_grade === 'YELLOW'
-                  ? styles.badgeYellow
-                  : styles.badgeRed,
-              ]}
-            >
-              <Text style={styles.badgeText}>
-                {item.safety_grade === 'GREEN' ? '🟢 초급' : item.safety_grade === 'YELLOW' ? '🟡 중급' : '🔴 고수'}
-              </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, flexShrink: 1 }}>
+              <View
+                style={[
+                  styles.badge,
+                  { backgroundColor: sourceMeta.bg, borderWidth: 1, borderColor: sourceMeta.border },
+                ]}
+              >
+                <Text style={[styles.badgeText, { color: sourceMeta.text }]}>{sourceMeta.label}</Text>
+              </View>
+              {!lease && (
+                <View
+                  style={[
+                    styles.badge,
+                    item.safety_grade === 'GREEN'
+                      ? styles.badgeGreen
+                      : item.safety_grade === 'YELLOW'
+                      ? styles.badgeYellow
+                      : styles.badgeRed,
+                  ]}
+                >
+                  <Text style={styles.badgeText}>
+                    {item.safety_grade === 'GREEN' ? '🟢 초급' : item.safety_grade === 'YELLOW' ? '🟡 중급' : '🔴 고수'}
+                  </Text>
+                </View>
+              )}
             </View>
             <Text style={styles.dDay}>{formatDDayLabel(item.d_day)}</Text>
           </View>
@@ -50,8 +66,23 @@ export default function FavoritesScreen() {
           </Text>
 
           <View style={styles.priceRow}>
-            <Text style={styles.price}>{item.min_bid_str}</Text>
-            <Text style={styles.gap}>({item.gap_amount_str} 저렴)</Text>
+            {lease ? (
+              <>
+                <Text style={styles.price}>연 {item.onbid_info?.annual_fee_str || item.min_bid_str}</Text>
+                {item.onbid_info?.est_monthly_fee_str ? (
+                  <Text style={[styles.gap, { color: '#047857' }]}>
+                    (월 약 {item.onbid_info.est_monthly_fee_str})
+                  </Text>
+                ) : undefined}
+              </>
+            ) : (
+              <>
+                <Text style={styles.price}>{item.min_bid_str}</Text>
+                {item.gap_amount > 0 ? (
+                  <Text style={styles.gap}>({item.gap_amount_str} 저렴)</Text>
+                ) : undefined}
+              </>
+            )}
           </View>
 
           <Text style={styles.loc} numberOfLines={1}>

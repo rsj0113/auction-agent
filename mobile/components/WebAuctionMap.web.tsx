@@ -127,7 +127,14 @@ function ensureLeafletLoaded(): Promise<any> {
   return leafletLoadPromise;
 }
 
-function formatShortPricePin(minBid: number, fallbackStr: string): string {
+function formatShortPricePin(minBid: number, fallbackStr: string, isLease?: boolean, monthlyFee?: number): string {
+  if (isLease) {
+    const val = monthlyFee && monthlyFee > 0 ? monthlyFee : Math.round(minBid / 12);
+    if (val >= 100_000_000) {
+      return `월 ${(val / 100_000_000).toFixed(1).replace(/\.0$/, '')}억`;
+    }
+    return `월 ${Math.max(1, Math.round(val / 10_000)).toLocaleString()}만`;
+  }
   if (!minBid || minBid <= 0) {
     return fallbackStr.replace(/\s+/g, '');
   }
@@ -240,13 +247,17 @@ export default function WebAuctionMap({
       if (typeof item.lat !== 'number' || typeof item.lng !== 'number') return;
       if (!Number.isFinite(item.lat) || !Number.isFinite(item.lng)) return;
 
-      const dotColor =
-        item.safety_grade === 'GREEN'
-          ? '#10b981'
-          : item.safety_grade === 'YELLOW'
-          ? '#f59e0b'
-          : '#ef4444';
-      const priceLabel = escapeHtml(formatShortPricePin(item.min_bid, item.min_bid_str));
+      const isLease = item.source_type === 'onbid_lease';
+      const dotColor = isLease
+        ? '#059669'
+        : item.safety_grade === 'GREEN'
+        ? '#10b981'
+        : item.safety_grade === 'YELLOW'
+        ? '#f59e0b'
+        : '#ef4444';
+      const priceLabel = escapeHtml(
+        formatShortPricePin(item.min_bid, item.min_bid_str, isLease, item.onbid_info?.est_monthly_fee)
+      );
       const isSelected = item.case_number === selectedCaseNumber;
 
       const icon = L.divIcon({
