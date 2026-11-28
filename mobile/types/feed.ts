@@ -1,5 +1,25 @@
 export type SafetyGrade = 'GREEN' | 'YELLOW' | 'RED';
 export type DifficultyLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+export type SourceType = 'auction' | 'onbid_sale' | 'onbid_lease';
+
+export interface OnbidInfo {
+  cltr_no: string;
+  onbid_cltr_no?: string;
+  prpt_div: string;
+  reg_org_nm: string;
+  bid_status: string;
+  bid_start_date: string;
+  bid_end_date: string;
+  detail_url: string;
+  annual_fee?: number;
+  annual_fee_str?: string;
+  est_monthly_fee?: number;
+  est_monthly_fee_str?: string;
+  deposit_note?: string;
+  lease_period_note?: string;
+  land_area_m2?: number;
+  bld_area_m2?: number;
+}
 
 export interface RawCourtRight {
   type?: string;
@@ -111,6 +131,10 @@ export interface AreaWinningStats {
 
 export interface FeedItem {
   case_number: string;
+  source_type?: SourceType;
+  source_badge?: string;
+  disposal_method?: '매각' | '임대';
+  onbid_info?: OnbidInfo | null;
   headline: string;
   safety_grade: SafetyGrade;
   difficulty?: DifficultyLevel;
@@ -154,6 +178,9 @@ export interface FeedItem {
 export interface MobileFeedData {
   generated_at: string;
   total_count: number;
+  auction_count?: number;
+  onbid_sale_count?: number;
+  onbid_lease_count?: number;
   green_count: number;
   yellow_count: number;
   red_count: number;

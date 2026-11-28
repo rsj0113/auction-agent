@@ -1018,6 +1018,10 @@ def generate_feed(limit: int | None = None) -> list[dict]:
 
         item = {
             "case_number": case_no,
+            "source_type": "auction",
+            "source_badge": "[경매]",
+            "disposal_method": "매각",
+            "onbid_info": None,
             "headline": headline,
             "safety_grade": safety_grade,
             "difficulty": difficulty,
@@ -1066,13 +1070,342 @@ def generate_feed(limit: int | None = None) -> list[dict]:
             break
 
     print(f"🧹 중복 제거: 사건번호 중복 {dup_case_skipped}건 · 동일 주소 중복 {dup_loc_skipped}건 제외")
+
+    # 온비드 공매(매각 + 임대) 활성 매물 연동 (수도권 우선)
+    onbid_items = load_onbid_feed_items(sale_limit=120, lease_limit=80)
+    feed_items.extend(onbid_items)
     return feed_items
 
 
+def _pick_stock_photo(usage_label: str) -> str:
+    if usage_label == "아파트":
+        return "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"
+    if usage_label == "오피스텔":
+        return "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+    if usage_label == "상가":
+        return "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
+    if usage_label == "토지":
+        return "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"
+    return "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80"
+
+
+def load_onbid_feed_items(sale_limit: int = 120, lease_limit: int = 80) -> list[dict]:
+    """
+    SQLite onbid_items에서 활성 수도권 온비드 공매 매각(매매)과 임대(대부) 물건을
+    모바일 앱·웹 피드 규격으로 변환한다.
+    - 공매 · 매각: source_type='onbid_sale', disposal_method='매각'
+    - 공매 · 임대: source_type='onbid_lease', disposal_method='임대' (매매 전용 지표 제외, 사용료·임대기간 중심)
+    """
+    if not os.path.exists(DB_PATH):
+        return []
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    today_iso = date.today().strftime("%Y-%m-%d")
+    results: list[dict] = []
+
+    def _fetch_by_disposal(disposal: str, min_price: int, max_rows: int) -> list[dict]:
+        try:
+            rows = cur.execute(
+                """
+                SELECT *
+                FROM onbid_items
+                WHERE disposal_method = ?
+                  AND COALESCE(bid_status, '') != '마감'
+                  AND bid_end_date >= ?
+                  AND min_bid >= ?
+                  AND (
+                      addr_sido LIKE '%서울%' OR addr_sido LIKE '%경기%' OR addr_sido LIKE '%인천%'
+                      OR addr_full LIKE '%서울%' OR addr_full LIKE '%경기%' OR addr_full LIKE '%인천%'
+                  )
+                ORDER BY
+                  CASE WHEN bid_status = '입찰진행중' THEN 0 ELSE 1 END,
+                  CASE
+                      WHEN usage LIKE '%주거%' OR usage LIKE '%아파트%' OR usage LIKE '%오피스텔%'
+                           OR usage LIKE '%상가%' OR usage LIKE '%업무%' OR usage LIKE '%판매%'
+                      THEN 0 ELSE 1
+                  END,
+                  CASE WHEN lat IS NOT NULL AND lng IS NOT NULL THEN 0 ELSE 1 END,
+                  bid_end_date ASC
+                """,
+                (disposal, today_iso, min_price),
+            ).fetchall()
+        except Exception as e:
+            print(f"⚠️ onbid_items({disposal}) 조회 스킵: {e}")
+            return []
+
+        items_out: list[dict] = []
+        seen_cltr: set[str] = set()
+        seen_nm: set[str] = set()
+
+        for r in rows:
+            row = dict(r)
+            cltr_no = (row.get("cltr_no") or "").strip()
+            cltr_nm = (row.get("cltr_nm") or "").strip()
+            if not cltr_no or cltr_no in seen_cltr:
+                continue
+
+            addr_sido = (row.get("addr_sido") or "").strip()
+            addr_sgg = (row.get("addr_sgg") or "").strip()
+            addr_emd = (row.get("addr_emd") or "").strip()
+            addr_full = (row.get("addr_full") or "").strip()
+            location = cltr_nm if (addr_sgg and addr_sgg in cltr_nm) else (f"{addr_sido} {addr_sgg} {addr_emd} {cltr_nm}".strip() or addr_full)
+            location = re.sub(r"\s+", " ", location).strip()
+
+            loc_key = normalize_location_key(location)
+            if loc_key and loc_key in seen_nm:
+                continue
+            seen_cltr.add(cltr_no)
+            if loc_key:
+                seen_nm.add(loc_key)
+
+            raw_usage = (row.get("usage") or "기타").strip()
+            usage_label = normalize_usage(raw_usage, f"{addr_full} {cltr_nm}")
+            short_loc = build_full_region_label(f"{addr_sido} {addr_sgg} {addr_emd}".strip() or location, addr_sgg, addr_emd)
+            min_bid = int(row.get("min_bid") or 0)
+            appraisal_raw = int(row.get("appraisal") or 0)
+            prpt_div = (row.get("prpt_div") or "공매재산").strip()
+            reg_org_nm = (row.get("reg_org_nm") or "온비드 공고기관").strip()
+            bid_status = (row.get("bid_status") or "입찰진행중").strip()
+            bid_start_date = (row.get("bid_start_date") or "").strip()
+            bid_end_date = (row.get("bid_end_date") or "").strip()
+            end_date_ymd = bid_end_date[:10].replace("-", "") if len(bid_end_date) >= 10 else ""
+            d_day_str = calculate_d_day(end_date_ymd)
+            pyeong = round(float(row.get("bld_area_pyeong") or 0), 1)
+            land_m2 = round(float(row.get("land_area_m2") or 0), 1)
+            bld_m2 = round(float(row.get("bld_area_m2") or 0), 1)
+            if pyeong <= 0 and land_m2 > 0 and usage_label == "토지":
+                pyeong = round(land_m2 / 3.3058, 1)
+            pyeong_short = f"{int(round(pyeong))}평 " if pyeong > 0 else ""
+
+            lat = row.get("lat")
+            lng = row.get("lng")
+            lat_f = float(lat) if lat is not None and str(lat).strip() != "" else None
+            lng_f = float(lng) if lng is not None and str(lng).strip() != "" else None
+            detail_url = (row.get("detail_url") or "https://www.onbid.co.kr").strip()
+            if not detail_url.startswith("http"):
+                detail_url = "https://www.onbid.co.kr"
+            photo_url = _pick_stock_photo(usage_label)
+            case_no = f"ONBID-{cltr_no}"
+
+            if disposal == "매각":
+                appraisal = appraisal_raw if appraisal_raw >= min_bid else min_bid
+                gap = max(0, appraisal - min_bid)
+                discount_pct = round((1 - min_bid / appraisal) * 100) if appraisal > 0 and appraisal > min_bid else 0
+                if discount_pct < 0 or discount_pct > 95:
+                    discount_pct = max(0, min(discount_pct, 95))
+                min_short = format_krw_short(min_bid)
+                gap_short = format_krw_short(gap)
+                deposit_req = int(min_bid * 0.1)
+
+                # 공매 매각 난이도 분류
+                if "공유재산" in prpt_div or "국유재산" in prpt_div or "신탁" in prpt_div:
+                    safety_grade, difficulty = "GREEN", "BEGINNER"
+                    right_summary = f"기관 직접 공매({prpt_div}) · 권리 깔끔"
+                elif discount_pct >= 50 or "지분" in cltr_nm:
+                    safety_grade, difficulty = "RED", "ADVANCED"
+                    right_summary = f"온비드 {prpt_div} · 고할인/권리 정밀확인 필요"
+                else:
+                    safety_grade, difficulty = "YELLOW", "INTERMEDIATE"
+                    right_summary = f"온비드 {prpt_div} · 명도·임차인 확인 필요"
+
+                if discount_pct >= 20 and gap >= 30_000_000:
+                    headline = f"{short_loc} {pyeong_short}{usage_label} 공매, 감정가보다 {gap_short} 싼 {min_short}에 매각"
+                elif discount_pct >= 15:
+                    headline = f"{discount_pct}% 할인된 {short_loc} {usage_label} 공매 ({min_short})"
+                else:
+                    headline = f"{short_loc} {pyeong_short}{usage_label} 온비드 매각 · {min_short} ({reg_org_nm})"
+
+                right_icon = "🟢" if safety_grade == "GREEN" else ("🟡" if safety_grade == "YELLOW" else "🔴")
+                bullets = [
+                    f"{right_icon} {right_summary}",
+                    f"🏛️ {reg_org_nm} 공매 · {bid_status}" + (f" (-{discount_pct}%)" if discount_pct > 0 else ""),
+                    f"🪙 입찰보증금 약 {format_krw(deposit_req)} (10%) · {d_day_str}",
+                ]
+                onbid_info = {
+                    "cltr_no": cltr_no,
+                    "onbid_cltr_no": str(row.get("onbid_cltr_no") or ""),
+                    "prpt_div": prpt_div,
+                    "reg_org_nm": reg_org_nm,
+                    "bid_status": bid_status,
+                    "bid_start_date": bid_start_date,
+                    "bid_end_date": bid_end_date,
+                    "detail_url": detail_url,
+                    "deposit_note": f"입찰보증금 통상 10% (약 {format_krw(deposit_req)}) · 온비드 공고문 확인",
+                    "land_area_m2": land_m2,
+                    "bld_area_m2": bld_m2,
+                }
+                ai_analysis = {
+                    "score": 82 if safety_grade == "GREEN" else (70 if safety_grade == "YELLOW" else 58),
+                    "grade": "A" if safety_grade == "GREEN" else ("B" if safety_grade == "YELLOW" else "C"),
+                    "verdict": f"온비드 {prpt_div} 매각 물건 ({reg_org_nm}) · {bid_status}",
+                    "suggested_bid": f"{format_krw(min_bid)} 부근 (공고문 조건 확인 후 응찰)",
+                    "expected_yield": "",
+                    "key_points": [
+                        f"공고기관: {reg_org_nm} ({prpt_div})",
+                        f"입찰기간: {bid_start_date} ~ {bid_end_date}",
+                        f"최저입찰가 {format_krw(min_bid)}" + (f" (감정가 대비 -{discount_pct}%)" if discount_pct > 0 else ""),
+                    ],
+                    "risks": [
+                        "온비드 공매는 인도명령 제도가 없어 명도소송·협의가 필요할 수 있습니다.",
+                        "입찰 전 온비드 원문 공고문에서 배분요구 종기·임차인·미납세금 인수 여부를 꼭 확인하세요.",
+                    ],
+                    "extinguished_rights": ["공고문상 말소 대상 권리 (온비드 공고 확인)"],
+                    "retained_rights": ["인수 조건 여부 온비드 공고문 확인 필수"],
+                    "analysis_detail": f"캠코 온비드({reg_org_nm})에서 진행 중인 {prpt_div} 매각 공매 물건입니다. 입찰 마감은 {bid_end_date}({d_day_str})입니다.",
+                    "malso_right": None,
+                    "assumed_deposit": 0,
+                    "assumed_deposit_str": "0원",
+                    "senior_unknown_count": 0,
+                }
+                items_out.append({
+                    "case_number": case_no,
+                    "source_type": "onbid_sale",
+                    "source_badge": "[공매 · 매각]",
+                    "disposal_method": "매각",
+                    "onbid_info": onbid_info,
+                    "headline": headline,
+                    "safety_grade": safety_grade,
+                    "difficulty": difficulty,
+                    "gap_amount": gap,
+                    "gap_amount_str": format_krw(gap),
+                    "gap_short_str": gap_short,
+                    "ref_price_name": "감정가" if appraisal_raw > min_bid else "예정가",
+                    "market_price": 0,
+                    "market_price_str": "",
+                    "summary_bullets": bullets,
+                    "card_tags": [f"공매 · 매각", f"📍 {short_loc}", d_day_str],
+                    "min_bid": min_bid,
+                    "min_bid_str": format_krw(min_bid),
+                    "appraisal": appraisal,
+                    "appraisal_str": format_krw(appraisal),
+                    "discount_pct": discount_pct,
+                    "deposit_required": deposit_req,
+                    "deposit_required_str": format_krw(deposit_req),
+                    "usage": usage_label,
+                    "area_pyeong": pyeong,
+                    "location": location,
+                    "short_location": short_loc,
+                    "floor": int(row.get("floor") or 1),
+                    "failed_count": 0,
+                    "auction_date": end_date_ymd,
+                    "d_day": d_day_str,
+                    "lat": lat_f,
+                    "lng": lng_f,
+                    "photo_url": photo_url,
+                    "photos": [photo_url],
+                    "photo_source": "stock",
+                    "photo_source_label": "🏛️ 온비드 공매 (참고 이미지)",
+                    "ai_analysis": ai_analysis,
+                    "bid_history": [],
+                    "rental_estimate": None,
+                    "area_winning_stats": None,
+                    "raw_court_data": None,
+                    "court_name": reg_org_nm,
+                })
+            else:
+                # ── 공매 · 임대(대부) — 매매 전용 지표(감정가·안전마진·할인율·매매 수익률) 제외 ──
+                annual_fee = min_bid
+                annual_fee_str = format_krw(annual_fee)
+                est_monthly = max(10_000, int(round((annual_fee / 12) / 10_000) * 10_000))
+                est_monthly_str = format_krw(est_monthly)
+                est_monthly_short = format_krw_short(est_monthly)
+                deposit_req = int(annual_fee * 0.05)
+
+                headline = f"{short_loc} {pyeong_short}{usage_label} 공공임대 · 월 환산 {est_monthly_short} ({reg_org_nm})"
+                bullets = [
+                    f"🏛️ {reg_org_nm} · {prpt_div} 임대(대부)",
+                    f"🔑 예정 사용료(연/기간) {annual_fee_str} · 월 환산 약 {est_monthly_str}",
+                    f"📅 입찰 마감 {bid_end_date[:10] or '공고 확인'} ({d_day_str}) · 입찰보증금 5~10%",
+                ]
+                onbid_info = {
+                    "cltr_no": cltr_no,
+                    "onbid_cltr_no": str(row.get("onbid_cltr_no") or ""),
+                    "prpt_div": prpt_div,
+                    "reg_org_nm": reg_org_nm,
+                    "bid_status": bid_status,
+                    "bid_start_date": bid_start_date,
+                    "bid_end_date": bid_end_date,
+                    "detail_url": detail_url,
+                    "annual_fee": annual_fee,
+                    "annual_fee_str": annual_fee_str,
+                    "est_monthly_fee": est_monthly,
+                    "est_monthly_fee_str": est_monthly_str,
+                    "deposit_note": f"입찰보증금 통상 5~10% (약 {format_krw(deposit_req)}~{format_krw(deposit_req * 2)}) · 공고문 확인",
+                    "lease_period_note": "공공 임대·사용수익허가 (통상 1~5년 · 온비드 공고문 확인)",
+                    "land_area_m2": land_m2,
+                    "bld_area_m2": bld_m2,
+                }
+                items_out.append({
+                    "case_number": case_no,
+                    "source_type": "onbid_lease",
+                    "source_badge": "[공매 · 임대]",
+                    "disposal_method": "임대",
+                    "onbid_info": onbid_info,
+                    "headline": headline,
+                    "safety_grade": "GREEN",
+                    "difficulty": "BEGINNER",
+                    "gap_amount": 0,
+                    "gap_amount_str": "",
+                    "gap_short_str": "",
+                    "ref_price_name": "예정 사용료",
+                    "market_price": 0,
+                    "market_price_str": "",
+                    "summary_bullets": bullets,
+                    "card_tags": ["공매 · 임대", f"월 환산 {est_monthly_short}", d_day_str],
+                    "min_bid": annual_fee,
+                    "min_bid_str": annual_fee_str,
+                    "appraisal": 0,
+                    "appraisal_str": "",
+                    "discount_pct": 0,
+                    "deposit_required": deposit_req,
+                    "deposit_required_str": format_krw(deposit_req),
+                    "usage": usage_label,
+                    "area_pyeong": pyeong,
+                    "location": location,
+                    "short_location": short_loc,
+                    "floor": int(row.get("floor") or 1),
+                    "failed_count": 0,
+                    "auction_date": end_date_ymd,
+                    "d_day": d_day_str,
+                    "lat": lat_f,
+                    "lng": lng_f,
+                    "photo_url": photo_url,
+                    "photos": [photo_url],
+                    "photo_source": "stock",
+                    "photo_source_label": "🔑 온비드 공공임대 (참고 이미지)",
+                    "ai_analysis": None,
+                    "bid_history": [],
+                    "rental_estimate": None,
+                    "area_winning_stats": None,
+                    "raw_court_data": None,
+                    "court_name": reg_org_nm,
+                })
+
+            if len(items_out) >= max_rows:
+                break
+
+        return items_out
+
+    sales = _fetch_by_disposal("매각", 1_000_000, sale_limit)
+    leases = _fetch_by_disposal("임대", 100_000, lease_limit)
+    conn.close()
+
+    print(f"🏛️ 온비드 공매 연동: 매각 {len(sales)}건 · 임대 {len(leases)}건 (수도권 활성 매물)")
+    results.extend(sales)
+    results.extend(leases)
+    return results
+
+
 def main():
-    print("🚀 [export_mobile_feed] DB 활성 매물 전체 피드 생성 중 (건수 제한 해제)...")
+    print("🚀 [export_mobile_feed] DB 활성 매물(경매 + 온비드 공매 매각/임대) 피드 생성 중...")
     items = generate_feed(limit=None)
 
+    auction_cnt = sum(1 for i in items if i.get("source_type", "auction") == "auction")
+    onbid_sale_cnt = sum(1 for i in items if i.get("source_type") == "onbid_sale")
+    onbid_lease_cnt = sum(1 for i in items if i.get("source_type") == "onbid_lease")
     green_cnt = sum(1 for i in items if i["safety_grade"] == "GREEN")
     yellow_cnt = sum(1 for i in items if i["safety_grade"] == "YELLOW")
     red_cnt = sum(1 for i in items if i["safety_grade"] == "RED")
@@ -1082,6 +1415,9 @@ def main():
     meta = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "total_count": len(items),
+        "auction_count": auction_cnt,
+        "onbid_sale_count": onbid_sale_cnt,
+        "onbid_lease_count": onbid_lease_cnt,
         "green_count": green_cnt,
         "yellow_count": yellow_cnt,
         "red_count": red_cnt,
@@ -1094,9 +1430,10 @@ def main():
         json.dump(meta, f, ensure_ascii=False, indent=2)
 
     os.makedirs(os.path.dirname(APP_OUTPUT_PATH), exist_ok=True)
-    shutil.copyfile(OUTPUT_PATH, APP_OUTPUT_PATH)
+    with open(APP_OUTPUT_PATH, "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, separators=(",", ":"))
 
-    print(f"✅ mobile_feed.json 생성 완료: 총 {len(items)}건 (유니크 매물)")
+    print(f"✅ mobile_feed.json 생성 완료: 총 {len(items)}건 (경매 {auction_cnt} · 공매 매각 {onbid_sale_cnt} · 공매 임대 {onbid_lease_cnt})")
     print(f"   🟢 초급(GREEN): {green_cnt}건 | 🟡 중급(YELLOW): {yellow_cnt}건 | 🔴 고수(RED): {red_cnt}건")
     print(f"   📊 인근 전월세 매칭: {rental_cnt}건 | 🏆 인근 낙찰통계 매칭: {win_stat_cnt}건")
     print(f"   저장 경로 1: {OUTPUT_PATH}")
@@ -1104,8 +1441,9 @@ def main():
 
     print("\n📋 [샘플 3건 미리보기]")
     for idx, sample in enumerate(items[:3], 1):
-        print(f"\n[{idx}] {sample['headline']} ({sample['difficulty']})")
-        print(f"    사건번호: {sample['case_number']} | 최저가: {sample['min_bid_str']} | AI: {sample['ai_analysis']['score']}점({sample['ai_analysis']['grade']})")
+        print(f"\n[{idx}] {sample['source_badge']} {sample['headline']} ({sample['difficulty']})")
+        ai_info = sample.get("ai_analysis") or {}
+        print(f"    사건번호: {sample['case_number']} | 금액: {sample['min_bid_str']} | AI: {ai_info.get('score', '-')}점({ai_info.get('grade', '-')})")
         if sample.get("rental_estimate"):
             re_d = sample["rental_estimate"]
             print(f"    임대추정: 보증금 {re_d['est_deposit_str']} / 월세 {re_d['est_monthly_rent_str']} (연 {re_d['annual_yield_pct']}%, {re_d['source_label']})")
