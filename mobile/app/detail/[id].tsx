@@ -184,7 +184,7 @@ export default function DetailScreen() {
 
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [loanPreset, setLoanPreset] = useState<LoanPreset>('normal');
-  const [mciExempt, setMciExempt] = useState(false);
+  const [mciExempt, setMciExempt] = useState(true);
   const [isRawExpanded, setIsRawExpanded] = useState(false);
   const [showAllTenants, setShowAllTenants] = useState(false);
   const [isFullRawJsonOpen, setIsFullRawJsonOpen] = useState(false);
@@ -880,7 +880,7 @@ export default function DetailScreen() {
               </View>
 
               <Text style={styles.disclaimerText}>
-                ※ 현행 지역별 방공제(서울 5,500만 · 경기/인천 과밀억제 4,800만 · 기타 2,800만)를 반영한 참고 시뮬레이션이며, 실제 대출 한도는 DSR·은행별 MCI 취급 여부·개인 신용도에 따라 달라질 수 있습니다.
+                ※ 기본값은 방공제 면제(MCI·MCG 보증보험 적용) 기준이며 토글을 끄면 지역별 방공제(서울 5,500만·경기/인천 4,800만) 차감 금액도 비교할 수 있습니다. 오피스텔·상가 등은 은행·상품에 따라 MCI 적용이 제한될 수 있습니다.
               </Text>
             </View>
 
@@ -1025,7 +1025,8 @@ export default function DetailScreen() {
                     <View style={styles.calcRows}>
                       <View style={styles.calcRow}>
                         <Text style={styles.calcKey}>
-                          상한가 기준 예상 대출 ({equityCalc.ltvPct}% · 방공제 반영)
+                          상한가 기준 예상 대출 ({equityCalc.ltvPct}% ·{' '}
+                          {equityCalc.appliedBangGongje > 0 ? '방공제 차감' : '방공제 면제'})
                         </Text>
                         <Text style={styles.calcValBlue}>{formatKrw(reverseBidCalc.loan)}</Text>
                       </View>

@@ -17,11 +17,11 @@ export function getRegionalBangGongje(location: string, usage: string): number {
 }
 
 /**
- * 경락잔금대출(주거 LTV 70% · 비주거 60%) + 지역별 방공제 + 부대비용 + 선순위 인수금 기준
+ * 경락잔금대출(주거 LTV 70% · 비주거 60%) + 기본 방공제 면제(MCI/MCG 보증보험 ON) + 부대비용 + 선순위 인수금 기준
  * 매각 물건의 예상 실투자금(필요 자기자본)을 원 단위로 산출한다.
- * 공매 임대 물건은 null 반환.
+ * (mciExempt=false 전달 시 지역별 방공제를 차감한 보수적 금액 산출, 공매 임대 물건은 null 반환)
  */
-export function estimateQuickEquity(item: FeedItem): number | null {
+export function estimateQuickEquity(item: FeedItem, mciExempt = true): number | null {
   if (!item || isOnbidLease(item)) return null;
   const basePrice = item.min_bid || 0;
   if (basePrice <= 0) return null;
@@ -29,7 +29,7 @@ export function estimateQuickEquity(item: FeedItem): number | null {
   const isNonResidential = item.usage === '상가' || item.usage === '토지';
   const ltv = isNonResidential ? 0.6 : 0.7;
   const appraisalBase = Math.min(basePrice, item.appraisal || basePrice);
-  const bang = getRegionalBangGongje(item.location, item.usage);
+  const bang = mciExempt ? 0 : getRegionalBangGongje(item.location, item.usage);
   const estLoan = Math.max(0, Math.floor(appraisalBase * ltv) - bang);
   const pureEquity = Math.max(0, basePrice - estLoan);
 
