@@ -27,19 +27,19 @@ cd "$SCRIPT_DIR"
 
 echo "=== $(date '+%Y-%m-%d %H:%M:%S') 맞춤형 정기 크롤링 시작 ===" >> "$LOG"
 
-# 일반 매물: 종류별(아파트:0201, 오피스텔:0205, 다세대/빌라:0204)로 각 법원당 최대 150개씩 수집
+# 일반 매물: 수도권(서울·경기·인천) 종류별(아파트:0201, 오피스텔:0205, 다세대/빌라:0204) 각 법원당 최대 150개씩 수집
 # (auto_crawling.py는 case_number 기준 ON CONFLICT DO UPDATE라 중복이 쌓이지 않음)
-for region in "서울" "경기"; do
+for region in "서울" "경기" "인천"; do
     for ptype in "0201" "0205" "0204"; do
         echo "[$region] 종류: $ptype (최대 150개) - $(date '+%H:%M:%S')" >> "$LOG"
         $PYTHON auto_crawling.py --region "$region" --property-type "$ptype" --max-items 150 >> "$LOG" 2>&1 || echo "[경고] $region $ptype 수집 중 일부 오류 발생 (계속 진행)" >> "$LOG"
     done
 done
 
-# 상가(0203): 법원당 최대 200개씩 수집
+# 상가(0203): 수도권(서울·경기·인천) 법원당 최대 200개씩 수집
 # 성남지원처럼 진행 중인 상가 물건이 150건을 넘는 법원에서 12월 기일 물건(예: 대장동 클라우드베이6 2025타경52448)이
 # 기존 50개 한도에 잘리던 문제를 해결. 무제한(9999) 호출은 토큰/시간 과소모가 커서 200개로 상한을 둔다.
-for region in "서울" "경기"; do
+for region in "서울" "경기" "인천"; do
     echo "[$region] 상가(0203) 수집 (최대 200개) - $(date '+%H:%M:%S')" >> "$LOG"
     $PYTHON auto_crawling.py --region "$region" --property-type "0203" --max-items 200 >> "$LOG" 2>&1 || echo "[경고] $region 0203 수집 중 일부 오류 발생 (계속 진행)" >> "$LOG"
 done
@@ -48,9 +48,13 @@ done
 echo "[네이버 상가] $(date '+%H:%M:%S') 성남·서울·경기 주요 상권 상가 실매물 수집 시작" >> "$LOG"
 $PYTHON -c "from naver_land_scraper import run; run(max_pages=3, headless=True)" >> "$LOG" 2>&1 || echo "[경고] 네이버 상가 수집 일부 오류 (계속 진행)" >> "$LOG"
 
-# 온비드(KAMCO) 공매 상가/부동산 공공데이터 OpenAPI 정기 수집
+# 네이버 부동산 주거·오피스텔·빌라·상가 전월세 시세 보강 (수익률 커버리지 확대)
+echo "[전월세 보강] $(date '+%H:%M:%S') 수도권 핵심 법정동 전월세 실매물 수집 시작" >> "$LOG"
+$PYTHON core/naver_rent_enricher.py --districts 35 --pages 2 >> "$LOG" 2>&1 || echo "[경고] 전월세 보강 일부 오류 (계속 진행)" >> "$LOG"
+
+# 온비드(KAMCO) 공매 상가/부동산 공공데이터 OpenAPI 정기 수집 (유형별 5페이지 확대)
 echo "[온비드 공매] $(date '+%H:%M:%S') 온비드 차세대 부동산 OpenAPI 물건 수집 시작" >> "$LOG"
-$PYTHON core/onbid_api_scraper.py --pages 2 >> "$LOG" 2>&1 || echo "[경고] 온비드 공매 수집 일부 오류 (계속 진행)" >> "$LOG"
+$PYTHON core/onbid_api_scraper.py --pages 5 >> "$LOG" 2>&1 || echo "[경고] 온비드 공매 수집 일부 오류 (계속 진행)" >> "$LOG"
 
 echo "[시세 매칭] $(date '+%H:%M:%S') 경매 물건 ↔ 네이버 상가/빌라 시세 및 안전마진 재계산" >> "$LOG"
 $PYTHON core/market_matcher.py >> "$LOG" 2>&1 || echo "[경고] 시세 매칭 일부 오류 (계속 진행)" >> "$LOG"

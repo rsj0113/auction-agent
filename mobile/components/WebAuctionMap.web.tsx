@@ -77,6 +77,11 @@ function ensureLeafletLoaded(): Promise<any> {
           border-color: #1c1917;
           z-index: 900;
         }
+        .ea-pin-pill.ea-pin-high-yield {
+          background: #ecfdf5;
+          border-color: #10b981;
+          color: #065f46;
+        }
         .ea-pin-pill.ea-pin-selected {
           background: #1c1917;
           border-color: #1c1917;
@@ -248,21 +253,31 @@ export default function WebAuctionMap({
       if (!Number.isFinite(item.lat) || !Number.isFinite(item.lng)) return;
 
       const isLease = item.source_type === 'onbid_lease';
+      const yieldPct = !isLease ? item.rental_estimate?.annual_yield_pct : undefined;
+      const isHighYield = typeof yieldPct === 'number' && yieldPct >= 8;
       const dotColor = isLease
+        ? '#059669'
+        : isHighYield
         ? '#059669'
         : item.safety_grade === 'GREEN'
         ? '#10b981'
         : item.safety_grade === 'YELLOW'
         ? '#f59e0b'
         : '#ef4444';
-      const priceLabel = escapeHtml(
-        formatShortPricePin(item.min_bid, item.min_bid_str, isLease, item.onbid_info?.est_monthly_fee)
+      const rawPriceLabel = formatShortPricePin(
+        item.min_bid,
+        item.min_bid_str,
+        isLease,
+        item.onbid_info?.est_monthly_fee
       );
+      const priceLabel = escapeHtml(isHighYield ? `🔥${rawPriceLabel}` : rawPriceLabel);
       const isSelected = item.case_number === selectedCaseNumber;
 
       const icon = L.divIcon({
         className: 'ea-pin-icon',
-        html: `<div class="ea-pin-pill${isSelected ? ' ea-pin-selected' : ''}" data-case="${escapeHtml(
+        html: `<div class="ea-pin-pill${isHighYield ? ' ea-pin-high-yield' : ''}${
+          isSelected ? ' ea-pin-selected' : ''
+        }" data-case="${escapeHtml(
           item.case_number
         )}"><span class="ea-pin-dot" style="background:${dotColor}"></span><span>${priceLabel}</span></div>`,
         iconSize: [0, 0],
@@ -271,7 +286,7 @@ export default function WebAuctionMap({
 
       const marker = L.marker([item.lat, item.lng], {
         icon,
-        zIndexOffset: isSelected ? 1000 : 0,
+        zIndexOffset: isSelected ? 1000 : isHighYield ? 300 : 0,
       });
 
       marker.on('click', (e: any) => {
@@ -285,7 +300,7 @@ export default function WebAuctionMap({
       });
 
       marker.addTo(layer);
-      markerByCaseRef.current.set(item.case_number, { marker, item, dotColor, priceLabel });
+      markerByCaseRef.current.set(item.case_number, { marker, item, dotColor, priceLabel, isHighYield });
       boundsCoords.push([item.lat, item.lng]);
     });
 
@@ -302,18 +317,20 @@ export default function WebAuctionMap({
     if (!isReady || !window.L) return;
     const L = window.L;
 
-    markerByCaseRef.current.forEach(({ marker, dotColor, priceLabel }, caseNo) => {
+    markerByCaseRef.current.forEach(({ marker, dotColor, priceLabel, isHighYield }, caseNo) => {
       const isSelected = caseNo === selectedCaseNumber;
       const icon = L.divIcon({
         className: 'ea-pin-icon',
-        html: `<div class="ea-pin-pill${isSelected ? ' ea-pin-selected' : ''}" data-case="${escapeHtml(
+        html: `<div class="ea-pin-pill${isHighYield ? ' ea-pin-high-yield' : ''}${
+          isSelected ? ' ea-pin-selected' : ''
+        }" data-case="${escapeHtml(
           caseNo
         )}"><span class="ea-pin-dot" style="background:${dotColor}"></span><span>${priceLabel}</span></div>`,
         iconSize: [0, 0],
         iconAnchor: [0, 0],
       });
       marker.setIcon(icon);
-      marker.setZIndexOffset(isSelected ? 1000 : 0);
+      marker.setZIndexOffset(isSelected ? 1000 : isHighYield ? 300 : 0);
     });
   }, [selectedCaseNumber, isReady]);
 

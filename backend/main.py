@@ -76,7 +76,8 @@ def get_auctions(
 
         is_case_search = bool(region and ("타경" in region or "202" in region))
         if not include_closed and not is_case_search:
-            query += """ AND COALESCE(status_flag, '') != 'CLOSED' 
+            query += """ AND COALESCE(status_flag, '') != 'CLOSED'
+                         AND appraisal > 0 AND min_bid >= 1000000
                          AND (
                              (auction_date IS NOT NULL AND auction_date != '' AND REPLACE(auction_date, '-', '') >= strftime('%Y%m%d', 'now', 'localtime'))
                              OR (
@@ -126,13 +127,21 @@ def get_auctions(
                 
         if region:
             import re as _re
-            tokens = [t.strip() for t in _re.split(r"[·,/|\s]+", region) if t.strip() and t.strip() not in ("전체", "서울", "경기")]
-            if not tokens:
-                tokens = [region.strip()]
-            sub_clauses = ["(location LIKE ? OR case_number LIKE ?)" for _ in tokens]
-            query += " AND (" + " OR ".join(sub_clauses) + ")"
-            for t in tokens:
-                params.extend([f"%{t}%", f"%{t}%"])
+            reg_clean = region.strip()
+            if reg_clean == "수도권":
+                tokens = ["서울", "경기", "인천"]
+            elif reg_clean == "전체":
+                tokens = []
+            else:
+                raw_tokens = [t.strip() for t in _re.split(r"[·,/|\s]+", reg_clean) if t.strip() and t.strip() != "전체"]
+                # 세부 시/군/구 토큰이 함께 있으면 상위 광역명(서울/경기/인천)을 빼고 정밀 매칭, 광역명만 있으면 그대로 유지
+                specific = [t for t in raw_tokens if t not in ("서울", "경기", "인천")]
+                tokens = specific if specific else raw_tokens
+            if tokens:
+                sub_clauses = ["(location LIKE ? OR case_number LIKE ?)" for _ in tokens]
+                query += " AND (" + " OR ".join(sub_clauses) + ")"
+                for t in tokens:
+                    params.extend([f"%{t}%", f"%{t}%"])
 
         if has_tenant:
             if has_tenant.lower() in ('yes', 'true', '1', 'y'):

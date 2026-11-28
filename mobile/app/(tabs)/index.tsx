@@ -27,6 +27,8 @@ import {
   estimateQuickEquity,
   formatShortEquity,
   getEstimatedYieldPct,
+  getYieldTier,
+  getYieldTierMeta,
 } from '../../utils/investmentMetrics';
 
 // react-native-maps는 네이티브 전용이므로 웹 환경에서는 조건부 로드
@@ -55,8 +57,10 @@ type FilterType =
   | 'gyeonggi';
 type SourceFilterType = 'sale_all' | 'auction' | 'onbid_sale' | 'onbid_lease';
 type UsageFilterType = 'all' | '아파트' | '빌라' | '오피스텔' | '상가' | '토지';
+type YieldSegmentType = 'all' | 'high' | 'mid' | 'general';
 type YieldFilterType = 'all' | 'y6' | 'y8' | 'y10';
 type EquityFilterType = 'all' | 'e50' | 'e100';
+type SortMode = 'yield_desc' | 'equity_asc' | 'discount_desc' | 'dday_asc';
 type ViewMode = 'list' | 'card' | 'map';
 type InfoModalType = 'notice' | 'guide' | null;
 
@@ -124,8 +128,10 @@ export default function FeedScreen() {
   const [activeSourceFilter, setActiveSourceFilter] = useState<SourceFilterType>('sale_all');
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [activeUsageFilter, setActiveUsageFilter] = useState<UsageFilterType>('all');
+  const [activeYieldSegment, setActiveYieldSegment] = useState<YieldSegmentType>('all');
   const [activeYieldFilter, setActiveYieldFilter] = useState<YieldFilterType>('all');
   const [activeEquityFilter, setActiveEquityFilter] = useState<EquityFilterType>('all');
+  const [sortMode, setSortMode] = useState<SortMode>('yield_desc');
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [selectedMapItem, setSelectedMapItem] = useState<FeedItem | null>(null);
 
@@ -262,8 +268,12 @@ export default function FeedScreen() {
     return counts;
   }, [sourceScopedItems]);
 
-  // 수익률 · 소액 실투자금(자기자본)별 건수 집계 (현재 선택된 거래유형 기준, 매각 매물 전용)
+  // 수익률 구분(고수익·중수익·일반/시세차익) 및 소액 실투자금별 건수 집계 (매각 매물 전용)
   const investFilterCounts = useMemo(() => {
+    let segAll = 0;
+    let segHigh = 0;
+    let segMid = 0;
+    let segGeneral = 0;
     let y6 = 0;
     let y8 = 0;
     let y10 = 0;
@@ -271,6 +281,12 @@ export default function FeedScreen() {
     let e100 = 0;
     for (const it of sourceScopedItems) {
       if (isOnbidLease(it)) continue;
+      segAll += 1;
+      const tier = getYieldTier(it);
+      if (tier === 'HIGH') segHigh += 1;
+      else if (tier === 'MID') segMid += 1;
+      else segGeneral += 1;
+
       const y = getEstimatedYieldPct(it);
       if (y !== null) {
         if (y >= 6) y6 += 1;
@@ -283,18 +299,30 @@ export default function FeedScreen() {
         if (eq <= 100_000_000) e100 += 1;
       }
     }
-    return { y6, y8, y10, e50, e100 };
+    return { segAll, segHigh, segMid, segGeneral, y6, y8, y10, e50, e100 };
   }, [sourceScopedItems]);
 
-  // '전체 탐색' & '동네 지도'용 필터링 적용 목록 (구분 + 용도 + 수익률 + 소액 자기자본 + 난이도/가격대/지역 교차 필터)
-  // 주의: 매매 가격대 · 수익률 · 소액 자기자본 필터는 법원경매 + 공매 매각에만 적용하고 공매 임대는 자동 제외!
+  // 전체 매각 기준 고수익 건수 ('오늘의 추천' 상단 바로가기 배지용)
+  const totalHighYieldCount = useMemo(() => {
+    return items.filter((it) => !isOnbidLease(it) && getYieldTier(it) === 'HIGH').length;
+  }, [items]);
+
+  // '전체 탐색' & '동네 지도'용 필터링 + 정렬 적용 목록
   const filteredItems = useMemo(() => {
     const isPriceFilter = activeFilter === 'budget_small' || activeFilter === 'budget_mid';
-    return sourceScopedItems.filter((item) => {
+    const filtered = sourceScopedItems.filter((item) => {
       if (isPriceFilter && isOnbidLease(item)) return false;
       if (activeUsageFilter !== 'all' && item.usage !== activeUsageFilter) return false;
 
-      // 6단계: 예상 수익률 필터 (매칭 데이터 있는 매각 매물 대상)
+      // 7단계: 핵심 수익률 정체성 구분 탭 (고수익 8%↑ / 중수익 5~8% / 일반·시세차익)
+      if (activeYieldSegment !== 'all' && !isOnbidLease(item)) {
+        const tier = getYieldTier(item);
+        if (activeYieldSegment === 'high' && tier !== 'HIGH') return false;
+        if (activeYieldSegment === 'mid' && tier !== 'MID') return false;
+        if (activeYieldSegment === 'general' && tier !== 'LOW' && tier !== 'NONE') return false;
+      }
+
+      // 6단계: 세부 예상 수익률 필터 (매칭 데이터 있는 매각 매물 대상)
       if (activeYieldFilter !== 'all') {
         const y = getEstimatedYieldPct(item);
         if (y === null) return false;
@@ -320,13 +348,54 @@ export default function FeedScreen() {
       if (activeFilter === 'gyeonggi' && !item.location.includes('경기') && !item.location.includes('인천')) return false;
       return true;
     });
-  }, [sourceScopedItems, activeFilter, activeUsageFilter, activeYieldFilter, activeEquityFilter]);
+
+    if (activeSourceFilter === 'onbid_lease') {
+      return filtered;
+    }
+
+    const sorted = [...filtered];
+    if (sortMode === 'yield_desc') {
+      sorted.sort((a, b) => {
+        const ya = getEstimatedYieldPct(a);
+        const yb = getEstimatedYieldPct(b);
+        if (ya !== null && yb !== null) return yb - ya;
+        if (ya !== null) return -1;
+        if (yb !== null) return 1;
+        return (b.discount_pct || 0) - (a.discount_pct || 0);
+      });
+    } else if (sortMode === 'equity_asc') {
+      sorted.sort((a, b) => {
+        const ea = estimateQuickEquity(a) ?? Number.MAX_SAFE_INTEGER;
+        const eb = estimateQuickEquity(b) ?? Number.MAX_SAFE_INTEGER;
+        return ea - eb;
+      });
+    } else if (sortMode === 'discount_desc') {
+      sorted.sort((a, b) => (b.discount_pct || 0) - (a.discount_pct || 0));
+    } else if (sortMode === 'dday_asc') {
+      sorted.sort((a, b) => {
+        const da = (a.auction_date || '99999999').replace(/-/g, '');
+        const db = (b.auction_date || '99999999').replace(/-/g, '');
+        return da.localeCompare(db);
+      });
+    }
+    return sorted;
+  }, [
+    sourceScopedItems,
+    activeSourceFilter,
+    activeFilter,
+    activeUsageFilter,
+    activeYieldSegment,
+    activeYieldFilter,
+    activeEquityFilter,
+    sortMode,
+  ]);
 
   const handleSourceFilterChange = (src: SourceFilterType) => {
     setActiveSourceFilter(src);
     setActiveUsageFilter('all');
     // 공매(임대) 선택 시 매매 전용 가격대/수익률/자기자본/난이도 필터는 자동 초기화
     if (src === 'onbid_lease') {
+      setActiveYieldSegment('all');
       setActiveYieldFilter('all');
       setActiveEquityFilter('all');
       if (
@@ -342,9 +411,32 @@ export default function FeedScreen() {
     setSelectedMapItem(null);
   };
 
-  const handleYieldFilterChange = (yf: YieldFilterType) => {
-    setActiveYieldFilter((prev) => (prev === yf ? 'all' : yf));
+  const handleYieldSegmentChange = (seg: YieldSegmentType) => {
+    setActiveYieldSegment(seg);
+    if (seg !== 'all') {
+      setActiveYieldFilter('all');
+    }
     setSelectedMapItem(null);
+  };
+
+  const handleYieldFilterChange = (yf: YieldFilterType) => {
+    setActiveYieldFilter((prev) => {
+      const next = prev === yf ? 'all' : yf;
+      if (next !== 'all') setActiveYieldSegment('all');
+      return next;
+    });
+    setSelectedMapItem(null);
+  };
+
+  const jumpToHighYieldList = () => {
+    setActiveSourceFilter('sale_all');
+    setActiveUsageFilter('all');
+    setActiveFilter('all');
+    setActiveYieldFilter('all');
+    setActiveEquityFilter('all');
+    setActiveYieldSegment('high');
+    setSortMode('yield_desc');
+    handleSelectViewMode('list');
   };
 
   const handleEquityFilterChange = (ef: EquityFilterType) => {
@@ -406,11 +498,12 @@ export default function FeedScreen() {
     const lease = isOnbidLease(item);
     const leaseMonthly = item.onbid_info?.est_monthly_fee_str;
     const estEquity = estimateQuickEquity(item);
-    const estYield = getEstimatedYieldPct(item);
+    const yieldMeta = getYieldTierMeta(item);
+    const isHighYield = !lease && yieldMeta.tier === 'HIGH';
 
     return (
       <TouchableOpacity
-        style={styles.listCard}
+        style={[styles.listCard, isHighYield && styles.listCardHighYield]}
         activeOpacity={0.92}
         onPress={() => router.push(`/detail/${encodeURIComponent(item.case_number)}`)}
       >
@@ -471,33 +564,36 @@ export default function FeedScreen() {
                 )}
               </View>
 
-              {/* 6단계: 예상 실투자금(자기자본) & 예상 수익률 핵심 배지 */}
-              {(estEquity !== null || estYield !== null) && (
-                <View style={styles.investBadgesRow}>
-                  {estEquity !== null && (
-                    <View
+              {/* 7단계: 수익률 정체성 구분 배지(고수익/중수익/저수익/일반·시세차익) & 예상 실투자금 배지 */}
+              <View style={styles.investBadgesRow}>
+                <View
+                  style={[
+                    styles.yieldTierPill,
+                    { backgroundColor: yieldMeta.bg, borderColor: yieldMeta.border },
+                  ]}
+                >
+                  <Text style={[styles.yieldTierPillText, { color: yieldMeta.text }]}>
+                    {yieldMeta.badgeText}
+                  </Text>
+                </View>
+                {estEquity !== null && (
+                  <View
+                    style={[
+                      styles.equityQuickPill,
+                      estEquity <= 50_000_000 && styles.equityQuickPillSmall,
+                    ]}
+                  >
+                    <Text
                       style={[
-                        styles.equityQuickPill,
-                        estEquity <= 50_000_000 && styles.equityQuickPillSmall,
+                        styles.equityQuickPillText,
+                        estEquity <= 50_000_000 && styles.equityQuickPillTextSmall,
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.equityQuickPillText,
-                          estEquity <= 50_000_000 && styles.equityQuickPillTextSmall,
-                        ]}
-                      >
-                        💸 실투자 약 {formatShortEquity(estEquity)}
-                      </Text>
-                    </View>
-                  )}
-                  {estYield !== null && (
-                    <View style={styles.yieldQuickPill}>
-                      <Text style={styles.yieldQuickPillText}>📈 예상 연 {estYield}%</Text>
-                    </View>
-                  )}
-                </View>
-              )}
+                      💸 실투자 약 {formatShortEquity(estEquity)}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </>
           )}
 
@@ -562,30 +658,16 @@ export default function FeedScreen() {
         : '🔴 고수';
     const shortSgg = (item.short_location || '').split(' ').slice(0, 2).join(' ');
     const estEquity = estimateQuickEquity(item);
-    const estYield = getEstimatedYieldPct(item);
+    const yieldMeta = getYieldTierMeta(item);
 
     const pastelTags: { label: string; tone: 'sage' | 'sand' | 'rose' }[] = [
+      {
+        label: yieldMeta.badgeText,
+        tone: yieldMeta.tier === 'HIGH' || yieldMeta.tier === 'MID' ? 'sage' : 'sand',
+      },
       ...(estEquity !== null
         ? [{ label: `💸 실투자 약 ${formatShortEquity(estEquity)}`, tone: 'sage' as const }]
         : []),
-      ...(estYield !== null
-        ? [{ label: `📈 예상 연 ${estYield}%`, tone: 'sage' as const }]
-        : [
-            {
-              label:
-                item.safety_grade === 'GREEN'
-                  ? '추가 인수금 0원'
-                  : item.safety_grade === 'YELLOW'
-                  ? '세입자·관리비 체크'
-                  : '고수용 하이리턴',
-              tone:
-                item.safety_grade === 'GREEN'
-                  ? ('sage' as const)
-                  : item.safety_grade === 'RED'
-                  ? ('rose' as const)
-                  : ('sand' as const),
-            },
-          ]),
       { label: formatDDayLabel(item.d_day), tone: 'sand' },
     ];
 
@@ -957,9 +1039,58 @@ export default function FeedScreen() {
         </View>
       </View>
 
-      {/* 2. 상단 필터 바 ('전체 탐색' & '동네 지도': 구분 + 용도 + 조건 교차 필터링) */}
+      {/* 2. 상단 필터 바 ('전체 탐색' & '동네 지도': 수익률 구분 + 거래유형 + 용도 + 세부 조건 교차 필터링) */}
       {!isLookbook && (
         <View style={styles.filterBar}>
+          {/* 0행 (매각 전용, 최상단 핵심 정체성): 수익률 높은 매물 vs 일반·시세차익 매물 구분 세그먼트 */}
+          {activeSourceFilter !== 'onbid_lease' && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterList}
+            >
+              {(
+                [
+                  { key: 'all', label: `전체 ${investFilterCounts.segAll}`, tone: 'all' },
+                  { key: 'high', label: `🔥 고수익 8%↑ (${investFilterCounts.segHigh})`, tone: 'high' },
+                  { key: 'mid', label: `📈 중수익 5~8% (${investFilterCounts.segMid})`, tone: 'mid' },
+                  { key: 'general', label: `🏷️ 일반·시세차익 (${investFilterCounts.segGeneral})`, tone: 'general' },
+                ] as { key: YieldSegmentType; label: string; tone: string }[]
+              ).map((seg) => {
+                const active = activeYieldSegment === seg.key;
+                return (
+                  <TouchableOpacity
+                    key={`seg-${seg.key}`}
+                    style={[
+                      styles.yieldSegChip,
+                      seg.tone === 'high' && styles.yieldSegChipHigh,
+                      seg.tone === 'mid' && styles.yieldSegChipMid,
+                      active &&
+                        (seg.tone === 'high'
+                          ? styles.yieldSegChipHighActive
+                          : seg.tone === 'mid'
+                          ? styles.yieldSegChipMidActive
+                          : styles.yieldSegChipActive),
+                    ]}
+                    onPress={() => handleYieldSegmentChange(seg.key)}
+                    activeOpacity={0.75}
+                  >
+                    <Text
+                      style={[
+                        styles.yieldSegText,
+                        seg.tone === 'high' && styles.yieldSegTextHigh,
+                        seg.tone === 'mid' && styles.yieldSegTextMid,
+                        active && styles.yieldSegTextActive,
+                      ]}
+                    >
+                      {seg.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          )}
+
           {/* 1행: 거래유형 구분 탭 (기본: 경매+공매 매각 / 법원경매 / 공매(매각) / 공매(임대)) */}
           <FlatList
             horizontal
@@ -1103,7 +1234,7 @@ export default function FeedScreen() {
             </ScrollView>
           )}
 
-          {/* 4행: 난이도 · 매매 가격대(임대 모드 제외) · 지역 필터 칩 */}
+          {/* 4행: 난이도 · 매매 가격대(임대 모드 제외) · 지역 · 정렬 필터 칩 */}
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -1142,6 +1273,41 @@ export default function FeedScreen() {
               );
             }}
           />
+
+          {/* 5행 (매각 전용 · 리스트 뷰): 정렬 바 — 기본 수익률 높은순으로 고수익 매물 최상단 노출 */}
+          {activeSourceFilter !== 'onbid_lease' && viewMode === 'list' && (
+            <View style={styles.sortBarRow}>
+              <Text style={styles.sortCountText}>검색 결과 {filteredItems.length}건</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.sortChipsWrap}
+              >
+                {(
+                  [
+                    { key: 'yield_desc', label: '🔥 수익률순' },
+                    { key: 'equity_asc', label: '💸 소액순' },
+                    { key: 'discount_desc', label: '🏷️ 할인율순' },
+                    { key: 'dday_asc', label: '⏰ 마감순' },
+                  ] as { key: SortMode; label: string }[]
+                ).map((sOpt) => {
+                  const active = sortMode === sOpt.key;
+                  return (
+                    <TouchableOpacity
+                      key={sOpt.key}
+                      style={[styles.sortChip, active && styles.sortChipActive]}
+                      onPress={() => setSortMode(sOpt.key)}
+                      activeOpacity={0.75}
+                    >
+                      <Text style={[styles.sortChipText, active && styles.sortChipTextActive]}>
+                        {sOpt.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
         </View>
       )}
 
@@ -1153,6 +1319,9 @@ export default function FeedScreen() {
           renderItem={renderListItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={12}
+          maxToRenderPerBatch={12}
+          windowSize={7}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Text style={{ fontSize: 40, marginBottom: 12 }}>🔍</Text>
@@ -1167,9 +1336,22 @@ export default function FeedScreen() {
           {/* 에디토리얼 큐레이션 서브 헤더 */}
           <View style={styles.lookbookSubHeader}>
             <Text style={styles.lookbookSubTitle}>TODAY&apos;S CURATION · 오늘의 추천</Text>
-            <TouchableOpacity onPress={() => handleSelectViewMode('list')} activeOpacity={0.7}>
-              <Text style={styles.lookbookViewAllLink}>전체 {items.length}건 ›</Text>
-            </TouchableOpacity>
+            <View style={styles.lookbookSubActions}>
+              {totalHighYieldCount > 0 && (
+                <TouchableOpacity
+                  style={styles.lookbookHighYieldChip}
+                  onPress={jumpToHighYieldList}
+                  activeOpacity={0.75}
+                >
+                  <Text style={styles.lookbookHighYieldChipText}>
+                    🔥 고수익 {totalHighYieldCount}건
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity onPress={() => handleSelectViewMode('list')} activeOpacity={0.7}>
+                <Text style={styles.lookbookViewAllLink}>전체 {items.length}건 ›</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <FlatList
@@ -2106,6 +2288,118 @@ const styles = StyleSheet.create({
     fontSize: 11.5,
     fontWeight: '800',
     color: '#047857',
+  },
+  yieldTierPill: {
+    borderWidth: 1,
+    paddingHorizontal: 9,
+    paddingVertical: 3.5,
+    borderRadius: 8,
+  },
+  yieldTierPillText: {
+    fontSize: 11.5,
+    fontWeight: '800',
+  },
+  listCardHighYield: {
+    borderWidth: 1.5,
+    borderColor: '#4ADE80',
+  },
+  yieldSegChip: {
+    paddingHorizontal: 13,
+    paddingVertical: 6.5,
+    borderRadius: 12,
+    backgroundColor: '#F5F5F4',
+    borderWidth: 1,
+    borderColor: '#E7E5E4',
+  },
+  yieldSegChipHigh: {
+    backgroundColor: '#ECFDF5',
+    borderColor: '#86EFAC',
+  },
+  yieldSegChipMid: {
+    backgroundColor: '#F0F9FF',
+    borderColor: '#BAE6FD',
+  },
+  yieldSegChipActive: {
+    backgroundColor: '#1C1917',
+    borderColor: '#1C1917',
+  },
+  yieldSegChipHighActive: {
+    backgroundColor: '#15803D',
+    borderColor: '#15803D',
+  },
+  yieldSegChipMidActive: {
+    backgroundColor: '#0369A1',
+    borderColor: '#0369A1',
+  },
+  yieldSegText: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: '#44403C',
+  },
+  yieldSegTextHigh: {
+    color: '#166534',
+  },
+  yieldSegTextMid: {
+    color: '#0369A1',
+  },
+  yieldSegTextActive: {
+    color: '#FFFFFF',
+  },
+  sortBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 3,
+    gap: 8,
+  },
+  sortCountText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#64748B',
+    flexShrink: 0,
+  },
+  sortChipsWrap: {
+    gap: 6,
+    alignItems: 'center',
+  },
+  sortChip: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  sortChipActive: {
+    backgroundColor: '#1E293B',
+    borderColor: '#1E293B',
+  },
+  sortChipText: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#475569',
+  },
+  sortChipTextActive: {
+    color: '#FFFFFF',
+  },
+  lookbookSubActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  lookbookHighYieldChip: {
+    backgroundColor: '#DCFCE7',
+    borderWidth: 1,
+    borderColor: '#86EFAC',
+    paddingHorizontal: 9,
+    paddingVertical: 3.5,
+    borderRadius: 999,
+  },
+  lookbookHighYieldChipText: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#166534',
   },
   usageChip: {
     paddingHorizontal: 13,

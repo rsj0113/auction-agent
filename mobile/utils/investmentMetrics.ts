@@ -1,5 +1,66 @@
-import { FeedItem } from '../types/feed';
+import { FeedItem, YieldTier } from '../types/feed';
 import { isOnbidLease } from './sourceBadge';
+
+export interface YieldTierMeta {
+  tier: YieldTier;
+  shortLabel: string;
+  badgeText: string;
+  bg: string;
+  border: string;
+  text: string;
+}
+
+export function getYieldTier(item: FeedItem): YieldTier {
+  if (!item || isOnbidLease(item)) return 'NONE';
+  const y = getEstimatedYieldPct(item);
+  if (y === null) return 'NONE';
+  if (y >= 8.0) return 'HIGH';
+  if (y >= 5.0) return 'MID';
+  return 'LOW';
+}
+
+export function getYieldTierMeta(item: FeedItem): YieldTierMeta {
+  const tier = getYieldTier(item);
+  const y = getEstimatedYieldPct(item);
+  if (tier === 'HIGH' && y !== null) {
+    return {
+      tier,
+      shortLabel: '고수익',
+      badgeText: `🔥 고수익 연 ${y}%`,
+      bg: '#DCFCE7',
+      border: '#4ADE80',
+      text: '#166534',
+    };
+  }
+  if (tier === 'MID' && y !== null) {
+    return {
+      tier,
+      shortLabel: '중수익',
+      badgeText: `📈 중수익 연 ${y}%`,
+      bg: '#E0F2FE',
+      border: '#7DD3FC',
+      text: '#0369A1',
+    };
+  }
+  if (tier === 'LOW' && y !== null) {
+    return {
+      tier,
+      shortLabel: '저수익',
+      badgeText: `📉 저수익 연 ${y}%`,
+      bg: '#FEF3C7',
+      border: '#FCD34D',
+      text: '#92400E',
+    };
+  }
+  return {
+    tier: 'NONE',
+    shortLabel: '일반·시세차익',
+    badgeText: item.usage === '토지' ? '🏷️ 토지 · 시세차익' : '🏷️ 일반 · 시세차익',
+    bg: '#F5F5F4',
+    border: '#E7E5E4',
+    text: '#57534E',
+  };
+}
 
 export type BangCategory = 'residential' | 'commercial' | 'land';
 

@@ -23,7 +23,7 @@ import { useFavorites } from '../../context/FavoritesContext';
 import { formatDDayLabel } from '../../utils/formatDDay';
 import { getSourceBadgeMeta, isOnbidItem, isOnbidLease } from '../../utils/sourceBadge';
 import { isFreePreviewCase } from '../../utils/curation';
-import { getBangGongjeInfo } from '../../utils/investmentMetrics';
+import { getBangGongjeInfo, getYieldTierMeta } from '../../utils/investmentMetrics';
 
 const feedData = require('../../assets/mobile_feed.json');
 
@@ -599,8 +599,39 @@ export default function DetailScreen() {
           </View>
 
           <View style={styles.contentWrap}>
-            {/* 핵심 헤드라인 & 주소 */}
+            {/* 핵심 헤드라인 & 주소 & 수익률 정체성 배지 */}
             <View style={styles.titleSection}>
+              {!isLease && (() => {
+                const yt = getYieldTierMeta(item);
+                return (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+                    <View
+                      style={{
+                        backgroundColor: yt.bg,
+                        borderColor: yt.border,
+                        borderWidth: 1,
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                        borderRadius: 999,
+                      }}
+                    >
+                      <Text style={{ fontSize: 12, fontWeight: '800', color: yt.text }}>
+                        {yt.badgeText}
+                      </Text>
+                    </View>
+                    {yt.tier === 'HIGH' && (
+                      <Text style={{ fontSize: 11.5, fontWeight: '700', color: '#15803D' }}>
+                        월세 현금흐름 우수 매물
+                      </Text>
+                    )}
+                    {yt.tier === 'NONE' && (
+                      <Text style={{ fontSize: 11.5, fontWeight: '600', color: '#78716C' }}>
+                        인근 임대 표본 미확인 · 시세차익/실거주 중심
+                      </Text>
+                    )}
+                  </View>
+                );
+              })()}
               <Text style={styles.headlineText}>{item.headline}</Text>
               <Text style={styles.locationText}>
                 {item.location} · {item.usage}

@@ -1,6 +1,7 @@
 import { FeedItem } from '../types/feed';
 import { formatDDayLabel } from './formatDDay';
 import { isOnbidLease } from './sourceBadge';
+import { getEstimatedYieldPct } from './investmentMetrics';
 
 /**
  * '오늘의 추천' 최상단(index 0부터 순서대로) 핀 고정할 사건번호 목록.
@@ -60,6 +61,15 @@ export function buildCuratedTopItems(allItems: FeedItem[], targetCount = 12): Fe
     score += (item.ai_analysis?.score || 0) * 0.2;
 
     if (item.min_bid >= 100_000_000 && item.min_bid <= 700_000_000) score += 8;
+
+    // 7단계: 이지경매 핵심 정체성 — 예상 연 수익률 우수 매물 강력 가중치
+    const estYield = getEstimatedYieldPct(item);
+    if (estYield !== null) {
+      if (estYield >= 10) score += 42;
+      else if (estYield >= 8) score += 34;
+      else if (estYield >= 6) score += 20;
+      else if (estYield >= 5) score += 10;
+    }
 
     // 다가오는 실매각 기일(오늘 마감 / 마감 N일 전) 매물을 오늘의 추천에 최우선 노출
     const dLabel = formatDDayLabel(item.d_day);

@@ -1,6 +1,7 @@
 export type SafetyGrade = 'GREEN' | 'YELLOW' | 'RED';
 export type DifficultyLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 export type SourceType = 'auction' | 'onbid_sale' | 'onbid_lease';
+export type YieldTier = 'HIGH' | 'MID' | 'LOW' | 'NONE';
 
 export interface OnbidInfo {
   cltr_no: string;
@@ -170,6 +171,7 @@ export interface FeedItem {
   ai_analysis?: AIAnalysis;
   bid_history?: BidHistoryItem[];
   rental_estimate?: RentalEstimate | null;
+  yield_tier?: YieldTier;
   area_winning_stats?: AreaWinningStats | null;
   raw_court_data?: RawCourtData;
   court_name: string;
@@ -185,6 +187,10 @@ export interface MobileFeedData {
   yellow_count: number;
   red_count: number;
   rental_matched_count?: number;
+  high_yield_count?: number;
+  mid_yield_count?: number;
+  low_yield_count?: number;
+  capital_gain_count?: number;
   area_stats_matched_count?: number;
   items: FeedItem[];
 }

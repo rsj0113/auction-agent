@@ -2047,6 +2047,8 @@ async def main():
                         help="DB에 이미 있는 물건도 강제 재분석 (캐시 무시, AI 토큰 소모)")
     parser.add_argument("--reanalyze-db", action="store_true",
                         help="크롤링 없이 DB 전체 물건을 AI 재분석 (권리분석엔진 재실행 포함)")
+    parser.add_argument("--fast-rule", action="store_true",
+                        help="대량 수집 시 OpenAI 호출 대신 고속 Rule-Engine으로 즉시 분석 적재")
     args = parser.parse_args()
 
     global BUILDING_TYPE_CODE
@@ -2218,7 +2220,7 @@ async def main():
                             rights_report.get('risk_level') != 'CRITICAL' and
                             any(k in u_type for k in ('아파트', '오피스텔', '상가'))
                         )
-                        if is_prime:
+                        if is_prime and not args.fast_rule:
                             ai_report = analyzer.analyze_item(item, rights_report)
                         else:
                             ai_report = _build_rule_report(item, rights_report)

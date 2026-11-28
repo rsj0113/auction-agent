@@ -465,27 +465,32 @@ def build_bid_history(appraisal: int, min_bid: int, failed_count: int, prev_min_
 
 def load_reference_indexes(conn: sqlite3.Connection) -> tuple[dict, dict, dict]:
     """
-    1) naver_listings (월세 데이터): emd / sgg 별 인덱스
+    1) naver_listings (월세 + 전세 데이터): emd / sgg 별 인덱스
     2) auction_results (낙찰 결과 5,700+건): (sgg, usage) 별 낙찰가율·경쟁률 및 임대 참조 인덱스
     """
     cur = conn.cursor()
 
-    # 1. naver_listings 월세 매물 로드 (면적·층 정보 포함 — 평형 밴드 보정용)
+    # 1. naver_listings 월세·전세 매물 로드 (면적·층·거래유형 포함 — 평형 밴드 보정용)
     naver_by_emd: dict[str, list[tuple]] = {}
     naver_by_sgg: dict[str, list[tuple]] = {}
     try:
         cur.execute("""
-            SELECT addr_sgg, addr_emd, area_pyeong, deposit_10k, monthly_rent_10k, realty_type_cd, floor
+            SELECT addr_sgg, addr_emd, area_pyeong, deposit_10k, monthly_rent_10k, realty_type_cd, floor, trade_type
             FROM naver_listings
-            WHERE trade_type = '월세' AND monthly_rent_10k > 0 AND area_pyeong > 0
+            WHERE area_pyeong > 0
+              AND (
+                  (trade_type = '월세' AND monthly_rent_10k > 0)
+                  OR (trade_type = '전세' AND deposit_10k >= 2000)
+              )
         """)
-        for sgg, emd, pyeong, dep, rent, rtype, floor in cur.fetchall():
+        for sgg, emd, pyeong, dep, rent, rtype, floor, ttype in cur.fetchall():
             rec = (
                 float(pyeong or 0),
                 int(dep or 0) * 10_000,
                 int(rent or 0) * 10_000,
                 (rtype or "").strip(),
                 str(floor or "").strip(),
+                (ttype or "월세").strip(),
             )
             if emd:
                 naver_by_emd.setdefault(emd.strip(), []).append(rec)
@@ -649,15 +654,35 @@ def normalize_usage(raw_usage: str, location: str = "", remarks: str = "") -> st
 
 
 def _dedup_naver_recs(recs: list[tuple]) -> list[tuple]:
-    """동일 호실 중복 중개 매물(면적·보증금·월세·층 동일) 제거"""
+    """동일 호실 중복 중개 매물(면적·보증금·월세·층·거래유형 동일) 제거"""
     seen: set[tuple] = set()
     out: list[tuple] = []
     for r in recs:
-        key = (round(r[0], 1), r[1], r[2], r[4] if len(r) > 4 else "")
+        key = (round(r[0], 1), r[1], r[2], r[4] if len(r) > 4 else "", r[5] if len(r) > 5 else "월세")
         if key not in seen:
             seen.add(key)
             out.append(r)
     return out
+
+
+def classify_yield_tier(rental_estimate: dict | None, is_lease: bool = False) -> str:
+    """
+    이지경매 핵심 정체성 — 예상 연 수익률 기반 4단계 구분:
+    - HIGH: 연 8.0% 이상 (🔥 고수익)
+    - MID:  연 5.0% ~ 7.9% (📈 중수익)
+    - LOW:  연 5.0% 미만 (📉 저수익)
+    - NONE: 수익률 미확인 · 토지 · 시세차익/일반 매물 (🏷️ 시세차익·일반)
+    """
+    if is_lease or not rental_estimate:
+        return "NONE"
+    y = rental_estimate.get("annual_yield_pct")
+    if not isinstance(y, (int, float)) or y <= 0:
+        return "NONE"
+    if y >= 8.0:
+        return "HIGH"
+    if y >= 5.0:
+        return "MID"
+    return "LOW"
 
 
 def estimate_rental_and_yield(
@@ -673,6 +698,7 @@ def estimate_rental_and_yield(
 ) -> dict | None:
     """
     인근 전월세 시세 및 예상 수익률 매칭.
+    - 아파트(A01)·오피스텔(A02)·빌라(C02/C03)·상가(D02/D03/D04) 동일 유형 실매물(월세 우선, 주거용 전세 환산 보조) 매칭.
     - 전용면적(평형) ±30%(우선) → ±40%(보조) 유사 평형 밴드 내에서만 보증금·월세를 함께 매칭.
     - 표본이 3건 미만이거나 면적이 미확인인 경우 전체 평형 평균으로 억지 추정하지 않고 None 반환!
     """
@@ -687,57 +713,79 @@ def estimate_rental_and_yield(
     sample_count = 0
     source_label = ""
 
-    # 1순위: 상가/오피스텔/기타 — naver_listings 동 → 시군구 유사 평형 밴드(±30% → ±40%) 월세·보증금 동시 매칭
-    if usage_label in ("상가", "오피스텔", "기타") and pyeong > 0:
+    # 1순위: 네이버 부동산 동 → 시군구 유사 평형 밴드(±30% → ±40%) 월세/전세 매칭 (토지 제외)
+    if usage_label in ("아파트", "빌라", "오피스텔", "상가", "기타") and pyeong > 0:
         candidates: list[tuple[str, list[tuple]]] = []
         if emd_clean and emd_clean in naver_by_emd:
             candidates.append((emd_clean, naver_by_emd[emd_clean]))
         if short_sgg and short_sgg in naver_by_sgg:
             candidates.append((short_sgg, naver_by_sgg[short_sgg]))
 
-        for loc_name, raw_pool in candidates:
-            # 오피스텔은 A02/OPST 표본이 충분하면 우선 사용, 부족하면 인근 상가/업무 풀을 보수 보정
-            if usage_label == "오피스텔":
-                type_pool = [r for r in raw_pool if r[3] in ("A02", "OPST")]
-                is_commercial_fallback = len(type_pool) < 3
-                base_pool = type_pool if not is_commercial_fallback else raw_pool
-            else:
-                is_commercial_fallback = False
-                base_pool = raw_pool
-
-            matched_band = None
-            matched_bounds = (0, 0)
+        def _match_pool(raw_pool: list[tuple], allowed_types: tuple[str, ...], trade_kind: str):
+            pool = [
+                r for r in raw_pool
+                if (not allowed_types or r[3] in allowed_types)
+                and (r[5] if len(r) > 5 else "월세") == trade_kind
+            ]
             for band_pct in (0.30, 0.40):
                 lo, hi = pyeong * (1.0 - band_pct), pyeong * (1.0 + band_pct)
-                band = _dedup_naver_recs([r for r in base_pool if lo <= r[0] <= hi])
+                band = _dedup_naver_recs([r for r in pool if lo <= r[0] <= hi])
                 if len(band) < 3:
                     continue
-
-                # 상가는 1층 vs 비1층 동일 층군 표본이 충분하면 우선 매칭
-                if usage_label == "상가" and floor_num != 0:
+                if usage_label == "상가" and floor_num != 0 and trade_kind == "월세":
                     fl_band = [r for r in band if (r[4] == "1") == (floor_num == 1)]
                     if len(fl_band) >= 3:
                         band = fl_band
+                return band, (max(1, round(lo)), max(1, round(hi)))
+            return None, (0, 0)
 
-                # 오피스텔이 상가(D02) 풀로 폴백할 때는 1층 메인 점포 상위 25% 아웃라이어 제거해 보수 보정
-                if usage_label == "오피스텔" and is_commercial_fallback and len(band) >= 6:
-                    rents_sorted = sorted(r[2] for r in band)
-                    q3 = rents_sorted[(len(rents_sorted) * 3) // 4]
-                    trimmed = [r for r in band if r[2] <= q3]
-                    if len(trimmed) >= 3:
-                        band = trimmed
+        usage_type_codes = {
+            "아파트": ("A01", "APT"),
+            "오피스텔": ("A02", "OPST"),
+            "빌라": ("C02", "C03", "VL"),
+            "상가": ("D02", "D03", "D04", "SG"),
+            "기타": ("D02", "D03", "D04", "A02"),
+        }
+        own_codes = usage_type_codes.get(usage_label, ())
 
-                matched_band = band
-                matched_bounds = (max(1, round(lo)), max(1, round(hi)))
-                break
+        for loc_name, raw_pool in candidates:
+            # 1-A. 동일 유형 월세 우선 매칭
+            matched_band, matched_bounds = _match_pool(raw_pool, own_codes, "월세")
+            is_commercial_fallback = False
+            matched_trade = "월세"
+
+            # 1-B. 주거용(아파트·빌라·오피스텔) 월세 표본 부족 시 동일 유형 전세 실매물 → 5.5% 월세 환산
+            if not matched_band and usage_label in ("아파트", "빌라", "오피스텔"):
+                matched_band, matched_bounds = _match_pool(raw_pool, own_codes, "전세")
+                if matched_band:
+                    matched_trade = "전세"
+
+            # 1-C. 오피스텔은 A02 표본이 모두 부족할 때만 인근 상가/업무 월세 풀 보수 보정(상위 25% 제거)
+            if not matched_band and usage_label == "오피스텔":
+                matched_band, matched_bounds = _match_pool(raw_pool, (), "월세")
+                if matched_band:
+                    is_commercial_fallback = True
+                    matched_trade = "월세"
+                    if len(matched_band) >= 6:
+                        rents_sorted = sorted(r[2] for r in matched_band)
+                        q3 = rents_sorted[(len(rents_sorted) * 3) // 4]
+                        trimmed = [r for r in matched_band if r[2] <= q3]
+                        if len(trimmed) >= 3:
+                            matched_band = trimmed
 
             if matched_band:
                 sample_count = len(matched_band)
-                est_deposit = int(round(statistics.median([r[1] for r in matched_band]) / 1_000_000) * 1_000_000)
-                est_monthly = int(round(statistics.median([r[2] for r in matched_band]) / 10_000) * 10_000)
                 band_tag = f"{matched_bounds[0]}~{matched_bounds[1]}평대"
-                suffix = "유사평형 보정 월세" if (usage_label == "오피스텔" and is_commercial_fallback) else "유사평형 월세"
-                source_label = f"네이버 부동산 {loc_name} {band_tag} {suffix}"
+                if matched_trade == "전세":
+                    est_jeonse = int(round(statistics.median([r[1] for r in matched_band]) / 1_000_000) * 1_000_000)
+                    est_deposit = int(round((est_jeonse * 0.2) / 1_000_000) * 1_000_000)
+                    est_monthly = int(round(((est_jeonse - est_deposit) * 0.055 / 12) / 10_000) * 10_000)
+                    source_label = f"네이버 부동산 {loc_name} {band_tag} 실전세 환산"
+                else:
+                    est_deposit = int(round(statistics.median([r[1] for r in matched_band]) / 1_000_000) * 1_000_000)
+                    est_monthly = int(round(statistics.median([r[2] for r in matched_band]) / 10_000) * 10_000)
+                    suffix = "유사평형 보정 월세" if is_commercial_fallback else "유사평형 월세"
+                    source_label = f"네이버 부동산 {loc_name} {band_tag} {suffix}"
                 break
 
     # 2순위: DB 자체 산출 est_monthly_rent (유사 평형 네이버 매칭이 없을 때, 토지 제외)
@@ -1117,6 +1165,7 @@ def generate_feed(limit: int | None = None) -> list[dict]:
             "ai_analysis": ai_analysis,
             "bid_history": bid_history,
             "rental_estimate": rental_estimate,
+            "yield_tier": classify_yield_tier(rental_estimate, is_lease=False),
             "area_winning_stats": area_winning_stats,
             "raw_court_data": raw_court_data,
             "court_name": row.get("court_name") or "",
@@ -1127,8 +1176,13 @@ def generate_feed(limit: int | None = None) -> list[dict]:
 
     print(f"🧹 중복 제거: 사건번호 중복 {dup_case_skipped}건 · 동일 주소 중복 {dup_loc_skipped}건 제외")
 
-    # 온비드 공매(매각 + 임대) 활성 매물 연동 (수도권 우선)
-    onbid_items = load_onbid_feed_items(sale_limit=120, lease_limit=80)
+    # 온비드 공매(매각 + 임대) 활성 매물 연동 (수도권 대폭 확대 + 매각 물건 전월세 수익률 매칭)
+    onbid_items = load_onbid_feed_items(
+        sale_limit=500,
+        lease_limit=250,
+        naver_indexes=naver_indexes,
+        rent_by_sgg_usage=rent_by_sgg_usage,
+    )
     feed_items.extend(onbid_items)
     return feed_items
 
@@ -1145,7 +1199,12 @@ def _pick_stock_photo(usage_label: str) -> str:
     return "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80"
 
 
-def load_onbid_feed_items(sale_limit: int = 120, lease_limit: int = 80) -> list[dict]:
+def load_onbid_feed_items(
+    sale_limit: int = 500,
+    lease_limit: int = 250,
+    naver_indexes: tuple[dict, dict] | None = None,
+    rent_by_sgg_usage: dict | None = None,
+) -> list[dict]:
     """
     SQLite onbid_items에서 활성 수도권 온비드 공매 매각(매매)과 임대(대부) 물건을
     모바일 앱·웹 피드 규격으로 변환한다.
@@ -1316,6 +1375,21 @@ def load_onbid_feed_items(sale_limit: int = 120, lease_limit: int = 80) -> list[
                     "assumed_deposit_str": "0원",
                     "senior_unknown_count": 0,
                 }
+                onbid_rental = None
+                if naver_indexes is not None and pyeong > 0 and usage_label != "토지":
+                    onbid_rental = estimate_rental_and_yield(
+                        row={"location": location, "est_monthly_rent": 0, "tenant_deposit": 0},
+                        usage_label=usage_label,
+                        min_bid=min_bid,
+                        appraisal=appraisal,
+                        pyeong=pyeong,
+                        sgg=addr_sgg,
+                        emd=addr_emd,
+                        naver_indexes=naver_indexes,
+                        rent_by_sgg_usage=rent_by_sgg_usage or {},
+                    )
+                onbid_yield_tier = classify_yield_tier(onbid_rental, is_lease=False)
+
                 items_out.append({
                     "case_number": case_no,
                     "source_type": "onbid_sale",
@@ -1356,7 +1430,8 @@ def load_onbid_feed_items(sale_limit: int = 120, lease_limit: int = 80) -> list[
                     "photo_source_label": "🏛️ 온비드 공매 (참고 이미지)",
                     "ai_analysis": ai_analysis,
                     "bid_history": [],
-                    "rental_estimate": None,
+                    "rental_estimate": onbid_rental,
+                    "yield_tier": onbid_yield_tier,
                     "area_winning_stats": None,
                     "raw_court_data": None,
                     "court_name": reg_org_nm,
@@ -1435,6 +1510,7 @@ def load_onbid_feed_items(sale_limit: int = 120, lease_limit: int = 80) -> list[
                     "ai_analysis": None,
                     "bid_history": [],
                     "rental_estimate": None,
+                    "yield_tier": "NONE",
                     "area_winning_stats": None,
                     "raw_court_data": None,
                     "court_name": reg_org_nm,
@@ -1466,6 +1542,13 @@ def main():
     yellow_cnt = sum(1 for i in items if i["safety_grade"] == "YELLOW")
     red_cnt = sum(1 for i in items if i["safety_grade"] == "RED")
     rental_cnt = sum(1 for i in items if i.get("rental_estimate"))
+    high_yield_cnt = sum(1 for i in items if i.get("yield_tier") == "HIGH")
+    mid_yield_cnt = sum(1 for i in items if i.get("yield_tier") == "MID")
+    low_yield_cnt = sum(1 for i in items if i.get("yield_tier") == "LOW")
+    capital_gain_cnt = sum(
+        1 for i in items
+        if i.get("source_type", "auction") != "onbid_lease" and i.get("yield_tier") == "NONE"
+    )
     win_stat_cnt = sum(1 for i in items if i.get("area_winning_stats"))
 
     meta = {
@@ -1478,6 +1561,10 @@ def main():
         "yellow_count": yellow_cnt,
         "red_count": red_cnt,
         "rental_matched_count": rental_cnt,
+        "high_yield_count": high_yield_cnt,
+        "mid_yield_count": mid_yield_cnt,
+        "low_yield_count": low_yield_cnt,
+        "capital_gain_count": capital_gain_cnt,
         "area_stats_matched_count": win_stat_cnt,
         "items": items,
     }
@@ -1491,6 +1578,7 @@ def main():
 
     print(f"✅ mobile_feed.json 생성 완료: 총 {len(items)}건 (경매 {auction_cnt} · 공매 매각 {onbid_sale_cnt} · 공매 임대 {onbid_lease_cnt})")
     print(f"   🟢 초급(GREEN): {green_cnt}건 | 🟡 중급(YELLOW): {yellow_cnt}건 | 🔴 고수(RED): {red_cnt}건")
+    print(f"   🔥 수익률 구분: 고수익(8%↑) {high_yield_cnt}건 | 중수익(5~8%) {mid_yield_cnt}건 | 저수익(<5%) {low_yield_cnt}건 | 일반·시세차익 {capital_gain_cnt}건")
     print(f"   📊 인근 전월세 매칭: {rental_cnt}건 | 🏆 인근 낙찰통계 매칭: {win_stat_cnt}건")
     print(f"   저장 경로 1: {OUTPUT_PATH}")
     print(f"   저장 경로 2: {APP_OUTPUT_PATH}")
