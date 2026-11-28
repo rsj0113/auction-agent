@@ -757,6 +757,18 @@ export default function DetailScreen() {
               )}
             </View>
 
+            {/* 오늘의 추천 상위 2건 무료 맛보기 안내 배너 */}
+            {isFreePreview && !isUnlocked && (
+              <View style={styles.freePreviewBanner}>
+                <Text style={styles.freePreviewBannerText}>
+                  🎁 오늘의 추천 무료 맛보기 매물 · 초대 코드 없이 필요 현금·역산·수익률 전체 공개 중
+                </Text>
+              </View>
+            )}
+
+            {/* 5단계 프리미엄 잠금 래퍼 (필요 현금 계산기 · 목표 수익률별 상한가 역산 · 인근 전월세/수익률) */}
+            <View style={isPremiumLocked ? styles.lockedSectionWrap : undefined}>
+              <View pointerEvents={isPremiumLocked ? 'none' : 'auto'} style={{ gap: 16 }}>
             {/* 3. 필요 자기자본(현금) 계산기 (대출 규제 시뮬레이션) */}
             <View style={styles.card}>
               <Text style={styles.cardTitle}>🧮 필요 자기자본(현금) 계산기</Text>
@@ -872,6 +884,180 @@ export default function DetailScreen() {
               </Text>
             </View>
 
+            {/* 3.5. 목표 수익률별 적정 입찰 상한가 역산 계산기 (5단계) */}
+            {reverseBidCalc && (
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>🎯 목표 수익률별 적정 입찰 상한가</Text>
+                  <View style={styles.targetYieldPill}>
+                    <Text style={styles.targetYieldPillText}>
+                      목표 연 {reverseBidCalc.targetYieldPct}%
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.cardSubCaption}>
+                  {rental
+                    ? `📊 인근 전·월세 시세(${rental.source_label}) 자동 반영 · 세금·대출이자(연 4.5%)·방공제 기준 역산`
+                    : '✏️ 인근 시세 미매칭 매물 · 예상 보증금/월세(만원)를 직접 수정하면 즉시 역산됩니다'}
+                </Text>
+
+                {/* 목표 수익률 4단 선택 [6% | 8% | 10% | 직접입력] */}
+                <View style={styles.presetRow}>
+                  {(
+                    [
+                      { key: '6', label: '6%' },
+                      { key: '8', label: '8%' },
+                      { key: '10', label: '10%' },
+                      { key: 'custom', label: '직접입력' },
+                    ] as { key: TargetYieldMode; label: string }[]
+                  ).map((opt) => {
+                    const active = targetYieldMode === opt.key;
+                    return (
+                      <TouchableOpacity
+                        key={opt.key}
+                        style={[styles.presetBtn, active && styles.presetBtnActive]}
+                        onPress={() => setTargetYieldMode(opt.key)}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={[styles.presetBtnText, active && styles.presetBtnTextActive]}>
+                          {opt.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                {targetYieldMode === 'custom' && (
+                  <View style={styles.customYieldRow}>
+                    <Text style={styles.customYieldLabel}>목표 연 수익률 (%)</Text>
+                    <TextInput
+                      style={styles.customYieldInput}
+                      value={customYieldInput}
+                      onChangeText={setCustomYieldInput}
+                      keyboardType="decimal-pad"
+                      placeholder="예: 7.5"
+                      placeholderTextColor="#94a3b8"
+                      maxLength={5}
+                    />
+                  </View>
+                )}
+
+                {/* 보증금 · 월세 입력 행 (만원 단위, 자유 수정 가능) */}
+                <View style={styles.rentInputsRow}>
+                  <View style={styles.rentInputBox}>
+                    <Text style={styles.rentInputLabel}>임대 보증금 (만원)</Text>
+                    <TextInput
+                      style={styles.rentInputField}
+                      value={depositManInput}
+                      onChangeText={setDepositManInput}
+                      keyboardType="numeric"
+                      placeholder="2000"
+                      placeholderTextColor="#94a3b8"
+                    />
+                  </View>
+                  <View style={styles.rentInputBox}>
+                    <Text style={styles.rentInputLabel}>예상 월세 (만원)</Text>
+                    <TextInput
+                      style={styles.rentInputField}
+                      value={monthlyRentManInput}
+                      onChangeText={setMonthlyRentManInput}
+                      keyboardType="numeric"
+                      placeholder="80"
+                      placeholderTextColor="#94a3b8"
+                    />
+                  </View>
+                </View>
+
+                {/* 역산 결과 하이라이트 */}
+                {reverseBidCalc.feasible ? (
+                  <>
+                    <View style={styles.reverseHighlightBox}>
+                      <View style={styles.reverseHighlightCol}>
+                        <Text style={styles.reverseHighlightLabel}>최대 입찰 상한가</Text>
+                        <Text style={styles.reverseHighlightVal}>
+                          {formatKrw(reverseBidCalc.maxBid)}
+                        </Text>
+                        {reverseBidCalc.ratioOfAppraisal > 0 && (
+                          <Text style={styles.reverseHighlightSub}>
+                            감정가 대비 {reverseBidCalc.ratioOfAppraisal}%
+                          </Text>
+                        )}
+                      </View>
+                      <View style={styles.reverseHighlightDivider} />
+                      <View style={styles.reverseHighlightCol}>
+                        <Text style={styles.reverseHighlightLabel}>필요 자기자본 (실투자금)</Text>
+                        <Text style={styles.reverseHighlightCash}>
+                          {formatKrw(reverseBidCalc.netInvestCash)}
+                        </Text>
+                        <Text style={styles.reverseHighlightSub}>임대보증금 회수 반영</Text>
+                      </View>
+                    </View>
+
+                    <View
+                      style={[
+                        styles.reverseCompareBanner,
+                        reverseBidCalc.diffVsMinBid >= 0
+                          ? styles.reverseCompareOk
+                          : styles.reverseCompareWarn,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.reverseCompareText,
+                          reverseBidCalc.diffVsMinBid >= 0
+                            ? styles.reverseCompareTextOk
+                            : styles.reverseCompareTextWarn,
+                        ]}
+                      >
+                        {reverseBidCalc.diffVsMinBid >= 0
+                          ? `✅ 현재 최저가(${item.min_bid_str}) 대비 +${formatKrw(
+                              reverseBidCalc.diffVsMinBid
+                            )} 입찰 여유가 있습니다.`
+                          : `⚠️ 현재 최저가(${item.min_bid_str})보다 ${formatKrw(
+                              Math.abs(reverseBidCalc.diffVsMinBid)
+                            )} 낮습니다. 추가 유찰 대기 또는 임대 조건 재검토를 권장합니다.`}
+                      </Text>
+                    </View>
+
+                    <View style={styles.calcRows}>
+                      <View style={styles.calcRow}>
+                        <Text style={styles.calcKey}>
+                          상한가 기준 예상 대출 ({equityCalc.ltvPct}% · 방공제 반영)
+                        </Text>
+                        <Text style={styles.calcValBlue}>{formatKrw(reverseBidCalc.loan)}</Text>
+                      </View>
+                      <View style={styles.calcRow}>
+                        <Text style={styles.calcKey}>취득세·등기·명도 부대비용</Text>
+                        <Text style={styles.calcVal}>{formatKrw(reverseBidCalc.extraCost)}</Text>
+                      </View>
+                      <View style={styles.calcRow}>
+                        <Text style={styles.calcKey}>연 대출이자 (연 4.5% 가정)</Text>
+                        <Text style={styles.calcValRed}>
+                          - {formatKrw(reverseBidCalc.annualInterest)}/년
+                        </Text>
+                      </View>
+                      <View style={[styles.calcRow, styles.calcRowLast]}>
+                        <Text style={styles.calcKey}>연 순수익 (이자 차감 후)</Text>
+                        <Text style={styles.calcValGreen}>
+                          {formatKrw(reverseBidCalc.netAnnualIncome)}/년 (월 약{' '}
+                          {formatKrw(Math.round(reverseBidCalc.netAnnualIncome / 12))})
+                        </Text>
+                      </View>
+                    </View>
+                  </>
+                ) : (
+                  <View style={styles.noRentalBox}>
+                    <Text style={styles.noRentalTitle}>
+                      목표 연 {reverseBidCalc.targetYieldPct}% 달성 상한가 산출 불가
+                    </Text>
+                    <Text style={styles.noRentalDesc}>
+                      입력된 월세 대비 대출이자·인수 보증금 부담이 커서 목표 수익률을 충족하기 어렵습니다. 예상 월세·보증금 또는 목표 수익률을 조정해 보세요.
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+
             {/* 4. 인근 전월세 시세 & 예상 수익률 */}
             <View style={styles.card}>
               <View style={styles.cardHeader}>
@@ -919,6 +1105,44 @@ export default function DetailScreen() {
                   <Text style={styles.noRentalDesc}>
                     현재 DB(네이버 부동산·현황조사서)에 이 물건과 동일 용도·유사 평형의 검증된 임대 표본이 부족해 수익률을 억지로 추정하지 않았습니다. 입찰 전 인근 부동산 시세를 직접 확인해 주세요.
                   </Text>
+                </View>
+              )}
+            </View>
+              </View>
+
+              {/* 5단계: 초대 코드 그라데이션 블러 잠금 오버레이 */}
+              {isPremiumLocked && (
+                <View
+                  style={[
+                    styles.blurVeilOverlay,
+                    Platform.OS === 'web'
+                      ? ({
+                          backgroundImage:
+                            'linear-gradient(to bottom, rgba(248,250,252,0.08) 0%, rgba(248,250,252,0.78) 32%, rgba(248,250,252,0.96) 62%, #f8fafc 100%)',
+                          backdropFilter: 'blur(6px)',
+                          WebkitBackdropFilter: 'blur(6px)',
+                        } as any)
+                      : styles.blurVeilNativeFallback,
+                  ]}
+                >
+                  <View style={styles.lockCardBox}>
+                    <Text style={styles.lockCardTitle}>
+                      필요 현금 · 적정 입찰가 역산 · 예상 수익률
+                    </Text>
+                    <Text style={styles.lockCardSub}>
+                      초대 코드를 한 번만 입력하면 모든 매물이 영구 해제됩니다
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.unlockCtaBtn}
+                      activeOpacity={0.85}
+                      onPress={() => {
+                        setInviteError('');
+                        setInviteModalVisible(true);
+                      }}
+                    >
+                      <Text style={styles.unlockCtaBtnText}>🔓 초대 코드 입력하고 전체 보기</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               )}
             </View>
@@ -1438,6 +1662,62 @@ export default function DetailScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* 5단계: 초대 코드 입력 모달 (EASYBID2026, 대소문자 무시 · 영구 저장) */}
+      <Modal
+        visible={inviteModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setInviteModalVisible(false)}
+      >
+        <Pressable
+          style={styles.inviteBackdrop}
+          onPress={() => setInviteModalVisible(false)}
+        >
+          <Pressable style={styles.inviteModalCard} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.inviteHeaderRow}>
+              <Text style={styles.inviteModalTitle}>🔓 초대 코드 입력</Text>
+              <TouchableOpacity
+                style={styles.inviteCloseBtn}
+                onPress={() => setInviteModalVisible(false)}
+                accessibilityLabel="닫기"
+              >
+                <Text style={styles.inviteCloseText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.inviteModalDesc}>
+              이지경매 베타 초대 코드를 1회 입력하시면 모든 매물의 필요 현금·목표 수익률 역산·예상 수익률이 영구 해제됩니다.
+            </Text>
+            <TextInput
+              style={styles.inviteInput}
+              value={inviteCodeInput}
+              onChangeText={(t) => {
+                setInviteCodeInput(t);
+                if (inviteError) setInviteError('');
+              }}
+              placeholder="초대 코드 입력"
+              placeholderTextColor="#94a3b8"
+              autoCapitalize="characters"
+              autoCorrect={false}
+              returnKeyType="done"
+              onSubmitEditing={handleSubmitInviteCode}
+            />
+            {inviteError ? (
+              <Text style={styles.inviteErrorText}>{inviteError}</Text>
+            ) : undefined}
+            <TouchableOpacity
+              style={styles.inviteSubmitBtn}
+              activeOpacity={0.85}
+              onPress={handleSubmitInviteCode}
+            >
+              <Text style={styles.inviteSubmitBtnText}>전체 잠금 해제하기</Text>
+            </TouchableOpacity>
+            <Text style={styles.inviteHintText}>
+              ※ 오늘의 추천 상위 2건은 초대 코드 없이도 무료 맛보기로 전체 공개됩니다.
+            </Text>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -2655,5 +2935,298 @@ const styles = StyleSheet.create({
   },
   favActionTextActive: {
     color: '#334155',
+  },
+
+  // ── 5단계: 무료 맛보기 배너 · 그라데이션 블러 잠금 · 초대 코드 모달 ──
+  freePreviewBanner: {
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  freePreviewBannerText: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: '#047857',
+    textAlign: 'center',
+  },
+  lockedSectionWrap: {
+    position: 'relative',
+    maxHeight: 280,
+    overflow: 'hidden',
+    borderRadius: 20,
+  },
+  blurVeilOverlay: {
+    position: 'absolute',
+    top: 68,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingBottom: 18,
+    zIndex: 20,
+  },
+  blurVeilNativeFallback: {
+    backgroundColor: 'rgba(248, 250, 252, 0.92)',
+  },
+  lockCardBox: {
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.96)',
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    alignItems: 'center',
+    gap: 8,
+    shadowColor: '#0f172a',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 14,
+    elevation: 6,
+  },
+  lockCardTitle: {
+    fontSize: 14.5,
+    fontWeight: '900',
+    color: '#0f172a',
+    textAlign: 'center',
+  },
+  lockCardSub: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#64748b',
+    textAlign: 'center',
+  },
+  unlockCtaBtn: {
+    marginTop: 4,
+    backgroundColor: '#1C1917',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 999,
+    width: '100%',
+    alignItems: 'center',
+  },
+  unlockCtaBtnText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#ffffff',
+  },
+  inviteBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.55)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  inviteModalCard: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    padding: 22,
+    gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 24,
+    elevation: 10,
+  },
+  inviteHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  inviteModalTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#0f172a',
+  },
+  inviteCloseBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inviteCloseText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#475569',
+  },
+  inviteModalDesc: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#475569',
+  },
+  inviteInput: {
+    borderWidth: 1.5,
+    borderColor: '#cbd5e1',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#0f172a',
+    backgroundColor: '#f8fafc',
+    letterSpacing: 1,
+  },
+  inviteErrorText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: '#dc2626',
+  },
+  inviteSubmitBtn: {
+    backgroundColor: '#1C1917',
+    borderRadius: 14,
+    paddingVertical: 13,
+    alignItems: 'center',
+  },
+  inviteSubmitBtnText: {
+    fontSize: 14.5,
+    fontWeight: '800',
+    color: '#ffffff',
+  },
+  inviteHintText: {
+    fontSize: 11.5,
+    color: '#64748b',
+    textAlign: 'center',
+  },
+
+  // ── 5단계: 목표 수익률별 적정 입찰 상한가 역산 계산기 ──
+  targetYieldPill: {
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  targetYieldPillText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#1D4ED8',
+  },
+  customYieldRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    marginTop: 8,
+  },
+  customYieldLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#334155',
+  },
+  customYieldInput: {
+    width: 90,
+    textAlign: 'right',
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#0f172a',
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  rentInputsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+  },
+  rentInputBox: {
+    flex: 1,
+    gap: 4,
+  },
+  rentInputLabel: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#64748b',
+  },
+  rentInputField: {
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 10,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#0f172a',
+  },
+  reverseHighlightBox: {
+    flexDirection: 'row',
+    backgroundColor: '#0f172a',
+    borderRadius: 16,
+    padding: 14,
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  reverseHighlightCol: {
+    flex: 1,
+    gap: 3,
+  },
+  reverseHighlightDivider: {
+    width: 1,
+    height: 44,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    marginHorizontal: 12,
+  },
+  reverseHighlightLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#cbd5e1',
+  },
+  reverseHighlightVal: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#ffffff',
+  },
+  reverseHighlightCash: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#38bdf8',
+  },
+  reverseHighlightSub: {
+    fontSize: 11,
+    color: '#94a3b8',
+    fontWeight: '600',
+  },
+  reverseCompareBanner: {
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    marginTop: 10,
+    borderWidth: 1,
+  },
+  reverseCompareOk: {
+    backgroundColor: '#ECFDF5',
+    borderColor: '#A7F3D0',
+  },
+  reverseCompareWarn: {
+    backgroundColor: '#FEF3C7',
+    borderColor: '#FDE68A',
+  },
+  reverseCompareText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    lineHeight: 18,
+  },
+  reverseCompareTextOk: {
+    color: '#065F46',
+  },
+  reverseCompareTextWarn: {
+    color: '#92400E',
   },
 });
