@@ -35,28 +35,42 @@ DB_FILE_PATH = "auction_db.sqlite"
 # 법원경매 사이트 용도별 코드 (상가/오피스텔 등). 빈 문자열이면 전체 용도.
 BUILDING_TYPE_CODE = ""  # 0205: 오피스텔, 0203: 상가, "": 전체 용도
 
-# 지역별 법원 목록 {법원명: B-코드}
+# 지역별 법원 목록 {법원명: 대법원 공식 B-코드 (selectCortOfcLst.on 검증 완료)}
 SEOUL_COURTS = {
     "서울중앙지방법원": "B000210",
-    "서울동부지방법원": "B000220",
-    "서울남부지방법원": "B000230",
-    "서울북부지방법원": "B000240",
-    "서울서부지방법원": "B000250",
+    "서울동부지방법원": "B000211",
+    "서울남부지방법원": "B000212",
+    "서울북부지방법원": "B000213",
+    "서울서부지방법원": "B000215",
 }
 GYEONGGI_COURTS = {
-    "수원지방법원": "",
-    "성남지원": "",
-    "여주지원": "",
-    "평택지원": "",
-    "안산지원": "",
-    "안양지원": "",
-    "의정부지방법원": "",
-    "고양지원": "",
-    "남양주지원": "",
+    "수원지방법원": "B000250",
+    "성남지원": "B000251",
+    "여주지원": "B000252",
+    "평택지원": "B000253",
+    "안산지원": "B250826",
+    "안양지원": "B000254",
+    "의정부지방법원": "B000214",
+    "고양지원": "B214807",
+    "남양주지원": "B214804",
 }
 INCHEON_COURTS = {
-    "인천지방법원": "",
-    "부천지원": "",
+    "인천지방법원": "B000240",
+    "부천지원": "B000241",
+}
+
+# 대법원 신버전(PGJ151F00) searchControllerMain.on 3단 물건종류 공식 코드 매핑
+# [(lclDspslGdsLstUsgCd, mclDspslGdsLstUsgCd, sclDspslGdsLstUsgCd), ...]
+PROPERTY_TYPE_API_MAP = {
+    "0201": [("20000", "20100", "20104")],  # 아파트
+    "0205": [("20000", "20100", "20110")],  # 오피스텔
+    "0204": [
+        ("20000", "20100", "20106"),        # 다세대주택
+        ("20000", "20100", "20108"),        # 빌라
+        ("20000", "20100", "20105"),        # 연립주택
+    ],
+    "0203": [("20000", "21100", "")],       # 상업용및업무용 전체 (근린생활시설·판매·업무)
+    "": [("", "", "")],                     # 전체 용도
 }
 
 console = Console()
@@ -1025,477 +1039,560 @@ class AuctionCrawler:
                 except Exception:
                     pass
 
-                console.print("[dim]👉 우측 민트색 퀵 단축 메뉴 '물건상세검색' 타겟팅 전환 및 실행...[/dim]")
-                
-                quick_search_locator = page.locator("a.btn_adv, a[title*='물건상세검색']").first
-                await quick_search_locator.wait_for(timeout=15000)
-                
-                box = await quick_search_locator.bounding_box()
-                if box:
-                    await page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+                # ── Phase 1 (고속·정밀): 대법원 공식 searchControllerMain.on JSON API 직접 페이징 수집 ──
+                # 구버전 DOM(input[value='0201'] / sbx_pageSize / pgl_gdsDtlSrchPage) 셀렉터 불일치로
+                # 종류 필터가 무시되고 1페이지 5~8건에서 멈추던 문제를 원천 해결한다.
+                all_court_code_map = {**SEOUL_COURTS, **GYEONGGI_COURTS, **INCHEON_COURTS}
+                resolved_cort_code = (court_code or all_court_code_map.get(region, "")).strip()
+                basic_items: list = []
+                cort_ofc_cd = resolved_cort_code
+                captured_xhr_headers: dict = {
+                    "referer": "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml",
+                    "accept": "application/json",
+                }
+                SEOUL_COURT_CODES: list = list(all_court_code_map.values())
+                api_phase1_ok = False
+
+                if resolved_cort_code:
+                    usage_tuples = PROPERTY_TYPE_API_MAP.get(BUILDING_TYPE_CODE, [("", "", "")])
+                    console.print(
+                        f"[bold green]⚡ 공식 검색 API(searchControllerMain.on) 직결 수집 시작 "
+                        f"({region}/{resolved_cort_code}, 종류={BUILDING_TYPE_CODE or '전체'}, 목표 최대 {max_items}건)[/bold green]"
+                    )
+                    seen_case_set: set = set()
+                    for lcl_cd, mcl_cd, scl_cd in usage_tuples:
+                        if len(basic_items) >= max_items:
+                            break
+                        page_no = 1
+                        total_cnt = None
+                        while len(basic_items) < max_items:
+                            api_res = await page.evaluate(
+                                """async ([cortCd, lclCd, mclCd, sclCd, pageNo, pageSize]) => {
+                                    try {
+                                        const r = await fetch('/pgj/pgjsearch/searchControllerMain.on', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json;charset=UTF-8',
+                                                'Accept': 'application/json'
+                                            },
+                                            credentials: 'include',
+                                            body: JSON.stringify({
+                                                dma_pageInfo: {
+                                                    pageNo: pageNo,
+                                                    pageSize: pageSize,
+                                                    bfPageNo: '',
+                                                    startRowNo: '',
+                                                    totalCnt: '',
+                                                    totalYn: 'Y',
+                                                    groupTotalCount: ''
+                                                },
+                                                dma_srchGdsDtlSrchInfo: {
+                                                    rletDspslSpcCondCd: '',
+                                                    bidDvsCd: '000331',
+                                                    mvprpRletDvsCd: '00031R',
+                                                    cortAuctnSrchCondCd: '0004601',
+                                                    rprsAdongSdCd: '', rprsAdongSggCd: '', rprsAdongEmdCd: '',
+                                                    rdnmSdCd: '', rdnmSggCd: '', rdnmNo: '',
+                                                    mvprpDspslPlcAdongSdCd: '', mvprpDspslPlcAdongSggCd: '', mvprpDspslPlcAdongEmdCd: '',
+                                                    rdDspslPlcAdongSdCd: '', rdDspslPlcAdongSggCd: '', rdDspslPlcAdongEmdCd: '',
+                                                    cortOfcCd: cortCd,
+                                                    jdbnCd: '', execrOfcDvsCd: '',
+                                                    lclDspslGdsLstUsgCd: lclCd,
+                                                    mclDspslGdsLstUsgCd: mclCd,
+                                                    sclDspslGdsLstUsgCd: sclCd,
+                                                    cortAuctnMbrsId: '',
+                                                    aeeEvlAmtMin: '', aeeEvlAmtMax: '',
+                                                    lwsDspslPrcRateMin: '', lwsDspslPrcRateMax: '',
+                                                    flbdNcntMin: '', flbdNcntMax: '',
+                                                    objctArDtsMin: '', objctArDtsMax: '',
+                                                    mvprpArtclKndCd: '', mvprpArtclNm: '', mvprpAtchmPlcTypCd: '',
+                                                    notifyLoc: 'off', lafjOrderBy: '', pgmId: 'PGJ151F01',
+                                                    csNo: '', cortStDvs: '1', statNum: 1,
+                                                    bidBgngYmd: '', bidEndYmd: '', dspslDxdyYmd: '',
+                                                    fstPbancLwsDspslPrcMin: '', fstPbancLwsDspslPrcMax: ''
+                                                }
+                                            })
+                                        });
+                                        if (!r.ok) return { error: r.status };
+                                        return await r.json();
+                                    } catch (e) {
+                                        return { error: String(e) };
+                                    }
+                                }""",
+                                [resolved_cort_code, lcl_cd, mcl_cd, scl_cd, page_no, 40],
+                            )
+                            if not api_res or api_res.get("error"):
+                                console.print(f"[dim yellow]⚠️ 검색 API 오류(page {page_no}): {api_res}[/dim yellow]")
+                                break
+                            sdata = api_res.get("data") or {}
+                            pinfo = sdata.get("dma_pageInfo") or {}
+                            rows_api = sdata.get("dlt_srchResult") or []
+                            if total_cnt is None:
+                                try:
+                                    total_cnt = int(pinfo.get("totalCnt") or 0)
+                                except Exception:
+                                    total_cnt = len(rows_api)
+                                console.print(
+                                    f"[dim]📊 API 조회 (scl={scl_cd or mcl_cd or '전체'}): 전체 {total_cnt}건 확인[/dim]"
+                                )
+                            api_phase1_ok = True
+                            if not rows_api:
+                                break
+                            added_this_page = 0
+                            for row_idx_i, r_obj in enumerate(rows_api):
+                                if len(basic_items) >= max_items:
+                                    break
+                                case_no = (r_obj.get("srnSaNo") or "").strip()
+                                if not case_no or case_no in seen_case_set:
+                                    continue
+                                seen_case_set.add(case_no)
+                                loc_s = (r_obj.get("printSt") or r_obj.get("convAddr") or "").strip() or "소재지 정보 없음"
+                                raw_usg = (r_obj.get("dspslUsgNm") or "").strip()
+                                flr_p = _extract_floor_from_location(loc_s)
+                                # 공식 용도명 정규화
+                                if raw_usg in ("다세대", "다세대주택", "연립주택", "빌라"):
+                                    usg_norm = "다세대/빌라"
+                                elif raw_usg in ("근린생활시설", "근린시설", "판매시설", "상가", "업무시설", "점포"):
+                                    usg_norm = "상가/근린시설"
+                                elif raw_usg:
+                                    usg_norm = _infer_usage(loc_s, raw_usg, flr_p)
+                                else:
+                                    usg_norm = _infer_usage(loc_s, "", flr_p)
+                                try:
+                                    app_v = int(float(r_obj.get("gamevalAmt") or 0))
+                                except Exception:
+                                    app_v = 0
+                                try:
+                                    min_v = int(float(r_obj.get("notifyMinmaePrice1") or r_obj.get("minmaePrice") or 0))
+                                except Exception:
+                                    min_v = 0
+                                try:
+                                    fc_v = int(r_obj.get("yuchalCnt") or 0)
+                                except Exception:
+                                    fc_v = 0
+                                mae_giil = str(r_obj.get("maeGiil") or "").strip()
+                                try:
+                                    lat_api = float(r_obj.get("wgs84Ycordi") or 0) or None
+                                    lng_api = float(r_obj.get("wgs84Xcordi") or 0) or None
+                                except Exception:
+                                    lat_api, lng_api = None, None
+                                basic_items.append({
+                                    "case_number": case_no,
+                                    "location": loc_s,
+                                    "usage": usg_norm,
+                                    "appraisal": app_v,
+                                    "min_bid": min_v,
+                                    "failed_count": fc_v,
+                                    "auction_date": mae_giil,
+                                    "lat": lat_api,
+                                    "lng": lng_api,
+                                    "bo_cd": (r_obj.get("boCd") or resolved_cort_code).strip(),
+                                    "maemul_ser": str(r_obj.get("maemulSer") or "1").strip(),
+                                    "row_id": (page_no, row_idx_i),
+                                })
+                                added_this_page += 1
+                            console.print(
+                                f"[dim]📄 API 페이지 {page_no} 수집 완료 (+{added_this_page}건 · 누적 {len(basic_items)}/{min(max_items, total_cnt or max_items)}건)[/dim]"
+                            )
+                            if len(rows_api) < 40 or (total_cnt and page_no * 40 >= total_cnt):
+                                break
+                            page_no += 1
+                            await asyncio.sleep(random.uniform(0.5, 1.0))
+
+                if api_phase1_ok:
+                    console.print(f"[bold green]🗂 Phase 1(API) 완료: {len(basic_items)}개 사건번호 수집 (cortOfcCd={cort_ofc_cd})[/bold green]")
+                    if not basic_items:
+                        console.print("[yellow]ℹ️ 해당 법원·종류 조건에 진행 중인 매물이 없습니다.[/yellow]")
+                        await browser.close()
+                        return []
                 else:
-                    await quick_search_locator.click()
+                    console.print("[dim]👉 우측 민트색 퀵 단축 메뉴 '물건상세검색' 타겟팅 전환 및 실행 (DOM 폴백)...[/dim]")
                 
-                await page.wait_for_timeout(6000)
+                if not api_phase1_ok:
+                    quick_search_locator = page.locator("a.btn_adv, a[title*='물건상세검색']").first
+                    await quick_search_locator.wait_for(timeout=15000)
+                
+                    box = await quick_search_locator.bounding_box()
+                    if box:
+                        await page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+                    else:
+                        await quick_search_locator.click()
+                
+                    await page.wait_for_timeout(6000)
 
-                console.print("[dim]👉 메인 작업 프레임(iframe) 스캔 및 구조 조율 중...[/dim]")
+                    console.print("[dim]👉 메인 작업 프레임(iframe) 스캔 및 구조 조율 중...[/dim]")
                 
-                frame = None
-                target_select_id = None
+                    frame = None
+                    target_select_id = None
                 
-                for attempt in range(60):
-                    all_frames = page.frames
-                    if attempt == 0 or attempt % 15 == 0:
-                        console.print(f"[dim]🔍 발견된 활성 iframe 수: {len(all_frames)}개[/dim]")
+                    for attempt in range(60):
+                        all_frames = page.frames
+                        if attempt == 0 or attempt % 15 == 0:
+                            console.print(f"[dim]🔍 발견된 활성 iframe 수: {len(all_frames)}개[/dim]")
                                 
-                    for f in all_frames:
-                        if "PGJ151" in f.url or "pgj" in f.url or "index.on" in f.url:
-                            frame = f
+                        for f in all_frames:
+                            if "PGJ151" in f.url or "pgj" in f.url or "index.on" in f.url:
+                                frame = f
+                                break
+                        if frame:
                             break
-                    if frame:
-                        break
-                    await asyncio.sleep(0.5)
+                        await asyncio.sleep(0.5)
 
-                if not frame and len(page.frames) > 0:
-                    for f in page.frames:
-                        if f.parent_frame is not None:
-                            frame = f
-                            break
+                    if not frame and len(page.frames) > 0:
+                        for f in page.frames:
+                            if f.parent_frame is not None:
+                                frame = f
+                                break
 
-                if not frame:
-                    body_content = await page.content()
-                    body_len = len(body_content) if body_content else 0
-                    console.print(f"[bold red]❌ 크롤러 렌더링 분석 결과: 확보한 HTML 길이 ({body_len} 자)[/bold red]")
-                    raise Exception("상세검색 폼 요소가 존재하는 메인 작업 iframe을 확보할 수 없습니다.")
+                    if not frame:
+                        body_content = await page.content()
+                        body_len = len(body_content) if body_content else 0
+                        console.print(f"[bold red]❌ 크롤러 렌더링 분석 결과: 확보한 HTML 길이 ({body_len} 자)[/bold red]")
+                        raise Exception("상세검색 폼 요소가 존재하는 메인 작업 iframe을 확보할 수 없습니다.")
 
-                console.print(f"[bold green]✅ 프레임 핀포인트 다이렉트 직결 성공 ({frame.url}).[/bold green]")
+                    console.print(f"[bold green]✅ 프레임 핀포인트 다이렉트 직결 성공 ({frame.url}).[/bold green]")
 
-                await frame.wait_for_load_state("load", timeout=15000)
-                await page.wait_for_timeout(2000)
+                    await frame.wait_for_load_state("load", timeout=15000)
+                    await page.wait_for_timeout(2000)
 
-                try:
-                    radio_btn = await frame.query_selector("input[value='L']")
-                    if not radio_btn:
-                        radio_btn = await frame.query_selector("label:has-text('법원/담당계')")
-                    if radio_btn:
-                        await radio_btn.click()
-                        await page.wait_for_timeout(1000)
-                except Exception as ex:
-                    console.print(f"[dim]ℹ️ 라디오 버튼 클릭 건너뜀 또는 에러: {ex}[/dim]")
-
-                for select_id in ["#mf_wfm_mainFrame_sbx_rletCortOfc", "#sbAuctnCd", "#sbBeobwon", "#idAuctnCd", "#idDoCode", "#idSrchDo"]:
-                    el = await frame.query_selector(select_id)
-                    if el:
-                        target_select_id = select_id
-                        break
-
-                if not target_select_id:
-                    el = await frame.query_selector("select[id*='CortOfc'], select[id*='Auctn'], select[id*='Beobwon'], select")
-                    if el:
-                        id_attr = await el.get_attribute("id")
-                        target_select_id = f"#{id_attr}" if id_attr else "select"
-
-                if not target_select_id:
-                    raise Exception("법원 선택상자 드롭다운 요소를 프레임 내에서 발견하지 못했습니다.")
-
-                console.print(f"[bold green]🎯 타겟 선택상자 ID 확보 성공: {target_select_id}[/bold green]")
-                console.print("[dim]👉 [우회 특허] WebSquare 컴포넌트 강제 갱신 주입 중...[/dim]")
-                
-                # 법원명으로 드롭다운 인덱스를 찾고 setSelectedIndex로 선택
-                js_select_websquare = f"""
-                (args) => {{
-                    const [region_name, select_id] = args;
-                    try {{
-                        const cleanId = select_id.replace('#', '');
-                        const doSelect = document.querySelector(select_id);
-                        if (!doSelect || doSelect.options.length < 2) return false;
-
-                        let targetIndex = -1;
-                        for (let i = 0; i < doSelect.options.length; i++) {{
-                            if (doSelect.options[i].text.includes(region_name) ||
-                                doSelect.options[i].value.includes(region_name)) {{
-                                targetIndex = i;
-                                break;
-                            }}
-                        }}
-                        if (targetIndex < 0) return false;
-
-                        if (window.WebSquare && window.WebSquare.util) {{
-                            const comp = window.WebSquare.util.getComponentById(cleanId);
-                            if (comp && comp.setSelectedIndex) {{
-                                comp.setSelectedIndex(targetIndex);
-                                comp.trigger("onchange");
-                                return true;
-                            }}
-                        }}
-                        // DOM 폴백
-                        doSelect.selectedIndex = targetIndex;
-                        doSelect.dispatchEvent(new Event('change', {{ bubbles: true }}));
-                        return true;
-                    }} catch (e) {{
-                        console.error(e);
-                    }}
-                    return false;
-                }}
-                """
-
-                success = False
-                for _ in range(30):
-                    success = await frame.evaluate(js_select_websquare, [region, target_select_id])
-                    if success:
-                        break
-                    await asyncio.sleep(0.5)
-
-                if not success:
                     try:
-                        eval_script = f"""
-                        () => {{
+                        radio_btn = await frame.query_selector("input[value='L']")
+                        if not radio_btn:
+                            radio_btn = await frame.query_selector("label:has-text('법원/담당계')")
+                        if radio_btn:
+                            await radio_btn.click()
+                            await page.wait_for_timeout(1000)
+                    except Exception as ex:
+                        console.print(f"[dim]ℹ️ 라디오 버튼 클릭 건너뜀 또는 에러: {ex}[/dim]")
+
+                    for select_id in ["#mf_wfm_mainFrame_sbx_rletCortOfc", "#sbAuctnCd", "#sbBeobwon", "#idAuctnCd", "#idDoCode", "#idSrchDo"]:
+                        el = await frame.query_selector(select_id)
+                        if el:
+                            target_select_id = select_id
+                            break
+
+                    if not target_select_id:
+                        el = await frame.query_selector("select[id*='CortOfc'], select[id*='Auctn'], select[id*='Beobwon'], select")
+                        if el:
+                            id_attr = await el.get_attribute("id")
+                            target_select_id = f"#{id_attr}" if id_attr else "select"
+
+                    if not target_select_id:
+                        raise Exception("법원 선택상자 드롭다운 요소를 프레임 내에서 발견하지 못했습니다.")
+
+                    console.print(f"[bold green]🎯 타겟 선택상자 ID 확보 성공: {target_select_id}[/bold green]")
+                    console.print("[dim]👉 [우회 특허] WebSquare 컴포넌트 강제 갱신 주입 중...[/dim]")
+                
+                    # 법원명으로 드롭다운 인덱스를 찾고 setSelectedIndex로 선택
+                    js_select_websquare = f"""
+                    (args) => {{
+                        const [region_name, select_id] = args;
+                        try {{
+                            const cleanId = select_id.replace('#', '');
+                            const doSelect = document.querySelector(select_id);
+                            if (!doSelect || doSelect.options.length < 2) return false;
+
+                            let targetIndex = -1;
+                            for (let i = 0; i < doSelect.options.length; i++) {{
+                                if (doSelect.options[i].text.includes(region_name) ||
+                                    doSelect.options[i].value.includes(region_name)) {{
+                                    targetIndex = i;
+                                    break;
+                                }}
+                            }}
+                            if (targetIndex < 0) return false;
+
                             if (window.WebSquare && window.WebSquare.util) {{
-                                const cleanId = '{target_select_id.replace("#", "")}';
                                 const comp = window.WebSquare.util.getComponentById(cleanId);
-                                if (comp) {{
-                                    comp.setSelectedIndex(1);
+                                if (comp && comp.setSelectedIndex) {{
+                                    comp.setSelectedIndex(targetIndex);
                                     comp.trigger("onchange");
                                     return true;
                                 }}
                             }}
-                            return false;
+                            // DOM 폴백
+                            doSelect.selectedIndex = targetIndex;
+                            doSelect.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                            return true;
+                        }} catch (e) {{
+                            console.error(e);
                         }}
-                        """
-                        success = await frame.evaluate(eval_script)
-                    except Exception:
-                        pass
+                        return false;
+                    }}
+                    """
 
-                if not success:
-                    raise Exception(f"WebSquare 컴포넌트 우회 인젝션 방식으로도 선택 박스({target_select_id})를 활성화할 수 없습니다.")
+                    success = False
+                    for _ in range(30):
+                        success = await frame.evaluate(js_select_websquare, [region, target_select_id])
+                        if success:
+                            break
+                        await asyncio.sleep(0.5)
 
-                # 법원 드롭다운에서 B-format 코드 수집 (WebSquare 내부 itemset 우선, 실패 시 하드코딩)
-                SEOUL_COURT_CODES: list = []
-                try:
-                    clean_id = target_select_id.replace('#', '')
-                    SEOUL_COURT_CODES = await frame.evaluate(f"""
-                    () => {{
-                        const cleanId = '{clean_id}';
-                        if (window.WebSquare && window.WebSquare.util) {{
-                            const comp = window.WebSquare.util.getComponentById(cleanId);
-                            if (comp && typeof comp.getItemset === 'function') {{
-                                const items = comp.getItemset();
-                                if (items && items.length) {{
-                                    const codes = items.map(item => item.code || item.value || item.id || item.key)
-                                                       .filter(v => v && typeof v === 'string' && v.startsWith('B'));
-                                    if (codes.length) return codes;
+                    if not success:
+                        try:
+                            eval_script = f"""
+                            () => {{
+                                if (window.WebSquare && window.WebSquare.util) {{
+                                    const cleanId = '{target_select_id.replace("#", "")}';
+                                    const comp = window.WebSquare.util.getComponentById(cleanId);
+                                    if (comp) {{
+                                        comp.setSelectedIndex(1);
+                                        comp.trigger("onchange");
+                                        return true;
+                                    }}
+                                }}
+                                return false;
+                            }}
+                            """
+                            success = await frame.evaluate(eval_script)
+                        except Exception:
+                            pass
+
+                    if not success:
+                        raise Exception(f"WebSquare 컴포넌트 우회 인젝션 방식으로도 선택 박스({target_select_id})를 활성화할 수 없습니다.")
+
+                    # 법원 드롭다운에서 B-format 코드 수집 (WebSquare 내부 itemset 우선, 실패 시 하드코딩)
+                    SEOUL_COURT_CODES: list = []
+                    try:
+                        clean_id = target_select_id.replace('#', '')
+                        SEOUL_COURT_CODES = await frame.evaluate(f"""
+                        () => {{
+                            const cleanId = '{clean_id}';
+                            if (window.WebSquare && window.WebSquare.util) {{
+                                const comp = window.WebSquare.util.getComponentById(cleanId);
+                                if (comp && typeof comp.getItemset === 'function') {{
+                                    const items = comp.getItemset();
+                                    if (items && items.length) {{
+                                        const codes = items.map(item => item.code || item.value || item.id || item.key)
+                                                           .filter(v => v && typeof v === 'string' && v.startsWith('B'));
+                                        if (codes.length) return codes;
+                                    }}
                                 }}
                             }}
+                            const sel = document.getElementById(cleanId);
+                            if (!sel) return [];
+                            return [...sel.options].map(o => o.value)
+                                                  .filter(v => v && v.length > 0);
                         }}
-                        const sel = document.getElementById(cleanId);
-                        if (!sel) return [];
-                        return [...sel.options].map(o => o.value)
-                                              .filter(v => v && v.length > 0);
-                    }}
-                    """)
-                    console.print(f"[dim]📋 법원 드롭다운 {len(SEOUL_COURT_CODES)}개 옵션 확인[/dim]")
-                except Exception:
-                    pass
-                if not SEOUL_COURT_CODES:
-                    SEOUL_COURT_CODES = ['B000220', 'B000230', 'B000240', 'B000250']
-
-                await page.wait_for_timeout(1000)
-
-                if BUILDING_TYPE_CODE:
-                    try:
-                        js_check_websquare = f"""
-                        (code) => {{
-                            try {{
-                                const chk = document.querySelector(`input[value='${{code}}']`);
-                                if (chk) {{
-                                    chk.checked = true;
-                                    chk.dispatchEvent(new Event('click', {{ bubbles: true }}));
-                                    chk.dispatchEvent(new Event('change', {{ bubbles: true }}));
-                                    return true;
-                                }}
-                            }} catch (e) {{}}
-                            return false;
-                        }}
-                        """
-                        await frame.evaluate(js_check_websquare, BUILDING_TYPE_CODE)
-                        await page.wait_for_timeout(500)
+                        """)
+                        console.print(f"[dim]📋 법원 드롭다운 {len(SEOUL_COURT_CODES)}개 옵션 확인[/dim]")
                     except Exception:
                         pass
+                    if not SEOUL_COURT_CODES:
+                        SEOUL_COURT_CODES = ['B000220', 'B000230', 'B000240', 'B000250']
+
+                    await page.wait_for_timeout(1000)
+
+                    if BUILDING_TYPE_CODE:
+                        try:
+                            js_check_websquare = f"""
+                            (code) => {{
+                                try {{
+                                    const chk = document.querySelector(`input[value='${{code}}']`);
+                                    if (chk) {{
+                                        chk.checked = true;
+                                        chk.dispatchEvent(new Event('click', {{ bubbles: true }}));
+                                        chk.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                        return true;
+                                    }}
+                                }} catch (e) {{}}
+                                return false;
+                            }}
+                            """
+                            await frame.evaluate(js_check_websquare, BUILDING_TYPE_CODE)
+                            await page.wait_for_timeout(500)
+                        except Exception:
+                            pass
                 
-                console.print("[dim]👉 [우회 특허] 검색 트리거 강제 실행 중...[/dim]")
+                    console.print("[dim]👉 [우회 특허] 검색 트리거 강제 실행 중...[/dim]")
                 
-                js_click_websquare = """
-                () => {
-                    try {
-                        const btn = document.querySelector("#mf_wfm_mainFrame_btn_search") || 
-                                    document.querySelector("#btnSrch") || 
-                                    document.querySelector("input[value='검색']") || 
-                                    document.querySelector(".btn_search, a.btn_search, button.btn_search");
-                        if (btn) {
-                            btn.click();
-                            btn.dispatchEvent(new Event('click', { bubbles: true }));
-                            return true;
-                        }
-                    } catch (e) {}
-                    return false;
-                }
-                """
-                click_success = await frame.evaluate(js_click_websquare)
-                if not click_success:
-                    search_btn = await frame.query_selector("text='검색'")
-                    if not search_btn:
-                        search_btn = await frame.query_selector("a#mf_wfm_mainFrame_btn_search")
-                    if search_btn:
-                        await search_btn.click()
-                
-                console.print("[dim]🔍 법원 서버로부터 검색 결과를 받아오는 중...[/dim]")
-                
-                try:
-                    # '인쇄하기' 텍스트는 검색 성공 시 하단 제어 바가 활성화될 때 나타납니다.
-                    await frame.wait_for_selector("text='인쇄하기'", timeout=30000)
-                    # 데이터가 DOM 트리 가상 그리드 상에 안전하게 매핑되도록 대기 보장
-                    await page.wait_for_timeout(3000)
-                    # 페이지당 표시 건수를 10건 -> 40건(최대)으로 변경하여 대량 수집 가속
-                    changed_size = await frame.evaluate("""() => {
+                    js_click_websquare = """
+                    () => {
                         try {
-                            const comp = window.WebSquare && window.WebSquare.util && window.WebSquare.util.getComponentById("mf_wfm_mainFrame_sbx_pageSize");
-                            if (comp && comp.setSelectedIndex) {
-                                comp.setSelectedIndex(3); // 40건
-                                comp.trigger("onchange");
-                                return true;
-                            }
-                            const sel = document.getElementById("mf_wfm_mainFrame_sbx_pageSize");
-                            if (sel) {
-                                sel.value = "40";
-                                sel.dispatchEvent(new Event("change", { bubbles: true }));
+                            const btn = document.querySelector("#mf_wfm_mainFrame_btn_search") || 
+                                        document.querySelector("#btnSrch") || 
+                                        document.querySelector("input[value='검색']") || 
+                                        document.querySelector(".btn_search, a.btn_search, button.btn_search");
+                            if (btn) {
+                                btn.click();
+                                btn.dispatchEvent(new Event('click', { bubbles: true }));
                                 return true;
                             }
                         } catch (e) {}
                         return false;
-                    }""")
-                    if changed_size:
-                        await page.wait_for_timeout(3500)
-                except Exception:
-                    no_data_element = await frame.query_selector("text='검색결과가 존재하지 않습니다'")
-                    if no_data_element:
-                        console.print("[yellow]ℹ️ 검색 조건에 일치하는 경매 물건이 존재하지 않습니다.[/yellow]")
-                        await browser.close()
-                        return []
-                    raise Exception("검색 결과 테이블 로딩 타임아웃")
+                    }
+                    """
+                    click_success = await frame.evaluate(js_click_websquare)
+                    if not click_success:
+                        search_btn = await frame.query_selector("text='검색'")
+                        if not search_btn:
+                            search_btn = await frame.query_selector("a#mf_wfm_mainFrame_btn_search")
+                        if search_btn:
+                            await search_btn.click()
                 
-                # ── Phase 1: 모든 페이지에서 기본 정보 스캔 (DOM만, moveDtlPage 사용 안 함) ──
-                # moveDtlPage 없이 페이지 이동이 자유롭다.
-                def _infer_usage(loc: str, cur_usage: str = "", flr: int = 0) -> str:
-                    if cur_usage and cur_usage.strip() not in ("", "기타") and not cur_usage.strip().isdigit():
-                        return cur_usage.strip()
-                    loc_s = loc or ""
-                    loc_lower = loc_s.lower()
-                    if not flr:
-                        flr = _extract_floor_from_location(loc_s)
-                    if any(k in loc_s for k in ["Mercedes-Benz", "BMW", "차대번호", "차종 :", "연식 :"]):
-                        return "차량/기타"
-
-                    # 0-a. 순수 토지 판별 (층/호/동 없는 지번 — '삼성당리' 등 행정지명 오탐 방지)
-                    has_unit = bool(re.search(r"(?:층|호|동\s+\d)", loc_s))
-                    if loc_s and not has_unit and not any(k in loc_s for k in ["아파트", "빌라", "오피스텔", "상가", "주택", "타워", "프라자"]):
-                        if "임야" in loc_s or re.search(r"\b산\s*\d+", loc_s) or re.search(r"\d+(-\d+)?$", loc_s.strip()):
-                            return "토지/대지"
-
-                    # 0. 특수 복지/노유자 시설
-                    if any(k in loc_s or k in cur_usage for k in ["노유자", "복지시설", "요양시설", "사회복지", "어린이집", "유치원", "노인복지", "피더하우스"]):
-                        return "노유자복지시설"
-
-                    # 1. 단지내 상가 / 상가동 / 대형 상업시설 / 1층 대형 호수·구획 상가 호수
-                    comm_pre_kw = [
-                        "단지내상가", "단지상가", "상가동", "제상가동", "근린상가", "지하도상가", "지하상가", "시장",
-                        "하이브랜드", "리빙관", "나인스에비뉴", "메디타워", "푸리마타워", "불로장생타워", "그랑파사쥬",
-                        "성남아리스타", "코아루센타시아",
-                    ]
-                    if any(k in loc_s for k in comm_pre_kw):
-                        return "상가/근린시설"
-
-                    has_apt_dong = bool(re.search(r"(?:제)?([1-9]\d{2,3})동", loc_s))
-                    if re.search(r"[가나다라마바사]-\d+호|제?비\d+[가나다]\d+호|\d+-\d+-\d+호", loc_s):
-                        return "상가/근린시설"
-                    if flr == 1 and not has_apt_dong:
-                        m_ho = re.search(r"(?:제)?(?:[가-힣A-Za-z]+)?(1[0-9]{2,3})호", loc_s)
-                        if m_ho and int(m_ho.group(1)) >= 106:
-                            return "상가/근린시설"
-                    if flr <= -2 and not any(k in loc_s for k in ["빌라", "다세대", "연립", "주택"]):
-                        return "상가/근린시설"
-
-                    # 2. 명확한 오피스텔 전용 브랜드 우선 검사
-                    offi_kw = ["오피스텔", "아트리움", "리버빌", "오피스", "메종", "르메이에르", "샤르망", "두산위브센티움", "효성해링턴타워", "센트럴푸르지오시티", "푸르지오시티", "자이엘라", "아이파크디어반", "더샵스타파크", "라포르테블랑"]
-                    if (any(k in loc_s for k in offi_kw) or ("스테이트" in loc_s and "힐스테이트" not in loc_s)) and not any(k in loc_s for k in ["상가", "점포"]):
-                        return "오피스텔"
-
-                    # 3. 명확한 주거용 아파트 우선 검사 (상가·빌라 오분류 방지)
-                    villa_kw = ["빌라", "다세대", "연립", "맨션", "하이츠", "빌리지", "주택", "하우스", "캐슬빌", "아트빌", "그린빌", "스카이빌", "드림빌", "청구빌", "현대빌", "삼성빌", "샤인빌", "블루빌", "스위트빌", "리즈빌", "아인스빌", "토브하우스", "하우징"]
-                    is_villa_name = any(k in loc_s for k in villa_kw)
-
-                    apt_kw = [
-                        "아파트", "단지", "마을", "한라비발디", "비발디", "센트럴파크", "푸르지오", "자이", "래미안",
-                        "힐스테이트", "아이파크", "더샵", "롯데캐슬", "이편한세상", "e편한세상", "e편한", "이편한", "이-편한",
-                        "아크로", "데시앙", "센트레빌", "위브", "해링턴", "꿈에그린", "포레나", "호반베르디움", "호반",
-                        "베르디움", "우미린", "중흥에스클래스", "반도유보라", "유보라", "한양수자인", "수자인", "화성파크드림", "파크드림",
-                        "주공", "현대", "우성", "삼성래미안", "한양", "벽산", "동아", "대림", "대우", "쌍용", "삼익", "선경",
-                        "한신", "극동", "경남", "동부", "금호", "코오롱", "신동아", "성원", "건영", "풍림", "삼환", "두산",
-                        "엘지", "청구", "미도", "진주", "시영", "그랑빌", "파크뷰", "리버파크", "트리지움", "엘스", "리센츠",
-                        "헬리오시티", "파크리오",
-                    ]
-                    apt_secondary_kw = ["센트럴", "파크", "포레", "스카이뷰"]
-                    if flr >= 0 and not is_villa_name and not any(k in loc_s for k in ["상가", "점포"]):
-                        if any(k in loc_s for k in apt_kw):
-                            return "아파트"
-                        if any(k in loc_s for k in apt_secondary_kw) and (has_apt_dong or flr >= 5):
-                            return "아파트"
-
-                    if is_villa_name and not any(k in loc_s for k in ["상가", "점포", "피더하우스", "노유자", "복지"]):
-                        return "다세대/빌라"
-
-                    # 4. 명확한 상업용 시설 검사
-                    comm_kw = ["상가", "근린", "지식산업", "프라자", "플라자", "에이스하이테크", "테크노", "비즈타워", "몰", "마켓", "스퀘어", "아케이드", "에스케이브이", "sk v1", "점포", "판매시설"]
-                    if any(k in loc_lower for k in comm_kw):
-                        return "상가/근린시설"
-
-                    # 5. 동·층 휴리스틱 (101동~ + 6층 이상 또는 7층 이상 공동주택 → 아파트)
-                    if has_apt_dong and flr >= 6 and not is_villa_name:
-                        return "아파트"
-                    if flr >= 7 and "호" in loc_s and not is_villa_name:
-                        return "아파트"
-                    if "층" in loc_s and "호" in loc_s:
-                        return "다세대/빌라"
-                    if "임야" in loc_s or re.search(r"\b산\s*\d+", loc_s) or ("층" not in loc_s and "호" not in loc_s and re.search(r"\d+(-\d+)?$", loc_s.strip())):
-                        return "토지/대지"
-                    return "기타"
-
-                basic_items: list = []
-                current_page = 1
-                row_index = 0
-                prev_count = 0
-                while len(basic_items) < max_items:
-                    current_rows = await frame.query_selector_all("tr")
-                    if row_index >= len(current_rows):
-                        # 현재 페이지에서 신규 수집된 건이 하나도 없으면 마지막 페이지 도달
-                        if current_page > 1 and len(basic_items) == prev_count:
-                            break
-                        prev_count = len(basic_items)
-                        current_page += 1
-                        moved = await frame.evaluate(f"""(targetPage) => {{
-                            try {{
-                                const pgl = window.WebSquare && window.WebSquare.util && window.WebSquare.util.getComponentById("mf_wfm_mainFrame_pgl_gdsDtlSrchPage");
-                                if (pgl && typeof pgl.setValue === "function") {{
-                                    pgl.setValue(targetPage);
-                                    if (typeof pgl.trigger === "function") {{
-                                        pgl.trigger("onchange");
-                                        pgl.trigger("onclick", targetPage);
-                                    }}
-                                }}
-                                const btn = document.getElementById("mf_wfm_mainFrame_pgl_gdsDtlSrchPage_page_" + targetPage);
-                                if (btn) {{
-                                    btn.click();
+                    console.print("[dim]🔍 법원 서버로부터 검색 결과를 받아오는 중...[/dim]")
+                
+                    try:
+                        # '인쇄하기' 텍스트는 검색 성공 시 하단 제어 바가 활성화될 때 나타납니다.
+                        await frame.wait_for_selector("text='인쇄하기'", timeout=30000)
+                        # 데이터가 DOM 트리 가상 그리드 상에 안전하게 매핑되도록 대기 보장
+                        await page.wait_for_timeout(3000)
+                        # 페이지당 표시 건수를 10건 -> 40건(최대)으로 변경하여 대량 수집 가속
+                        changed_size = await frame.evaluate("""() => {
+                            try {
+                                const comp = window.WebSquare && window.WebSquare.util && window.WebSquare.util.getComponentById("mf_wfm_mainFrame_sbx_pageSize");
+                                if (comp && comp.setSelectedIndex) {
+                                    comp.setSelectedIndex(3); // 40건
+                                    comp.trigger("onchange");
                                     return true;
-                                }}
-                                if (targetPage % 10 === 1) {{
-                                    const nextBlock = document.querySelector("#mf_wfm_mainFrame_pgl_gdsDtlSrchPage_next_btn a, #mf_wfm_mainFrame_pgl_gdsDtlSrchPage_next_btn");
-                                    if (nextBlock) {{
-                                        nextBlock.click();
+                                }
+                                const sel = document.getElementById("mf_wfm_mainFrame_sbx_pageSize");
+                                if (sel) {
+                                    sel.value = "40";
+                                    sel.dispatchEvent(new Event("change", { bubbles: true }));
+                                    return true;
+                                }
+                            } catch (e) {}
+                            return false;
+                        }""")
+                        if changed_size:
+                            await page.wait_for_timeout(3500)
+                    except Exception:
+                        no_data_element = await frame.query_selector("text='검색결과가 존재하지 않습니다'")
+                        if no_data_element:
+                            console.print("[yellow]ℹ️ 검색 조건에 일치하는 경매 물건이 존재하지 않습니다.[/yellow]")
+                            await browser.close()
+                            return []
+                        raise Exception("검색 결과 테이블 로딩 타임아웃")
+                
+                    # ── Phase 1(DOM 폴백): 모듈 전역 _infer_usage() 사용 ──
+                    basic_items = []
+                    current_page = 1
+                    row_index = 0
+                    prev_count = 0
+                    while len(basic_items) < max_items:
+                        current_rows = await frame.query_selector_all("tr")
+                        if row_index >= len(current_rows):
+                            # 현재 페이지에서 신규 수집된 건이 하나도 없으면 마지막 페이지 도달
+                            if current_page > 1 and len(basic_items) == prev_count:
+                                break
+                            prev_count = len(basic_items)
+                            current_page += 1
+                            moved = await frame.evaluate(f"""(targetPage) => {{
+                                try {{
+                                    const pgl = window.WebSquare && window.WebSquare.util && window.WebSquare.util.getComponentById("mf_wfm_mainFrame_pgl_gdsDtlSrchPage");
+                                    if (pgl && typeof pgl.setValue === "function") {{
+                                        pgl.setValue(targetPage);
+                                        if (typeof pgl.trigger === "function") {{
+                                            pgl.trigger("onchange");
+                                            pgl.trigger("onclick", targetPage);
+                                        }}
+                                    }}
+                                    const btn = document.getElementById("mf_wfm_mainFrame_pgl_gdsDtlSrchPage_page_" + targetPage);
+                                    if (btn) {{
+                                        btn.click();
                                         return true;
                                     }}
-                                }}
-                            }} catch (e) {{}}
-                            return false;
-                        }}""", current_page)
-                        if not moved:
-                            break
-                        console.print(f"[dim]📄 페이지 {current_page}로 이동 중... (누적 {len(basic_items)}건)[/dim]")
-                        await page.wait_for_timeout(3000)
-                        row_index = 0
-                        continue
-
-                    row = current_rows[row_index]
-                    row_index += 1
-                    try:
-                        cols = await row.query_selector_all("td")
-                        if len(cols) < 5:
-                            continue
-                        case_text = await cols[1].inner_text()
-                        case_matches = re.findall(r'(\d+타경\s*\d+)', case_text)
-                        if not case_matches:
-                            continue
-                        
-                        usage_text = await cols[2].inner_text()
-                        usage_clean = usage_text.strip()
-
-                        location_raw = await cols[3].inner_text()
-                        location_lines = [l.strip() for l in location_raw.split('\n') if l.strip()]
-                        location = next((l for l in location_lines if l not in ("지도", "지적도")), "소재지 정보 없음")
-                        flr_parsed = _extract_floor_from_location(location)
-                        usage = _infer_usage(location, usage_clean, flr_parsed)
-
-                        row_full_text = await row.inner_text()
-                        for match in case_matches:
-                            row_full_text = row_full_text.replace(match, "")
-                        row_full_text = re.sub(r'\d+타경\s*\d+', '', row_full_text)
-                        backup_prices = [int(p.replace(',', '')) for p in re.findall(r'[0-9,]+', row_full_text)
-                                         if p.replace(',', '').isdigit() and len(p.replace(',', '')) >= 5]
-                        appraisal = backup_prices[0] if backup_prices else 0
-                        min_bid   = backup_prices[1] if len(backup_prices) > 1 else 0
-
-                        cur_row_id = (current_page, row_index - 1)
-                        for case_id in case_matches:
-                            case_number = case_id.strip()
-                            if len(basic_items) >= max_items:
+                                    if (targetPage % 10 === 1) {{
+                                        const nextBlock = document.querySelector("#mf_wfm_mainFrame_pgl_gdsDtlSrchPage_next_btn a, #mf_wfm_mainFrame_pgl_gdsDtlSrchPage_next_btn");
+                                        if (nextBlock) {{
+                                            nextBlock.click();
+                                            return true;
+                                        }}
+                                    }}
+                                }} catch (e) {{}}
+                                return false;
+                            }}""", current_page)
+                            if not moved:
                                 break
-                            if not any(b['case_number'] == case_number for b in basic_items):
-                                basic_items.append({"case_number": case_number,
-                                                    "location": location,
-                                                    "usage": usage,
-                                                    "appraisal": appraisal,
-                                                    "min_bid": min_bid,
-                                                    "row_id": cur_row_id})
-                    except Exception:
-                        pass
+                            console.print(f"[dim]📄 페이지 {current_page}로 이동 중... (누적 {len(basic_items)}건)[/dim]")
+                            await page.wait_for_timeout(3000)
+                            row_index = 0
+                            continue
 
-                console.print(f"[dim]🗂 Phase 1 완료: {len(basic_items)}개 사건번호 수집[/dim]")
+                        row = current_rows[row_index]
+                        row_index += 1
+                        try:
+                            cols = await row.query_selector_all("td")
+                            if len(cols) < 5:
+                                continue
+                            case_text = await cols[1].inner_text()
+                            case_matches = re.findall(r'(\d+타경\s*\d+)', case_text)
+                            if not case_matches:
+                                continue
+                        
+                            usage_text = await cols[2].inner_text()
+                            usage_clean = usage_text.strip()
 
-                # ── Phase 2: cortOfcCd 확보 (moveDtlPage 첫 번째 항목 한 번만) ──
-                cort_ofc_cd = ''
-                captured_xhr_headers: dict = {}
-                if basic_items:
-                    detail_captured: list = []
+                            location_raw = await cols[3].inner_text()
+                            location_lines = [l.strip() for l in location_raw.split('\n') if l.strip()]
+                            location = next((l for l in location_lines if l not in ("지도", "지적도")), "소재지 정보 없음")
+                            flr_parsed = _extract_floor_from_location(location)
+                            usage = _infer_usage(location, usage_clean, flr_parsed)
 
-                    async def _capture_detail_xhr(response, _c=detail_captured, _h=captured_xhr_headers):
-                        if 'selectAuctnCsSrchRslt' in response.url:
-                            try:
-                                body = await response.json()
-                                _c.append(body)
-                                req_headers = response.request.headers
-                                for k in ('content-type', 'referer', 'x-requested-with', 'accept', 'origin'):
-                                    if k in req_headers:
-                                        _h[k] = req_headers[k]
-                            except Exception:
-                                pass
+                            row_full_text = await row.inner_text()
+                            for match in case_matches:
+                                row_full_text = row_full_text.replace(match, "")
+                            row_full_text = re.sub(r'\d+타경\s*\d+', '', row_full_text)
+                            backup_prices = [int(p.replace(',', '')) for p in re.findall(r'[0-9,]+', row_full_text)
+                                             if p.replace(',', '').isdigit() and len(p.replace(',', '')) >= 5]
+                            appraisal = backup_prices[0] if backup_prices else 0
+                            min_bid   = backup_prices[1] if len(backup_prices) > 1 else 0
 
-                    page.on('response', _capture_detail_xhr)
-                    try:
-                        await frame.evaluate("() => moveDtlPage(0)")
-                        await asyncio.sleep(6)
-                    except Exception as e_xhr:
-                        console.print(f"[dim yellow]⚠️ moveDtlPage(0) 실패: {e_xhr}[/dim yellow]")
-                    finally:
-                        page.remove_listener('response', _capture_detail_xhr)
+                            cur_row_id = (current_page, row_index - 1)
+                            for case_id in case_matches:
+                                case_number = case_id.strip()
+                                if len(basic_items) >= max_items:
+                                    break
+                                if not any(b['case_number'] == case_number for b in basic_items):
+                                    basic_items.append({"case_number": case_number,
+                                                        "location": location,
+                                                        "usage": usage,
+                                                        "appraisal": appraisal,
+                                                        "min_bid": min_bid,
+                                                        "row_id": cur_row_id})
+                        except Exception:
+                            pass
 
-                    seed = detail_captured[0] if detail_captured else {}
-                    cort_ofc_cd = ((seed.get('data') or {}).get('dma_result') or {}).get('csBaseInfo', {}).get('cortOfcCd', '')
-                    seed_cs_no = ((seed.get('data') or {}).get('dma_result') or {}).get('csBaseInfo', {}).get('csNo', '')
-                    # moveDtlPage 첫 번째 항목의 상세를 basic_items[0]에 캐싱
-                    basic_items[0]['_seed_detail'] = seed
-                    seed_row_id = basic_items[0].get('row_id', -1)
-                    for bi in basic_items:
-                        if bi.get('row_id') == seed_row_id:
-                            bi['_seed_detail'] = seed
-                    console.print(f"[dim]🔑 cortOfcCd 확보: {cort_ofc_cd or '실패'}[/dim]")
+                    console.print(f"[dim]🗂 Phase 1 완료: {len(basic_items)}개 사건번호 수집[/dim]")
+
+                    # ── Phase 2: cortOfcCd 확보 (moveDtlPage 첫 번째 항목 한 번만) ──
+                    cort_ofc_cd = ''
+                    captured_xhr_headers: dict = {}
+                    if basic_items:
+                        detail_captured: list = []
+
+                        async def _capture_detail_xhr(response, _c=detail_captured, _h=captured_xhr_headers):
+                            if 'selectAuctnCsSrchRslt' in response.url:
+                                try:
+                                    body = await response.json()
+                                    _c.append(body)
+                                    req_headers = response.request.headers
+                                    for k in ('content-type', 'referer', 'x-requested-with', 'accept', 'origin'):
+                                        if k in req_headers:
+                                            _h[k] = req_headers[k]
+                                except Exception:
+                                    pass
+
+                        page.on('response', _capture_detail_xhr)
+                        try:
+                            await frame.evaluate("() => moveDtlPage(0)")
+                            await asyncio.sleep(6)
+                        except Exception as e_xhr:
+                            console.print(f"[dim yellow]⚠️ moveDtlPage(0) 실패: {e_xhr}[/dim yellow]")
+                        finally:
+                            page.remove_listener('response', _capture_detail_xhr)
+
+                        seed = detail_captured[0] if detail_captured else {}
+                        cort_ofc_cd = ((seed.get('data') or {}).get('dma_result') or {}).get('csBaseInfo', {}).get('cortOfcCd', '')
+                        seed_cs_no = ((seed.get('data') or {}).get('dma_result') or {}).get('csBaseInfo', {}).get('csNo', '')
+                        # moveDtlPage 첫 번째 항목의 상세를 basic_items[0]에 캐싱
+                        basic_items[0]['_seed_detail'] = seed
+                        seed_row_id = basic_items[0].get('row_id', -1)
+                        for bi in basic_items:
+                            if bi.get('row_id') == seed_row_id:
+                                bi['_seed_detail'] = seed
+                        console.print(f"[dim]🔑 cortOfcCd 확보: {cort_ofc_cd or '실패'}[/dim]")
 
                 # ── Phase 3: 각 물건 상세 fetch (frame 상태 무관하게 동작) ──
                 _CASE_KIND_CODES = {'타경': '0130', '타특': '0140', '타기': '0150'}
@@ -1588,13 +1685,18 @@ class AuctionCrawler:
                                     "ai_model": "Rule-Engine"
                                 }, ensure_ascii=False)
                                 from core.geocoder import geocode_address
-                                lat_v, lng_v = geocode_address(bi['location'])
+                                lat_v = bi.get('lat')
+                                lng_v = bi.get('lng')
+                                if not (lat_v and lng_v):
+                                    lat_v, lng_v = geocode_address(bi['location'])
+                                fc_v = bi.get('failed_count') if bi.get('failed_count') is not None else (1 if app_v > min_v else 0)
+                                ad_v = bi.get('auction_date') or ""
                                 new_batch.append((
                                     cn, bi['location'], bi.get('usage') or _infer_usage(bi['location'], "", _extract_floor_from_location(bi['location'])),
-                                    app_v, min_v, min_v, 1 if app_v > min_v else 0, "[]", "", 0, 0,
+                                    app_v, min_v, min_v, fc_v, "[]", "", 0, 0,
                                     score_v, grade_v, f"감정가 대비 {disc_v}% 할인 매물", f"{int(min_v * 1.03):,}원",
                                     rep_v, now_init, now_init, "Rule-Engine", "NEW",
-                                    app_v, margin_v, disc_v, 0, "감정가기준", lat_v, lng_v
+                                    app_v, margin_v, disc_v, 0, "감정가기준", lat_v, lng_v, ad_v
                                 ))
                         if new_batch:
                             _conn.executemany("""
@@ -1604,8 +1706,8 @@ class AuctionCrawler:
                                     ai_score, ai_grade, ai_verdict, ai_suggested_bid, ai_report_json,
                                     last_updated, created_at, ai_model, status_flag,
                                     market_price, safety_margin, market_discount_pct, market_match_count, market_match_level,
-                                    lat, lng
-                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    lat, lng, auction_date
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             """, new_batch)
                             _conn.commit()
                             console.print(f"[bold green]⚡ Phase 1 신규 매물 {len(new_batch)}건 DB 즉시 등록 완료![/bold green]")
@@ -1629,18 +1731,19 @@ class AuctionCrawler:
 
                     console.print(f"[bold cyan]👉 {case_number} 상세 API 호출 중...[/bold cyan]")
 
-                    matched_cort_code = cort_ofc_cd
+                    item_cort_code = bi.get('bo_cd') or cort_ofc_cd
+                    matched_cort_code = item_cort_code
                     if bi.get('_seed_detail'):
                         raw_detail = bi['_seed_detail']
                         console.print(f"[dim]📡 상세(seed): 성공[/dim]")
                     elif row_id in row_detail_cache:
                         raw_detail = row_detail_cache[row_id]
                         console.print(f"[dim]📡 상세(캐시): 재사용[/dim]")
-                    elif cort_ofc_cd:
-                        await asyncio.sleep(random.uniform(1.8, 3.2))
+                    elif item_cort_code:
+                        await asyncio.sleep(random.uniform(1.0, 2.0))
                         try:
                             api_cs_no = _to_api_cs_no(case_number)
-                            raw_detail = await page.evaluate(fetch_js, [api_cs_no, cort_ofc_cd])
+                            raw_detail = await page.evaluate(fetch_js, [api_cs_no, item_cort_code])
                             if raw_detail and raw_detail.get('error'):
                                 raw_detail = {}
                             elif raw_detail:
@@ -1650,13 +1753,13 @@ class AuctionCrawler:
                         except Exception:
                             raw_detail = {}
 
-                        # dspslGdsDxdyInfo 없으면 다른 B-format 법원 코드로 재시도
+                        # DOM 폴백 모드에서만 다른 법원 코드 재시도 (API 모드에서는 정확한 bo_cd 사용)
                         _dma_tmp = (raw_detail.get('data') or {}).get('dma_result') or {}
-                        if not _dma_tmp.get('dspslGdsDxdyInfo'):
-                            for alt_code in SEOUL_COURT_CODES:
-                                if alt_code == cort_ofc_cd:
+                        if not api_phase1_ok and not _dma_tmp.get('dspslGdsDxdyInfo'):
+                            for alt_code in SEOUL_COURT_CODES[:5]:
+                                if alt_code == item_cort_code:
                                     continue
-                                await asyncio.sleep(random.uniform(1.5, 2.5))
+                                await asyncio.sleep(random.uniform(1.0, 1.8))
                                 try:
                                     alt_detail = await page.evaluate(fetch_js, [api_cs_no, alt_code])
                                     if not alt_detail or alt_detail.get('error'):
