@@ -1434,10 +1434,10 @@ export default function FeedScreen() {
                     <Text style={styles.infoCardBody}>
                       상세 화면의 <Text style={styles.guideStrong}>필요 자기자본 계산기</Text>에서
                       일반 LTV · 생애최초 · 보수적(경매) 조건을 눌러 실제 필요한 현금을 바로 비교해
-                      보세요. 기본값은 <Text style={styles.guideStrong}>MCI·MCG 보증보험 가입(방공제 면제)</Text>
-                      기준으로 계산되며, 토글을 끄면 지역별 소액임차보증금(서울 5,500만 ·
-                      경기/인천 과밀억제 4,800만 · 기타 2,800만)을 차감한 보수적 금액도 비교할 수
-                      있습니다(오피스텔·상가는 은행/상품에 따라 MCI 적용 제한 가능).{'\n\n'}
+                      보세요. <Text style={styles.guideStrong}>주거용</Text>은 MCI·MCG 방공제 면제 ON이
+                      기본이며 토글을 끄면 주택임대차법(서울 5,500만·과밀억제 4,800만·광역시 2,800만·기타 2,500만)이
+                      차감됩니다. <Text style={styles.guideStrong}>상가</Text>는 기본 0원(보수적 토글 ON 시
+                      상가임대차법 서울 2,200만 등 차감), <Text style={styles.guideStrong}>토지</Text>는 미적용입니다.{'\n\n'}
                       또한 <Text style={styles.guideStrong}>법원 원본 데이터</Text> 아코디언에서
                       ‘선순위 인수 예상 보증금’과 ‘전체 조사된 임차인 현황’을 반드시 구분해 확인하세요.
                     </Text>

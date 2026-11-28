@@ -23,6 +23,7 @@ import { useFavorites } from '../../context/FavoritesContext';
 import { formatDDayLabel } from '../../utils/formatDDay';
 import { getSourceBadgeMeta, isOnbidItem, isOnbidLease } from '../../utils/sourceBadge';
 import { isFreePreviewCase } from '../../utils/curation';
+import { getBangGongjeInfo } from '../../utils/investmentMetrics';
 
 const feedData = require('../../assets/mobile_feed.json');
 
@@ -157,25 +158,6 @@ function parseRemarkSections(rawRemarks?: string): RemarkSection[] {
   return sections.length > 0 ? sections : [{ heading: '매각물건명세서 원문', body: text }];
 }
 
-function getBangGongje(location: string, usage: string): { amount: number; regionLabel: string } {
-  const isNonResidential = usage === '상가' || usage === '토지';
-  if (isNonResidential) {
-    return { amount: 0, regionLabel: '비주거(방공제 미적용)' };
-  }
-  const loc = location || '';
-  if (loc.includes('서울')) {
-    return { amount: 55_000_000, regionLabel: '서울 5,500만원' };
-  }
-  const metroOvercrowded = [
-    '인천', '성남', '분당', '수원', '용인', '안양', '과천', '광명', '의왕', '군포',
-    '부천', '시흥', '고양', '일산', '하남', '구리', '남양주', '의정부', '화성', '김포', '파주', '경기',
-  ];
-  if (metroOvercrowded.some((kw) => loc.includes(kw))) {
-    return { amount: 48_000_000, regionLabel: '경기·인천 과밀억제 4,800만원' };
-  }
-  return { amount: 28_000_000, regionLabel: '기타 지역 2,800만원' };
-}
-
 export default function DetailScreen() {
   const router = useRouter();
   const { width: winWidth } = useWindowDimensions();
@@ -184,7 +166,8 @@ export default function DetailScreen() {
 
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [loanPreset, setLoanPreset] = useState<LoanPreset>('normal');
-  const [mciExempt, setMciExempt] = useState(true);
+  const [mciExempt, setMciExempt] = useState(true); // 주거용 기본값: MCI/MCG 방공제 면제 ON
+  const [commercialBangDeduct, setCommercialBangDeduct] = useState(false); // 상가 기본값: 방공제 미차감(0원), 보수적 토글 ON 시 차감
   const [isRawExpanded, setIsRawExpanded] = useState(false);
   const [showAllTenants, setShowAllTenants] = useState(false);
   const [isFullRawJsonOpen, setIsFullRawJsonOpen] = useState(false);
@@ -290,13 +273,15 @@ export default function DetailScreen() {
 
   const galleryWidth = Math.min(winWidth, 640);
 
-  // 필요 자기자본 시뮬레이션 계산 (현행 경락잔금대출/주담대 규제 + 방공제 차감/면제 반영)
+  // 필요 자기자본 시뮬레이션 계산 (주거용/상가/토지 분리 방공제 반영)
   const equityCalc = useMemo(() => {
     if (!item) return null;
-    const isNonResidential = item.usage === '상가' || item.usage === '토지';
+    const bangInfo = getBangGongjeInfo(item.location, item.usage);
+    const isLand = bangInfo.category === 'land';
+    const isCommercial = bangInfo.category === 'commercial';
+    const isNonResidential = isCommercial || isLand;
     const basePrice = item.min_bid; // 최저가 낙찰 가정 시뮬레이션
     const appraisalBase = Math.min(basePrice, item.appraisal || basePrice);
-    const bangInfo = getBangGongje(item.location, item.usage);
 
     let ltv = isNonResidential ? 0.6 : 0.7;
     let maxCap = Infinity;
@@ -315,16 +300,31 @@ export default function DetailScreen() {
       presetDesc = '규제지역·다주택 감안 보수적 LTV 50% 기준';
     }
 
-    // 방공제(소액임차보증금) 실제 차감 여부: 생애최초 특례 또는 MCI 가입 시 면제
-    const isBangExempt = isNonResidential || loanPreset === 'first_home' || mciExempt;
-    const appliedBangGongje = isBangExempt ? 0 : bangInfo.amount;
-    const bangStatusLabel = isNonResidential
-      ? '비주거 미적용'
-      : loanPreset === 'first_home'
-      ? '생애최초 특례 면제 (0원)'
-      : mciExempt
-      ? 'MCI 보증보험 면제 (0원)'
-      : `${bangInfo.regionLabel} 차감`;
+    // 용도별 방공제 적용 여부:
+    // - 토지: 항상 0원(미적용)
+    // - 상가: 기본 0원(미차감), 보수적 계산 토글 ON 시 상가임대차법 기준 차감
+    // - 주거용: 기본 MCI 면제 ON(0원) 또는 생애최초 특례 면제, 토글 OFF 시 주택임대차법 기준 차감
+    let appliedBangGongje = 0;
+    let bangStatusLabel = '미적용 (0원)';
+    if (isLand) {
+      appliedBangGongje = 0;
+      bangStatusLabel = '토지 미적용 (0원)';
+    } else if (isCommercial) {
+      appliedBangGongje = commercialBangDeduct ? bangInfo.amount : 0;
+      bangStatusLabel = commercialBangDeduct
+        ? `${bangInfo.regionLabel} 차감`
+        : '기본 미차감 (0원)';
+    } else if (loanPreset === 'first_home') {
+      appliedBangGongje = 0;
+      bangStatusLabel = '생애최초 특례 면제 (0원)';
+    } else if (mciExempt) {
+      appliedBangGongje = 0;
+      bangStatusLabel = 'MCI 보증보험 면제 (0원)';
+    } else {
+      appliedBangGongje = bangInfo.amount;
+      bangStatusLabel = `${bangInfo.regionLabel} 차감`;
+    }
+    const isBangExempt = appliedBangGongje === 0;
 
     const rawLoan = Math.min(Math.floor(appraisalBase * ltv), maxCap);
     const estLoan = Math.max(0, rawLoan - appliedBangGongje);
@@ -337,6 +337,7 @@ export default function DetailScreen() {
     const totalCashNeeded = pureEquity + extraCost + assumedDeposit;
 
     return {
+      bangCategory: bangInfo.category,
       isNonResidential,
       ltv,
       maxCap,
@@ -353,7 +354,7 @@ export default function DetailScreen() {
       assumedDeposit,
       totalCashNeeded,
     };
-  }, [item, loanPreset, mciExempt]);
+  }, [item, loanPreset, mciExempt, commercialBangDeduct]);
 
   // 5단계: 목표 수익률별 적정 입찰 상한가 역산 계산기
   // (인근 전월세 시세 또는 직접 입력 보증금/월세 · 취득세/부대비용 · 대출이자 4.5% · 방공제 · 선순위 인수금 반영)
@@ -803,8 +804,8 @@ export default function DetailScreen() {
 
               <Text style={styles.presetDescText}>📌 {equityCalc.presetDesc}</Text>
 
-              {/* 방공제 면제(MCI 보증보험) 토글 — 주거용 & 일반/보수적 LTV일 때 */}
-              {!equityCalc.isNonResidential && loanPreset !== 'first_home' && (
+              {/* 용도별 방공제 토글 — 주거용(MCI 면제 ON 기본) vs 상가(보수적 차감 OFF 기본) · 토지 미표시 */}
+              {equityCalc.bangCategory === 'residential' && loanPreset !== 'first_home' && (
                 <TouchableOpacity
                   style={[styles.mciToggleRow, mciExempt && styles.mciToggleRowActive]}
                   onPress={() => setMciExempt(!mciExempt)}
@@ -815,10 +816,30 @@ export default function DetailScreen() {
                   </View>
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={styles.mciToggleTitle}>
-                      MCI·MCG 보증보험 가입 (방공제 {formatKrw(equityCalc.bangInfo.amount)} 면제)
+                      MCI 방공제 면제 ({formatKrw(equityCalc.bangInfo.amount)})
                     </Text>
                     <Text style={styles.mciToggleSub}>
-                      미가입 시 {equityCalc.bangInfo.regionLabel}이 대출 한도에서 자동 차감됩니다
+                      끄면 {equityCalc.bangInfo.regionLabel} 차감 (주택임대차법)
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+
+              {equityCalc.bangCategory === 'commercial' && (
+                <TouchableOpacity
+                  style={[styles.mciToggleRow, commercialBangDeduct && styles.mciToggleRowActive]}
+                  onPress={() => setCommercialBangDeduct(!commercialBangDeduct)}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.mciCheckBox, commercialBangDeduct && styles.mciCheckBoxActive]}>
+                    <Text style={styles.mciCheckMark}>{commercialBangDeduct ? '✓' : ''}</Text>
+                  </View>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={styles.mciToggleTitle}>
+                      상가 방공제 보수적 차감 ({formatKrw(equityCalc.bangInfo.amount)})
+                    </Text>
+                    <Text style={styles.mciToggleSub}>
+                      기본 0원 · 켜면 {equityCalc.bangInfo.regionLabel} 차감 (상가임대차법)
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -844,7 +865,7 @@ export default function DetailScreen() {
                     }
                   >
                     {equityCalc.appliedBangGongje > 0
-                      ? `- ${formatKrw(equityCalc.appliedBangGongje)} (${equityCalc.bangInfo.regionLabel.split(' ')[0]})`
+                      ? `- ${formatKrw(equityCalc.appliedBangGongje)} (${equityCalc.bangInfo.regionShort})`
                       : equityCalc.bangStatusLabel}
                   </Text>
                 </View>
@@ -880,7 +901,11 @@ export default function DetailScreen() {
               </View>
 
               <Text style={styles.disclaimerText}>
-                ※ 기본값은 방공제 면제(MCI·MCG 보증보험 적용) 기준이며 토글을 끄면 지역별 방공제(서울 5,500만·경기/인천 4,800만) 차감 금액도 비교할 수 있습니다. 오피스텔·상가 등은 은행·상품에 따라 MCI 적용이 제한될 수 있습니다.
+                {equityCalc.bangCategory === 'commercial'
+                  ? '※ 상가는 주택용 MCI 대상이 아니며 실무상 기본 0원(미차감) 기준입니다. 보수적 차감 토글을 켜면 상가임대차법 기준(서울 2,200만·과밀억제 1,900만·광역시 1,300만·기타 1,000만)이 차감됩니다.'
+                  : equityCalc.bangCategory === 'land'
+                  ? '※ 토지는 소액임차보증금(방공제) 미적용(0원) 기준이며, 실제 대출 한도는 지목·은행 심사·DSR에 따라 달라질 수 있습니다.'
+                  : '※ 주거용 기본값은 MCI·MCG 보증보험(방공제 면제) ON이며 토글을 끄면 주택임대차법 기준(서울 5,500만·과밀억제 4,800만·광역시 2,800만·기타 2,500만)이 차감됩니다. 오피스텔 등은 은행·상품에 따라 MCI 적용이 제한될 수 있습니다.'}
               </Text>
             </View>
 
