@@ -766,7 +766,7 @@ export default function DetailScreen() {
               </View>
             )}
 
-            {/* 5단계 프리미엄 잠금 래퍼 (필요 현금 계산기 · 목표 수익률별 상한가 역산 · 인근 전월세/수익률) */}
+            {/* 6-2단계 프리미엄 잠금 래퍼 (필요 현금 계산기부터 페이지 맨 아래 전체를 하나로 잠금) */}
             <View style={isPremiumLocked ? styles.lockedSectionWrap : undefined}>
               <View pointerEvents={isPremiumLocked ? 'none' : 'auto'} style={{ gap: 16 }}>
             {/* 3. 필요 자기자본(현금) 계산기 (대출 규제 시뮬레이션) */}
@@ -884,6 +884,9 @@ export default function DetailScreen() {
               </Text>
             </View>
 
+            {/* 잠금 상태에서는 필요 자기자본 상단 미리보기까지만 렌더링하고 하위 전체(역산·임대·AI·히스토리·법원원문)는 차단 */}
+            {!isPremiumLocked && (
+              <>
             {/* 3.5. 목표 수익률별 적정 입찰 상한가 역산 계산기 (5단계) */}
             {reverseBidCalc && (
               <View style={styles.card}>
@@ -1105,44 +1108,6 @@ export default function DetailScreen() {
                   <Text style={styles.noRentalDesc}>
                     현재 DB(네이버 부동산·현황조사서)에 이 물건과 동일 용도·유사 평형의 검증된 임대 표본이 부족해 수익률을 억지로 추정하지 않았습니다. 입찰 전 인근 부동산 시세를 직접 확인해 주세요.
                   </Text>
-                </View>
-              )}
-            </View>
-              </View>
-
-              {/* 5단계: 초대 코드 그라데이션 블러 잠금 오버레이 */}
-              {isPremiumLocked && (
-                <View
-                  style={[
-                    styles.blurVeilOverlay,
-                    Platform.OS === 'web'
-                      ? ({
-                          backgroundImage:
-                            'linear-gradient(to bottom, rgba(248,250,252,0.08) 0%, rgba(248,250,252,0.78) 32%, rgba(248,250,252,0.96) 62%, #f8fafc 100%)',
-                          backdropFilter: 'blur(6px)',
-                          WebkitBackdropFilter: 'blur(6px)',
-                        } as any)
-                      : styles.blurVeilNativeFallback,
-                  ]}
-                >
-                  <View style={styles.lockCardBox}>
-                    <Text style={styles.lockCardTitle}>
-                      필요 현금 · 적정 입찰가 역산 · 예상 수익률
-                    </Text>
-                    <Text style={styles.lockCardSub}>
-                      초대 코드를 한 번만 입력하면 모든 매물이 영구 해제됩니다
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.unlockCtaBtn}
-                      activeOpacity={0.85}
-                      onPress={() => {
-                        setInviteError('');
-                        setInviteModalVisible(true);
-                      }}
-                    >
-                      <Text style={styles.unlockCtaBtnText}>🔓 초대 코드 입력하고 전체 보기</Text>
-                    </TouchableOpacity>
-                  </View>
                 </View>
               )}
             </View>
@@ -1627,8 +1592,49 @@ export default function DetailScreen() {
             )}
               </>
             )}
+              </View>
 
-            {/* 관할 기관 및 사건/물건 메타 정보 */}
+              {/* 6-2단계: 초대 코드 그라데이션 블러 잠금 오버레이 (필요 자기자본 계산기~하단 전체 잠금) */}
+              {isPremiumLocked && (
+                <View
+                  style={[
+                    styles.blurVeilOverlay,
+                    Platform.OS === 'web'
+                      ? ({
+                          backgroundImage:
+                            'linear-gradient(to bottom, rgba(248,250,252,0.06) 0%, rgba(248,250,252,0.82) 30%, rgba(248,250,252,0.97) 58%, #f8fafc 100%)',
+                          backdropFilter: 'blur(7px)',
+                          WebkitBackdropFilter: 'blur(7px)',
+                        } as any)
+                      : styles.blurVeilNativeFallback,
+                  ]}
+                >
+                  <View style={styles.lockCardBox}>
+                    <Text style={styles.lockCardTitle}>
+                      필요 현금 · 수익률 역산 · 권리분석 · 법원 원문
+                    </Text>
+                    <Text style={styles.lockCardSub}>
+                      초대 코드를 한 번만 입력하면 모든 매물의 상세 분석이 영구 해제됩니다
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.unlockCtaBtn}
+                      activeOpacity={0.85}
+                      onPress={() => {
+                        setInviteError('');
+                        setInviteModalVisible(true);
+                      }}
+                    >
+                      <Text style={styles.unlockCtaBtnText}>🔓 초대 코드 입력하고 전체 보기</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            </View>
+              </>
+            )}
+
+            {/* 관할 기관 및 사건/물건 메타 정보 (잠금 시 함께 숨김) */}
+            {!isPremiumLocked && (
             <View style={styles.metaCard}>
               <Text style={styles.metaRow}>
                 <Text style={styles.metaKey}>{isOnbid ? '공고 기관: ' : '관할 법원: '}</Text>
@@ -1643,6 +1649,7 @@ export default function DetailScreen() {
                 <Text style={styles.metaVal}>{onbid?.bid_end_date || item.auction_date || '일정 확인 필요'}</Text>
               </Text>
             </View>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -1686,7 +1693,7 @@ export default function DetailScreen() {
               </TouchableOpacity>
             </View>
             <Text style={styles.inviteModalDesc}>
-              이지경매 베타 초대 코드를 1회 입력하시면 모든 매물의 필요 현금·목표 수익률 역산·예상 수익률이 영구 해제됩니다.
+              이지경매 베타 초대 코드를 1회 입력하시면 모든 매물의 필요 현금·수익률 역산·임차인/권리분석·법원 원문이 영구 해제됩니다.
             </Text>
             <TextInput
               style={styles.inviteInput}
@@ -2954,7 +2961,7 @@ const styles = StyleSheet.create({
   },
   lockedSectionWrap: {
     position: 'relative',
-    maxHeight: 280,
+    maxHeight: 330,
     overflow: 'hidden',
     borderRadius: 20,
   },

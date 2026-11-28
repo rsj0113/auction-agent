@@ -470,17 +470,23 @@ def load_reference_indexes(conn: sqlite3.Connection) -> tuple[dict, dict, dict]:
     """
     cur = conn.cursor()
 
-    # 1. naver_listings 월세 매물 로드
+    # 1. naver_listings 월세 매물 로드 (면적·층 정보 포함 — 평형 밴드 보정용)
     naver_by_emd: dict[str, list[tuple]] = {}
     naver_by_sgg: dict[str, list[tuple]] = {}
     try:
         cur.execute("""
-            SELECT addr_sgg, addr_emd, area_pyeong, deposit_10k, monthly_rent_10k, realty_type_cd
+            SELECT addr_sgg, addr_emd, area_pyeong, deposit_10k, monthly_rent_10k, realty_type_cd, floor
             FROM naver_listings
-            WHERE trade_type = '월세' AND monthly_rent_10k > 0
+            WHERE trade_type = '월세' AND monthly_rent_10k > 0 AND area_pyeong > 0
         """)
-        for sgg, emd, pyeong, dep, rent, rtype in cur.fetchall():
-            rec = (float(pyeong or 0), int(dep or 0) * 10_000, int(rent or 0) * 10_000, rtype or "")
+        for sgg, emd, pyeong, dep, rent, rtype, floor in cur.fetchall():
+            rec = (
+                float(pyeong or 0),
+                int(dep or 0) * 10_000,
+                int(rent or 0) * 10_000,
+                (rtype or "").strip(),
+                str(floor or "").strip(),
+            )
             if emd:
                 naver_by_emd.setdefault(emd.strip(), []).append(rec)
             if sgg:
@@ -642,6 +648,18 @@ def normalize_usage(raw_usage: str, location: str = "", remarks: str = "") -> st
     return "기타"
 
 
+def _dedup_naver_recs(recs: list[tuple]) -> list[tuple]:
+    """동일 호실 중복 중개 매물(면적·보증금·월세·층 동일) 제거"""
+    seen: set[tuple] = set()
+    out: list[tuple] = []
+    for r in recs:
+        key = (round(r[0], 1), r[1], r[2], r[4] if len(r) > 4 else "")
+        if key not in seen:
+            seen.add(key)
+            out.append(r)
+    return out
+
+
 def estimate_rental_and_yield(
     row: dict,
     usage_label: str,
@@ -655,44 +673,82 @@ def estimate_rental_and_yield(
 ) -> dict | None:
     """
     인근 전월세 시세 및 예상 수익률 매칭.
-    실제 DB/네이버/현황조사서 근거가 없으면 절대 허위 추정하지 않고 None 반환!
+    - 전용면적(평형) ±30%(우선) → ±40%(보조) 유사 평형 밴드 내에서만 보증금·월세를 함께 매칭.
+    - 표본이 3건 미만이거나 면적이 미확인인 경우 전체 평형 평균으로 억지 추정하지 않고 None 반환!
     """
     naver_by_emd, naver_by_sgg = naver_indexes
     short_sgg = sgg.strip().split()[-1] if sgg else ""
     emd_clean = emd.strip() if emd else ""
+    floor_num = _extract_floor_from_location(str(row.get("location") or ""))
 
-    est_monthly = int(row.get("est_monthly_rent") or 0)
+    est_monthly = 0
     est_deposit = 0
     est_jeonse = 0
     sample_count = 0
     source_label = ""
 
-    # 1순위: DB 자체 산출 est_monthly_rent가 있는 경우 (토지 제외 또는 수익률 정상 범위)
-    if est_monthly >= 100_000 and usage_label != "토지":
+    # 1순위: 상가/오피스텔/기타 — naver_listings 동 → 시군구 유사 평형 밴드(±30% → ±40%) 월세·보증금 동시 매칭
+    if usage_label in ("상가", "오피스텔", "기타") and pyeong > 0:
+        candidates: list[tuple[str, list[tuple]]] = []
+        if emd_clean and emd_clean in naver_by_emd:
+            candidates.append((emd_clean, naver_by_emd[emd_clean]))
+        if short_sgg and short_sgg in naver_by_sgg:
+            candidates.append((short_sgg, naver_by_sgg[short_sgg]))
+
+        for loc_name, raw_pool in candidates:
+            # 오피스텔은 A02/OPST 표본이 충분하면 우선 사용, 부족하면 인근 상가/업무 풀을 보수 보정
+            if usage_label == "오피스텔":
+                type_pool = [r for r in raw_pool if r[3] in ("A02", "OPST")]
+                is_commercial_fallback = len(type_pool) < 3
+                base_pool = type_pool if not is_commercial_fallback else raw_pool
+            else:
+                is_commercial_fallback = False
+                base_pool = raw_pool
+
+            matched_band = None
+            matched_bounds = (0, 0)
+            for band_pct in (0.30, 0.40):
+                lo, hi = pyeong * (1.0 - band_pct), pyeong * (1.0 + band_pct)
+                band = _dedup_naver_recs([r for r in base_pool if lo <= r[0] <= hi])
+                if len(band) < 3:
+                    continue
+
+                # 상가는 1층 vs 비1층 동일 층군 표본이 충분하면 우선 매칭
+                if usage_label == "상가" and floor_num != 0:
+                    fl_band = [r for r in band if (r[4] == "1") == (floor_num == 1)]
+                    if len(fl_band) >= 3:
+                        band = fl_band
+
+                # 오피스텔이 상가(D02) 풀로 폴백할 때는 1층 메인 점포 상위 25% 아웃라이어 제거해 보수 보정
+                if usage_label == "오피스텔" and is_commercial_fallback and len(band) >= 6:
+                    rents_sorted = sorted(r[2] for r in band)
+                    q3 = rents_sorted[(len(rents_sorted) * 3) // 4]
+                    trimmed = [r for r in band if r[2] <= q3]
+                    if len(trimmed) >= 3:
+                        band = trimmed
+
+                matched_band = band
+                matched_bounds = (max(1, round(lo)), max(1, round(hi)))
+                break
+
+            if matched_band:
+                sample_count = len(matched_band)
+                est_deposit = int(round(statistics.median([r[1] for r in matched_band]) / 1_000_000) * 1_000_000)
+                est_monthly = int(round(statistics.median([r[2] for r in matched_band]) / 10_000) * 10_000)
+                band_tag = f"{matched_bounds[0]}~{matched_bounds[1]}평대"
+                suffix = "유사평형 보정 월세" if (usage_label == "오피스텔" and is_commercial_fallback) else "유사평형 월세"
+                source_label = f"네이버 부동산 {loc_name} {band_tag} {suffix}"
+                break
+
+    # 2순위: DB 자체 산출 est_monthly_rent (유사 평형 네이버 매칭이 없을 때, 토지 제외)
+    db_est_monthly = int(row.get("est_monthly_rent") or 0)
+    if est_monthly <= 0 and db_est_monthly >= 100_000 and usage_label != "토지":
+        est_monthly = db_est_monthly
         est_deposit = int(round((est_monthly * 20) / 1_000_000) * 1_000_000)
         sample_count = int(row.get("market_match_count") or 1)
         source_label = "DB 인근 임대 매칭"
 
-    # 2순위: 상가/오피스텔/기타는 naver_listings (20,638건) 동 -> 시군구 유사 평형 월세 매칭
-    if est_monthly <= 0 and usage_label in ("상가", "오피스텔", "기타"):
-        pool = []
-        if emd_clean and emd_clean in naver_by_emd:
-            pool = naver_by_emd[emd_clean]
-            source_label = f"네이버 부동산 {emd_clean} 월세"
-        elif short_sgg and short_sgg in naver_by_sgg:
-            pool = naver_by_sgg[short_sgg]
-            source_label = f"네이버 부동산 {short_sgg} 월세"
-
-        if pool:
-            if pyeong > 0:
-                similar = [p for p in pool if p[0] > 0 and pyeong * 0.45 <= p[0] <= pyeong * 1.75]
-                if len(similar) >= 2:
-                    pool = similar
-            sample_count = len(pool)
-            est_deposit = int(statistics.median([p[1] for p in pool]))
-            est_monthly = int(statistics.median([p[2] for p in pool]))
-
-    # 3순위: 주거용(아파트/빌라) — 법원 현황조사서 실제 임차인 보증금이 확인된 경우 실전세 참고
+    # 3순위: 주거용(아파트/빌라/오피스텔) — 법원 현황조사서 실제 임차인 보증금이 확인된 경우 실전세 참고
     tenant_dep = int(row.get("tenant_deposit") or 0)
     if est_monthly <= 0 and usage_label in ("아파트", "빌라", "오피스텔") and tenant_dep >= 20_000_000:
         # 현황조사서 실보증금을 전세가 참고치로 활용 (보증금 20% + 나머지 5.5% 월세 환산 참고)

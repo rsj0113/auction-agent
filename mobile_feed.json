@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-28 10:20:38",
+  "generated_at": "2026-11-28 16:35:22",
   "total_count": 648,
   "auction_count": 448,
   "onbid_sale_count": 120,
@@ -7,7 +7,7 @@
   "green_count": 186,
   "yellow_count": 218,
   "red_count": 244,
-  "rental_matched_count": 70,
+  "rental_matched_count": 60,
   "area_stats_matched_count": 260,
   "items": [
     {
@@ -2179,17 +2179,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 30000000,
-        "est_deposit_str": "3,000만원",
-        "est_monthly_rent": 2300000,
-        "est_monthly_rent_str": "230만원",
+        "est_deposit": 20000000,
+        "est_deposit_str": "2,000만원",
+        "est_monthly_rent": 1500000,
+        "est_monthly_rent_str": "150만원",
         "est_jeonse": 288000000,
         "est_jeonse_str": "2억 8,800만원",
-        "annual_yield_pct": 9.8,
+        "annual_yield_pct": 6.1,
         "gap_invest_cash": 24960000,
         "gap_invest_cash_str": "2,496만원",
-        "sample_count": 150,
-        "source_label": "네이버 부동산 역삼동 월세"
+        "sample_count": 31,
+        "source_label": "네이버 부동산 역삼동 6~11평대 유사평형 보정 월세"
       },
       "area_winning_stats": {
         "region_label": "강남구 오피스텔",
@@ -7393,15 +7393,15 @@
       "rental_estimate": {
         "est_deposit": 30000000,
         "est_deposit_str": "3,000만원",
-        "est_monthly_rent": 2500000,
-        "est_monthly_rent_str": "250만원",
-        "est_jeonse": 575000000,
-        "est_jeonse_str": "5억 7,500만원",
-        "annual_yield_pct": 3.0,
-        "gap_invest_cash": 440000000,
-        "gap_invest_cash_str": "4억 4,000만원",
-        "sample_count": 165,
-        "source_label": "네이버 부동산 백현동 월세"
+        "est_monthly_rent": 2220000,
+        "est_monthly_rent_str": "222만원",
+        "est_jeonse": 514000000,
+        "est_jeonse_str": "5억 1,400만원",
+        "annual_yield_pct": 2.7,
+        "gap_invest_cash": 501000000,
+        "gap_invest_cash_str": "5억 100만원",
+        "sample_count": 34,
+        "source_label": "네이버 부동산 백현동 18~33평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -7706,15 +7706,15 @@
       "rental_estimate": {
         "est_deposit": 30000000,
         "est_deposit_str": "3,000만원",
-        "est_monthly_rent": 2100000,
-        "est_monthly_rent_str": "210만원",
+        "est_monthly_rent": 1700000,
+        "est_monthly_rent_str": "170만원",
         "est_jeonse": 296000000,
         "est_jeonse_str": "2억 9,600만원",
-        "annual_yield_pct": 8.6,
+        "annual_yield_pct": 7.0,
         "gap_invest_cash": 26000000,
         "gap_invest_cash_str": "2,600만원",
-        "sample_count": 186,
-        "source_label": "네이버 부동산 신흥동 월세"
+        "sample_count": 35,
+        "source_label": "네이버 부동산 신흥동 16~29평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -12997,15 +12997,15 @@
       "rental_estimate": {
         "est_deposit": 30000000,
         "est_deposit_str": "3,000만원",
-        "est_monthly_rent": 2700000,
-        "est_monthly_rent_str": "270만원",
-        "est_jeonse": 619000000,
-        "est_jeonse_str": "6억 1,900만원",
-        "annual_yield_pct": 3.3,
-        "gap_invest_cash": 381000000,
-        "gap_invest_cash_str": "3억 8,100만원",
-        "sample_count": 196,
-        "source_label": "네이버 부동산 논현동 월세"
+        "est_monthly_rent": 2400000,
+        "est_monthly_rent_str": "240만원",
+        "est_jeonse": 554000000,
+        "est_jeonse_str": "5억 5,400만원",
+        "annual_yield_pct": 3.0,
+        "gap_invest_cash": 446000000,
+        "gap_invest_cash_str": "4억 4,600만원",
+        "sample_count": 57,
+        "source_label": "네이버 부동산 논현동 11~21평대 유사평형 보정 월세"
       },
       "area_winning_stats": {
         "region_label": "강남구 오피스텔",
@@ -25069,17 +25069,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 30000000,
-        "est_deposit_str": "3,000만원",
-        "est_monthly_rent": 1800000,
-        "est_monthly_rent_str": "180만원",
+        "est_deposit": 20000000,
+        "est_deposit_str": "2,000만원",
+        "est_monthly_rent": 1200000,
+        "est_monthly_rent_str": "120만원",
         "est_jeonse": 158000000,
         "est_jeonse_str": "1억 5,800만원",
-        "annual_yield_pct": 15.2,
+        "annual_yield_pct": 9.5,
         "gap_invest_cash": 14200000,
         "gap_invest_cash_str": "1,420만원",
-        "sample_count": 245,
-        "source_label": "네이버 부동산 구미동 월세"
+        "sample_count": 67,
+        "source_label": "네이버 부동산 구미동 6~12평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -27705,17 +27705,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 20000000,
-        "est_deposit_str": "2,000만원",
-        "est_monthly_rent": 1200000,
-        "est_monthly_rent_str": "120만원",
+        "est_deposit": 15000000,
+        "est_deposit_str": "1,500만원",
+        "est_monthly_rent": 1000000,
+        "est_monthly_rent_str": "100만원",
         "est_jeonse": 224000000,
         "est_jeonse_str": "2억 2,400만원",
-        "annual_yield_pct": 6.4,
+        "annual_yield_pct": 5.2,
         "gap_invest_cash": 20000000,
         "gap_invest_cash_str": "2,000만원",
-        "sample_count": 491,
-        "source_label": "네이버 부동산 중원구 월세"
+        "sample_count": 133,
+        "source_label": "네이버 부동산 중원구 9~17평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -32636,17 +32636,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 124000000,
-        "est_deposit_str": "1억 2,400만원",
-        "est_monthly_rent": 6214077,
-        "est_monthly_rent_str": "621만원",
+        "est_deposit": 57000000,
+        "est_deposit_str": "5,700만원",
+        "est_monthly_rent": 4950000,
+        "est_monthly_rent_str": "495만원",
         "est_jeonse": 0,
         "est_jeonse_str": "",
-        "annual_yield_pct": 2.6,
+        "annual_yield_pct": 2.0,
         "gap_invest_cash": 0,
         "gap_invest_cash_str": "",
-        "sample_count": 53,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 62,
+        "source_label": "네이버 부동산 서현동 39~73평대 유사평형 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -43368,19 +43368,7 @@
           "date": "20261026"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 57000000,
-        "est_deposit_str": "5,700만원",
-        "est_monthly_rent": 2853644,
-        "est_monthly_rent_str": "285만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 21.6,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 737,
-        "source_label": "DB 인근 임대 매칭"
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
@@ -43740,17 +43728,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 37000000,
-        "est_deposit_str": "3,700만원",
-        "est_monthly_rent": 1838646,
-        "est_monthly_rent_str": "183만원",
+        "est_deposit": 20000000,
+        "est_deposit_str": "2,000만원",
+        "est_monthly_rent": 1200000,
+        "est_monthly_rent_str": "120만원",
         "est_jeonse": 0,
         "est_jeonse_str": "",
-        "annual_yield_pct": 12.0,
+        "annual_yield_pct": 7.2,
         "gap_invest_cash": 0,
         "gap_invest_cash_str": "",
-        "sample_count": 144,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 62,
+        "source_label": "네이버 부동산 호계동 9~17평대 유사평형 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -50334,17 +50322,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 59000000,
-        "est_deposit_str": "5,900만원",
-        "est_monthly_rent": 2930430,
-        "est_monthly_rent_str": "293만원",
+        "est_deposit": 100000000,
+        "est_deposit_str": "1억원",
+        "est_monthly_rent": 6250000,
+        "est_monthly_rent_str": "625만원",
         "est_jeonse": 0,
         "est_jeonse_str": "",
-        "annual_yield_pct": 5.3,
+        "annual_yield_pct": 12.1,
         "gap_invest_cash": 0,
         "gap_invest_cash_str": "",
-        "sample_count": 268,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 14,
+        "source_label": "네이버 부동산 호계동 72~134평대 유사평형 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -54051,17 +54039,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 33000000,
-        "est_deposit_str": "3,300만원",
-        "est_monthly_rent": 1665160,
-        "est_monthly_rent_str": "166만원",
+        "est_deposit": 20000000,
+        "est_deposit_str": "2,000만원",
+        "est_monthly_rent": 1200000,
+        "est_monthly_rent_str": "120만원",
         "est_jeonse": 156000000,
         "est_jeonse_str": "1억 5,600만원",
-        "annual_yield_pct": 14.6,
+        "annual_yield_pct": 9.6,
         "gap_invest_cash": 14100000,
         "gap_invest_cash_str": "1,410만원",
         "sample_count": 67,
-        "source_label": "DB 인근 임대 매칭"
+        "source_label": "네이버 부동산 구미동 6~12평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -54379,17 +54367,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 53000000,
-        "est_deposit_str": "5,300만원",
-        "est_monthly_rent": 2667847,
-        "est_monthly_rent_str": "266만원",
+        "est_deposit": 40000000,
+        "est_deposit_str": "4,000만원",
+        "est_monthly_rent": 2200000,
+        "est_monthly_rent_str": "220만원",
         "est_jeonse": 0,
         "est_jeonse_str": "",
-        "annual_yield_pct": 6.7,
+        "annual_yield_pct": 5.4,
         "gap_invest_cash": 0,
         "gap_invest_cash_str": "",
-        "sample_count": 129,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 57,
+        "source_label": "네이버 부동산 서초동 10~18평대 유사평형 월세"
       },
       "area_winning_stats": {
         "region_label": "서초구 상가",
@@ -59105,19 +59093,7 @@
           "date": "20261130"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 0,
-        "est_deposit_str": "0원",
-        "est_monthly_rent": 19059426,
-        "est_monthly_rent_str": "1,905만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 4.2,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 0,
-        "source_label": ""
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
@@ -59350,17 +59326,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 32000000,
-        "est_deposit_str": "3,200만원",
-        "est_monthly_rent": 1617073,
-        "est_monthly_rent_str": "161만원",
+        "est_deposit": 20000000,
+        "est_deposit_str": "2,000만원",
+        "est_monthly_rent": 1200000,
+        "est_monthly_rent_str": "120만원",
         "est_jeonse": 102000000,
         "est_jeonse_str": "1억 200만원",
-        "annual_yield_pct": 24.7,
+        "annual_yield_pct": 15.9,
         "gap_invest_cash": 8592000,
         "gap_invest_cash_str": "859만원",
-        "sample_count": 35,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 13,
+        "source_label": "네이버 부동산 역삼동 4~8평대 유사평형 보정 월세"
       },
       "area_winning_stats": {
         "region_label": "강남구 오피스텔",
@@ -59717,19 +59693,7 @@
           "date": "20261207"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 0,
-        "est_deposit_str": "0원",
-        "est_monthly_rent": 8957497,
-        "est_monthly_rent_str": "895만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 6.0,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 0,
-        "source_label": ""
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
@@ -60655,17 +60619,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 37000000,
-        "est_deposit_str": "3,700만원",
-        "est_monthly_rent": 1845946,
-        "est_monthly_rent_str": "184만원",
+        "est_deposit": 20000000,
+        "est_deposit_str": "2,000만원",
+        "est_monthly_rent": 1250000,
+        "est_monthly_rent_str": "125만원",
         "est_jeonse": 131000000,
         "est_jeonse_str": "1억 3,100만원",
-        "annual_yield_pct": 21.1,
+        "annual_yield_pct": 12.3,
         "gap_invest_cash": 11100000,
         "gap_invest_cash_str": "1,110만원",
-        "sample_count": 99,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 145,
+        "source_label": "네이버 부동산 중원구 11~20평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -60979,17 +60943,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 38000000,
-        "est_deposit_str": "3,800만원",
-        "est_monthly_rent": 1907819,
-        "est_monthly_rent_str": "190만원",
+        "est_deposit": 20000000,
+        "est_deposit_str": "2,000만원",
+        "est_monthly_rent": 1600000,
+        "est_monthly_rent_str": "160만원",
         "est_jeonse": 147000000,
         "est_jeonse_str": "1억 4,700만원",
-        "annual_yield_pct": 18.8,
+        "annual_yield_pct": 13.7,
         "gap_invest_cash": 13000000,
         "gap_invest_cash_str": "1,300만원",
-        "sample_count": 99,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 49,
+        "source_label": "네이버 부동산 서초동 5~10평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -61149,17 +61113,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 15000000,
-        "est_deposit_str": "1,500만원",
-        "est_monthly_rent": 732240,
-        "est_monthly_rent_str": "73만원",
+        "est_deposit": 10000000,
+        "est_deposit_str": "1,000만원",
+        "est_monthly_rent": 600000,
+        "est_monthly_rent_str": "60만원",
         "est_jeonse": 72000000,
         "est_jeonse_str": "7,200만원",
-        "annual_yield_pct": 14.0,
+        "annual_yield_pct": 10.6,
         "gap_invest_cash": 5910000,
         "gap_invest_cash_str": "591만원",
-        "sample_count": 17,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 25,
+        "source_label": "네이버 부동산 성남동 5~8평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -63473,17 +63437,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 33000000,
-        "est_deposit_str": "3,300만원",
-        "est_monthly_rent": 1639814,
-        "est_monthly_rent_str": "163만원",
+        "est_deposit": 20000000,
+        "est_deposit_str": "2,000만원",
+        "est_monthly_rent": 1200000,
+        "est_monthly_rent_str": "120만원",
         "est_jeonse": 156000000,
         "est_jeonse_str": "1억 5,600만원",
-        "annual_yield_pct": 14.4,
+        "annual_yield_pct": 9.6,
         "gap_invest_cash": 13600000,
         "gap_invest_cash_str": "1,360만원",
-        "sample_count": 35,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 13,
+        "source_label": "네이버 부동산 역삼동 4~8평대 유사평형 보정 월세"
       },
       "area_winning_stats": {
         "region_label": "강남구 오피스텔",
@@ -63635,17 +63599,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 33000000,
-        "est_deposit_str": "3,300만원",
-        "est_monthly_rent": 1667269,
-        "est_monthly_rent_str": "166만원",
+        "est_deposit": 20000000,
+        "est_deposit_str": "2,000만원",
+        "est_monthly_rent": 1490000,
+        "est_monthly_rent_str": "149만원",
         "est_jeonse": 162000000,
         "est_jeonse_str": "1억 6,200만원",
-        "annual_yield_pct": 14.0,
+        "annual_yield_pct": 11.5,
         "gap_invest_cash": 14000000,
         "gap_invest_cash_str": "1,400만원",
-        "sample_count": 53,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 22,
+        "source_label": "네이버 부동산 역삼동 5~9평대 유사평형 보정 월세"
       },
       "area_winning_stats": {
         "region_label": "강남구 오피스텔",
@@ -64103,17 +64067,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 15000000,
-        "est_deposit_str": "1,500만원",
-        "est_monthly_rent": 732240,
-        "est_monthly_rent_str": "73만원",
+        "est_deposit": 10000000,
+        "est_deposit_str": "1,000만원",
+        "est_monthly_rent": 600000,
+        "est_monthly_rent_str": "60만원",
         "est_jeonse": 141000000,
         "est_jeonse_str": "1억 4,100만원",
-        "annual_yield_pct": 6.4,
+        "annual_yield_pct": 5.0,
         "gap_invest_cash": 12000000,
         "gap_invest_cash_str": "1,200만원",
-        "sample_count": 17,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 25,
+        "source_label": "네이버 부동산 성남동 5~8평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -64806,17 +64770,17 @@
         }
       ],
       "rental_estimate": {
-        "est_deposit": 46000000,
-        "est_deposit_str": "4,600만원",
-        "est_monthly_rent": 2310416,
-        "est_monthly_rent_str": "231만원",
+        "est_deposit": 30000000,
+        "est_deposit_str": "3,000만원",
+        "est_monthly_rent": 1500000,
+        "est_monthly_rent_str": "150만원",
         "est_jeonse": 332000000,
         "est_jeonse_str": "3억 3,200만원",
-        "annual_yield_pct": 8.8,
+        "annual_yield_pct": 5.4,
         "gap_invest_cash": 29000000,
         "gap_invest_cash_str": "2,900만원",
-        "sample_count": 44,
-        "source_label": "DB 인근 임대 매칭"
+        "sample_count": 73,
+        "source_label": "네이버 부동산 야탑동 15~28평대 유사평형 보정 월세"
       },
       "area_winning_stats": null,
       "raw_court_data": {
@@ -67111,19 +67075,7 @@
           "date": "20261104"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 0,
-        "est_deposit_str": "0원",
-        "est_monthly_rent": 6724624,
-        "est_monthly_rent_str": "672만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 6.3,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 0,
-        "source_label": ""
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
@@ -68083,19 +68035,7 @@
           "date": "20261117"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 0,
-        "est_deposit_str": "0원",
-        "est_monthly_rent": 5732287,
-        "est_monthly_rent_str": "573만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 4.3,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 0,
-        "source_label": ""
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
@@ -68506,19 +68446,7 @@
           "date": "20261123"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 0,
-        "est_deposit_str": "0원",
-        "est_monthly_rent": 4601973,
-        "est_monthly_rent_str": "460만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 5.9,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 0,
-        "source_label": ""
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
@@ -70033,19 +69961,7 @@
           "date": "20261118"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 0,
-        "est_deposit_str": "0원",
-        "est_monthly_rent": 3693195,
-        "est_monthly_rent_str": "369만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 5.2,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 0,
-        "source_label": ""
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
@@ -72371,19 +72287,7 @@
           "date": "20261109"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 0,
-        "est_deposit_str": "0원",
-        "est_monthly_rent": 12266905,
-        "est_monthly_rent_str": "1,226만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 3.7,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 0,
-        "source_label": ""
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
@@ -72563,19 +72467,7 @@
           "date": "20261110"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 0,
-        "est_deposit_str": "0원",
-        "est_monthly_rent": 5993200,
-        "est_monthly_rent_str": "599만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 2.4,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 0,
-        "source_label": ""
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
@@ -73362,19 +73254,7 @@
           "date": "20261102"
         }
       ],
-      "rental_estimate": {
-        "est_deposit": 0,
-        "est_deposit_str": "0원",
-        "est_monthly_rent": 25695083,
-        "est_monthly_rent_str": "2,569만원",
-        "est_jeonse": 0,
-        "est_jeonse_str": "",
-        "annual_yield_pct": 15.8,
-        "gap_invest_cash": 0,
-        "gap_invest_cash_str": "",
-        "sample_count": 0,
-        "source_label": ""
-      },
+      "rental_estimate": null,
       "area_winning_stats": null,
       "raw_court_data": {
         "rights_list": [
