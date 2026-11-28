@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,19 +8,30 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Linking,
+  Modal,
+  Pressable,
+  TextInput,
+  Platform,
   useWindowDimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { FeedItem, TenantRecord } from '../../types/feed';
 import { useFavorites } from '../../context/FavoritesContext';
 import { formatDDayLabel } from '../../utils/formatDDay';
 import { getSourceBadgeMeta, isOnbidItem, isOnbidLease } from '../../utils/sourceBadge';
+import { isFreePreviewCase } from '../../utils/curation';
 
 const feedData = require('../../assets/mobile_feed.json');
 
 type LoanPreset = 'normal' | 'first_home' | 'conservative';
+type TargetYieldMode = '6' | '8' | '10' | 'custom';
+
+const INVITE_STORAGE_KEY = 'easy_auction_invite_unlocked';
+const VALID_INVITE_CODE = 'EASYBID2026';
+const DEFAULT_LOAN_INTEREST_RATE = 0.045; // 연 4.5% 참고 금리
 
 function formatKrw(val: number): string {
   if (!val || val <= 0) return '0원';
@@ -178,11 +189,104 @@ export default function DetailScreen() {
   const [showAllTenants, setShowAllTenants] = useState(false);
   const [isFullRawJsonOpen, setIsFullRawJsonOpen] = useState(false);
 
+  // 5단계: 초대 코드 잠금 해제 상태 (AsyncStorage + localStorage 영구 저장)
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      try {
+        return window.localStorage.getItem(INVITE_STORAGE_KEY) === 'true';
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
+  const [inviteModalVisible, setInviteModalVisible] = useState(false);
+  const [inviteCodeInput, setInviteCodeInput] = useState('');
+  const [inviteError, setInviteError] = useState('');
+
+  // 5단계: 목표 수익률별 적정 입찰 상한가 역산 계산기 상태
+  const [targetYieldMode, setTargetYieldMode] = useState<TargetYieldMode>('8');
+  const [customYieldInput, setCustomYieldInput] = useState('7.5');
+
   const photoScrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
 
   const caseNumber = decodeURIComponent(id || '');
   const items: FeedItem[] = feedData.items || [];
   const item = items.find((i) => i.case_number === caseNumber);
+
+  // 보증금/월세(만원) 입력값 — 인근 시세 매칭 시 자동 프리필, 미매칭 시 참고 입력값 제공
+  const defaultDepositMan = useMemo(() => {
+    if (!item) return '2000';
+    if (item.rental_estimate?.est_deposit && item.rental_estimate.est_deposit > 0) {
+      return String(Math.round(item.rental_estimate.est_deposit / 10_000));
+    }
+    return String(Math.max(1000, Math.round((item.min_bid * 0.05) / 1_000_000) * 100));
+  }, [item]);
+
+  const defaultMonthlyMan = useMemo(() => {
+    if (!item) return '80';
+    if (item.rental_estimate?.est_monthly_rent && item.rental_estimate.est_monthly_rent > 0) {
+      return String(Math.round(item.rental_estimate.est_monthly_rent / 10_000));
+    }
+    return String(Math.max(40, Math.round(((item.min_bid * 0.045) / 12) / 100_000) * 10));
+  }, [item]);
+
+  const [depositManInput, setDepositManInput] = useState(defaultDepositMan);
+  const [monthlyRentManInput, setMonthlyRentManInput] = useState(defaultMonthlyMan);
+
+  useEffect(() => {
+    setDepositManInput(defaultDepositMan);
+    setMonthlyRentManInput(defaultMonthlyMan);
+  }, [defaultDepositMan, defaultMonthlyMan]);
+
+  // AsyncStorage / localStorage에서 초대 코드 해제 여부 로드
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        if (Platform.OS === 'web' && typeof window !== 'undefined') {
+          if (window.localStorage.getItem(INVITE_STORAGE_KEY) === 'true') {
+            if (mounted) setIsUnlocked(true);
+            return;
+          }
+        }
+        const saved = await AsyncStorage.getItem(INVITE_STORAGE_KEY);
+        if (mounted && saved === 'true') {
+          setIsUnlocked(true);
+        }
+      } catch {
+        // ignore storage errors
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const isFreePreview = useMemo(() => {
+    if (!caseNumber) return false;
+    return isFreePreviewCase(items, caseNumber);
+  }, [items, caseNumber]);
+
+  const handleSubmitInviteCode = async () => {
+    const normalized = inviteCodeInput.trim().toUpperCase();
+    if (normalized !== VALID_INVITE_CODE) {
+      setInviteError('초대 코드가 올바르지 않습니다. 다시 확인해 주세요.');
+      return;
+    }
+    setInviteError('');
+    setIsUnlocked(true);
+    setInviteModalVisible(false);
+    setInviteCodeInput('');
+    try {
+      await AsyncStorage.setItem(INVITE_STORAGE_KEY, 'true');
+    } catch {}
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(INVITE_STORAGE_KEY, 'true');
+      } catch {}
+    }
+  };
 
   const galleryWidth = Math.min(winWidth, 640);
 
@@ -234,6 +338,8 @@ export default function DetailScreen() {
 
     return {
       isNonResidential,
+      ltv,
+      maxCap,
       ltvPct: Math.round(ltv * 100),
       presetDesc,
       rawLoan,
@@ -248,6 +354,95 @@ export default function DetailScreen() {
       totalCashNeeded,
     };
   }, [item, loanPreset, mciExempt]);
+
+  // 5단계: 목표 수익률별 적정 입찰 상한가 역산 계산기
+  // (인근 전월세 시세 또는 직접 입력 보증금/월세 · 취득세/부대비용 · 대출이자 4.5% · 방공제 · 선순위 인수금 반영)
+  const reverseBidCalc = useMemo(() => {
+    if (!item || !equityCalc) return null;
+
+    const rawTarget =
+      targetYieldMode === 'custom'
+        ? parseFloat(customYieldInput.replace(/[^0-9.]/g, ''))
+        : parseFloat(targetYieldMode);
+    const targetYieldPct =
+      Number.isFinite(rawTarget) && rawTarget >= 1 && rawTarget <= 30 ? rawTarget : 8;
+    const targetYield = targetYieldPct / 100;
+
+    const depMan = parseFloat(depositManInput.replace(/[^0-9.]/g, '')) || 0;
+    const rentMan = parseFloat(monthlyRentManInput.replace(/[^0-9.]/g, '')) || 0;
+    const depositWon = Math.max(0, Math.round(depMan * 10_000));
+    const monthlyRentWon = Math.max(0, Math.round(rentMan * 10_000));
+    const annualRent = monthlyRentWon * 12;
+
+    const { isNonResidential, ltv, maxCap, appliedBangGongje, assumedDeposit } = equityCalc;
+
+    const evalAtBid = (bid: number) => {
+      const rawLoan = Math.min(Math.floor(bid * ltv), maxCap);
+      const loan = Math.max(0, rawLoan - appliedBangGongje);
+      const taxRate = isNonResidential ? 0.046 : bid <= 600_000_000 ? 0.013 : 0.025;
+      const extraCost = Math.round((bid * taxRate + 2_000_000) / 100_000) * 100_000;
+      const annualInterest = Math.round(loan * DEFAULT_LOAN_INTEREST_RATE);
+      const netAnnualIncome = annualRent - annualInterest;
+      const grossCashNeeded = Math.max(0, bid - loan) + extraCost + assumedDeposit;
+      const netInvestCash = grossCashNeeded - depositWon;
+      return { loan, extraCost, annualInterest, netAnnualIncome, grossCashNeeded, netInvestCash };
+    };
+
+    if (annualRent <= 0) {
+      return {
+        targetYieldPct,
+        depositWon,
+        monthlyRentWon,
+        maxBid: 0,
+        feasible: false,
+        loan: 0,
+        extraCost: 0,
+        annualInterest: 0,
+        netAnnualIncome: 0,
+        grossCashNeeded: 0,
+        netInvestCash: 0,
+        diffVsMinBid: -item.min_bid,
+        ratioOfAppraisal: 0,
+      };
+    }
+
+    // 단조감소 함수(입찰가 ↑ => 이자 ↑, 실투자금 ↑ => 수익률 ↓)에 대한 이분탐색으로 최대 입찰 상한가 정밀 역산
+    let lo = 0;
+    let hi = Math.max(item.appraisal * 2.5, item.min_bid * 3, 5_000_000_000);
+    for (let iter = 0; iter < 48; iter++) {
+      const mid = (lo + hi) / 2;
+      const r = evalAtBid(mid);
+      const meets =
+        r.netAnnualIncome > 0 &&
+        (r.netInvestCash <= 0 || r.netAnnualIncome / r.netInvestCash >= targetYield);
+      if (meets) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+
+    const maxBid = Math.max(0, Math.floor(lo / 1_000_000) * 1_000_000);
+    const atMax = evalAtBid(maxBid);
+    const ratioOfAppraisal =
+      item.appraisal > 0 ? Math.round((maxBid / item.appraisal) * 100) : 0;
+
+    return {
+      targetYieldPct,
+      depositWon,
+      monthlyRentWon,
+      maxBid,
+      feasible: maxBid >= 10_000_000 && atMax.netAnnualIncome > 0,
+      loan: atMax.loan,
+      extraCost: atMax.extraCost,
+      annualInterest: atMax.annualInterest,
+      netAnnualIncome: atMax.netAnnualIncome,
+      grossCashNeeded: atMax.grossCashNeeded,
+      netInvestCash: Math.max(0, atMax.netInvestCash),
+      diffVsMinBid: maxBid - item.min_bid,
+      ratioOfAppraisal,
+    };
+  }, [item, equityCalc, targetYieldMode, customYieldInput, depositManInput, monthlyRentManInput]);
 
   if (!item || !equityCalc) {
     return (
@@ -266,6 +461,7 @@ export default function DetailScreen() {
   const sourceMeta = getSourceBadgeMeta(item);
   const isLease = isOnbidLease(item);
   const isOnbid = isOnbidItem(item);
+  const isPremiumLocked = !isLease && !isFreePreview && !isUnlocked;
   const onbid = item.onbid_info;
   const photos = item.photos && item.photos.length > 0 ? item.photos : [item.photo_url];
   const rawData = item.raw_court_data;
