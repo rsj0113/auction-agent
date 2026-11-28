@@ -3,12 +3,43 @@ import { formatDDayLabel } from './formatDDay';
 import { isOnbidLease } from './sourceBadge';
 
 /**
+ * '오늘의 추천' 최상단(index 0부터 순서대로) 핀 고정할 사건번호 목록.
+ * 피드에 해당 사건번호가 살아있는 한 최상단에 고정되며, 사라지면 자동 해제된다.
+ * (상위 2건 무료 맛보기 `isFreePreviewCase`에도 자동 반영)
+ */
+export const PINNED_TOP_CASE_NUMBERS: string[] = ['2025타경104525'];
+
+/**
  * '오늘의 추천' TOP N 큐레이션 점수 산출 (매각 전용: 법원경매 + 공매 매각 · 임대 제외)
  * 홈('오늘의 추천')과 상세 화면('무료 맛보기 상위 2건' 판정)이 동일한 기준을 공유한다.
  */
 export function buildCuratedTopItems(allItems: FeedItem[], targetCount = 12): FeedItem[] {
   const saleOnly = allItems.filter((item) => !isOnbidLease(item));
-  const scored = saleOnly.map((item) => {
+  const saleByCase = new Map<string, FeedItem>();
+  for (const item of saleOnly) {
+    if (!saleByCase.has(item.case_number)) {
+      saleByCase.set(item.case_number, item);
+    }
+  }
+
+  // 핀 고정 매물을 최우선으로 index 0부터 배치 (피드에 살아있는 매물만)
+  const picked: FeedItem[] = [];
+  const pickedIds = new Set<string>();
+  const regionCounts: Record<string, number> = {};
+
+  for (const pinnedCase of PINNED_TOP_CASE_NUMBERS) {
+    const pinnedItem = saleByCase.get(pinnedCase);
+    if (!pinnedItem || pickedIds.has(pinnedItem.case_number)) continue;
+    picked.push(pinnedItem);
+    pickedIds.add(pinnedItem.case_number);
+    const regionKey = (pinnedItem.short_location || '').split(' ').slice(0, 2).join(' ');
+    regionCounts[regionKey] = (regionCounts[regionKey] || 0) + 1;
+    if (picked.length >= targetCount) return picked;
+  }
+
+  const scored = saleOnly
+    .filter((item) => !pickedIds.has(item.case_number))
+    .map((item) => {
     let score = 0;
     const p = item.photo_url || '';
     const isCourtPhoto = p.includes('/photos/') && !p.includes('_sv.jpg');
@@ -40,24 +71,22 @@ export function buildCuratedTopItems(allItems: FeedItem[], targetCount = 12): Fe
   scored.sort((a, b) => b.score - a.score);
 
   // 지역 편중 방지를 위해 같은 시군구 최대 3건까지만 우선 선택
-  const picked: FeedItem[] = [];
-  const regionCounts: Record<string, number> = {};
-
   for (const { item } of scored) {
     const regionKey = (item.short_location || '').split(' ').slice(0, 2).join(' ');
     const cnt = regionCounts[regionKey] || 0;
     if (cnt >= 3) continue;
     picked.push(item);
+    pickedIds.add(item.case_number);
     regionCounts[regionKey] = cnt + 1;
     if (picked.length >= targetCount) break;
   }
 
   // 혹시 부족하면 남은 상위 매물로 채움
   if (picked.length < targetCount) {
-    const pickedIds = new Set(picked.map((i) => i.case_number));
     for (const { item } of scored) {
       if (!pickedIds.has(item.case_number)) {
         picked.push(item);
+        pickedIds.add(item.case_number);
         if (picked.length >= targetCount) break;
       }
     }
