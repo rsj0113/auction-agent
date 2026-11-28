@@ -1149,10 +1149,14 @@ class AuctionCrawler:
                                 loc_s = (r_obj.get("printSt") or r_obj.get("convAddr") or "").strip() or "소재지 정보 없음"
                                 raw_usg = (r_obj.get("dspslUsgNm") or "").strip()
                                 flr_p = _extract_floor_from_location(loc_s)
-                                # 공식 용도명 정규화
-                                if raw_usg in ("다세대", "다세대주택", "연립주택", "빌라"):
+                                # 공식 용도명 정규화 (대법원 API 복합 문자열 '상가,오피스텔,근린시설' / '연립주택,다세대,빌라' 정제)
+                                if scl_cd == "20104" or raw_usg == "아파트":
+                                    usg_norm = "아파트"
+                                elif scl_cd == "20110" or "오피스텔" in raw_usg:
+                                    usg_norm = "오피스텔"
+                                elif scl_cd in ("20106", "20108", "20105") or any(k in raw_usg for k in ("다세대", "연립", "빌라")):
                                     usg_norm = "다세대/빌라"
-                                elif raw_usg in ("근린생활시설", "근린시설", "판매시설", "상가", "업무시설", "점포"):
+                                elif any(k in raw_usg for k in ("근린생활", "근린시설", "판매시설", "상가", "업무시설", "점포")):
                                     usg_norm = "상가/근린시설"
                                 elif raw_usg:
                                     usg_norm = _infer_usage(loc_s, raw_usg, flr_p)
