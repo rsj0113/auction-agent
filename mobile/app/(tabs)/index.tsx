@@ -23,6 +23,11 @@ import WebAuctionMap from '../../components/WebAuctionMap';
 import { formatDDayLabel } from '../../utils/formatDDay';
 import { getSourceBadgeMeta, getSourceType, isOnbidLease } from '../../utils/sourceBadge';
 import { buildCuratedTopItems } from '../../utils/curation';
+import {
+  estimateQuickEquity,
+  formatShortEquity,
+  getEstimatedYieldPct,
+} from '../../utils/investmentMetrics';
 
 // react-native-maps는 네이티브 전용이므로 웹 환경에서는 조건부 로드
 let MapView: any = null;
@@ -50,6 +55,8 @@ type FilterType =
   | 'gyeonggi';
 type SourceFilterType = 'sale_all' | 'auction' | 'onbid_sale' | 'onbid_lease';
 type UsageFilterType = 'all' | '아파트' | '빌라' | '오피스텔' | '상가' | '토지';
+type YieldFilterType = 'all' | 'y6' | 'y8' | 'y10';
+type EquityFilterType = 'all' | 'e50' | 'e100';
 type ViewMode = 'list' | 'card' | 'map';
 type InfoModalType = 'notice' | 'guide' | null;
 
@@ -117,6 +124,8 @@ export default function FeedScreen() {
   const [activeSourceFilter, setActiveSourceFilter] = useState<SourceFilterType>('sale_all');
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [activeUsageFilter, setActiveUsageFilter] = useState<UsageFilterType>('all');
+  const [activeYieldFilter, setActiveYieldFilter] = useState<YieldFilterType>('all');
+  const [activeEquityFilter, setActiveEquityFilter] = useState<EquityFilterType>('all');
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [selectedMapItem, setSelectedMapItem] = useState<FeedItem | null>(null);
 
@@ -253,13 +262,55 @@ export default function FeedScreen() {
     return counts;
   }, [sourceScopedItems]);
 
-  // '전체 탐색' & '동네 지도'용 필터링 적용 목록 (구분 + 용도 + 난이도/가격대/지역 교차 필터)
-  // 주의: 매매 가격대 필터('3억 이하', '3억~6억')는 법원경매 + 공매 매각에만 적용하고 공매 임대는 자동 제외!
+  // 수익률 · 소액 실투자금(자기자본)별 건수 집계 (현재 선택된 거래유형 기준, 매각 매물 전용)
+  const investFilterCounts = useMemo(() => {
+    let y6 = 0;
+    let y8 = 0;
+    let y10 = 0;
+    let e50 = 0;
+    let e100 = 0;
+    for (const it of sourceScopedItems) {
+      if (isOnbidLease(it)) continue;
+      const y = getEstimatedYieldPct(it);
+      if (y !== null) {
+        if (y >= 6) y6 += 1;
+        if (y >= 8) y8 += 1;
+        if (y >= 10) y10 += 1;
+      }
+      const eq = estimateQuickEquity(it);
+      if (eq !== null) {
+        if (eq <= 50_000_000) e50 += 1;
+        if (eq <= 100_000_000) e100 += 1;
+      }
+    }
+    return { y6, y8, y10, e50, e100 };
+  }, [sourceScopedItems]);
+
+  // '전체 탐색' & '동네 지도'용 필터링 적용 목록 (구분 + 용도 + 수익률 + 소액 자기자본 + 난이도/가격대/지역 교차 필터)
+  // 주의: 매매 가격대 · 수익률 · 소액 자기자본 필터는 법원경매 + 공매 매각에만 적용하고 공매 임대는 자동 제외!
   const filteredItems = useMemo(() => {
     const isPriceFilter = activeFilter === 'budget_small' || activeFilter === 'budget_mid';
     return sourceScopedItems.filter((item) => {
       if (isPriceFilter && isOnbidLease(item)) return false;
       if (activeUsageFilter !== 'all' && item.usage !== activeUsageFilter) return false;
+
+      // 6단계: 예상 수익률 필터 (매칭 데이터 있는 매각 매물 대상)
+      if (activeYieldFilter !== 'all') {
+        const y = getEstimatedYieldPct(item);
+        if (y === null) return false;
+        if (activeYieldFilter === 'y6' && y < 6) return false;
+        if (activeYieldFilter === 'y8' && y < 8) return false;
+        if (activeYieldFilter === 'y10' && y < 10) return false;
+      }
+
+      // 6단계: 소액 실투자금(자기자본) 필터 (LTV 70%/60% · 방공제 반영)
+      if (activeEquityFilter !== 'all') {
+        const eq = estimateQuickEquity(item);
+        if (eq === null) return false;
+        if (activeEquityFilter === 'e50' && eq > 50_000_000) return false;
+        if (activeEquityFilter === 'e100' && eq > 100_000_000) return false;
+      }
+
       if (activeFilter === 'beginner' && (isOnbidLease(item) || item.safety_grade !== 'GREEN')) return false;
       if (activeFilter === 'intermediate' && (isOnbidLease(item) || item.safety_grade !== 'YELLOW')) return false;
       if (activeFilter === 'advanced' && (isOnbidLease(item) || item.safety_grade !== 'RED')) return false;
@@ -269,22 +320,35 @@ export default function FeedScreen() {
       if (activeFilter === 'gyeonggi' && !item.location.includes('경기') && !item.location.includes('인천')) return false;
       return true;
     });
-  }, [sourceScopedItems, activeFilter, activeUsageFilter]);
+  }, [sourceScopedItems, activeFilter, activeUsageFilter, activeYieldFilter, activeEquityFilter]);
 
   const handleSourceFilterChange = (src: SourceFilterType) => {
     setActiveSourceFilter(src);
     setActiveUsageFilter('all');
-    // 공매(임대) 선택 시 매매 전용 가격대/난이도 필터는 자동 초기화
-    if (
-      src === 'onbid_lease' &&
-      (activeFilter === 'budget_small' ||
+    // 공매(임대) 선택 시 매매 전용 가격대/수익률/자기자본/난이도 필터는 자동 초기화
+    if (src === 'onbid_lease') {
+      setActiveYieldFilter('all');
+      setActiveEquityFilter('all');
+      if (
+        activeFilter === 'budget_small' ||
         activeFilter === 'budget_mid' ||
         activeFilter === 'beginner' ||
         activeFilter === 'intermediate' ||
-        activeFilter === 'advanced')
-    ) {
-      setActiveFilter('all');
+        activeFilter === 'advanced'
+      ) {
+        setActiveFilter('all');
+      }
     }
+    setSelectedMapItem(null);
+  };
+
+  const handleYieldFilterChange = (yf: YieldFilterType) => {
+    setActiveYieldFilter((prev) => (prev === yf ? 'all' : yf));
+    setSelectedMapItem(null);
+  };
+
+  const handleEquityFilterChange = (ef: EquityFilterType) => {
+    setActiveEquityFilter((prev) => (prev === ef ? 'all' : ef));
     setSelectedMapItem(null);
   };
 
@@ -341,6 +405,8 @@ export default function FeedScreen() {
     const fav = isFavorite(item.case_number);
     const lease = isOnbidLease(item);
     const leaseMonthly = item.onbid_info?.est_monthly_fee_str;
+    const estEquity = estimateQuickEquity(item);
+    const estYield = getEstimatedYieldPct(item);
 
     return (
       <TouchableOpacity
@@ -392,17 +458,47 @@ export default function FeedScreen() {
               ) : undefined}
             </View>
           ) : (
-            <View style={styles.priceRow}>
-              <View style={styles.priceLeft}>
-                <Text style={styles.priceLabel}>최저가</Text>
-                <Text style={styles.priceValue}>{item.min_bid_str}</Text>
+            <>
+              <View style={styles.priceRow}>
+                <View style={styles.priceLeft}>
+                  <Text style={styles.priceLabel}>최저가</Text>
+                  <Text style={styles.priceValue}>{item.min_bid_str}</Text>
+                </View>
+                {item.discount_pct > 0 && (
+                  <View style={styles.discountBadge}>
+                    <Text style={styles.discountText}>-{item.discount_pct}%</Text>
+                  </View>
+                )}
               </View>
-              {item.discount_pct > 0 && (
-                <View style={styles.discountBadge}>
-                  <Text style={styles.discountText}>-{item.discount_pct}%</Text>
+
+              {/* 6단계: 예상 실투자금(자기자본) & 예상 수익률 핵심 배지 */}
+              {(estEquity !== null || estYield !== null) && (
+                <View style={styles.investBadgesRow}>
+                  {estEquity !== null && (
+                    <View
+                      style={[
+                        styles.equityQuickPill,
+                        estEquity <= 50_000_000 && styles.equityQuickPillSmall,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.equityQuickPillText,
+                          estEquity <= 50_000_000 && styles.equityQuickPillTextSmall,
+                        ]}
+                      >
+                        💸 실투자 약 {formatShortEquity(estEquity)}
+                      </Text>
+                    </View>
+                  )}
+                  {estYield !== null && (
+                    <View style={styles.yieldQuickPill}>
+                      <Text style={styles.yieldQuickPillText}>📈 예상 연 {estYield}%</Text>
+                    </View>
+                  )}
                 </View>
               )}
-            </View>
+            </>
           )}
 
           <View style={styles.bulletContainer}>
@@ -465,18 +561,31 @@ export default function FeedScreen() {
         ? '🟡 중급'
         : '🔴 고수';
     const shortSgg = (item.short_location || '').split(' ').slice(0, 2).join(' ');
+    const estEquity = estimateQuickEquity(item);
+    const estYield = getEstimatedYieldPct(item);
 
     const pastelTags: { label: string; tone: 'sage' | 'sand' | 'rose' }[] = [
-      {
-        label:
-          item.safety_grade === 'GREEN'
-            ? '추가 인수금 0원'
-            : item.safety_grade === 'YELLOW'
-            ? '세입자·관리비 체크'
-            : '고수용 하이리턴',
-        tone: item.safety_grade === 'GREEN' ? 'sage' : item.safety_grade === 'RED' ? 'rose' : 'sand',
-      },
-      { label: `보증금 ${item.deposit_required_str}`, tone: 'sand' },
+      ...(estEquity !== null
+        ? [{ label: `💸 실투자 약 ${formatShortEquity(estEquity)}`, tone: 'sage' as const }]
+        : []),
+      ...(estYield !== null
+        ? [{ label: `📈 예상 연 ${estYield}%`, tone: 'sage' as const }]
+        : [
+            {
+              label:
+                item.safety_grade === 'GREEN'
+                  ? '추가 인수금 0원'
+                  : item.safety_grade === 'YELLOW'
+                  ? '세입자·관리비 체크'
+                  : '고수용 하이리턴',
+              tone:
+                item.safety_grade === 'GREEN'
+                  ? ('sage' as const)
+                  : item.safety_grade === 'RED'
+                  ? ('rose' as const)
+                  : ('sand' as const),
+            },
+          ]),
       { label: formatDDayLabel(item.d_day), tone: 'sand' },
     ];
 
@@ -918,7 +1027,83 @@ export default function FeedScreen() {
             }}
           />
 
-          {/* 3행: 난이도 · 매매 가격대(임대 모드 제외) · 지역 필터 칩 */}
+          {/* 3행 (매각 전용): 핵심 투자 필터 — 예상 수익률(전체|연 6%↑|8%↑|10%↑) & 소액 실투자금(전체|5천만 이하|1억 이하) */}
+          {activeSourceFilter !== 'onbid_lease' && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterList}
+            >
+              {/* 예상 수익률 필터 그룹 */}
+              {(
+                [
+                  { key: 'all', label: '수익률 전체' },
+                  { key: 'y6', label: `📈 연 6%↑ (${investFilterCounts.y6})` },
+                  { key: 'y8', label: `📈 연 8%↑ (${investFilterCounts.y8})` },
+                  { key: 'y10', label: `📈 연 10%↑ (${investFilterCounts.y10})` },
+                ] as { key: YieldFilterType; label: string }[]
+              ).map((opt) => {
+                const active = activeYieldFilter === opt.key;
+                return (
+                  <TouchableOpacity
+                    key={`yield-${opt.key}`}
+                    style={[styles.investChipYield, active && styles.investChipYieldActive]}
+                    onPress={() =>
+                      opt.key === 'all'
+                        ? setActiveYieldFilter('all')
+                        : handleYieldFilterChange(opt.key)
+                    }
+                    activeOpacity={0.75}
+                  >
+                    <Text
+                      style={[
+                        styles.investChipYieldText,
+                        active && styles.investChipYieldTextActive,
+                      ]}
+                    >
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+
+              <View style={styles.filterGroupDivider} />
+
+              {/* 소액 실투자금(자기자본) 필터 그룹 */}
+              {(
+                [
+                  { key: 'all', label: '자기자본 전체' },
+                  { key: 'e50', label: `💸 5천만 이하 (${investFilterCounts.e50})` },
+                  { key: 'e100', label: `💸 1억 이하 (${investFilterCounts.e100})` },
+                ] as { key: EquityFilterType; label: string }[]
+              ).map((opt) => {
+                const active = activeEquityFilter === opt.key;
+                return (
+                  <TouchableOpacity
+                    key={`eq-${opt.key}`}
+                    style={[styles.investChipEquity, active && styles.investChipEquityActive]}
+                    onPress={() =>
+                      opt.key === 'all'
+                        ? setActiveEquityFilter('all')
+                        : handleEquityFilterChange(opt.key)
+                    }
+                    activeOpacity={0.75}
+                  >
+                    <Text
+                      style={[
+                        styles.investChipEquityText,
+                        active && styles.investChipEquityTextActive,
+                      ]}
+                    >
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          )}
+
+          {/* 4행: 난이도 · 매매 가격대(임대 모드 제외) · 지역 필터 칩 */}
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -1831,6 +2016,96 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
+  },
+  filterGroupDivider: {
+    width: 1,
+    height: 18,
+    backgroundColor: '#E2E8F0',
+    alignSelf: 'center',
+    marginHorizontal: 2,
+  },
+  investChipYield: {
+    paddingHorizontal: 11,
+    paddingVertical: 5.5,
+    borderRadius: 16,
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+  },
+  investChipYieldActive: {
+    backgroundColor: '#059669',
+    borderColor: '#059669',
+  },
+  investChipYieldText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#047857',
+  },
+  investChipYieldTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+  },
+  investChipEquity: {
+    paddingHorizontal: 11,
+    paddingVertical: 5.5,
+    borderRadius: 16,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  investChipEquityActive: {
+    backgroundColor: '#2563EB',
+    borderColor: '#2563EB',
+  },
+  investChipEquityText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#1D4ED8',
+  },
+  investChipEquityTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+  },
+  investBadgesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  equityQuickPill: {
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    paddingHorizontal: 9,
+    paddingVertical: 3.5,
+    borderRadius: 8,
+  },
+  equityQuickPillSmall: {
+    backgroundColor: '#DBEAFE',
+    borderColor: '#93C5FD',
+  },
+  equityQuickPillText: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#1D4ED8',
+  },
+  equityQuickPillTextSmall: {
+    color: '#1E40AF',
+  },
+  yieldQuickPill: {
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+    paddingHorizontal: 9,
+    paddingVertical: 3.5,
+    borderRadius: 8,
+  },
+  yieldQuickPillText: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#047857',
   },
   usageChip: {
     paddingHorizontal: 13,
